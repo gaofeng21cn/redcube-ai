@@ -206,8 +206,7 @@
         "get_product_status",
         "get_product_preflight",
         "get_product_entry_manifest",
-        "invoke_product_entry",
-        "invoke_domain_entry"
+        "invoke_product_entry"
       ],
       "skill_refs": [
         "agent/skills/visual_deliverable_authoring.md"
@@ -223,8 +222,7 @@
         "get_product_status",
         "get_product_preflight",
         "get_product_entry_manifest",
-        "invoke_product_entry",
-        "invoke_domain_entry"
+        "invoke_product_entry"
       ],
       "prompt_refs": [
         {
@@ -663,8 +661,7 @@
       ],
       "action_refs": [
         "invoke_product_entry",
-        "get_product_entry_session",
-        "invoke_domain_entry"
+        "get_product_entry_session"
       ],
       "skill_refs": [
         "agent/skills/visual_deliverable_authoring.md"
@@ -680,8 +677,7 @@
       "stage_pack_conformance_version": "standard-stage-pack.v2",
       "allowed_action_refs": [
         "invoke_product_entry",
-        "get_product_entry_session",
-        "invoke_domain_entry"
+        "get_product_entry_session"
       ],
       "prompt_refs": [
         {
@@ -1131,8 +1127,7 @@
       ],
       "action_refs": [
         "invoke_product_entry",
-        "get_product_entry_session",
-        "invoke_domain_entry"
+        "get_product_entry_session"
       ],
       "skill_refs": [
         "agent/skills/visual_deliverable_authoring.md"
@@ -1149,8 +1144,7 @@
       "stage_pack_conformance_version": "standard-stage-pack.v2",
       "allowed_action_refs": [
         "invoke_product_entry",
-        "get_product_entry_session",
-        "invoke_domain_entry"
+        "get_product_entry_session"
       ],
       "prompt_refs": [
         {
@@ -1583,8 +1577,7 @@
       "action_refs": [
         "invoke_product_entry",
         "run_image_ppt_proof",
-        "run_native_ppt_proof",
-        "invoke_domain_entry"
+        "run_native_ppt_proof"
       ],
       "skill_refs": [
         "agent/skills/visual_deliverable_authoring.md",
@@ -1604,8 +1597,7 @@
       "allowed_action_refs": [
         "invoke_product_entry",
         "run_image_ppt_proof",
-        "run_native_ppt_proof",
-        "invoke_domain_entry"
+        "run_native_ppt_proof"
       ],
       "prompt_refs": [
         {
@@ -2057,8 +2049,7 @@
         "get_product_entry_session",
         "dispatch_domain_handler",
         "run_image_ppt_proof",
-        "run_native_ppt_proof",
-        "invoke_domain_entry"
+        "run_native_ppt_proof"
       ],
       "skill_refs": [
         "agent/skills/visual_deliverable_authoring.md",
@@ -2080,8 +2071,7 @@
         "get_product_entry_session",
         "dispatch_domain_handler",
         "run_image_ppt_proof",
-        "run_native_ppt_proof",
-        "invoke_domain_entry"
+        "run_native_ppt_proof"
       ],
       "prompt_refs": [
         {
@@ -2544,8 +2534,7 @@
         "export_domain_handler",
         "dispatch_domain_handler",
         "run_image_ppt_proof",
-        "run_native_ppt_proof",
-        "invoke_domain_entry"
+        "run_native_ppt_proof"
       ],
       "skill_refs": [
         "agent/skills/native_helper_policy.md",
@@ -2567,8 +2556,7 @@
         "export_domain_handler",
         "dispatch_domain_handler",
         "run_image_ppt_proof",
-        "run_native_ppt_proof",
-        "invoke_domain_entry"
+        "run_native_ppt_proof"
       ],
       "prompt_refs": [
         {

@@ -22,8 +22,7 @@
         "get_product_status",
         "get_product_preflight",
         "get_product_entry_manifest",
-        "invoke_product_entry",
-        "invoke_domain_entry"
+        "invoke_product_entry"
       ],
       "domain_stage_refs": [
         "source_readiness",
@@ -69,8 +68,7 @@
       ],
       "allowed_action_refs": [
         "invoke_product_entry",
-        "get_product_entry_session",
-        "invoke_domain_entry"
+        "get_product_entry_session"
       ],
       "domain_stage_refs": [
         "storyline",
@@ -121,8 +119,7 @@
       ],
       "allowed_action_refs": [
         "invoke_product_entry",
-        "get_product_entry_session",
-        "invoke_domain_entry"
+        "get_product_entry_session"
       ],
       "domain_stage_refs": [
         "visual_direction"
@@ -171,8 +168,7 @@
       "allowed_action_refs": [
         "invoke_product_entry",
         "run_image_ppt_proof",
-        "run_native_ppt_proof",
-        "invoke_domain_entry"
+        "run_native_ppt_proof"
       ],
       "domain_stage_refs": [
         "author_image_pages",
@@ -227,8 +223,7 @@
         "get_product_entry_session",
         "dispatch_domain_handler",
         "run_image_ppt_proof",
-        "run_native_ppt_proof",
-        "invoke_domain_entry"
+        "run_native_ppt_proof"
       ],
       "domain_stage_refs": [
         "visual_director_review",
@@ -287,8 +282,7 @@
         "export_domain_handler",
         "dispatch_domain_handler",
         "run_image_ppt_proof",
-        "run_native_ppt_proof",
-        "invoke_domain_entry"
+        "run_native_ppt_proof"
       ],
       "domain_stage_refs": [
         "export_pptx",

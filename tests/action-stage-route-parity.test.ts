@@ -37,8 +37,18 @@ test('mutating RCA actions declare ordered routes with exact manifest coverage',
   const sourceCatalog = buildRedCubeActionMetadata().family_action_catalog;
 
   assert.deepEqual(
-    trackedCatalog.actions.map(({ action_id, effect, stage_route }) => ({ action_id, effect, stage_route })),
-    sourceCatalog.actions.map(({ action_id, effect, stage_route }) => ({ action_id, effect, stage_route })),
+    trackedCatalog.actions.map(({ action_id, effect, stage_route, stage_route_exempt }) => ({
+      action_id,
+      effect,
+      stage_route,
+      stage_route_exempt,
+    })),
+    sourceCatalog.actions.map(({ action_id, effect, stage_route, stage_route_exempt }) => ({
+      action_id,
+      effect,
+      stage_route,
+      stage_route_exempt,
+    })),
   );
   for (const stage of manifest.stages) {
     const trackedStage = trackedStageControlPlane.stages.find((entry) => entry.stage_id === stage.stage_id);
@@ -47,6 +57,11 @@ test('mutating RCA actions declare ordered routes with exact manifest coverage',
   }
 
   for (const action of sourceCatalog.actions) {
+    if (action.stage_route_exempt === 'domain_handler_target_only') {
+      assert.equal('stage_route' in action, false, action.action_id);
+      assert.deepEqual(actionStageCoverage(manifest, action.action_id), [], action.action_id);
+      continue;
+    }
     if (action.effect === 'read_only') {
       assert.equal('stage_route' in action, false, action.action_id);
       assert.notDeepEqual(actionStageCoverage(manifest, action.action_id), [], action.action_id);
@@ -91,6 +106,23 @@ test('mutating RCA actions declare ordered routes with exact manifest coverage',
       );
     }
   }
+});
+
+test('invoke_domain_entry remains an internal target and never becomes a stage action', () => {
+  const manifest = readJson('agent/stages/manifest.json');
+  const catalog = buildRedCubeActionMetadata().family_action_catalog;
+  const action = catalog.actions.find((entry) => entry.action_id === 'invoke_domain_entry');
+
+  assert.equal(action.stage_route_exempt, 'domain_handler_target_only');
+  assert.equal('stage_route' in action, false);
+  assert.deepEqual(actionStageCoverage(manifest, action.action_id), []);
+  assert.equal(action.supported_surfaces.mcp.descriptor_only, true);
+  assert.equal(action.supported_surfaces.mcp.public_runtime, false);
+  assert.equal(action.supported_surfaces.cli, null);
+  assert.equal(action.supported_surfaces.skill, null);
+  assert.equal(action.supported_surfaces.openai, null);
+  assert.equal(action.supported_surfaces.ai_sdk, null);
+  assert.equal(action.supported_surfaces.product_entry.action_key, 'invoke_domain_entry');
 });
 
 test('invoke_product_entry preserves the no-skip mainline and review-or-package terminals', () => {
