@@ -7,7 +7,9 @@ Machine boundary: `agent/` 持有 stage semantics、prompt policy refs、stage s
 
 本目录是 RCA 的 canonical Declarative Visual Pack。OPL generated surfaces 消费这些 refs 来生成 CLI、MCP、Skill、product-entry、status、session、domain_action_adapter 和 workbench descriptors；它们不写 RedCube visual truth、artifact body、review/export verdict、visual memory body 或 owner receipt。
 
-`contracts/foundry_agent_series.json` 和 `contracts/domain_descriptor.json` 暴露 canonical `series_design_profile`：RCA 与 MAS、MAG、OMA 共用 OPL Agent lifecycle、generic slots、stage sections、closeout shape 和 authority invariants。本 pack 通过 `domain_specific_profile` 与 RCA-owned contracts 记录 visual-material input profile、visual-deliverable stage semantics，以及 PPT/PDF/PNG/export handoff output profile。
+`contracts/foundry_agent_series.json` 是 RCA 对 OPL Foundry policy 的 refs-only consumer：它只 pin OPL canonical series/skeleton contract 与 shared policy release，使用 canonical `rca` agent identity，并把 generated stage control plane 的 target domain 保持为 `redcube_ai`。通用 lifecycle、workspace topology、closeout 和 public-series policy body 全部由 OPL 持有；RCA 只在 `visual_domain_delta_refs`、`contracts/domain_descriptor.json` 与本 pack 中保留 visual-material input、visual-deliverable stage semantics，以及 PPT/PDF/PNG/export handoff 的 domain refs。
+
+`contracts/visual_transition_adapter_profile.json` 是 RCA-owned visual transition adapter registry。product-entry 将其作为顶层 `visual_transition_adapter_profile_registry` 原样投影给 OPL Atlas；该 registry 仅提供 domain refs，不执行 domain action、不写 visual truth，也不签 owner receipt、typed blocker、quality 或 export verdict。
 
 ## Stage Prompt / Skill / Tool 分工
 

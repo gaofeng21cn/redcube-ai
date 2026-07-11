@@ -127,6 +127,7 @@ export function buildReturnedManifestProjection({
     no_regression_owner_receipt_opl_consumption_proof: domainAuthorityRefs.no_regression_owner_receipt_opl_consumption_proof,
     lifecycle_guarded_apply_proof: domainAuthorityRefs.lifecycle_guarded_apply_proof,
     visual_transition_spec: domainAuthorityRefs.visual_transition_spec,
+    visual_transition_adapter_profile_registry: domainAuthorityRefs.visual_transition_adapter_profile_registry,
     visual_transition_evaluator: visualTransitionEvaluator,
     visual_pack_compiler_handoff: (
       visualPackCompilerHandoff

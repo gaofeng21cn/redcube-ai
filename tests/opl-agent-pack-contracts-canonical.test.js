@@ -12,20 +12,56 @@ test('RCA root contracts expose OPL-owned standard surfaces with RCA refs-only p
   const stageRefs = readJson('contracts/stage_control_plane.json');
   const packRefs = readJson('contracts/pack_compiler_input.json');
 
-  assert.equal(foundryProfile.surface_kind, 'opl_foundry_agent_series_contract');
-  assert.equal(foundryProfile.generic_foundry_series_owner, 'one-person-lab');
-  assert.equal(foundryProfile.repo_local_generic_foundry_spine, 'retired');
-  assert.equal(foundryProfile.repo_local_foundry_cli_surface, 'retired');
-  assert.equal(foundryProfile.profile_role, 'domain_specific_profile_ref_only');
-  assert.equal(foundryProfile.domain_specific_profile.stage_pack_role, 'declarative_visual_pack');
-  assert.equal(foundryProfile.standard_public_projection_policy.standard_public_foundry_surface, 'opl_generated_hosted_series');
-  assert.equal(foundryProfile.rca_authority_boundary.opl_can_write_visual_truth, false);
+  assert.equal(foundryProfile.surface_kind, 'opl_foundry_agent_series_consumer');
+  assert.equal(foundryProfile.version, 'foundry-agent-series-consumer.v1');
+  assert.equal(foundryProfile.canonical_policy_export, 'opl-framework/foundry-agent-series-policy');
+  assert.equal(
+    foundryProfile.canonical_series_contract_ref,
+    'contracts/opl-framework/foundry-agent-series-contract.json',
+  );
+  assert.equal(
+    foundryProfile.canonical_skeleton_contract_ref,
+    'contracts/opl-framework/standard-domain-agent-skeleton-contract.json',
+  );
+  assert.deepEqual(foundryProfile.shared_policy_release, {
+    policy_release_contract_ref: 'contracts/opl-framework/foundry-agent-series-policy-release.json',
+    policy_bundle_fingerprint: 'sha256:503f515e8fa08b3f81ce28cac461368c609d4565de239c9f95c3f910cb758ed5',
+    fingerprint_algorithm: 'sha256:stable-json',
+    domain_contract_policy_release_pin_required: true,
+    domain_adapter_must_not_copy_policy_body_as_authority: true,
+    consumer_alignment_check: 'foundry:policy-release',
+  });
+  assert.equal(foundryProfile.domain_id, 'rca');
+  assert.equal(foundryProfile.foundry_agent_id, 'rca');
+  assert.equal(foundryProfile.authority_owner, 'redcube_ai');
   assert.equal(foundryProfile.stage_manifest_ref, 'agent/stages/manifest.json');
   assert.equal(foundryProfile.stage_control_plane_ref, 'opl-generated:family_stage_control_plane');
-  assert.equal(foundryProfile.required_identity_fields.includes('stage_manifest_ref'), true);
-  assert.equal(foundryProfile.shared_release_pin_strategy.owner_managed_latest_stable_channel_required, true);
-  assert.equal(foundryProfile.shared_release_pin_strategy.lockfile_resolved_commit_receipt_required, true);
-  assert.equal(foundryProfile.shared_release_pin_strategy.consumer_exact_commit_equality_gate, false);
+  assert.equal(foundryProfile.stage_control_plane_target_domain_id, 'redcube_ai');
+  assert.deepEqual(Object.keys(foundryProfile.authority_boundary).sort(), [
+    'domain_can_write_other_domain_truth',
+    'domain_can_write_other_domain_memory_body',
+    'domain_can_mutate_other_domain_artifact_body',
+    'domain_can_authorize_other_domain_quality_or_export',
+    'generated_surface_can_claim_domain_ready',
+  ].sort());
+  for (const [field, value] of Object.entries(foundryProfile.authority_boundary)) {
+    assert.equal(value, false, `authority_boundary.${field}`);
+  }
+  for (const field of [
+    'agent_membership_projection_policy',
+    'app_projection_policy',
+    'contract_version_policy',
+    'domain_adapter_policy',
+    'rca_authority_boundary',
+    'required_identity_fields',
+    'required_stage_packets',
+    'series_design_profile',
+    'shared_progress_projection_fields',
+    'shared_release_pin_strategy',
+    'standard_feedback_self_evolution_trigger_policy',
+    'standard_public_projection_policy',
+    'workspace_topology_profile',
+  ]) assert.equal(Object.hasOwn(foundryProfile, field), false, field);
 
   assert.equal(domainDescriptor.foundry_agent_profile_ref, 'contracts/foundry_agent_series.json');
   assert.equal(domainDescriptor.generic_surface_owner, 'one-person-lab');

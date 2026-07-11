@@ -155,9 +155,9 @@ test('RCA /goal workflow AgentLab suite is a top-level external suite contract',
   );
   assert.equal(
     handoff.feedback_self_evolution_trigger.policy_ref,
-    'contracts/foundry_agent_series.json#/standard_feedback_self_evolution_trigger_policy',
+    'contracts/opl-framework/foundry-agent-series-contract.json#/standard_feedback_self_evolution_trigger_policy',
   );
-  assert.equal(handoff.feedback_self_evolution_trigger.target_agent_id, 'redcube');
+  assert.equal(handoff.feedback_self_evolution_trigger.target_agent_id, 'rca');
   assert.equal(
     handoff.feedback_self_evolution_trigger.external_suite_ref,
     'contracts/agent_lab_handoff.json#/external_suite_seed',

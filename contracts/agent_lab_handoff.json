@@ -50,9 +50,9 @@
   "feedback_self_evolution_trigger": {
     "surface_kind": "opl_foundry_agent_feedback_self_evolution_trigger",
     "schema_version": 1,
-    "policy_ref": "contracts/foundry_agent_series.json#/standard_feedback_self_evolution_trigger_policy",
+    "policy_ref": "contracts/opl-framework/foundry-agent-series-contract.json#/standard_feedback_self_evolution_trigger_policy",
     "policy_id": "standard_agent_feedback_self_evolution_trigger.v1",
-    "target_agent_id": "redcube",
+    "target_agent_id": "rca",
     "target_domain_id": "redcube_ai",
     "adapter_kind": "domain_thin_feedback_adapter",
     "feedbackops_event_kind": "target_agent_feedback_external_suite",
