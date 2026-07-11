@@ -131,15 +131,15 @@ export async function buildOplStageExecutionPlan({
     authority_refs: {
       domain_handler_ref: '/product_entry_shell/domain_handler',
       domain_action_adapter_ref: '/product_entry_shell/domain_handler',
-      family_action_catalog_ref: '/family_action_catalog',
-      family_stage_control_plane_ref: '/family_stage_control_plane',
+      family_action_catalog_ref: 'contracts/action_catalog.json',
+      family_stage_control_plane_ref: 'contracts/stage_control_plane.json',
       domain_memory_descriptor_ref: '/domain_memory_descriptor',
       visual_transition_spec_ref: '/visual_transition_spec',
       artifact_locator_contract_ref: '/artifact_locator_contract',
       review_state_ref: '/review_state',
       publication_projection_ref: '/publication_projection',
       owner_receipt_contract_ref: '/domain_owner_receipt_contract',
-      guarded_action_catalog_ref: '/family_action_catalog/actions/dispatch_domain_handler',
+      guarded_action_catalog_ref: 'contracts/action_catalog.json',
     },
     forbidden_opl_writes: [
       'visual_truth',

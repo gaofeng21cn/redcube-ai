@@ -1150,8 +1150,8 @@
     },
     {
       "module_id": "generic_cli_mcp_wrappers",
-      "surface_ref": "/family_action_catalog_parity",
-      "status": "canonical_metadata_parity_landed",
+      "surface_ref": "contracts/action_catalog.json",
+      "status": "canonical_contract_ref_landed",
       "classification": "domain_handler_target",
       "opl_generic_primitive": "standard_domain_agent_scaffold",
       "oplAbsorbCandidate": true,
@@ -1191,7 +1191,7 @@
       "opl_absorb_candidate": true,
       "opl_replacement_expectation": {
         "owner": "opl",
-        "expectation_ref": "/family_action_catalog",
+        "expectation_ref": "contracts/action_catalog.json",
         "replacement_surface": "opl_standard_domain_agent_generated_cli_mcp_wrappers",
         "expected_mode": "domain_handler_target_called_by_opl_generated_surface",
         "rca_consumes_as": "consumer_projection_only",
@@ -2271,8 +2271,8 @@
     },
     "consumed_from_refs": [
       "/domain_descriptor",
-      "/family_action_catalog",
-      "/family_stage_control_plane",
+      "contracts/action_catalog.json",
+      "contracts/stage_control_plane.json",
       "/visual_pack_compiler_handoff/generated_surface_handoff",
       "/privatized_functional_module_audit"
     ],

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
 import {
@@ -79,7 +79,8 @@ test('RCA manifest and domain_action_adapter expose external work-order owner cl
       'no_forbidden_write_refs',
     ]);
 
-    const domainHandlerAction = manifest.family_action_catalog.actions.find(
+    const actionCatalog = JSON.parse(readFileSync(new URL('../contracts/action_catalog.json', import.meta.url), 'utf8'));
+    const domainHandlerAction = actionCatalog.actions.find(
       (entry) => entry.action_id === 'dispatch_domain_handler',
     );
     assert.equal(

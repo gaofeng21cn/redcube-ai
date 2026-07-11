@@ -30,6 +30,10 @@ OPL 是 stage-led family runtime、generated/default caller、projection、opera
 
 `Codex CLI` 是 RCA 当前唯一物化的 concrete stage executor。其他 executor 的选择、托管与 attempt ledger 归 OPL owner surface；RCA 只消费 `stage_control_plane` 中的 opaque executor refs，不维护本地 adapter、routing config、fallback 或 proof backend。
 
+### Action 与 stage 合同只保留一份正文
+
+`contracts/action_catalog.json` 与 `contracts/stage_control_plane.json` 分别是 action 和 stage 的唯一正文。RCA product-entry manifest、domain-handler export、stage plan 及其测试只传递或读取这两个 repo-local contract ref；不得重新内联 catalog / stage body、parity mirror，或使用未绑定的路径。OPL 解析器必须在绑定的 RCA repo 内 fail-closed 地加载这两个精确路径。
+
 ### RCA authority kernel 保留 visual judgment 和 artifact authority
 
 RCA 保留 source readiness、communication / visual direction、route truth、layout/review/export verdict、artifact mutation/export authority、visual memory accept/reject、owner receipt、typed blocker、route-back、human gate 和 native helper implementation。

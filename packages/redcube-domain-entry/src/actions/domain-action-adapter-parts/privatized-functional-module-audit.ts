@@ -86,7 +86,7 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
     rca_exports_only: ['evidence_gap_refs', 'typed_blocker_refs', 'safe_repair_hint_refs'],
   },
   generic_cli_mcp_wrappers: {
-    expectation_ref: '/family_action_catalog',
+    expectation_ref: 'contracts/action_catalog.json',
     opl_replacement_surface: 'opl_standard_domain_agent_generated_cli_mcp_wrappers',
     rca_projection_mode: 'canonical_action_metadata_refs_only',
     generic_substrate_owner: 'one-person-lab',

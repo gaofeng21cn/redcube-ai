@@ -60,7 +60,7 @@ test('RCA exposes Temporal autonomy as the default OPL-hosted runtime contract w
     assert.equal(gatesById.provider_online_management.owner, 'one-person-lab');
     assert.equal(gatesById.provider_online_management.status, 'default_enabled');
     assert.equal(gatesById.stage_descriptor_handoff.status, 'ready');
-    assert.equal(gatesById.stage_descriptor_handoff.rca_surface_ref, '/family_stage_control_plane');
+    assert.equal(gatesById.stage_descriptor_handoff.rca_surface_ref, 'contracts/stage_control_plane.json');
     assert.equal(gatesById.queue_wakeup_handoff.status, 'ready');
     assert.deepEqual(gatesById.queue_wakeup_handoff.required_domain_action_adapter_actions, [
       'emit_no_regression_evidence',

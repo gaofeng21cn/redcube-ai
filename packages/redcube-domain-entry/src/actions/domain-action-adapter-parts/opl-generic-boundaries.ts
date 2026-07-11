@@ -80,8 +80,8 @@ export const OPL_GENERATED_INTERFACE_CONSUMPTION = Object.freeze({
   bridge_exit_gate: { ...OPL_GENERATED_SURFACE_EXIT_GATE },
   consumed_from_refs: [
     '/domain_descriptor',
-    '/family_action_catalog',
-    '/family_stage_control_plane',
+    'contracts/action_catalog.json',
+    'contracts/stage_control_plane.json',
     '/visual_pack_compiler_handoff/generated_surface_handoff',
     '/privatized_functional_module_audit',
   ],
@@ -385,7 +385,7 @@ export function buildOplSubstrateAdapterExportProjection() {
         family: 'source_refs',
         mode: 'descriptor_index_only',
         refs: [
-          '/family_stage_control_plane',
+          'contracts/stage_control_plane.json',
           '/domain_memory_descriptor',
           '/domain_memory_descriptor_locator',
           '/controlled_visual_stage_attempt',
@@ -455,7 +455,7 @@ export function buildOplSubstrateAdapterExportProjection() {
     ],
     source_manifest_refs: {
       workspace_locator_ref: '/workspace_locator',
-      family_stage_control_plane_ref: '/family_stage_control_plane',
+      family_stage_control_plane_ref: 'contracts/stage_control_plane.json',
       artifact_locator_contract_ref: '/artifact_locator_contract',
       domain_memory_descriptor_ref: '/domain_memory_descriptor',
       domain_memory_descriptor_locator_ref: '/domain_memory_descriptor_locator',

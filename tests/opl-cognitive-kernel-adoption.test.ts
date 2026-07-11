@@ -127,17 +127,13 @@ test('RCA stage control plane declares tool boundaries and independent gates', (
   assert.equal(plane.golden_path_profile_ref, 'contracts/golden_path_profile.json');
   assert.deepEqual(plane.stage_pack_required_sections, requiredStagePackSections);
 
-  for (const stage of plane.stages) {
+  for (const [index, stage] of plane.stages.entries()) {
     assert.equal(stage.tool_refs[0].ref, 'agent/tools/domain_affordances.md');
     assert.equal(stage.tool_refs[0].catalog_role, 'available_affordance_catalog_not_workflow_script');
 
     assert.equal(
       stage.stage_contract.tool_affordance_boundary_ref,
-      `/family_stage_control_plane/stages/${stage.stage_id}/tool_affordance_boundary`,
-    );
-    assert.equal(
-      stage.stage_contract.tool_affordance_boundary_ref,
-      `/family_stage_control_plane/stages/${stage.stage_id}/tool_affordance_boundary`,
+      `contracts/stage_control_plane.json#/stages/${index}/tool_affordance_boundary`,
     );
     assert.equal(refs(adoptionBoundary.capability_refs).has('source_context_and_visual_brief_reading'), true);
     assert.equal(adoptionBoundary.executor_autonomy.executor_can_choose_tools, true);
@@ -146,19 +142,19 @@ test('RCA stage control plane declares tool boundaries and independent gates', (
 
     assert.equal(
       stage.stage_contract.candidate_pool_policy_ref,
-      `/family_stage_control_plane/stages/${stage.stage_id}/candidate_pool_policy`,
+      `contracts/stage_control_plane.json#/stages/${index}/candidate_pool_policy`,
     );
     assert.ok(stage.strategy_refs.length > 0);
     assert.equal(
       stage.stage_contract.handoff_policy_ref,
-      `/family_stage_control_plane/stages/${stage.stage_id}/handoff_policy`,
+      `contracts/stage_control_plane.json#/stages/${index}/handoff_policy`,
     );
 
     const declaredGateRefs = new Set(stage.evaluation.map((entry: any) => entry.ref));
     assert.equal(declaredGateRefs.size > 0, true);
     assert.equal(
       stage.stage_contract.independent_gate_policy_ref,
-      `/family_stage_control_plane/stages/${stage.stage_id}/independent_gate_policy`,
+      `contracts/stage_control_plane.json#/stages/${index}/independent_gate_policy`,
     );
   }
 });

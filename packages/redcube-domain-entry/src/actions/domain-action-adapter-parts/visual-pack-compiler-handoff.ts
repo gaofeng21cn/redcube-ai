@@ -211,8 +211,8 @@ export function buildVisualPackCompilerHandoffProjection() {
       generated_surface_mode: 'opl_generated_surface_consumed_domain_handlers_only',
       source_refs: [
         { source_id: 'domain_descriptor', ref: 'contracts/domain_descriptor.json' },
-        { source_id: 'deliverable_family_graph', ref: '/family_stage_control_plane' },
-        { source_id: 'action_metadata', ref: '/family_action_catalog' },
+        { source_id: 'deliverable_family_graph', ref: 'contracts/stage_control_plane.json' },
+        { source_id: 'action_metadata', ref: 'contracts/action_catalog.json' },
         { source_id: 'visual_transition_spec', ref: '/visual_transition_spec' },
         { source_id: 'review_export_policies', refs: ['/review_state', '/publication_projection'] },
         { source_id: 'artifact_locator_policy', ref: '/artifact_locator_contract' },

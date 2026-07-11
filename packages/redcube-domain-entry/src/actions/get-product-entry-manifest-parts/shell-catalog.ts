@@ -25,8 +25,8 @@ import { buildSkillCommandContracts } from './utils.js';
 export function buildProductEntryManifestShellCatalog({
   actionMetadata,
   familyActionCatalogRef = {
-    ref_kind: 'json_pointer',
-    ref: '/family_action_catalog',
+    ref_kind: 'repo_path',
+    ref: 'contracts/action_catalog.json',
     label: 'RedCube family action catalog',
   },
   familySchedulerReplacement,

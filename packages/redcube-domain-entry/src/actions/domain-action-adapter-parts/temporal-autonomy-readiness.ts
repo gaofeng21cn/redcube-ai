@@ -48,7 +48,7 @@ export function buildTemporalAutonomyReadinessProjection({
       family_scheduler_replacement_ref: '/family_scheduler_replacement',
       opl_generic_primitive_consumption_ref: '/opl_generic_primitive_consumption',
       opl_stability_read_model_consumption_ref: '/opl_stability_read_model_consumption',
-      family_stage_control_plane_ref: '/family_stage_control_plane',
+      family_stage_control_plane_ref: 'contracts/stage_control_plane.json',
       runtime_inventory_ref: '/runtime_inventory',
       task_lifecycle_ref: '/task_lifecycle',
       controlled_soak_no_regression_attempt_ref: '/controlled_soak_no_regression_attempt',
@@ -111,7 +111,7 @@ export function buildTemporalAutonomyReadinessProjection({
         gate_id: 'stage_descriptor_handoff',
         owner: DOMAIN_ID,
         status: 'ready',
-        rca_surface_ref: '/family_stage_control_plane',
+        rca_surface_ref: 'contracts/stage_control_plane.json',
         opl_consumes_stage_descriptors: true,
       },
       {

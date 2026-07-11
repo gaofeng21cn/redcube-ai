@@ -98,9 +98,6 @@ export function buildReturnedManifestProjection({
       supported_commands: actionMetadata.skill_commands.map((contract) => contract.command),
       command_contracts: buildSkillCommandContracts(actionMetadata),
     },
-    family_action_catalog: actionMetadata.family_action_catalog,
-    family_action_catalog_parity: actionMetadata.parity,
-    family_stage_control_plane: familyStageControlPlane,
     opl_provider_runtime_contract: (
       oplProviderRuntimeContract
       || manifest.opl_provider_runtime_contract

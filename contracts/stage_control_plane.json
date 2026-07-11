@@ -58,8 +58,8 @@
       "role": "artifact_authority_contract"
     },
     {
-      "ref_kind": "json_pointer",
-      "ref": "/family_action_catalog",
+      "ref_kind": "repo_path",
+      "ref": "contracts/action_catalog.json",
       "role": "domain_handler_target_refs"
     }
   ],
@@ -73,7 +73,7 @@
   "stage_action_parity": {
     "surface_kind": "rca_stage_action_ref_parity",
     "status": "aligned",
-    "family_action_catalog_ref": "/family_action_catalog",
+    "family_action_catalog_ref": "contracts/action_catalog.json",
     "missing_action_refs": []
   },
   "stage_output_role_interface": {
@@ -288,10 +288,10 @@
         "refs_only": true
       },
       "stage_contract": {
-        "tool_affordance_boundary_ref": "/family_stage_control_plane/stages/source_intake/tool_affordance_boundary",
-        "candidate_pool_policy_ref": "/family_stage_control_plane/stages/source_intake/candidate_pool_policy",
-        "handoff_policy_ref": "/family_stage_control_plane/stages/source_intake/handoff_policy",
-        "independent_gate_policy_ref": "/family_stage_control_plane/stages/source_intake/independent_gate_policy",
+        "tool_affordance_boundary_ref": "contracts/stage_control_plane.json#/stages/0/tool_affordance_boundary",
+        "candidate_pool_policy_ref": "contracts/stage_control_plane.json#/stages/0/candidate_pool_policy",
+        "handoff_policy_ref": "contracts/stage_control_plane.json#/stages/0/handoff_policy",
+        "independent_gate_policy_ref": "contracts/stage_control_plane.json#/stages/0/independent_gate_policy",
         "runtime_event_refs": [],
         "requires": [
           "stage_policy_ref:agent/stages/source_intake.md",
@@ -738,10 +738,10 @@
         "refs_only": true
       },
       "stage_contract": {
-        "tool_affordance_boundary_ref": "/family_stage_control_plane/stages/communication_strategy/tool_affordance_boundary",
-        "candidate_pool_policy_ref": "/family_stage_control_plane/stages/communication_strategy/candidate_pool_policy",
-        "handoff_policy_ref": "/family_stage_control_plane/stages/communication_strategy/handoff_policy",
-        "independent_gate_policy_ref": "/family_stage_control_plane/stages/communication_strategy/independent_gate_policy",
+        "tool_affordance_boundary_ref": "contracts/stage_control_plane.json#/stages/1/tool_affordance_boundary",
+        "candidate_pool_policy_ref": "contracts/stage_control_plane.json#/stages/1/candidate_pool_policy",
+        "handoff_policy_ref": "contracts/stage_control_plane.json#/stages/1/handoff_policy",
+        "independent_gate_policy_ref": "contracts/stage_control_plane.json#/stages/1/independent_gate_policy",
         "runtime_event_refs": [],
         "requires": [
           "stage_policy_ref:agent/stages/communication_strategy.md",
@@ -1165,10 +1165,10 @@
         "refs_only": true
       },
       "stage_contract": {
-        "tool_affordance_boundary_ref": "/family_stage_control_plane/stages/visual_direction/tool_affordance_boundary",
-        "candidate_pool_policy_ref": "/family_stage_control_plane/stages/visual_direction/candidate_pool_policy",
-        "handoff_policy_ref": "/family_stage_control_plane/stages/visual_direction/handoff_policy",
-        "independent_gate_policy_ref": "/family_stage_control_plane/stages/visual_direction/independent_gate_policy",
+        "tool_affordance_boundary_ref": "contracts/stage_control_plane.json#/stages/2/tool_affordance_boundary",
+        "candidate_pool_policy_ref": "contracts/stage_control_plane.json#/stages/2/candidate_pool_policy",
+        "handoff_policy_ref": "contracts/stage_control_plane.json#/stages/2/handoff_policy",
+        "independent_gate_policy_ref": "contracts/stage_control_plane.json#/stages/2/independent_gate_policy",
         "runtime_event_refs": [],
         "requires": [
           "stage_policy_ref:agent/stages/visual_direction.md",
@@ -1613,10 +1613,10 @@
         "refs_only": true
       },
       "stage_contract": {
-        "tool_affordance_boundary_ref": "/family_stage_control_plane/stages/artifact_creation/tool_affordance_boundary",
-        "candidate_pool_policy_ref": "/family_stage_control_plane/stages/artifact_creation/candidate_pool_policy",
-        "handoff_policy_ref": "/family_stage_control_plane/stages/artifact_creation/handoff_policy",
-        "independent_gate_policy_ref": "/family_stage_control_plane/stages/artifact_creation/independent_gate_policy",
+        "tool_affordance_boundary_ref": "contracts/stage_control_plane.json#/stages/3/tool_affordance_boundary",
+        "candidate_pool_policy_ref": "contracts/stage_control_plane.json#/stages/3/candidate_pool_policy",
+        "handoff_policy_ref": "contracts/stage_control_plane.json#/stages/3/handoff_policy",
+        "independent_gate_policy_ref": "contracts/stage_control_plane.json#/stages/3/independent_gate_policy",
         "runtime_event_refs": [],
         "requires": [
           "stage_policy_ref:agent/stages/artifact_creation.md",
@@ -2071,10 +2071,10 @@
         "refs_only": true
       },
       "stage_contract": {
-        "tool_affordance_boundary_ref": "/family_stage_control_plane/stages/review_and_revision/tool_affordance_boundary",
-        "candidate_pool_policy_ref": "/family_stage_control_plane/stages/review_and_revision/candidate_pool_policy",
-        "handoff_policy_ref": "/family_stage_control_plane/stages/review_and_revision/handoff_policy",
-        "independent_gate_policy_ref": "/family_stage_control_plane/stages/review_and_revision/independent_gate_policy",
+        "tool_affordance_boundary_ref": "contracts/stage_control_plane.json#/stages/4/tool_affordance_boundary",
+        "candidate_pool_policy_ref": "contracts/stage_control_plane.json#/stages/4/candidate_pool_policy",
+        "handoff_policy_ref": "contracts/stage_control_plane.json#/stages/4/handoff_policy",
+        "independent_gate_policy_ref": "contracts/stage_control_plane.json#/stages/4/independent_gate_policy",
         "runtime_event_refs": [],
         "requires": [
           "stage_policy_ref:agent/stages/review_and_revision.md",
@@ -2523,10 +2523,10 @@
         "refs_only": true
       },
       "stage_contract": {
-        "tool_affordance_boundary_ref": "/family_stage_control_plane/stages/package_and_handoff/tool_affordance_boundary",
-        "candidate_pool_policy_ref": "/family_stage_control_plane/stages/package_and_handoff/candidate_pool_policy",
-        "handoff_policy_ref": "/family_stage_control_plane/stages/package_and_handoff/handoff_policy",
-        "independent_gate_policy_ref": "/family_stage_control_plane/stages/package_and_handoff/independent_gate_policy",
+        "tool_affordance_boundary_ref": "contracts/stage_control_plane.json#/stages/5/tool_affordance_boundary",
+        "candidate_pool_policy_ref": "contracts/stage_control_plane.json#/stages/5/candidate_pool_policy",
+        "handoff_policy_ref": "contracts/stage_control_plane.json#/stages/5/handoff_policy",
+        "independent_gate_policy_ref": "contracts/stage_control_plane.json#/stages/5/independent_gate_policy",
         "runtime_event_refs": [],
         "requires": [
           "stage_policy_ref:agent/stages/package_and_handoff.md",

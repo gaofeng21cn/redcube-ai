@@ -44,9 +44,9 @@
       },
       "source_of_work": {
         "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_catalog_ref": "contracts/action_catalog.json",
         "source_action_id": "get_product_status",
-        "stage_catalog_ref": "family_stage_control_plane:redcube_ai_stage_control_plane",
+        "stage_catalog_ref": "contracts/stage_control_plane.json",
         "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
         "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
@@ -76,9 +76,9 @@
       },
       "source_of_work": {
         "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_catalog_ref": "contracts/action_catalog.json",
         "source_action_id": "get_product_preflight",
-        "stage_catalog_ref": "family_stage_control_plane:redcube_ai_stage_control_plane",
+        "stage_catalog_ref": "contracts/stage_control_plane.json",
         "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
         "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
@@ -108,9 +108,9 @@
       },
       "source_of_work": {
         "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_catalog_ref": "contracts/action_catalog.json",
         "source_action_id": "invoke_product_entry",
-        "stage_catalog_ref": "family_stage_control_plane:redcube_ai_stage_control_plane",
+        "stage_catalog_ref": "contracts/stage_control_plane.json",
         "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
         "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
@@ -158,9 +158,9 @@
       },
       "source_of_work": {
         "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_catalog_ref": "contracts/action_catalog.json",
         "source_action_id": "get_product_entry_session",
-        "stage_catalog_ref": "family_stage_control_plane:redcube_ai_stage_control_plane",
+        "stage_catalog_ref": "contracts/stage_control_plane.json",
         "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
         "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
@@ -197,9 +197,9 @@
       },
       "source_of_work": {
         "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_catalog_ref": "contracts/action_catalog.json",
         "source_action_id": "get_product_entry_manifest",
-        "stage_catalog_ref": "family_stage_control_plane:redcube_ai_stage_control_plane",
+        "stage_catalog_ref": "contracts/stage_control_plane.json",
         "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
         "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
@@ -236,9 +236,9 @@
       },
       "source_of_work": {
         "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_catalog_ref": "contracts/action_catalog.json",
         "source_action_id": "export_domain_handler",
-        "stage_catalog_ref": "family_stage_control_plane:redcube_ai_stage_control_plane",
+        "stage_catalog_ref": "contracts/stage_control_plane.json",
         "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
         "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
@@ -280,9 +280,9 @@
       },
       "source_of_work": {
         "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_catalog_ref": "contracts/action_catalog.json",
         "source_action_id": "dispatch_domain_handler",
-        "stage_catalog_ref": "family_stage_control_plane:redcube_ai_stage_control_plane",
+        "stage_catalog_ref": "contracts/stage_control_plane.json",
         "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
         "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
@@ -339,9 +339,9 @@
       },
       "source_of_work": {
         "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_catalog_ref": "contracts/action_catalog.json",
         "source_action_id": "run_image_ppt_proof",
-        "stage_catalog_ref": "family_stage_control_plane:redcube_ai_stage_control_plane",
+        "stage_catalog_ref": "contracts/stage_control_plane.json",
         "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
         "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
@@ -383,9 +383,9 @@
       },
       "source_of_work": {
         "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_catalog_ref": "contracts/action_catalog.json",
         "source_action_id": "run_native_ppt_proof",
-        "stage_catalog_ref": "family_stage_control_plane:redcube_ai_stage_control_plane",
+        "stage_catalog_ref": "contracts/stage_control_plane.json",
         "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
         "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
@@ -427,9 +427,9 @@
       },
       "source_of_work": {
         "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_catalog_ref": "contracts/action_catalog.json",
         "source_action_id": "invoke_domain_entry",
-        "stage_catalog_ref": "family_stage_control_plane:redcube_ai_stage_control_plane",
+        "stage_catalog_ref": "contracts/stage_control_plane.json",
         "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
         "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },

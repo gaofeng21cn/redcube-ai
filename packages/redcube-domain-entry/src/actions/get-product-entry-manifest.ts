@@ -15,8 +15,12 @@ import { buildFamilyOrchestrationCompanion } from './family-orchestration-compan
 import { getProductPreflight } from './get-product-preflight.js';
 import {
   buildRedCubeActionMetadata,
+  FAMILY_ACTION_CATALOG_CONTRACT_REF,
 } from './family-action-catalog.js';
-import { buildRedCubeFamilyStageControlPlane } from './family-stage-control-plane.js';
+import {
+  buildRedCubeFamilyStageControlPlane,
+  FAMILY_STAGE_CONTROL_PLANE_CONTRACT_REF,
+} from './family-stage-control-plane.js';
 import {
   buildFamilyDomainMemoryDescriptor,
   buildRuntimeResidueRetirementAudit,
@@ -68,6 +72,17 @@ import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-ma
 import { buildTemporalLongSoakEvidenceInventory } from './get-product-entry-manifest-parts/temporal-long-soak-evidence-inventory.js';
 import { buildVisualTransitionEvaluatorProjection } from './domain-action-adapter-parts/visual-transition-evaluator.js';
 import { buildRedCubeProductEntryDescriptor } from './get-product-entry-manifest-parts/entry-descriptor.js';
+
+const FAMILY_ACTION_CATALOG_REF = {
+  ref_kind: 'repo_path',
+  ref: FAMILY_ACTION_CATALOG_CONTRACT_REF,
+  label: 'RedCube canonical action catalog',
+};
+const FAMILY_STAGE_CONTROL_PLANE_REF = {
+  ref_kind: 'repo_path',
+  ref: FAMILY_STAGE_CONTROL_PLANE_CONTRACT_REF,
+  label: 'RedCube canonical stage control plane',
+};
 
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
@@ -158,9 +173,7 @@ export async function getProductEntryManifest(request) {
   };
   const sourceProvenance = buildSourceProvenanceSection();
   const actionMetadata = buildRedCubeActionMetadata();
-  const familyStageControlPlane = buildRedCubeFamilyStageControlPlane({
-    familyActionCatalog: actionMetadata.family_action_catalog,
-  });
+  const familyStageControlPlane = buildRedCubeFamilyStageControlPlane();
   const {
     automation,
     entryStatusSurface,
@@ -195,10 +208,12 @@ export async function getProductEntryManifest(request) {
     pptRouteSelection,
     runtime,
     domainAuthorityRefs,
+    familyActionCatalogRef: FAMILY_ACTION_CATALOG_REF,
     workspaceRoot,
   });
 
-  const manifest = buildFamilyProductEntryManifest({
+  const manifest = {
+    ...buildFamilyProductEntryManifest({
     manifest_kind: 'redcube_product_entry_manifest',
     target_domain_id: 'redcube_ai',
     formal_entry: buildFormalEntryPolicy(),
@@ -227,9 +242,6 @@ export async function getProductEntryManifest(request) {
     persistence_policy: persistencePolicy,
     lifecycle_ledger: lifecycleLedger,
     owner_route: ownerRoute,
-    family_action_catalog: actionMetadata.family_action_catalog,
-    family_action_catalog_parity: actionMetadata.parity,
-    family_stage_control_plane: familyStageControlPlane,
     artifact_locator_contract: domainAuthorityRefs.artifact_locator_contract,
     domain_memory_descriptor_locator: domainAuthorityRefs.domain_memory_descriptor_locator,
     visual_pattern_memory_writeback: visualPatternMemoryWriteback,
@@ -279,7 +291,10 @@ export async function getProductEntryManifest(request) {
       productEntrySessionCommand,
       sourceProvenance,
     }),
-  });
+  }),
+    family_action_catalog_ref: FAMILY_ACTION_CATALOG_REF,
+    family_stage_control_plane_ref: FAMILY_STAGE_CONTROL_PLANE_REF,
+  };
   return buildReturnedManifestProjection({
     actionMetadata,
     domainMemoryDescriptor,

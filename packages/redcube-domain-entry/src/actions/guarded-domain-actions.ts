@@ -253,8 +253,8 @@ const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
   },
   {
     module_id: 'generic_cli_mcp_wrappers',
-    surface_ref: '/family_action_catalog_parity',
-    status: 'canonical_metadata_parity_landed',
+    surface_ref: 'contracts/action_catalog.json',
+    status: 'canonical_contract_ref_landed',
     classification: 'domain_handler_target',
     opl_generic_primitive: 'standard_domain_agent_scaffold',
     oplAbsorbCandidate: true,
