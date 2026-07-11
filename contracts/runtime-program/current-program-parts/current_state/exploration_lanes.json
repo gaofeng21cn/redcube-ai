@@ -352,7 +352,7 @@
         ],
         "cache_layers": [
           "npm",
-          "pip",
+          "uv",
           "playwright"
         ],
         "default_quality_lane_runs_true_renderer": false,

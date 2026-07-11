@@ -75,6 +75,7 @@ test('run-test-group routes Python cache outside the checkout', () => {
   assert.match(runner, /PYTHONDONTWRITEBYTECODE/);
   assert.match(runner, /PYTHONPYCACHEPREFIX/);
   assert.match(runner, /UV_PROJECT_ENVIRONMENT/);
+  assert.doesNotMatch(runner, /PIP_CACHE_DIR/);
   assert.match(runner, /NPM_CONFIG_CACHE/);
   assert.match(runner, /NODE_COMPILE_CACHE/);
   assert.match(runner, /XDG_CACHE_HOME/);
@@ -492,15 +493,16 @@ test('run-test-group resolves an explicit Python command for screenshot review a
   );
 });
 
-test('run-test-group bootstraps a managed Python runtime when host python resolves to unstable 3.14', () => {
+test('run-test-group bootstraps a lock-synced managed Python runtime when host python resolves to unstable 3.14', () => {
   const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-python-'));
   const managedPython = path.join(runtimeStateRoot, 'python', 'stable-playwright', 'venv', 'bin', 'python');
+  const managedRoot = path.join(runtimeStateRoot, 'python', 'stable-playwright');
 
   const resolved = resolveRedCubePythonCommand({
     env: {
       REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
     },
-    spawnSyncImpl(command, args) {
+    spawnSyncImpl(command, args, options) {
       if (command === 'python3') {
         assert.deepEqual(args, ['-c', 'import sys; import playwright; print(sys.executable)']);
         return { status: 0, stdout: '/opt/homebrew/bin/python3.14\n', stderr: '' };
@@ -532,15 +534,29 @@ test('run-test-group bootstraps a managed Python runtime when host python resolv
           stderr: '',
         };
       }
-      if (command === '/Users/test/python3.12' && args[0] === '-m' && args[1] === 'venv') {
+      if (command === 'uv') {
+        assert.deepEqual(args, [
+          'sync',
+          '--locked',
+          '--no-dev',
+          '--extra',
+          'native',
+          '--no-install-project',
+          '--python',
+          '/Users/test/python3.12',
+        ]);
+        assert.equal(options.cwd, path.resolve(''));
+        assert.equal(options.env.UV_PROJECT_ENVIRONMENT, path.join(managedRoot, 'venv'));
+        assert.equal(options.env.UV_CACHE_DIR, path.join(managedRoot, 'uv-cache'));
+        assert.equal(options.env.PLAYWRIGHT_BROWSERS_PATH, path.join(managedRoot, 'playwright-browsers'));
+        assert.equal(options.env.UV_PYTHON_DOWNLOADS, 'never');
         mkdirSync(path.dirname(managedPython), { recursive: true });
         writeFileSync(managedPython, '#!/usr/bin/env python3\n', 'utf-8');
         return { status: 0, stdout: '', stderr: '' };
       }
-      if (command === managedPython && args[0] === '-m' && args[1] === 'pip') {
-        return { status: 0, stdout: '', stderr: '' };
-      }
       if (command === managedPython && args[0] === '-m' && args[1] === 'playwright') {
+        assert.equal(options.cwd, path.resolve(''));
+        assert.equal(options.env.UV_PROJECT_ENVIRONMENT, path.join(managedRoot, 'venv'));
         return { status: 0, stdout: '', stderr: '' };
       }
       if (command === managedPython && args[0] === '-c') {
@@ -567,6 +583,9 @@ test('run-test-group bootstraps a managed Python runtime when host python resolv
 
   assert.equal(resolved.command, managedPython);
   assert.equal(resolved.source, 'managed_python_runtime');
+  const marker = JSON.parse(readFileSync(path.join(managedRoot, 'installation.json'), 'utf-8'));
+  assert.match(marker.dependency_signature, /^[a-f0-9]{64}$/);
+  assert.equal('requirements_signature' in marker, false);
 });
 
 test('run-test-group fails fast when no Python with playwright can be resolved', () => {
@@ -588,6 +607,14 @@ test('run-test-group fails fast when no Python with playwright can be resolved',
 test('Codex-backed verification Python command contract is frozen in current program', () => {
   const currentProgram = readCurrentProgramContract();
 
+  assert.deepEqual(
+    currentProgram.current_state.green_baseline.ci_quality_lane_requires,
+    ['python-3.12', 'uv-lock-native-dependencies'],
+  );
+  assert.deepEqual(
+    currentProgram.current_state.exploration_lanes.ppt_native_authoring_proof_lane.production_hardening.ci_proof_lane_v2.cache_layers,
+    ['npm', 'uv', 'playwright'],
+  );
   assert.equal(
     currentProgram.current_state.green_baseline.local_codex_execution.python_command_env,
     'REDCUBE_PYTHON_COMMAND',

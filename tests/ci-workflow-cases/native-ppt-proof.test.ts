@@ -52,8 +52,15 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   );
   assert.match(runner, /suite_id"\)\s*==\s*"data_charts"|suite_id/);
   assert.match(runner, /synthetic_preview/);
-  assert.match(dockerfile, /COPY \.github\/requirements\/ci-python\.txt/);
-  assert.match(dockerfile, /python3 -m pip install .*\/tmp\/redcube-ci-python\.txt/);
+  assert.match(dockerfile, /FROM ghcr\.io\/astral-sh\/uv:0\.9\.5 AS uv/);
+  assert.match(dockerfile, /COPY --from=uv \/uv \/uvx \/bin\//);
+  assert.match(dockerfile, /COPY pyproject\.toml uv\.lock/);
+  assert.match(dockerfile, /PYTHONPATH=\/workspace\/python/);
+  assert.match(dockerfile, /PYTHONDONTWRITEBYTECODE=1/);
+  assert.match(dockerfile, /REDCUBE_NATIVE_PPT_PROOF_PYTHON=\/opt\/redcube-venv\/bin\/python/);
+  assert.match(dockerfile, /uv sync --locked --no-dev --extra native --no-install-project --python \/usr\/bin\/python3/);
+  assert.doesNotMatch(dockerfile, /pip install|requirements\/ci-python\.txt/);
+  assert.doesNotMatch(runner, /PIP_CACHE_DIR/);
   assert.match(dockerfile, /iOfficeAI\/OfficeCLI\/releases\/download\/v1\.0\.100\/officecli-linux-x64/);
   assert.match(dockerfile, /sha256sum -c -/);
   for (const source of [dockerfile, runner]) {
@@ -80,14 +87,14 @@ test('native PPT proof V2 contract is ready for opt-in CI triggers and cache pol
   );
   assert.deepEqual(
     contract.proof_job.required_cache_layers.map((layer) => layer.id),
-    ['npm', 'pip', 'playwright'],
+    ['npm', 'uv', 'playwright'],
   );
   assert.equal(contract.proof_job.artifact_index.path, 'artifacts/native-ppt-proof/artifact-index.json');
   assert.equal(contract.proof_job.artifact_index.schema_version, 'native_ppt_proof_artifact_index.v2');
   assert.match(workflow, /github\.event_name == 'schedule'/);
   assert.match(workflow, /contains\(github\.event\.pull_request\.labels\.\*\.name, 'native-ppt-proof'\)/);
-  assert.match(workflow, /native-ppt-proof-pip-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('\.github\/requirements\/ci-python\.txt'\) \}\}/);
-  assert.match(workflow, /native-ppt-proof-playwright-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('\.github\/requirements\/ci-python\.txt'\) \}\}/);
+  assert.match(workflow, /native-ppt-proof-uv-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('uv\.lock'\) \}\}/);
+  assert.match(workflow, /native-ppt-proof-playwright-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('uv\.lock'\) \}\}/);
   assert.match(runner, /artifact-index\.json/);
   assert.match(runner, /build-artifact-index\.py/);
   assert.doesNotMatch(

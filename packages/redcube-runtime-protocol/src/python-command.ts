@@ -17,7 +17,9 @@ const PYTHON_PLAYWRIGHT_PROBE_ARGS = ['-c', 'import sys; import playwright; prin
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
-const REQUIREMENTS_FILE = path.join(REPO_ROOT, '.github', 'requirements', 'ci-python.txt');
+const PYPROJECT_FILE = path.join(REPO_ROOT, 'pyproject.toml');
+const UV_LOCK_FILE = path.join(REPO_ROOT, 'uv.lock');
+const UV_COMMAND = 'uv';
 const RUNTIME_STATE_ROOT_ENV = 'REDCUBE_RUNTIME_STATE_ROOT';
 const MANAGED_PYTHON_ROOT_SEGMENTS = ['python', 'stable-playwright'];
 const MANAGED_PYTHON_MARKER_FILE = 'installation.json';
@@ -38,6 +40,13 @@ type ManagedPythonPaths = {
   venvDir: string;
   pythonCommand: string;
   markerFile: string;
+  cacheDir: string;
+  playwrightBrowsersDir: string;
+  pycacheDir: string;
+};
+type RunOptions = {
+  cwd?: string;
+  env?: EnvMap;
 };
 
 function parseExplicitPythonCommand(value: string): Pick<ResolvedRedCubePythonCommand, 'command' | 'args'> {
@@ -202,30 +211,58 @@ function managedPythonPaths(env: EnvMap): ManagedPythonPaths {
     venvDir: path.join(root, 'venv'),
     pythonCommand: path.join(root, 'venv', 'bin', 'python'),
     markerFile: path.join(root, MANAGED_PYTHON_MARKER_FILE),
+    cacheDir: path.join(root, 'uv-cache'),
+    playwrightBrowsersDir: path.join(root, 'playwright-browsers'),
+    pycacheDir: path.join(root, 'pycache'),
   };
 }
 
-function requirementsSignature(): string {
-  const content = readFileSync(REQUIREMENTS_FILE, 'utf-8');
-  return createHash('sha256').update(content).digest('hex');
+function dependencySignature(): string {
+  const hash = createHash('sha256');
+  for (const file of [PYPROJECT_FILE, UV_LOCK_FILE]) {
+    hash.update(path.basename(file));
+    hash.update('\0');
+    hash.update(readFileSync(file));
+  }
+  return hash.digest('hex');
 }
 
 function managedPythonReady(paths: ManagedPythonPaths, spawnSyncImpl: SpawnSyncImpl, signature: string): boolean {
   const marker = safeJson(paths.markerFile);
   if (!existsSync(paths.pythonCommand)) return false;
-  if (!marker || marker.requirements_signature !== signature) return false;
+  if (!marker || marker.dependency_signature !== signature) return false;
   const playwrightProbe = probePythonWithPlaywright(paths.pythonCommand, spawnSyncImpl);
   if (!playwrightProbe.ok) return false;
   const versionProbe = probePythonVersion(playwrightProbe.executable, spawnSyncImpl);
   return versionProbe.ok && isStablePythonVersion(versionProbe);
 }
 
-function runOrThrow(command: string, args: string[], spawnSyncImpl: SpawnSyncImpl, label: string): void {
+function managedPythonEnv(env: EnvMap, paths: ManagedPythonPaths): EnvMap {
+  return {
+    ...process.env,
+    ...env,
+    UV_PROJECT_ENVIRONMENT: paths.venvDir,
+    UV_CACHE_DIR: paths.cacheDir,
+    UV_PYTHON_DOWNLOADS: 'never',
+    PLAYWRIGHT_BROWSERS_PATH: paths.playwrightBrowsersDir,
+    PYTHONDONTWRITEBYTECODE: '1',
+    PYTHONPYCACHEPREFIX: paths.pycacheDir,
+  };
+}
+
+function runOrThrow(
+  command: string,
+  args: string[],
+  spawnSyncImpl: SpawnSyncImpl,
+  label: string,
+  options: RunOptions = {},
+): void {
   let result;
   try {
     result = spawnSyncImpl(command, args, {
       encoding: 'utf-8',
       maxBuffer: 16 * 1024 * 1024,
+      ...options,
     });
   } catch (error) {
     throw new Error(`${label} 失败。\nCommand: ${command} ${args.join(' ')}\nError: ${error instanceof Error ? error.message : String(error)}`);
@@ -247,7 +284,7 @@ function resolveManagedBasePython(spawnSyncImpl: SpawnSyncImpl): Extract<Version
 
 function ensureManagedPythonCommand(env: EnvMap, spawnSyncImpl: SpawnSyncImpl): ResolvedRedCubePythonCommand {
   const paths = managedPythonPaths(env);
-  const signature = requirementsSignature();
+  const signature = dependencySignature();
   if (managedPythonReady(paths, spawnSyncImpl, signature)) {
     return {
       command: paths.pythonCommand,
@@ -265,11 +302,23 @@ function ensureManagedPythonCommand(env: EnvMap, spawnSyncImpl: SpawnSyncImpl): 
 
   mkdirSync(paths.root, { recursive: true });
   rmSync(paths.venvDir, { recursive: true, force: true });
-  runOrThrow(basePython.executable, ['-m', 'venv', paths.venvDir], spawnSyncImpl, '创建托管 Python 虚拟环境');
-  runOrThrow(paths.pythonCommand, ['-m', 'pip', 'install', '-r', REQUIREMENTS_FILE], spawnSyncImpl, '安装 RedCube Python 依赖');
-  runOrThrow(paths.pythonCommand, ['-m', 'playwright', 'install', 'chromium'], spawnSyncImpl, '安装 Playwright Chromium');
+  const managedEnv = managedPythonEnv(env, paths);
+  runOrThrow(
+    UV_COMMAND,
+    ['sync', '--locked', '--no-dev', '--extra', 'native', '--no-install-project', '--python', basePython.executable],
+    spawnSyncImpl,
+    '同步 RedCube Python 锁定依赖',
+    { cwd: REPO_ROOT, env: managedEnv },
+  );
+  runOrThrow(
+    paths.pythonCommand,
+    ['-m', 'playwright', 'install', 'chromium'],
+    spawnSyncImpl,
+    '安装 Playwright Chromium',
+    { cwd: REPO_ROOT, env: managedEnv },
+  );
   writeFileSync(paths.markerFile, JSON.stringify({
-    requirements_signature: signature,
+    dependency_signature: signature,
     base_python: basePython.executable,
     base_version: basePython.version,
   }, null, 2), 'utf-8');

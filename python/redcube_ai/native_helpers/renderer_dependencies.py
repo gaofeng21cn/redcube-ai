@@ -24,7 +24,7 @@ NATIVE_PPT_DEPENDENCY_INSTALL_COMMAND = "tools/native-ppt-proof/install-deps.sh"
 NATIVE_PPT_DOCKER_COMMAND = (
     "docker build -f tools/native-ppt-proof/Dockerfile -t redcube-native-ppt-proof . "
     "&& docker run --rm -it -v \"$PWD:/workspace\" -w /workspace redcube-native-ppt-proof "
-    "bash -lc \"npm ci && python3 -m redcube_ai.native_helpers.doctor\""
+    "bash -lc \"npm ci && python -m redcube_ai.native_helpers.doctor\""
 )
 
 
@@ -81,4 +81,3 @@ def platform_install_hint() -> str:
     if system == "Linux":
         return DEBIAN_INSTALL_COMMAND
     return NATIVE_PPT_DOCKER_COMMAND
-

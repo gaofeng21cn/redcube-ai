@@ -79,7 +79,7 @@
     }
   ],
   "generated_array_fields": [],
-  "source_digest": "a91dcb452e97df4f09cdf60c0e858b16433d9d385db59e7b9e0032f4461e53d8",
+  "source_digest": "9c343572cdf590ea9d360585d91ab8c9f6acd1cde6e614127e978a96d2cacf84",
   "source_part_refs": [
     {
       "json_pointer": "/program_id",
@@ -177,7 +177,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/exploration_lanes.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 460,
-      "sha256": "31b36de45e140d67f71202be76d5c87aed24236d8a6f6f9904e2510677e8e864"
+      "sha256": "ca2544e9d76e6a295562bd60394b88d8a374aa9400ef19f13956f15e3242e347"
     },
     {
       "json_pointer": "/current_state/foundation_milestones",
@@ -191,7 +191,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/green_baseline.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 59,
-      "sha256": "d06987ba061b18c984960468bd5809ea01d2f38c5517c6215cd5e26403668b24"
+      "sha256": "9831a1e53add4a8aa771a7b87d8976da29f05356b9a8959110bf18bd25c25af0"
     },
     {
       "json_pointer": "/current_state/next_activation_package",

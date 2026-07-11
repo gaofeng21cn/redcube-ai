@@ -113,7 +113,7 @@ RCA may install or provide these system dependencies for proof execution:
 
 Required project dependencies:
 
-- Python packages from `.github/requirements/ci-python.txt`
+- Python packages from `pyproject.toml` and the exact `uv.lock` resolution
 - Node packages from `npm ci`
 
 Manually running the installer is optional operator preparation, not a product-entry precondition:
@@ -127,10 +127,13 @@ On macOS this installs LibreOffice through Homebrew cask and Poppler / Noto CJK 
 Run the same diagnostics surface locally:
 
 ```bash
-python3 -m pip install -r .github/requirements/ci-python.txt
+export UV_PROJECT_ENVIRONMENT="$(mktemp -d)/redcube-ai-native-helper-venv"
+uv sync --locked --no-dev --extra native --no-install-project
 npm ci
-python3 -m redcube_ai.native_helpers.doctor
+PYTHONPATH=python "$UV_PROJECT_ENVIRONMENT/bin/python" -m redcube_ai.native_helpers.doctor
 ```
+
+`UV_PROJECT_ENVIRONMENT` must stay outside the checkout. `--no-install-project` keeps the source tree free of `.venv` and `*.egg-info`; native helper callers use the existing `PYTHONPATH=python` package boundary.
 
 Run the repo-owned native proof runner:
 

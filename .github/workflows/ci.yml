@@ -36,10 +36,18 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: '0.9.5'
+
       - name: Install Python test dependencies
+        env:
+          UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/redcube-ai-quality-venv
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install -r .github/requirements/ci-python.txt
+          uv sync --locked --no-dev --extra native --no-install-project --python 3.12
+          echo "$UV_PROJECT_ENVIRONMENT/bin" >> "$GITHUB_PATH"
+          echo "REDCUBE_PYTHON_COMMAND=$UV_PROJECT_ENVIRONMENT/bin/python" >> "$GITHUB_ENV"
 
       - name: Install Node dependencies
         run: npm ci
@@ -81,22 +89,30 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Cache pip
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: '0.9.5'
+
+      - name: Cache uv
         uses: actions/cache@v5
         with:
-          path: ~/.cache/pip
-          key: native-ppt-proof-pip-${{ runner.os }}-${{ hashFiles('.github/requirements/ci-python.txt') }}
+          path: ~/.cache/uv
+          key: native-ppt-proof-uv-${{ runner.os }}-${{ hashFiles('uv.lock') }}
 
       - name: Cache Playwright browsers
         uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
-          key: native-ppt-proof-playwright-${{ runner.os }}-${{ hashFiles('.github/requirements/ci-python.txt') }}
+          key: native-ppt-proof-playwright-${{ runner.os }}-${{ hashFiles('uv.lock') }}
 
       - name: Install Python native helper dependencies
+        env:
+          UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/redcube-ai-native-ppt-proof-venv
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install -r .github/requirements/ci-python.txt
+          uv sync --locked --no-dev --extra native --no-install-project --python 3.12
+          echo "$UV_PROJECT_ENVIRONMENT/bin" >> "$GITHUB_PATH"
+          echo "REDCUBE_PYTHON_COMMAND=$UV_PROJECT_ENVIRONMENT/bin/python" >> "$GITHUB_ENV"
 
       - name: Install Node dependencies
         run: npm ci
@@ -138,22 +154,30 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Cache pip
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: '0.9.5'
+
+      - name: Cache uv
         uses: actions/cache@v5
         with:
-          path: ~/.cache/pip
-          key: image-ppt-proof-pip-${{ runner.os }}-${{ hashFiles('.github/requirements/ci-python.txt') }}
+          path: ~/.cache/uv
+          key: image-ppt-proof-uv-${{ runner.os }}-${{ hashFiles('uv.lock') }}
 
       - name: Cache Playwright browsers
         uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
-          key: image-ppt-proof-playwright-${{ runner.os }}-${{ hashFiles('.github/requirements/ci-python.txt') }}
+          key: image-ppt-proof-playwright-${{ runner.os }}-${{ hashFiles('uv.lock') }}
 
       - name: Install Python proof dependencies
+        env:
+          UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/redcube-ai-image-ppt-proof-venv
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install -r .github/requirements/ci-python.txt
+          uv sync --locked --no-dev --extra native --no-install-project --python 3.12
+          echo "$UV_PROJECT_ENVIRONMENT/bin" >> "$GITHUB_PATH"
+          echo "REDCUBE_PYTHON_COMMAND=$UV_PROJECT_ENVIRONMENT/bin/python" >> "$GITHUB_ENV"
 
       - name: Install Node dependencies
         run: npm ci

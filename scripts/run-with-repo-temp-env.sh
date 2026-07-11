@@ -27,7 +27,6 @@ mkdir -p \
   "${repo_temp_root}/python/pytest-cache" \
   "${repo_temp_root}/uv/cache" \
   "${repo_temp_root}/uv/project-venv" \
-  "${repo_temp_root}/pip/cache" \
   "${repo_temp_root}/npm/cache" \
   "${repo_temp_root}/node/compile-cache" \
   "${repo_temp_root}/xdg-cache"
@@ -40,7 +39,6 @@ export PYTHONPYCACHEPREFIX="${repo_temp_root}/python/pycache"
 export PYTEST_ADDOPTS="${PYTEST_ADDOPTS:-} -p no:cacheprovider -o cache_dir=${repo_temp_root}/python/pytest-cache"
 export UV_CACHE_DIR="${repo_temp_root}/uv/cache"
 export UV_PROJECT_ENVIRONMENT="${repo_temp_root}/uv/project-venv"
-export PIP_CACHE_DIR="${repo_temp_root}/pip/cache"
 export NPM_CONFIG_CACHE="${repo_temp_root}/npm/cache"
 export npm_config_cache="${NPM_CONFIG_CACHE}"
 export NODE_COMPILE_CACHE="${repo_temp_root}/node/compile-cache"

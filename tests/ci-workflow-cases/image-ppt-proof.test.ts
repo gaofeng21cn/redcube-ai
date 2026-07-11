@@ -17,6 +17,11 @@ test('image PPT proof optional CI lane never runs live image generation by defau
   assert.equal(contract.proof_job.artifact_index.path, 'artifacts/image-ppt-proof/artifact-index.json');
   assert.equal(contract.proof_job.artifact_index.schema_version, 'image_ppt_proof_artifact_index.v1');
   assert.deepEqual(
+    contract.proof_job.required_cache_layers.map((layer) => layer.id),
+    ['npm', 'uv', 'playwright'],
+  );
+  assert.equal(contract.proof_job.required_cache_layers[1].key_source, 'uv.lock');
+  assert.deepEqual(
     contract.proof_job.required_artifact_refs,
     [
       'generated_png',

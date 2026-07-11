@@ -349,6 +349,8 @@ test('Python native helper doctor runs as a package module and emits fixed JSON 
   });
   assert.match(report.renderer_availability.dependency_install.suggested_command, /install-deps\.sh|apt-get|docker build/);
   assert.match(report.renderer_availability.suggested_docker_command, /docker build -f tools\/native-ppt-proof\/Dockerfile/);
+  assert.match(report.renderer_availability.suggested_docker_command, /python -m redcube_ai\.native_helpers\.doctor/);
+  assert.doesNotMatch(report.renderer_availability.suggested_docker_command, /python3 -m redcube_ai\.native_helpers\.doctor/);
   assert.equal(typeof report.renderer_availability.linux_native_proof.available, 'boolean');
   assert.equal(
     report.renderer_availability.linux_native_proof.available

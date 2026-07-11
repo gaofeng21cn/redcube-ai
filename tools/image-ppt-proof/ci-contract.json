@@ -27,14 +27,14 @@
         "key_source": "package-lock.json"
       },
       {
-        "id": "pip",
+        "id": "uv",
         "uses": "actions/cache",
-        "key_source": ".github/requirements/ci-python.txt"
+        "key_source": "uv.lock"
       },
       {
         "id": "playwright",
         "uses": "actions/cache",
-        "key_source": ".github/requirements/ci-python.txt"
+        "key_source": "uv.lock"
       }
     ],
     "artifact_index": {

@@ -54,7 +54,6 @@ mkdirSync(path.join(repoTempRoot, 'tmp'), { recursive: true });
 mkdirSync(pythonCacheRoot, { recursive: true });
 mkdirSync(path.join(repoTempRoot, 'uv', 'cache'), { recursive: true });
 mkdirSync(path.join(repoTempRoot, 'uv', 'project-venv'), { recursive: true });
-mkdirSync(path.join(repoTempRoot, 'pip', 'cache'), { recursive: true });
 mkdirSync(path.join(repoTempRoot, 'npm', 'cache'), { recursive: true });
 mkdirSync(path.join(repoTempRoot, 'node', 'compile-cache'), { recursive: true });
 mkdirSync(path.join(repoTempRoot, 'xdg-cache'), { recursive: true });
@@ -78,7 +77,6 @@ process.env.UV_PROJECT_ENVIRONMENT = externalEnvValue(
   'UV_PROJECT_ENVIRONMENT',
   path.join(repoTempRoot, 'uv', 'project-venv'),
 );
-process.env.PIP_CACHE_DIR = externalEnvValue('PIP_CACHE_DIR', path.join(repoTempRoot, 'pip', 'cache'));
 process.env.NPM_CONFIG_CACHE = externalEnvValue('NPM_CONFIG_CACHE', path.join(repoTempRoot, 'npm', 'cache'));
 process.env.npm_config_cache = externalEnvValue('npm_config_cache', process.env.NPM_CONFIG_CACHE);
 process.env.NODE_COMPILE_CACHE = externalEnvValue(

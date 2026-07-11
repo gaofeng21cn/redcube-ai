@@ -46,7 +46,7 @@
   },
   "ci_quality_lane_requires": [
     "python-3.12",
-    "ci-python-requirements"
+    "uv-lock-native-dependencies"
   ],
   "ci_quality_lane_reason": "test:smoke is the minimal local entry, test:fast is the hosted core regression lane, test:family keeps the family shared pin contract clean-clone safe, meta:ci runs only the meta remainder not already covered by fast, integration:remaining keeps local fast-then-integration verification from rerunning fast-covered integration files, full:remaining keeps local fast-family-meta-integration verification from rerunning already covered active files, historical stays explicit through test:historical or full:with-historical, route-heavy Codex/browser verification files stay serialized, and proof-only browser/renderer setup stays in the explicit native-ppt-proof and image-ppt-proof jobs instead of the default quality lane",
   "required_verification": [

@@ -1,7 +1,10 @@
+FROM ghcr.io/astral-sh/uv:0.9.5 AS uv
 FROM node:24-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /workspace
+
+COPY --from=uv /uv /uvx /bin/
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -10,8 +13,6 @@ RUN apt-get update \
       fonts-noto-cjk \
       curl \
       python3 \
-      python3-pip \
-      python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://github.com/iOfficeAI/OfficeCLI/releases/download/v1.0.100/SHA256SUMS -o /tmp/officecli-SHA256SUMS \
@@ -20,8 +21,18 @@ RUN curl -fsSL https://github.com/iOfficeAI/OfficeCLI/releases/download/v1.0.100
     && chmod +x /usr/local/bin/officecli \
     && rm -f /tmp/officecli-SHA256SUMS
 
-COPY .github/requirements/ci-python.txt /tmp/redcube-ci-python.txt
-RUN python3 -m pip install --break-system-packages --no-cache-dir -r /tmp/redcube-ci-python.txt \
-    && python3 -m playwright install --with-deps chromium
+ENV UV_PROJECT_ENVIRONMENT=/opt/redcube-venv \
+    UV_CACHE_DIR=/tmp/uv-cache \
+    UV_LINK_MODE=copy \
+    PYTHONPATH=/workspace/python \
+    PYTHONDONTWRITEBYTECODE=1 \
+    REDCUBE_NATIVE_PPT_PROOF_PYTHON=/opt/redcube-venv/bin/python \
+    PATH="/opt/redcube-venv/bin:${PATH}"
 
-CMD ["python3", "-m", "redcube_ai.native_helpers.doctor"]
+COPY pyproject.toml uv.lock ./
+COPY python ./python
+RUN uv sync --locked --no-dev --extra native --no-install-project --python /usr/bin/python3 \
+    && python -m playwright install --with-deps chromium \
+    && rm -rf "$UV_CACHE_DIR"
+
+CMD ["python", "-m", "redcube_ai.native_helpers.doctor"]

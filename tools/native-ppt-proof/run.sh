@@ -13,15 +13,13 @@ mkdir -p \
   "$proof_cache_root/pycache" \
   "$proof_cache_root/pytest-cache" \
   "$proof_cache_root/uv-cache" \
-  "$proof_cache_root/uv-project-venv" \
-  "$proof_cache_root/pip-cache"
+  "$proof_cache_root/uv-project-venv"
 export TMPDIR="$proof_tmp_root/"
 export PYTHONDONTWRITEBYTECODE=1
 export PYTHONPYCACHEPREFIX="$proof_cache_root/pycache"
 export PYTEST_ADDOPTS="${PYTEST_ADDOPTS:+$PYTEST_ADDOPTS }-p no:cacheprovider -o cache_dir=$proof_cache_root/pytest-cache"
 export UV_CACHE_DIR="$proof_cache_root/uv-cache"
 export UV_PROJECT_ENVIRONMENT="$proof_cache_root/uv-project-venv"
-export PIP_CACHE_DIR="$proof_cache_root/pip-cache"
 
 output_root="${REDCUBE_NATIVE_PPT_PROOF_OUTPUT_DIR:-artifacts/native-ppt-proof}"
 skip_system_deps="${REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS:-0}"
