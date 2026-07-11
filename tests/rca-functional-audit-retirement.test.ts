@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { readFileSync } from 'node:fs';
+import { buildStandardAgentSourceBehaviorChecks } from '../node_modules/opl-framework-shared/dist/modules/foundry-lab/standard-domain-agent-source-behavior.js';
 
 import {
   activeShellScripts,
@@ -149,6 +150,15 @@ test('RCA functional audit keeps generic runtime ownership retired without copyi
     modules.native_helper_envelope.migration_class,
     'native_helper_implementation',
   );
+});
+
+test('RCA canonical functional audit leaves no OPL source-behavior residue', () => {
+  const checks = buildStandardAgentSourceBehaviorChecks(path.resolve());
+
+  assert.equal(checks.status, 'passed');
+  assert.equal(checks.matched_source_behavior_count, 0);
+  assert.equal(checks.unclassified_generic_behavior_count, 0);
+  assert.equal(checks.active_private_generic_residue_count, 0);
 });
 
 test('RCA physical morphology policy keeps active source tails classified and source refs resolvable', () => {

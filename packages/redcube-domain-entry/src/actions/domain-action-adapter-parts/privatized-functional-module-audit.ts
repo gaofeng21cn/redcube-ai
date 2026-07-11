@@ -468,6 +468,8 @@ export function buildVisualAuthorityFunctionsAuditModule() {
       'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts',
       'packages/redcube-domain-entry/src/actions/domain-action-adapter.ts',
       'packages/redcube-runtime/src',
+      'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-receipt-actions.ts',
+      'packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/functional-closure.ts',
     ],
     activeCallers: ['visual route execution', 'review/export gates', 'memory writeback acceptance', 'owner receipt signing'],
     activeCallerStatus: 'minimal_authority_functions_active',

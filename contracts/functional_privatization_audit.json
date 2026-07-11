@@ -542,7 +542,8 @@
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/memory-apply-proof.ts",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_memory_writeback",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts",
+        "packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/domain-memory-descriptors.ts"
       ],
       "activeCallers": [
         "apply_visual_memory_writeback domain handler action",
@@ -665,7 +666,9 @@
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/artifact_locator",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_workspace_lifecycle",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/opl-ledger-artifact-registration.ts",
+        "packages/redcube-domain-entry/src/actions/product-entry-deliverable.ts"
       ],
       "activeCallers": [
         "artifact locator contract",
@@ -789,7 +792,10 @@
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/owner-boundary.ts",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/review_projection",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-transition-evaluator.ts"
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-transition-evaluator.ts",
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/opl-generic-boundaries.ts",
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts",
+        "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts"
       ],
       "activeCallers": [
         "visual director review",
@@ -914,7 +920,8 @@
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
         "contracts/runtime-program/python-native-helper-catalog.json",
-        "python/redcube_ai"
+        "python/redcube_ai",
+        "packages/redcube-domain-entry/src/actions/native-ppt-product-entry-proof.ts"
       ],
       "activeCallers": [
         "native PPT proof lane",
@@ -1037,7 +1044,19 @@
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
         "packages/redcube-domain-entry/src/actions/get-product-status.ts",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/operator_evidence_readiness_projection"
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/operator_evidence_readiness_projection",
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/domain_action_adapter-export-projection.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/contracts.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/extra-payload.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-sections.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-payload-summaries.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-readiness.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-refs/efficiency-handoff.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-refs/evidence-constants.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-refs/production-scaleout.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-refs/production-tail-workorder.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/utils.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts"
       ],
       "activeCallers": [
         "OPL generated product status/workbench consumes RCA operator evidence refs",
@@ -1170,7 +1189,11 @@
         "apps/redcube-cli/src/cli.ts",
         "packages/redcube-domain-entry/src/actions/family-action-catalog.ts",
         "packages/redcube-domain-entry/src/actions/family-action-catalog.ts",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts"
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/entry-descriptor.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/policy.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/shell-catalog.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/shell-projections.ts"
       ],
       "activeCallers": [
         "OPL generated CLI/MCP wrapper domain handler targets",
@@ -1447,7 +1470,10 @@
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts#/opl_stability_read_model_consumption",
         "packages/redcube-domain-entry/src/actions/get-product-status.ts",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework"
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework",
+        "packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/runtime-descriptors.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-refs/receipt-monitor-handoff.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/temporal-long-soak-evidence-inventory.ts"
       ],
       "activeCallers": [
         "product status refs",
@@ -1665,7 +1691,9 @@
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
-        "packages/redcube-runtime/src"
+        "packages/redcube-runtime/src",
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-receipt-actions.ts",
+        "packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/functional-closure.ts"
       ],
       "activeCallers": [
         "visual route execution",
