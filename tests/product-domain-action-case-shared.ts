@@ -66,6 +66,11 @@ async function getProductEntryManifest(request) {
   return module.getProductEntryManifest(request);
 }
 
+async function exportDomainHandler(request) {
+  const module = await import('../packages/redcube-domain-entry/dist/index.js');
+  return module.exportDomainHandler(request);
+}
+
 async function getProductEntrySessionSurface(request) {
   const module = await import('../packages/redcube-domain-entry/dist/index.js');
   return module.getProductEntrySession(request);
@@ -264,6 +269,7 @@ export {
   createDeliverable,
   execFileSync,
   exportDomainActionAdapter,
+  exportDomainHandler,
   dispatchDomainActionAdapter,
   executeSourceAugmentation,
   existsSync,

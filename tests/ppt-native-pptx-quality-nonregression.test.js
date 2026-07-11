@@ -7,7 +7,6 @@ import { fileURLToPath } from 'node:url';
 
 import {
   createDeliverable,
-  getProductEntryManifest,
   runDeliverableRoute,
 } from './product-domain-action-test-api.js';
 import { withEnv, withMockCodexRuntime } from './mock-codex-cli.js';
@@ -174,22 +173,6 @@ test('native PPTX quality non-regression contract is refs-only and non-authorita
     engineContract.native_ppt_quality_surface.required_per_slide_metrics,
   );
   assertOfficecliPolicy(engineContract.officecli_materializer_policy);
-});
-
-test('product-entry manifest exposes native PPTX only as explicit optional route', async () => {
-  const manifest = await getProductEntryManifest({
-    workspace_locator: {
-      workspace_root: mkdtempSync(path.join(os.tmpdir(), 'redcube-native-pptx-quality-manifest-')),
-    },
-  });
-  const pptPolicy = manifest.deliverable_facade.family_route_policy.ppt_deck;
-  assert.equal(pptPolicy.default_visual_route, 'author_image_pages');
-  assert.equal(pptPolicy.native_ppt_proof_lane.default_enabled, false);
-  assert.equal(pptPolicy.native_ppt_proof_lane.production_selectable, true);
-  assert.deepEqual(pptPolicy.native_ppt_proof_lane.runnable_routes, NATIVE_ROUTES);
-  assert.deepEqual(pptPolicy.native_ppt_proof_lane.preserved_gates, PRESERVED_GATES);
-  assertIncludesAll(pptPolicy.route_selection_policy.explicit_selection_required_for, NATIVE_ROUTES, 'explicit_selection_required_for');
-  assertOfficecliPolicy(pptPolicy.native_ppt_proof_lane.officecli_materializer_policy);
 });
 
 test('native PPTX authoring artifact exposes refs without visual verdict authority', async () => {

@@ -145,14 +145,16 @@ test('OPL default callers see RCA deletion evidence refs without delete authorit
   const readiness = payload.agent_default_caller_readiness;
   assert.equal(readiness.status, 'ready_domain_evidence_required');
   assert.equal(readiness.summary.generated_default_caller_surface_count, 8);
-  assert.equal(readiness.summary.missing_domain_owner_receipt_or_typed_blocker_count, 0);
-  assert.equal(readiness.summary.missing_no_forbidden_write_proof_count, 0);
-  assert.equal(readiness.summary.missing_tombstone_or_provenance_ref_count, 0);
+  assert.equal(readiness.summary.missing_domain_owner_receipt_or_typed_blocker_count, 1);
+  assert.equal(readiness.summary.missing_no_forbidden_write_proof_count, 1);
+  assert.equal(readiness.summary.missing_tombstone_or_provenance_ref_count, 1);
   assert.equal(readiness.migration_gate_policy.physical_delete_authorized_by_this_report, false);
   assert.equal(readiness.authority_boundary.report_can_authorize_domain_repo_physical_delete, false);
 
   const report = readiness.reports[0];
   assert.equal(report.deletion_gate.physical_delete_authorized, false);
+  assert.equal(report.deletion_gate.evidence_worklist_count, 1);
+  assert.equal(report.deletion_gate.default_caller_delete_ready, false);
   assert.equal(report.private_platform_residue_deletion_gate.status, 'empty');
   assert.equal(report.private_platform_residue_deletion_gate.residue_gate_count, 0);
   assert.equal(report.private_platform_residue_deletion_gate.owner_decision_work_order.open_count_semantics, 'zero_residue_gate_count_means_no_cleanup_lane_items_not_physical_delete_authorized');

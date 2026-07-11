@@ -192,37 +192,37 @@
         "primitive": "generic_scheduler",
         "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/family_scheduler_replacement",
         "manifest_ref": "/family_scheduler_replacement",
-        "domain_action_adapter_ref": "/runtime_framework/family_scheduler_replacement"
+        "domain_action_adapter_ref": "/family_stage_control_plane_ref"
       },
       {
         "primitive": "memory_transport",
         "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/domain_memory_descriptor_locator",
         "manifest_ref": "/domain_memory_descriptor_locator",
-        "domain_action_adapter_ref": "/mapped_surfaces/visual_pattern_memory_writeback"
+        "domain_action_adapter_ref": "/domain_authority_refs/domain_memory_descriptor_locator_ref"
       },
       {
         "primitive": "artifact_lifecycle",
         "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/lifecycle_guarded_apply_proof",
         "manifest_ref": "/lifecycle_guarded_apply_proof",
-        "domain_action_adapter_ref": "/mapped_surfaces/lifecycle_guarded_apply"
+        "domain_action_adapter_ref": "/domain_authority_refs/lifecycle_guarded_apply_proof_ref"
       },
       {
         "primitive": "review_repair_transport",
         "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/quality_projection",
         "manifest_ref": "/review_state",
-        "domain_action_adapter_ref": "/mapped_surfaces/review_projection"
+        "domain_action_adapter_ref": "/domain_authority_refs/visual_transition_spec_ref"
       },
       {
         "primitive": "native_helper_generic_envelope",
         "contract_ref": "contracts/runtime-program/python-native-helper-catalog.json",
         "manifest_ref": "/native_ppt_operator_ux",
-        "domain_action_adapter_ref": "/mapped_surfaces/native_helper_implementation"
+        "domain_action_adapter_ref": "/action_handler_refs/handler_target_ref"
       },
       {
         "primitive": "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper",
         "contract_ref": "rca.visual_pack_compiler_handoff.v1",
         "manifest_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
-        "domain_action_adapter_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
+        "domain_action_adapter_ref": "/declarative_stage_manifest_ref"
       }
     ],
     "forbidden_rca_generic_owner_flags": {

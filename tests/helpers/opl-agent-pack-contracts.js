@@ -4,9 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
-  OPL_GENERATED_INTERFACE_CONSUMPTION,
   buildFamilyDomainMemoryDescriptor,
-  buildPrivatizedFunctionalModuleAuditProjection,
   buildPhysicalSourceMorphologyPolicy,
   buildRedCubeActionMetadata,
   buildRedCubeDomainAuthorityRefs,
@@ -151,7 +149,8 @@ export function buildCanonicalPack() {
     },
   });
   const visualPackCompilerHandoff = buildVisualPackCompilerHandoffProjection();
-  const functionalAudit = buildPrivatizedFunctionalModuleAuditProjection();
+  const functionalAudit = readJson('contracts/functional_privatization_audit.json');
+  const generatedInterfaceConsumption = functionalAudit.opl_generated_interface_consumption;
   const generatedSurfaceIds = [
     ...oplCanonicalGeneratedSurfaceIds,
     ...wrapperDescriptorScopeIds,
@@ -204,7 +203,7 @@ export function buildCanonicalPack() {
       ),
     generated_surfaces_requested: [...new Set(generatedSurfaceIds)],
       generated_interface_consumption_ref: '/opl_generated_interface_consumption',
-      repo_local_handler_targets: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_handler_targets,
+      repo_local_handler_targets: generatedInterfaceConsumption.repo_local_handler_targets,
       repo_local_handlers_are_generated_surface_owners: false,
       domain_repo_can_own_generated_surface: false,
       ...{ stage_pack_required_sections: visualPackCompilerHandoff.declarative_visual_pack_input.cognitive_stage_pack_contract.required_stage_sections, cognitive_kernel_adoption_ref: 'contracts/cognitive_kernel_adoption.json', golden_path_profile_ref: 'contracts/golden_path_profile.json', tool_refs: [visualPackCompilerHandoff.declarative_visual_pack_input.cognitive_stage_pack_contract.domain_affordance_catalog_ref], tool_affordance_boundary: visualPackCompilerHandoff.declarative_visual_pack_input.cognitive_stage_pack_contract.tool_affordance_boundary },
@@ -218,7 +217,7 @@ export function buildCanonicalPack() {
         declarative_stage_manifest: 'agent/stages/manifest.json',
         generated_stage_control_plane: 'opl-generated:family_stage_control_plane',
         memory_descriptor: 'packages/redcube-domain-entry/src/actions/domain-authority-refs.ts::buildFamilyDomainMemoryDescriptor',
-        functional_audit: 'packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts::buildPrivatizedFunctionalModuleAuditProjection',
+        functional_audit: 'contracts/functional_privatization_audit.json',
       },
       authority_boundary: {
         opl_can_write_domain_truth: false,

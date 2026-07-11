@@ -114,7 +114,7 @@
   ],
   "projection_surfaces": {
     "product_entry_manifest_ref": "/opl_ledger_artifact_registration",
-    "domain_handler_export_ref": "/mapped_surfaces/opl_ledger_artifact_registration",
+    "domain_handler_export_ref": "/artifact_locator_refs",
     "artifact_inventory_supporting_file_id": "opl_ledger_artifact_registration"
   },
   "owner_boundary": {

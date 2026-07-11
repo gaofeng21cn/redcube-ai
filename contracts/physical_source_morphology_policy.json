@@ -389,8 +389,8 @@
       "surface_id": "domain_action_adapter_guarded_actions",
       "source_refs": [
         "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
-        "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/"
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-orchestration.ts",
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts"
       ],
       "classification": "domain_handler_target",
       "current_rca_role": "guarded_domain_action_target_and_refs_only_domain_action_adapter_adapter_not_domain_action_adapter_owner",
@@ -1125,8 +1125,8 @@
         "current_rca_role": "guarded_domain_action_target_and_refs_only_domain_action_adapter_adapter_not_domain_action_adapter_owner",
         "source_refs": [
           "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
-          "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts",
-          "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/"
+          "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-orchestration.ts",
+          "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts"
         ]
       },
       {
@@ -1261,7 +1261,7 @@
       "legacy_name_policy.current_role_guard_policy",
       "legacy_name_policy.forbidden_payload_role_policy"
     ],
-    "checked_source_ref_count": 57,
+    "checked_source_ref_count": 55,
     "checked_machine_boundary_ref_count": 3,
     "checked_source_refs": [
       "agent/",
@@ -1277,14 +1277,15 @@
       "docs/history/",
       "docs/history/tombstones/retired-managed-product-entry-contract-2026-05-20.md",
       "packages/redcube-domain-entry/package.json",
-      "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/",
+      "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-orchestration.ts",
+      "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/domain_action_adapter-export-projection.ts",
+      "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts",
       "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/physical-source-morphology-policy.ts#buildPhysicalSourceMorphologyPolicy",
       "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
       "packages/redcube-domain-entry/src/actions/family-action-catalog.ts",
       "packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts",
       "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
       "packages/redcube-domain-entry/src/actions/get-product-status.ts",
-      "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts",
       "packages/redcube-domain-entry/src/actions/invoke-domain-entry.ts",
       "packages/redcube-domain-entry/src/actions/invoke-opl-hosted-product-entry.ts",
       "packages/redcube-domain-entry/src/actions/invoke-product-entry.ts",

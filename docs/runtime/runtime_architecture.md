@@ -94,7 +94,7 @@ OPL 侧通过 generated `domain_action_adapter` descriptor 进入 RCA `domain-ha
 
 | Surface | 当前 runtime 读法 |
 | --- | --- |
-| `domain-handler export` | 暴露 product-entry registration、session continuity、artifact inventory、runtime health、review/publication projection refs。 |
+| `domain-handler export` | 只暴露 action-handler、domain-authority、domain-evidence、typed-blocker、receipt 与 artifact-locator refs；不生成通用 runtime、session/workbench、operator、stability 或 readiness projection。 |
 | `domain-handler dispatch` | 只接受 RCA-owned guarded actions，并只返回 receipt、typed blocker、no-regression、memory/lifecycle 或 workspace evidence refs。 |
 | `runtimeWatch` | direct review/progress read model；`runtime_watch` 不再是 generated `domain_action_adapter` default dispatch action。 |
 | retired managed / continuation actions | 只作为 tombstone、negative guard 或 history/provenance 读取；generic supervision / continuation 归 OPL runner/session shell。 |

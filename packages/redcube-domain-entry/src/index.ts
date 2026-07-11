@@ -68,12 +68,10 @@ export {
 } from './actions/family-action-catalog.js';
 
 export {
-  buildPrivatizedFunctionalModuleAuditProjection,
-  OPL_GENERATED_INTERFACE_CONSUMPTION,
   buildVisualPackCompilerHandoffProjection,
   RCA_COGNITIVE_KERNEL_ADOPTION,
   RCA_GOLDEN_PATH_PROFILE,
-} from './actions/guarded-domain-actions.js';
+} from './actions/domain-action-adapter-parts/visual-pack-compiler-handoff.js';
 
 export {
   listDomainActionAdapterBlockedActions,

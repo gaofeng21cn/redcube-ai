@@ -4,7 +4,11 @@ import { DECLARATIVE_STAGE_MANIFEST_REF } from './declarative-stage-manifest.js'
 import { buildRedCubeDomainAuthorityRefs } from './domain-authority-refs.js';
 import { normalizeWorkspaceRoot } from './domain-action-adapter-parts/task-utils.js';
 
-const GENERATED_STAGE_CONTROL_PLANE_REF = 'opl-generated:family_stage_control_plane';
+const GENERATED_STAGE_CONTROL_PLANE_REF = {
+  ref_kind: 'generated_surface',
+  ref: 'opl-generated:family_stage_control_plane',
+  source_ref: 'agent/stages/manifest.json',
+};
 
 function buildDomainEvidenceRefs() {
   return {
@@ -64,6 +68,9 @@ export async function getProductEntryManifest(request: Record<string, unknown> =
     },
     declarative_stage_manifest_ref: DECLARATIVE_STAGE_MANIFEST_REF,
     family_stage_control_plane_ref: GENERATED_STAGE_CONTROL_PLANE_REF,
+    visual_transition_spec: domainAuthorityRefs.visual_transition_spec,
+    visual_transition_adapter_profile_registry:
+      domainAuthorityRefs.visual_transition_adapter_profile_registry,
     domain_evidence_refs: buildDomainEvidenceRefs(),
     typed_blocker_refs: buildTypedBlockerRefs(),
     receipt_refs: {

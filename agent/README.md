@@ -11,6 +11,8 @@ Machine boundary: `agent/` 持有 stage semantics、prompt policy refs、stage s
 
 `contracts/visual_transition_adapter_profile.json` 是 RCA-owned visual transition adapter registry。product-entry 将其作为顶层 `visual_transition_adapter_profile_registry` 原样投影给 OPL Atlas；该 registry 仅提供 domain refs，不执行 domain action、不写 visual truth，也不签 owner receipt、typed blocker、quality 或 export verdict。
 
+product-entry 以 `{ref_kind: "generated_surface", ref: "opl-generated:family_stage_control_plane", source_ref: "agent/stages/manifest.json"}` 指向 OPL 生成的 stage plane，并把 `visual_transition_spec` 与 `visual_transition_adapter_profile_registry` 保持为顶层 RCA-owned Atlas input。`domain-handler export` 只公开 action-handler、domain-authority、evidence、typed-blocker、receipt 与 artifact-locator refs，不复制通用 runtime、workbench、operator 或 readiness projection。
+
 ## Stage Prompt / Skill / Tool 分工
 
 - `agent/prompts/*.md` 是 stage operating surface：它说明每个 stage 应该做什么、读取哪些 source / prior stage refs、返回哪些 receipts / refs / typed blockers / repair targets。Stage prompt 不沉淀跨 stage 的专业方法，也不物化文件。

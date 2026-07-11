@@ -1,5 +1,6 @@
 import {
   assert,
+  exportDomainHandler,
   getProductEntryManifest,
   prepareProductEntryWorkspace,
   test,
@@ -75,7 +76,58 @@ test('product-entry consumes the declarative stage manifest and never a tracked 
 
     assert.equal(existsSync('contracts/stage_control_plane.json'), false);
     assert.equal(manifest.declarative_stage_manifest_ref, 'agent/stages/manifest.json');
-    assert.equal(manifest.family_stage_control_plane_ref, 'opl-generated:family_stage_control_plane');
+    assert.deepEqual(manifest.family_stage_control_plane_ref, {
+      ref_kind: 'generated_surface',
+      ref: 'opl-generated:family_stage_control_plane',
+      source_ref: 'agent/stages/manifest.json',
+    });
     assert.equal(Object.hasOwn(manifest, 'family_stage_control_plane'), false);
+  });
+});
+
+test('domain-handler export is an exact refs-only authority target without generic shells', async () => {
+  await withMockCodexRuntimeState(async () => {
+    const exportSurface = await exportDomainHandler({
+      workspace_root: await prepareProductEntryWorkspace(),
+    });
+
+    assert.deepEqual(Object.keys(exportSurface).sort(), [
+      'action_handler_refs',
+      'adapter_id',
+      'artifact_locator_refs',
+      'authority_boundary',
+      'command',
+      'compatibility_alias_allowed',
+      'declarative_stage_manifest_ref',
+      'dispatch_command',
+      'domain_authority_refs',
+      'domain_evidence_refs',
+      'domain_id',
+      'family_action_catalog_ref',
+      'family_stage_control_plane_ref',
+      'handler_id',
+      'handler_role',
+      'ok',
+      'receipt_refs',
+      'repo_local_legacy_product_domain_action_adapter_command_available',
+      'surface_kind',
+      'typed_blocker_refs',
+      'version',
+      'workspace_locator',
+      'wrapped_projection_surface_kind',
+    ].sort());
+    for (const retiredSurface of [
+      'runtime_framework',
+      'mapped_surfaces',
+      'guarded_actions',
+      'blocked_actions',
+      'source_manifest_refs',
+      'runtime_residue_retirement',
+      'summary',
+    ]) {
+      assert.equal(Object.hasOwn(exportSurface, retiredSurface), false, retiredSurface);
+    }
+    assert.equal(exportSurface.authority_boundary.projection_can_claim_domain_ready, false);
+    assert.ok(JSON.stringify(exportSurface).length < 20_000);
   });
 });

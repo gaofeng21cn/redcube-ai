@@ -117,6 +117,6 @@
     "latest_temporal_long_soak_probe_closeout_ref": "contracts/production_acceptance/rca-temporal-long-soak-probe-20260710.json",
     "owner_chain_live_progress_evidence_ref": "contracts/owner_chain_live_progress_evidence.json",
     "live_stage_run_progress_evidence_ref": "contracts/live_stage_run_progress_evidence.json",
-    "domain_action_adapter_ref": "opl_generated:domain_action_adapter#/mapped_surfaces/temporal_stage_run_consumption_policy"
+    "domain_action_adapter_ref": "opl_generated:domain_action_adapter#/domain_handler_target_refs"
   }
 }

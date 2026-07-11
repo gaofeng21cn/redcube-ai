@@ -20,7 +20,7 @@ test('OPL transition runner and RCA domain adapter exchange refs without sharing
       (entry) => entry.transition_id === 'review_ready_to_package',
     );
 
-    assert.equal(adapter.mapped_surfaces.visual_transition_spec.spec_id, manifest.visual_transition_spec.spec_id);
+    assert.equal(adapter.domain_authority_refs.visual_transition_spec_ref, '/visual_transition_spec');
     assert.ok(transition);
 
     const guards = Object.fromEntries(transition.required_guard_refs.map((guardId) => [guardId, {}]));

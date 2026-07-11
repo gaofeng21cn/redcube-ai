@@ -7,7 +7,11 @@ const ACTION_CATALOG_REF = {
   label: 'RedCube canonical action catalog',
 };
 const DECLARATIVE_STAGE_MANIFEST_REF = 'agent/stages/manifest.json';
-const GENERATED_STAGE_CONTROL_PLANE_REF = 'opl-generated:family_stage_control_plane';
+const GENERATED_STAGE_CONTROL_PLANE_REF = {
+  ref_kind: 'generated_surface',
+  ref: 'opl-generated:family_stage_control_plane',
+  source_ref: 'agent/stages/manifest.json',
+};
 
 function readContract(relativePath) {
   return JSON.parse(readFileSync(new URL(`../../${relativePath}`, import.meta.url), 'utf8'));
@@ -22,7 +26,7 @@ export function assertManifestActionAndStageControlPlane({
 
   assert.deepEqual(manifest.family_action_catalog_ref, ACTION_CATALOG_REF);
   assert.equal(manifest.declarative_stage_manifest_ref, DECLARATIVE_STAGE_MANIFEST_REF);
-  assert.equal(manifest.family_stage_control_plane_ref, GENERATED_STAGE_CONTROL_PLANE_REF);
+  assert.deepEqual(manifest.family_stage_control_plane_ref, GENERATED_STAGE_CONTROL_PLANE_REF);
   assert.equal(Object.hasOwn(manifest, 'family_action_catalog'), false);
   assert.equal(Object.hasOwn(manifest, 'family_action_catalog_parity'), false);
   assert.equal(Object.hasOwn(manifest, 'family_stage_control_plane'), false);

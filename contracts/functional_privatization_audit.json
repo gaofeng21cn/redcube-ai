@@ -662,7 +662,7 @@
       "rca_scope": "visual_artifact_export_authority_and_locator_refs",
       "audit_readout": "project_opl_artifact_lifecycle_retain_rca_export_authority",
       "codePaths": [
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/artifact_locator",
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/domain_action_adapter-export-projection.ts#/artifact_locator_refs",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_workspace_lifecycle",
         "packages/redcube-domain-entry/src/actions/product-entry-deliverable.ts"
       ],
@@ -787,11 +787,9 @@
       "audit_readout": "retain_domain_gate_project_transport_refs",
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/owner-boundary.ts",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/review_projection",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-transition-evaluator.ts",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/opl-generic-boundaries.ts",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts",
-        "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts"
+        "packages/redcube-domain-entry/src/actions/domain-authority-refs.ts",
+        "packages/redcube-domain-entry/src/actions/domain-handler.ts"
       ],
       "activeCallers": [
         "visual director review",
@@ -1448,14 +1446,13 @@
       "rca_scope": "visual_domain_status_projection_refs_only",
       "audit_readout": "project_only",
       "codePaths": [
-        "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts#/opl_stability_read_model_consumption",
         "packages/redcube-domain-entry/src/actions/get-product-status.ts",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework",
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/domain_action_adapter-export-projection.ts",
         "packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/runtime-descriptors.ts"
       ],
       "activeCallers": [
         "product status refs",
-        "domain-handler runtime framework refs"
+        "domain-handler exact evidence and locator refs"
       ],
       "activeCallerStatus": "active_refs_only_consumer_projection",
       "migrationAction": "Keep observability exporter, SLO, control-loop summary, usage and resource-pressure aggregation in OPL.",

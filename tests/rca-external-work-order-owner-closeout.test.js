@@ -104,19 +104,11 @@ test('RCA manifest and domain_action_adapter expose external work-order owner cl
     );
 
     assert.equal(
-      domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.action,
-      'emit_external_work_order_owner_closeout',
+      domain_action_adapter.domain_authority_refs.external_work_order_owner_closeout_ref,
+      '/domain_authority_refs/domain_owner_receipt_contract/external_work_order_owner_closeout',
     );
-    assert.equal(domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.owner, 'redcube_ai');
-    assert.equal(domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.refs_only, true);
-    assert.equal(domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.writes_visual_truth, false);
-    assert.equal(domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.writes_artifact_body, false);
-    assert.equal(domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.writes_memory_body, false);
-    assert.equal(domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.authorizes_quality_or_export, false);
-    assert.equal(
-      domain_action_adapter.source_manifest_refs.external_work_order_owner_closeout_ref,
-      '/domain_owner_receipt_contract/external_work_order_owner_closeout',
-    );
+    assert.equal(domain_action_adapter.authority_boundary.opl_can_write_visual_truth, false);
+    assert.equal(domain_action_adapter.authority_boundary.opl_can_authorize_review_or_export, false);
   });
 });
 
