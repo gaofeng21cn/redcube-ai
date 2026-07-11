@@ -41,7 +41,7 @@ test('product-entry manifest exposes owner receipt, lifecycle apply, and transit
     });
 
     const ownerReceipt = manifest.domain_owner_receipt_contract;
-    assert.equal(ownerReceipt.surface_kind, 'domain_owner_receipt_contract');
+    assert.equal(ownerReceipt.surface_kind, 'owner_receipt_contract');
     assert.equal(ownerReceipt.contract_id, 'rca.domain_owner_receipt.v1');
     assert.deepEqual(ownerReceipt.allowed_return_shapes, [
       'domain_receipt',

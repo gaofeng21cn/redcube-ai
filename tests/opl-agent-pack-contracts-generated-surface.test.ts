@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 
+import { buildRepoGeneratedInterfaceBundle } from 'opl-framework-shared/domain-pack-compiler';
+
 import {
   assertNoLegacyAuthorityFunctionFields,
   readJson,
@@ -30,10 +32,19 @@ test('RCA generated surface handoff is OPL-owned and root pack input is refs-onl
   assert.equal(packRefs.canonical_agent_id, 'rca');
   assert.equal(packRefs.domain_id, 'redcube_ai');
   assert.equal(packRefs.pack_compiler_owner, 'one-person-lab');
-  assert.equal(packRefs.authority_boundary.opl_can_compile_generated_surfaces_from_refs, true);
+  assert.equal(Object.hasOwn(packRefs.authority_boundary, 'opl_can_compile_generated_surfaces_from_refs'), false);
   assert.equal(packRefs.authority_boundary.opl_can_write_domain_truth, false);
   assert.equal(packRefs.authority_boundary.opl_can_authorize_quality_or_export, false);
   assert.equal(packRefs.required_domain_pack_paths.every((entry) => entry.startsWith('agent/')), true);
+  assert.equal(packRefs.required_domain_pack_paths.includes('agent/stages/manifest.json'), true);
+  assert.equal(packRefs.source_refs.stage_refs, 'agent/stages/manifest.json');
+  assert.equal(packRefs.source_refs.stage_graph_source_ref, 'agent/stages/manifest.json');
+  assert.equal(packRefs.standard_stage_pack_conformance.enforcement_ref, 'agent/stages/manifest.json');
+
+  const bundle = buildRepoGeneratedInterfaceBundle(repoRoot, 'all', 'rca');
+  assert.equal(bundle.status, 'ready');
+  assert.equal(bundle.bundle.agent_id, 'rca');
+  assert.equal(bundle.bundle.target_domain_id, 'redcube_ai');
 
   assert.equal(actionTargets.surface_kind, 'family_action_catalog');
   assert.equal(actionTargets.version, 'family-action-catalog.v1');

@@ -4,7 +4,7 @@ const DOMAIN_OWNER = 'redcube_ai';
 
 export function buildDomainOwnerReceiptContract() {
   return {
-    surface_kind: 'domain_owner_receipt_contract',
+    surface_kind: 'owner_receipt_contract',
     contract_id: 'rca.domain_owner_receipt.v1',
     owner: DOMAIN_OWNER,
     contract_model: 'domain_receipt_typed_blocker_no_regression_refs_only',
