@@ -116,3 +116,23 @@ test('RCA standard-agent principles declare current OPL stage references without
     assert.equal(value, false);
   }
 });
+
+test('RCA declares the required OPL-owned workspace lifecycle policy', () => {
+  const lifecyclePolicy = readJson('contracts/workspace_lifecycle_policy.json');
+
+  assert.equal(lifecyclePolicy.surface_kind, 'opl_domain_workspace_file_lifecycle_policy');
+  assert.equal(lifecyclePolicy.version, 'opl-domain-workspace-file-lifecycle.v1');
+  assert.equal(lifecyclePolicy.policy_owner, 'one-person-lab');
+  assert.equal(lifecyclePolicy.domain_id, 'redcube_ai');
+  assert.equal(lifecyclePolicy.structural_gate_only, true);
+  assert.equal(lifecyclePolicy.workspace_runtime_artifact_roots.externalized, true);
+  assert.deepEqual(lifecyclePolicy.workspace_runtime_artifact_roots.required_locator_refs, [
+    'workspace_root_ref',
+    'runtime_artifact_root_ref',
+    'artifact_locator_ref',
+    'restore_or_retention_receipt_ref',
+  ]);
+  for (const value of Object.values(lifecyclePolicy.authority_boundary)) {
+    assert.equal(value, false);
+  }
+});
