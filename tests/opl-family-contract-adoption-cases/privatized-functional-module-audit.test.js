@@ -169,11 +169,11 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
       );
       assert.equal(entry.physical_deletion_guard.owner_evidence_lane_ref, undefined, entry.module_id);
       assert.equal(entry.physical_deletion_guard.typed_blocker_ref, undefined, entry.module_id);
-      if (entry.module_id === 'visual_pack_compiler_handoff') {
+      if (['visual_pack_compiler_handoff', 'visual_authority_functions'].includes(entry.module_id)) {
         assert.equal(entry.opl_owned_generic_primitive_consumer, false, entry.module_id);
         assert.equal(entry.opl_absorb_candidate, false, entry.module_id);
-      } else if (entry.module_id === 'visual_authority_functions') {
-        assert.equal(entry.opl_owned_generic_primitive_consumer, false, entry.module_id);
+      } else if (entry.module_id === 'native_helper_envelope') {
+        assert.equal(entry.opl_owned_generic_primitive_consumer, true, entry.module_id);
         assert.equal(entry.opl_absorb_candidate, false, entry.module_id);
       } else {
         assert.equal(entry.opl_owned_generic_primitive_consumer, true, entry.module_id);
