@@ -670,11 +670,11 @@ test('ppt screenshot review escalates speaker fit failures back to slide_bluepri
       deliverableId: 'deck-a',
       route: 'screenshot_review',
     });
-    assert.equal(screenshotReviewResult.ok, false);
-    assert.match(screenshotReviewResult.run?.error?.message || '', /Route screenshot_review blocked/);
+    assert.equal(screenshotReviewResult.ok, true);
 
     const reviewArtifact = readJson(routeArtifactFile(screenshotReviewResult));
-    assert.equal(reviewArtifact.status, 'block');
+    assert.equal(reviewArtifact.status, 'completed_with_quality_debt');
+    assert.equal(reviewArtifact.quality_debt?.blocks_stage_transition, false);
     assert.equal(reviewArtifact.checks?.speaker_fit_ok, false);
     assert.equal(reviewArtifact.review_state_patch?.rerun_from_stage, 'slide_blueprint');
     assert.equal(reviewArtifact.review_state_patch?.rerun_policy?.rerun_from_stage, 'slide_blueprint');

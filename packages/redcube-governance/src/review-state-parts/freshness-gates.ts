@@ -172,18 +172,20 @@ export function buildSourceReadinessReport(summary) {
 
   if (summary.status === 'missing') {
     return {
-      status: 'block',
+      status: 'quality_debt',
       issues: uniqueList(summary.blocking_reasons).length > 0
         ? uniqueList(summary.blocking_reasons)
         : ['source_readiness_missing'],
       rerun_from_stage: 'source_readiness',
       recommended_action: 'run_source_research',
+      blocks_stage_transition: false,
+      blocks_ready_claims: true,
     };
   }
 
   if (summary.status !== 'pass') {
     return {
-      status: 'block',
+      status: 'quality_debt',
       issues: summary.status === 'invalid'
         ? (uniqueList(summary.blocking_reasons).length > 0
             ? uniqueList(summary.blocking_reasons)
@@ -191,6 +193,8 @@ export function buildSourceReadinessReport(summary) {
         : ['source_readiness_not_planning_ready', ...uniqueList(summary.blocking_evidence_gaps)],
       rerun_from_stage: 'source_readiness',
       recommended_action: 'run_source_research',
+      blocks_stage_transition: false,
+      blocks_ready_claims: true,
     };
   }
 

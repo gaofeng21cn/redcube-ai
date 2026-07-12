@@ -57,8 +57,8 @@ const PROFESSIONAL_SPECIALIST_SKILLS_BY_ROUTE = Object.freeze({
   'ppt_deck:visual_direction': ['visual_director', 'template_profiler'],
   'ppt_deck:author_image_pages': ['page_author', 'visual_director'],
   'ppt_deck:render_html': ['page_author', 'visual_director'],
-  'ppt_deck:author_pptx_native': ['native_ppt_designer', 'template_profiler'],
-  'ppt_deck:repair_pptx_native': ['native_ppt_designer', 'template_profiler', 'reviewer'],
+  'ppt_deck:author_pptx_native': ['native_ppt_designer'],
+  'ppt_deck:repair_pptx_native': ['native_ppt_designer', 'reviewer'],
   'ppt_deck:director_review': ['reviewer'],
   'ppt_deck:visual_director_review': ['reviewer'],
   'ppt_deck:screenshot_review': ['reviewer'],
@@ -224,7 +224,15 @@ export function resolveGenerationTimeoutMs(timeoutMs, localFileInspection = [], 
   return hasImageInspection ? defaultVisualTimeoutMs : defaultGenerationTimeoutMs;
 }
 
-export function buildGenerationInput({ family, route, promptRelativePath, context, outputContract, localFileInspection = [] }) {
+export function buildGenerationInput({
+  family,
+  route,
+  promptRelativePath,
+  context,
+  outputContract,
+  outputContractDelivery = 'inline',
+  localFileInspection = [],
+}) {
   const guidance = readPromptGuidance(promptRelativePath);
   const professionalSkillSection = buildProfessionalSkillGuidanceSection(family, route, context);
   const localFileSection = buildLocalFileInspectionSection(localFileInspection);
@@ -245,15 +253,13 @@ export function buildGenerationInput({ family, route, promptRelativePath, contex
     guidance,
     '',
     ...(professionalSkillSection ? [professionalSkillSection, ''] : []),
-    '## Context',
-    '```json',
-    JSON.stringify(context, null, 2),
-    '```',
-    '',
+    ...(outputContractDelivery === 'attached_schema'
+      ? []
+      : ['## Context', '```json', JSON.stringify(context, null, 2), '```', '']),
     '## Output Contract',
-    '```json',
-    JSON.stringify(outputContract, null, 2),
-    '```',
+    ...(outputContractDelivery === 'attached_schema'
+      ? ['Return one JSON object that satisfies the output schema attached to this Codex invocation.']
+      : ['```json', JSON.stringify(outputContract, null, 2), '```']),
     '',
     ...(localFileSection ? [localFileSection, ''] : []),
     '## Output Rule',

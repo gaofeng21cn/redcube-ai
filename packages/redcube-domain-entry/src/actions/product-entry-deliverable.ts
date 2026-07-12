@@ -37,7 +37,23 @@ function writeJson(file, value) {
 }
 
 function requestedConstraints(delivery) {
-  return isPlainObject(delivery?.constraints) ? delivery.constraints : {};
+  const constraints = isPlainObject(delivery?.constraints) ? delivery.constraints : {};
+  const route = safeText(delivery?.route);
+  const laneId = route === 'author_image_pages' || route === 'repair_image_pages'
+    ? 'image_pages'
+    : route === 'render_html' || route === 'fix_html'
+      ? 'html'
+      : route === 'author_pptx_native' || route === 'repair_pptx_native'
+        ? 'native_pptx'
+        : '';
+  return laneId ? mergeJsonObject(constraints, {
+    authoring_route_lock: {
+      lane_id: laneId,
+      selected_route: route,
+      source: 'explicit_product_entry_route',
+      automatic_cross_lane_fallback_allowed: false,
+    },
+  }) : constraints;
 }
 
 function rehydrateDeliverableContractWithConstraints({
@@ -205,7 +221,7 @@ export async function ensureProductEntryDeliverable({
       deliverableId,
       title: requireField('delivery_request.title', deliveryIdentity.title),
       goal: requireField('delivery_request.goal', deliveryIdentity.goal),
-      constraints: delivery.constraints,
+      constraints: requestedConstraints(delivery),
     });
   } else {
     rehydrateDeliverableContractWithConstraints({

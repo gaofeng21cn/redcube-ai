@@ -16,6 +16,7 @@ import {
   artifactRerunFromStage,
   artifactRequestsFixHtml,
   nextLinearStageId,
+  nextStageAfterRoute,
   readHydratedContractForRequest,
   readStageArtifactForRequest,
   routeSequenceStageIds,
@@ -103,6 +104,9 @@ function canRevisitContinuationEdgeAfterRepair({
   continuationRouteRuns: DependencyRouteRun[];
 }): boolean {
   if (currentResult.ok !== true) return false;
+  if (VISUAL_REVISION_ROUTES.has(currentRoute) && nextRoute === 'visual_director_review') {
+    return continuationRouteCount(currentRoute, continuationRouteRuns) <= MAX_REPAIR_CONTINUATION_CYCLES;
+  }
   if (currentRoute !== 'visual_director_review' || nextRoute !== 'screenshot_review') return false;
   const lastRoute = continuationRouteRuns.at(-1)?.route || '';
   const previousRoute = lastRoute === currentRoute
@@ -117,22 +121,19 @@ function continuationRouteCount(route: string, continuationRouteRuns: Dependency
 
 function blockedDirectorRepairRouteRequiringScreenshotFeedback(request: RunDeliverableRouteRequest): string | null {
   const artifact = readStageArtifactForRequest(request, 'visual_director_review') as { status?: unknown } | null;
-  if (safeText(artifact?.status) !== 'block') return null;
+  if (!['block', 'completed_with_quality_debt'].includes(safeText(artifact?.status))) return null;
   const repairRoute = artifactRerunFromStage(artifact);
   return REVISION_ROUTES_REQUIRING_SCREENSHOT_FEEDBACK.has(repairRoute) ? repairRoute : null;
 }
 
-function canContinueNativePptRepairCycle({
-  request,
+function canContinueRepairCycle({
   nextRoute,
   continuationRouteRuns,
 }: {
-  request: RunDeliverableRouteRequest;
   nextRoute: string;
   continuationRouteRuns: DependencyRouteRun[];
 }): boolean {
-  if (nextRoute !== 'repair_pptx_native') return false;
-  if (blockedDirectorRepairRouteRequiringScreenshotFeedback(request) !== 'repair_pptx_native') return false;
+  if (!VISUAL_REVISION_ROUTES.has(nextRoute)) return false;
   return continuationRouteCount(nextRoute, continuationRouteRuns) < MAX_REPAIR_CONTINUATION_CYCLES;
 }
 
@@ -198,17 +199,40 @@ function nextContinuationStageId({
   request,
   contract,
   currentRoute,
+  continuationRouteRuns,
 }: {
   request: RunDeliverableRouteRequest;
   contract: JsonObject;
   currentRoute: string;
+  continuationRouteRuns: DependencyRouteRun[];
 }): string | null {
   if (VISUAL_REVISION_ROUTES.has(currentRoute) || VISUAL_AUTHOR_ALTERNATE_ROUTES.has(currentRoute)) {
     return 'visual_director_review';
   }
+  if (currentRoute === 'visual_director_review') {
+    const directorArtifact = readStageArtifactForRequest(request, 'visual_director_review');
+    const recommendedRepairRoute = artifactRerunFromStage(directorArtifact);
+    if (VISUAL_REVISION_ROUTES.has(recommendedRepairRoute)) {
+      if (REVISION_ROUTES_REQUIRING_SCREENSHOT_FEEDBACK.has(recommendedRepairRoute)) {
+        return 'screenshot_review';
+      }
+      if (continuationRouteCount(recommendedRepairRoute, continuationRouteRuns) < MAX_REPAIR_CONTINUATION_CYCLES) {
+        return recommendedRepairRoute;
+      }
+      return nextStageAfterRoute(contract, recommendedRepairRoute);
+    }
+  }
   if (currentRoute === 'screenshot_review') {
     const pendingDirectorRepairRoute = blockedDirectorRepairRouteRequiringScreenshotFeedback(request);
     if (pendingDirectorRepairRoute) return pendingDirectorRepairRoute;
+    const reviewArtifact = readStageArtifactForRequest(request, 'screenshot_review');
+    const recommendedRepairRoute = artifactRerunFromStage(reviewArtifact);
+    if (VISUAL_REVISION_ROUTES.has(recommendedRepairRoute)) {
+      if (continuationRouteCount(recommendedRepairRoute, continuationRouteRuns) < MAX_REPAIR_CONTINUATION_CYCLES) {
+        return recommendedRepairRoute;
+      }
+      return nextStageAfterRoute(contract, recommendedRepairRoute);
+    }
   }
   const nextStage = nextLinearStageId(contract, currentRoute);
   if (currentRoute === 'screenshot_review' && nextStage && VISUAL_REVISION_ROUTES.has(nextStage)) {
@@ -231,7 +255,7 @@ function blockedStageRecommendedRepairRoute({
 }): string | null {
   if (result.ok === true) return null;
   const artifact = readStageArtifactForRequest(request, currentRoute) as { status?: unknown } | null;
-  if (safeText(artifact?.status) !== 'block') return null;
+  if (!['block', 'completed_with_quality_debt'].includes(safeText(artifact?.status))) return null;
   const repairRoute = artifactRerunFromStage(artifact);
   if (currentRoute === 'visual_director_review' && blockedDirectorRepairRouteRequiringScreenshotFeedback(request)) {
     return 'screenshot_review';
@@ -370,7 +394,7 @@ async function continueToStopAfterStage({
   let currentResult = result;
   const continuationRouteRuns: DependencyRouteRun[] = [];
   const visited = new Set([currentRoute]);
-  const maxContinuationHops = declaredStageIds.length + 2;
+  const maxContinuationHops = declaredStageIds.length + (MAX_REPAIR_CONTINUATION_CYCLES * 3) + 4;
 
   for (let hop = 0; hop < maxContinuationHops; hop += 1) {
     if (currentRoute === stopAfterStage) {
@@ -381,6 +405,7 @@ async function continueToStopAfterStage({
           request,
           contract,
           currentRoute,
+          continuationRouteRuns,
         })
       : blockedStageRecommendedRepairRoute({
           request,
@@ -396,7 +421,7 @@ async function continueToStopAfterStage({
       nextRoute,
       currentResult,
       continuationRouteRuns,
-    }) || canContinueNativePptRepairCycle({ request, nextRoute, continuationRouteRuns });
+    }) || canContinueRepairCycle({ nextRoute, continuationRouteRuns });
     if (visited.has(edgeKey) && !canRevisitEdge) {
       return { result: currentResult, continuationRouteRuns };
     }

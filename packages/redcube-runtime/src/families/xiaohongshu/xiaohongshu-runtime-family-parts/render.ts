@@ -189,10 +189,10 @@ export function createXiaohongshuRenderParts(deps) {
     adapter = CODEX_DEFAULT_ADAPTER,
   }) {
     const planSlides = safeArray(planArtifact?.single_note_plan?.slides);
-    return planSlides.map((slide) => {
+    return planSlides.flatMap((slide) => {
       const rawContent = slideHtmlById.get(slide.slide_id);
       if (!rawContent) {
-        throw new Error(`${route} output missing slide: ${slide.slide_id}`);
+        return [];
       }
       const materialRules = visualArtifact?.visual_direction?.material_rules || {};
       const recipeDecision = creativeSourceStamp({
@@ -227,7 +227,7 @@ export function createXiaohongshuRenderParts(deps) {
         slide.slide_id,
         'xiaohongshu',
       );
-      return {
+      return [{
         slide_id: slide.slide_id,
         slide_no: slide.slide_no,
         title: slide.title,
@@ -262,7 +262,7 @@ export function createXiaohongshuRenderParts(deps) {
         },
         markup_contract_source: CREATIVE_MATERIALIZED_FROM,
         content,
-      };
+      }];
     });
   }
 
@@ -285,6 +285,16 @@ export function createXiaohongshuRenderParts(deps) {
       route: 'render_html',
       adapter,
     });
+    if (slides.length === 0) {
+      const error = new Error('render_html produced no consumable HTML pages');
+      error.failure_kind = 'missing_consumable_artifact';
+      error.hard_stop_kind = 'missing_consumable_artifact';
+      throw error;
+    }
+    const planSlides = safeArray(plan?.single_note_plan?.slides);
+    const missingSlideIds = planSlides
+      .map((slide) => safeText(slide?.slide_id))
+      .filter((slideId) => slideId && !slides.some((slide) => safeText(slide?.slide_id) === slideId));
     const contractRender = renderContract(contract);
     const renderPlan = {
       render_strategy: safeText(contractRender.render_strategy, 'upstream_structured_ai_html'),
@@ -323,12 +333,23 @@ export function createXiaohongshuRenderParts(deps) {
     }));
     return {
       ...attachCommon('render_html', contract, generationRuntime, adapter),
+      status: missingSlideIds.length > 0 ? 'completed_with_quality_debt' : 'completed',
+      quality_debt: missingSlideIds.length > 0 ? {
+        status: 'recorded_non_blocking',
+        reasons: ['html_authoring_partial_failure'],
+        failed_slide_ids: missingSlideIds,
+        blocks_stage_transition: false,
+        blocks_ready_claims: true,
+      } : null,
       creative_execution: creativeExecution('render_html', generationRuntime, adapter),
       render_execution: renderExecution,
       lifecycle_stage: 'visual_authorship',
       html_bundle: {
         html_file: htmlFile,
         page_count: slides.length,
+        expected_page_count: planSlides.length,
+        actual_page_count: slides.length,
+        page_count_gate_pass: slides.length === planSlides.length,
         shell_contract: CANVAS,
         render_strategy: renderPlan.render_strategy,
         director_contract: renderPlan.director_contract, html_design_companion: renderPlan.html_design_companion,
@@ -420,6 +441,16 @@ export function createXiaohongshuRenderParts(deps) {
       route: PAGE_FIX_ROUTE,
       adapter,
     });
+    if (slides.length === 0) {
+      const error = new Error('fix_html produced no consumable HTML pages');
+      error.failure_kind = 'missing_consumable_artifact';
+      error.hard_stop_kind = 'missing_consumable_artifact';
+      throw error;
+    }
+    const allPlanSlides = safeArray(plan?.single_note_plan?.slides);
+    const missingSlideIds = allPlanSlides
+      .map((slide) => safeText(slide?.slide_id))
+      .filter((slideId) => slideId && !slides.some((slide) => safeText(slide?.slide_id) === slideId));
     const contractRender = renderContract(contract);
     const renderPlan = {
       render_strategy: safeText(contractRender.render_strategy, 'upstream_structured_ai_html'),
@@ -462,11 +493,22 @@ export function createXiaohongshuRenderParts(deps) {
     }));
     return {
       ...attachCommon(PAGE_FIX_ROUTE, contract, generationRuntime, adapter),
+      status: missingSlideIds.length > 0 ? 'completed_with_quality_debt' : 'completed',
+      quality_debt: missingSlideIds.length > 0 ? {
+        status: 'recorded_non_blocking',
+        reasons: ['html_repair_partial_failure'],
+        failed_slide_ids: missingSlideIds,
+        blocks_stage_transition: false,
+        blocks_ready_claims: true,
+      } : null,
       creative_execution: creativeExecution(PAGE_FIX_ROUTE, generationRuntime, adapter),
       lifecycle_stage: 'visual_authorship',
       html_bundle: {
         html_file: htmlFile,
         page_count: slides.length,
+        expected_page_count: allPlanSlides.length,
+        actual_page_count: slides.length,
+        page_count_gate_pass: slides.length === allPlanSlides.length,
         shell_contract: CANVAS,
         render_strategy: renderPlan.render_strategy,
         director_contract: renderPlan.director_contract, html_design_companion: renderPlan.html_design_companion,

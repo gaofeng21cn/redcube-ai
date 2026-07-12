@@ -115,6 +115,7 @@ test('RCA owner-chain evidence contract records mock-safe visual canary refs wit
 
   assert.equal(temporalPolicy.owner_chain_completion_audit.completion_status, 'blocked_requires_real_visual_stage_owner_acceptance');
   assert.deepEqual(temporalPolicy.owner_chain_completion_audit.accepted_terminal_evidence_refs, [
+    'progress_delta_receipt_ref',
     'owner_receipt_ref',
     'typed_blocker_ref',
     'human_gate_ref',

@@ -96,3 +96,67 @@ test('poster_onepager mainline runs through review and export on shared runtime'
     assert.equal(typeof exportArtifact.export_bundle.source_html, 'string');
   });
 });
+
+test('poster_onepager review quality debt does not block screenshot review or export', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-poster-progress-first-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'poster_onepager',
+      profileId: 'knowledge_poster',
+      topicId: 'topic-a',
+      deliverableId: 'poster-debt',
+      title: '甲状腺门诊知识海报',
+      goal: '验证质量债务不阻断交付推进',
+    });
+    for (const route of ['storyline', 'poster_blueprint', 'visual_direction', 'render_html']) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'poster_onepager',
+        topicId: 'topic-a',
+        deliverableId: 'poster-debt',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+    process.env.REDCUBE_MOCK_POSTER_REVIEW_VARIANT = 'force_director_block';
+    const directorResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'poster_onepager',
+      topicId: 'topic-a',
+      deliverableId: 'poster-debt',
+      route: 'visual_director_review',
+    });
+    delete process.env.REDCUBE_MOCK_POSTER_REVIEW_VARIANT;
+    assert.equal(directorResult.ok, true);
+    const directorArtifact = JSON.parse(readFileSync(directorResult.artifactFile, 'utf-8'));
+    assert.equal(directorArtifact.status, 'completed_with_quality_debt');
+
+    process.env.REDCUBE_MOCK_POSTER_SCREENSHOT_REVIEW_VARIANT = 'force_block';
+    const screenshotResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'poster_onepager',
+      topicId: 'topic-a',
+      deliverableId: 'poster-debt',
+      route: 'screenshot_review',
+    });
+    delete process.env.REDCUBE_MOCK_POSTER_SCREENSHOT_REVIEW_VARIANT;
+    assert.equal(screenshotResult.ok, true, JSON.stringify(screenshotResult));
+    const screenshotArtifact = JSON.parse(readFileSync(screenshotResult.artifactFile, 'utf-8'));
+    assert.equal(screenshotArtifact.status, 'completed_with_quality_debt');
+
+    const exportResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'poster_onepager',
+      topicId: 'topic-a',
+      deliverableId: 'poster-debt',
+      route: 'export_bundle',
+    });
+    assert.equal(exportResult.ok, true);
+    const exported = JSON.parse(readFileSync(exportResult.artifactFile, 'utf-8'));
+    assert.equal(exported.status, 'completed_with_quality_debt');
+    assert.equal(exported.quality_debt.blocks_stage_transition, false);
+    assert.equal(exported.review_state_patch.ready_for_export, false);
+    assert.equal(existsSync(exported.export_bundle.source_html), true);
+  });
+});

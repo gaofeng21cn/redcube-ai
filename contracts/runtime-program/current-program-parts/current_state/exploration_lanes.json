@@ -182,13 +182,14 @@
         "sparse oversized card",
         "optional OCR manifest domain_action_adapter"
       ],
-      "hard_block_checks": [
+      "ready_claim_block_checks": [
         "external_audience_language_ok",
         "title_safe_zone_clear",
         "table_legibility_ok",
         "layout_density_ok"
       ],
-      "fail_closed_when_missing_png_or_manifest": true,
+      "zero_consumable_png_hard_stop": true,
+      "missing_or_partial_manifest_quality_debt": true,
       "rerun_route": "repair_image_pages"
     },
     "cache_resume_and_repair": {
@@ -204,7 +205,8 @@
       "default_reuses_same_key_png": true,
       "repair_scope": "blocked_slide_ids_only",
       "unblocked_slide_policy": "reuse_prior_png_and_record_preserved_hashes",
-      "fail_closed_when_prior_png_missing": true,
+      "missing_prior_png_quality_debt_when_other_pages_are_consumable": true,
+      "zero_consumable_png_hard_stop": true,
       "token_persistence_allowed": false
     },
     "operator_ux": {
@@ -404,7 +406,8 @@
           "numeric_label_overflows",
           "coordinate_determinism_hash"
         ],
-        "review_fail_closed_when_metrics_missing": true
+        "review_quality_debt_when_metrics_missing": true,
+        "quality_debt_blocks_ready_claims_not_stage_transition": true
       },
       "export_evidence": {
         "status": "landed",

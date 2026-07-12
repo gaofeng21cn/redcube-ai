@@ -118,7 +118,7 @@
     "claims_allowed": [
       "controlled_fixture_trace_shape_present",
       "refs_only_asset_follow_audit_present",
-      "owner_receipt_or_typed_blocker_closeout_shape_present"
+      "progress_receipt_or_owner_answer_or_hard_stop_closeout_shape_present"
     ],
     "claims_forbidden": [
       "live_domain_progress",

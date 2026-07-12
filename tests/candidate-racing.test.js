@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 import { planCandidateRace, runCandidateRaceRoute, selectCandidateRaceWinner } from './package-surfaces.js';
 
-test('candidate racing planner records parallel candidates without claiming quality gate bypass', () => {
+test('candidate racing planner treats candidate retries as quality budget', () => {
   const plan = planCandidateRace({
     family: 'ppt_deck',
     route: 'visual_direction',
@@ -13,7 +13,7 @@ test('candidate racing planner records parallel candidates without claiming qual
 
   assert.equal(plan.racing_kind, 'parallel_candidate_race');
   assert.equal(plan.reuse_claimed, false);
-  assert.equal(plan.quality_gate_policy, 'all_candidates_must_pass_same_contract_before_selection');
+  assert.equal(plan.quality_gate_policy, 'quality_budget_prefers_pass_and_selects_best_available_artifact');
   assert.deepEqual(plan.candidates.map((candidate) => candidate.candidate_id), [
     'visual_direction-candidate-1',
     'visual_direction-candidate-2',
@@ -33,18 +33,22 @@ test('candidate racing selector picks the highest passing candidate and records 
   assert.equal(selection.selection_kind, 'quality_preserving_candidate_selection');
   assert.equal(selection.winner.candidate_id, 'c');
   assert.deepEqual(selection.rejected_candidates.map((candidate) => candidate.candidate_id), ['b', 'a']);
-  assert.equal(selection.quality_gate_policy, 'blocked_candidates_never_win');
+  assert.equal(selection.quality_gate_policy, 'passing_candidate_preferred');
 });
 
-test('candidate racing selector rejects all-blocked candidate sets', () => {
-  assert.throws(
-    () => selectCandidateRaceWinner({
-      candidates: [
-        { candidate_id: 'a', gate_status: 'block', score: 1 },
-      ],
-    }),
-    /No passing candidate/,
-  );
+test('candidate racing selector keeps the best materialized candidate when quality budget is exhausted', () => {
+  const selection = selectCandidateRaceWinner({
+    candidates: [
+      { candidate_id: 'a', gate_status: 'block', score: 1 },
+      { candidate_id: 'b', gate_status: 'block', score: 2 },
+    ],
+  });
+  assert.equal(selection.winner.candidate_id, 'b');
+  assert.equal(selection.quality_gate_policy, 'quality_budget_exhausted_select_best_available');
+});
+
+test('candidate racing selector still rejects an empty materialized candidate set', () => {
+  assert.throws(() => selectCandidateRaceWinner({ candidates: [] }), /No materialized candidate/);
 });
 
 test('candidate racing route executes candidates in parallel and only returns a passing winner', async () => {

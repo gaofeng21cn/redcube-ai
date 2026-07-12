@@ -300,10 +300,9 @@ test('screenshot review summary gets Reviewer and Curator guidance while slide b
   assert.doesNotMatch(batchInput, /### Visual Memory Curator/);
 });
 
-test('buildGenerationInput fail-closes mapped ppt routes when declared specialist guidance is missing', () => {
+test('buildGenerationInput keeps native authoring focused on the downstream native designer guidance', () => {
   const nativeDesigner = path.resolve('agent/professional_skills/rca-native-ppt-designer/SKILL.md');
-  const templateProfiler = path.resolve('agent/professional_skills/rca-template-profiler/SKILL.md');
-  const allDeclaredFilesExist = existsSync(nativeDesigner) && existsSync(templateProfiler);
+  const allDeclaredFilesExist = existsSync(nativeDesigner);
 
   if (allDeclaredFilesExist) {
     const input = buildGenerationInput({
@@ -314,7 +313,7 @@ test('buildGenerationInput fail-closes mapped ppt routes when declared specialis
       outputContract: { type: 'object' },
     });
     assert.match(input, /### Native PPT Designer/);
-    assert.match(input, /### Template Profiler/);
+    assert.doesNotMatch(input, /### Template Profiler/);
     return;
   }
 
@@ -400,6 +399,59 @@ test('generateStructuredArtifactViaCodexCli records deterministic prompt telemet
   assert.deepEqual(result.generationRuntime.slide_scope.slide_ids, ['S01', 'S05', 'S07']);
   assert.equal(Number.isInteger(result.generationRuntime.estimated_prompt_tokens), true);
   assert.equal(result.generationRuntime.estimated_prompt_tokens > 0, true);
+});
+
+test('native PPT structured generation passes the shape plan contract through Codex output-schema and cleans the temp file', async () => {
+  let schemaFile = '';
+  let nativePrompt = '';
+  const outputContract = {
+    type: 'object',
+    required: ['editable_shape_plan'],
+    properties: {
+      editable_shape_plan: {
+        type: 'object',
+        description: `native-schema-only-${'x'.repeat(1024)}`,
+        required: ['slides'],
+        properties: { slides: { type: 'array', minItems: 1, items: { type: 'object' } } },
+      },
+    },
+  };
+  const result = await generateStructuredArtifactViaCodexCli({
+    family: 'ppt_deck',
+    route: 'author_pptx_native',
+    promptRelativePath: 'prompts/ppt_deck/author_pptx_native.md',
+    context: { blueprint: { slides: [{ slide_id: 'S01' }] } },
+    outputContract,
+    contract: mockCodexContract(),
+    spawnSyncImpl(_command, args, options) {
+      nativePrompt = String(options.input);
+      const schemaFlagIndex = args.indexOf('--output-schema');
+      assert.notEqual(schemaFlagIndex, -1);
+      schemaFile = args[schemaFlagIndex + 1];
+      assert.deepEqual(JSON.parse(readFileSync(schemaFile, 'utf-8')), outputContract);
+      writeCodexLastMessage(args, JSON.stringify({ editable_shape_plan: { slides: [{}] } }));
+      return {
+        status: 0,
+        stdout: JSON.stringify({ event: 'run.completed', run_id: 'mock-native-schema' }),
+        stderr: '',
+        error: null,
+      };
+    },
+  });
+  assert.equal(result.data.editable_shape_plan.slides.length, 1);
+  assert.match(nativePrompt, /output schema attached to this Codex invocation/);
+  assert.doesNotMatch(nativePrompt, /native-schema-only-/);
+  assert.equal((nativePrompt.match(/"blueprint"/g) || []).length, 1);
+  assert.equal(result.generationRuntime.output_schema_attached, true);
+  assert.equal(
+    result.generationRuntime.output_schema_bytes,
+    Buffer.byteLength(JSON.stringify(outputContract), 'utf-8'),
+  );
+  assert.equal(
+    result.generationRuntime.estimated_request_tokens,
+    Math.ceil((Buffer.byteLength(nativePrompt, 'utf-8') + result.generationRuntime.output_schema_bytes) / 4),
+  );
+  assert.equal(existsSync(schemaFile), false);
 });
 
 test('generateImageViaCodexNativeImagegen delegates raster output to Codex native imagegen without provider tokens', async () => {
@@ -619,12 +671,11 @@ test('generateImageViaCodexNativeImagegen accepts current Codex generated_images
   }
 });
 
-test('generateImageViaCodexNativeImagegen rejects command-rendered PNGs that only claim native imagegen', async () => {
+test('generateImageViaCodexNativeImagegen preserves a readable PNG with provenance quality debt when only the executor declares imagegen', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-imagegen-command-render-'));
   const outputFile = path.join(workspaceRoot, 'S01.png');
 
-  await assert.rejects(
-    generateMockImage({
+  const result = await generateMockImage({
       outputFile,
       spawnSyncImpl(_command, args) {
         writeFileSync(outputFile, ONE_PIXEL_PNG);
@@ -644,14 +695,15 @@ test('generateImageViaCodexNativeImagegen rejects command-rendered PNGs that onl
           error: null,
         };
       },
-    }),
-    /native image_generation\/generated_images provenance/,
-  );
+    });
+  assert.equal(result.imageFile, outputFile);
+  assert.equal(result.generationRuntime.provenance_status, 'executor_declared_native_imagegen');
+  assert.equal(result.generationRuntime.provenance_quality_debt.blocks_stage_transition, false);
 
   rmSync(workspaceRoot, { recursive: true, force: true });
 });
 
-test('generateImageViaCodexNativeImagegen rejects generated_images probes without a copy to the target', async () => {
+test('generateImageViaCodexNativeImagegen records provenance quality debt when generated_images copy evidence is absent', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-imagegen-probe-only-'));
   const threadId = '019e6462-8396-7062-bdcb-461ddc160d19';
   const generatedDir = path.join(workspaceRoot, '.codex', 'generated_images', threadId);
@@ -660,8 +712,7 @@ test('generateImageViaCodexNativeImagegen rejects generated_images probes withou
   mkdirSync(generatedDir, { recursive: true });
   writeFileSync(generatedFile, ONE_PIXEL_PNG);
 
-  await assert.rejects(
-    generateMockImage({
+  const result = await generateMockImage({
       outputFile,
       spawnSyncImpl(_command, args) {
         writeFileSync(outputFile, ONE_PIXEL_PNG);
@@ -694,19 +745,19 @@ test('generateImageViaCodexNativeImagegen rejects generated_images probes withou
           error: null,
         };
       },
-    }),
-    /native image_generation\/generated_images provenance/,
-  );
+    });
+  assert.equal(result.imageFile, outputFile);
+  assert.equal(result.generationRuntime.provenance_status, 'executor_declared_native_imagegen');
+  assert.equal(result.generationRuntime.provenance_quality_debt.blocks_verified_provenance_claim, true);
 
   rmSync(workspaceRoot, { recursive: true, force: true });
 });
 
-test('generateImageViaCodexNativeImagegen rejects PNGs created without native imagegen provenance', async () => {
+test('generateImageViaCodexNativeImagegen delivers readable PNGs without a native tool event as quality debt', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-imagegen-no-tool-'));
   const outputFile = path.join(workspaceRoot, 'S01.png');
 
-  await assert.rejects(
-    generateMockImage({
+  const result = await generateMockImage({
       outputFile,
       spawnSyncImpl(_command, args) {
         writeFileSync(outputFile, ONE_PIXEL_PNG);
@@ -718,9 +769,10 @@ test('generateImageViaCodexNativeImagegen rejects PNGs created without native im
           error: null,
         };
       },
-    }),
-    /native image_generation\/generated_images provenance/,
-  );
+    });
+  assert.equal(result.imageFile, outputFile);
+  assert.equal(result.generationRuntime.provenance_status, 'executor_declared_native_imagegen');
+  assert.equal(result.generationRuntime.provenance_quality_debt.reason, 'native_imagegen_event_receipt_unavailable');
 
   rmSync(workspaceRoot, { recursive: true, force: true });
 });

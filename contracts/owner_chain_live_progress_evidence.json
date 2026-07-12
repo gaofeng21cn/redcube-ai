@@ -110,7 +110,7 @@
   "owner_chain_stages": [
     {
       "stage_id": "visual_direction",
-      "domain_role": "visual_stage_owner_receipt_or_typed_blocker_closeout",
+      "domain_role": "visual_stage_progress_receipt_or_owner_answer_or_hard_stop_closeout",
       "accepted_success_ref_shape": "rca-owner-receipt:visual-stage:<receipt-id>",
       "accepted_blocker_ref_shape": "rca-typed-blocker:controlled-soak:<blocker-id>",
       "required_return_shape": "domain_receipt_or_typed_blocker",
@@ -273,6 +273,7 @@
     "source_policy_ref": "contracts/temporal_stage_run_consumption_policy.json#/owner_chain_completion_audit",
     "completion_status": "blocked_requires_real_visual_stage_owner_acceptance",
     "accepted_terminal_evidence_refs": [
+      "progress_delta_receipt_ref",
       "owner_receipt_ref",
       "typed_blocker_ref",
       "human_gate_ref",

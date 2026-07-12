@@ -69,6 +69,7 @@
     "audit_id": "rca.temporal_stage_run_owner_chain_completion_audit.v1",
     "completion_status": "blocked_requires_real_visual_stage_owner_acceptance",
     "accepted_terminal_evidence_refs": [
+      "progress_delta_receipt_ref",
       "owner_receipt_ref",
       "typed_blocker_ref",
       "human_gate_ref",
@@ -90,7 +91,8 @@
     ],
     "requires_real_visual_stage_owner_acceptance": true,
     "requires_review_export_acceptance_for_export_claim": true,
-    "requires_owner_receipt_or_typed_blocker_for_domain_closeout": true,
+    "requires_progress_receipt_owner_answer_or_hard_stop_for_stage_closeout": true,
+    "requires_owner_receipt_for_quality_export_or_ready_claim": true,
     "mock_safe_canary_counts_as_completion": false,
     "generated_surface_readiness_counts_as_completion": false,
     "provider_completion_counts_as_completion": false,
@@ -106,7 +108,8 @@
   "route_back_policy": {
     "owner": "redcube_ai",
     "route_back_ref_required_when_domain_cannot_close": true,
-    "typed_blocker_ref_required_for_non_human_blocker": true,
+    "typed_blocker_ref_required_for_legal_non_human_hard_stop": true,
+    "quality_route_back_uses_non_blocking_quality_debt_ref": true,
     "human_gate_ref_required_for_human_decision": true,
     "owner_receipt_ref_required_for_domain_completion": true
   },

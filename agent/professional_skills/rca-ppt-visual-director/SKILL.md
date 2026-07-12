@@ -96,12 +96,13 @@ Operate as the visual direction specialist between blueprint approval and page a
 
 ## Blockers And Repair Targets
 
-Return `typed_blocker` when:
+Return `typed_blocker` only when:
 
-- The blueprint is missing real slide ids, visible claims, evidence, or page roles.
-- Brand/template requirements conflict with source truth or readability.
-- The requested visual style requires assets or reference material that is unavailable.
-- The deck cannot meet hard page count and readability constraints without owner decision.
+- No consumable blueprint or visual-direction artifact can be produced.
+- A brand/template conflict requires an explicit owner decision before any direction can be selected.
+- Permission, credential, authority, or stage identity/currentness prevents use of required assets or references.
+
+Missing slide detail, unavailable optional assets, weak evidence/page roles, template-capacity limits, repetition, density, or inability to meet ideal readability within the page budget becomes quality debt plus repair guidance when a consumable visual direction exists. It must not block authoring; it blocks only visual/export readiness claims.
 
 Return `repair_target` when:
 

@@ -8,6 +8,7 @@ interface ReviewExportCloseoutInput {
   deliverableId: unknown;
   status: unknown;
   blockerKind?: string;
+  hardStop?: boolean;
   blockingReasons?: unknown[];
   nextRequiredOwnerAction?: string | null;
   reviewExportRefs?: unknown[];
@@ -60,7 +61,7 @@ export function buildReviewExportCloseout(input: ReviewExportCloseoutInput): Jso
   const refs = commonRefs(family, route, deliverableId);
   const explicitReviewExportRefs = uniqueStrings([gateRef, ...safeArray(input.reviewExportRefs)]);
   const artifactRefs = uniqueStrings(safeArray(input.artifactRefs));
-  if (isBlockedStatus(input.status)) {
+  if (isBlockedStatus(input.status) && input.hardStop === true) {
     const blockerRef = typedBlockerRef(family, route, deliverableId);
     const blockingReasons = uniqueStrings(input.blockingReasons || ['review_export_gate_blocked']);
     return {
@@ -93,6 +94,8 @@ export function buildReviewExportCloseout(input: ReviewExportCloseoutInput): Jso
     };
   }
   const receiptRef = ownerReceiptRef(family, route, deliverableId);
+  const qualityDebt = isBlockedStatus(input.status);
+  const qualityDebtReasons = uniqueStrings(input.blockingReasons || ['review_export_quality_gate_not_passed']);
   return {
     owner_receipt_refs: [receiptRef],
     typed_blocker_refs: [],
@@ -118,6 +121,14 @@ export function buildReviewExportCloseout(input: ReviewExportCloseoutInput): Jso
     },
     typed_blocker: null,
     blocking_reasons: [],
+    quality_debt: qualityDebt ? {
+      status: 'recorded_non_blocking',
+      reasons: qualityDebtReasons,
+      recommended_repair_stage: safeText(input.nextRequiredOwnerAction) || null,
+      blocks_stage_transition: false,
+      blocks_visual_ready_claim: true,
+      blocks_export_ready_claim: true,
+    } : null,
   };
 }
 

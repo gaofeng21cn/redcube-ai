@@ -30,7 +30,7 @@
       "quality_gate_refs": ["agent/quality_gates/visual_authority_boundaries.md", "agent/quality_gates/communication_and_direction.md"],
       "allowed_action_refs": ["invoke_product_entry", "get_product_entry_session"],
       "requires": ["source_truth_frozen"],
-      "ensures": ["communication_strategy_accepted"],
+      "ensures": ["communication_strategy_artifact_recorded"],
       "next_stage_refs": ["visual_direction"],
       "trust_lane": "ai_decision"
     },
@@ -44,8 +44,8 @@
       "knowledge_refs": ["agent/knowledge/communication_visual_direction.md"],
       "quality_gate_refs": ["agent/quality_gates/visual_authority_boundaries.md", "agent/quality_gates/communication_and_direction.md"],
       "allowed_action_refs": ["invoke_product_entry", "get_product_entry_session"],
-      "requires": ["communication_strategy_accepted"],
-      "ensures": ["visual_direction_accepted"],
+      "requires": ["communication_strategy_artifact_recorded"],
+      "ensures": ["visual_direction_artifact_recorded"],
       "next_stage_refs": ["artifact_creation"],
       "trust_lane": "ai_decision"
     },
@@ -59,7 +59,7 @@
       "knowledge_refs": ["agent/knowledge/artifact_and_export_authority.md"],
       "quality_gate_refs": ["agent/quality_gates/visual_authority_boundaries.md", "agent/quality_gates/artifact_authority.md"],
       "allowed_action_refs": ["invoke_product_entry", "run_image_ppt_proof", "run_native_ppt_proof"],
-      "requires": ["visual_direction_accepted"],
+      "requires": ["visual_direction_artifact_recorded"],
       "ensures": ["artifact_candidate_rendered"],
       "next_stage_refs": ["review_and_revision"],
       "trust_lane": "codex_executor"
@@ -75,7 +75,7 @@
       "quality_gate_refs": ["agent/quality_gates/visual_authority_boundaries.md", "agent/quality_gates/review_export_memory.md"],
       "allowed_action_refs": ["invoke_product_entry", "get_product_entry_session"],
       "requires": ["artifact_candidate_rendered"],
-      "ensures": ["visual_review_gate_receipt_recorded"],
+      "ensures": ["visual_review_artifact_recorded"],
       "next_stage_refs": ["package_and_handoff"],
       "trust_lane": "ai_decision"
     },
@@ -89,10 +89,10 @@
       "knowledge_refs": ["agent/knowledge/artifact_and_export_authority.md", "agent/knowledge/owner_receipt_policy.md"],
       "quality_gate_refs": ["agent/quality_gates/visual_authority_boundaries.md", "agent/quality_gates/artifact_authority.md", "agent/quality_gates/review_export_memory.md"],
       "allowed_action_refs": ["invoke_product_entry", "dispatch_domain_handler", "get_product_entry_session", "get_product_entry_manifest", "export_domain_handler"],
-      "requires": ["visual_review_gate_receipt_recorded"],
-      "ensures": ["export_handoff_receipt_recorded"],
+      "requires": ["visual_review_artifact_recorded"],
+      "ensures": ["export_handoff_artifact_recorded"],
       "next_stage_refs": [],
-      "trust_lane": "human_gate"
+      "trust_lane": "domain_agent"
     }
   ],
   "authority_boundary": {
@@ -102,5 +102,13 @@
     "opl_can_authorize_quality_or_export": false,
     "opl_can_sign_owner_receipt": false,
     "provider_completion_is_domain_completion": false
+  },
+  "progress_first_policy": {
+    "contract_id": "rca.progress_first_stage_admission.v1",
+    "artifact_advances_stage": true,
+    "retries_are_quality_budget": true,
+    "quality_debt_blocks_transition": false,
+    "quality_debt_blocks_ready_claims": true,
+    "explicit_human_gate_only": true
   }
 }

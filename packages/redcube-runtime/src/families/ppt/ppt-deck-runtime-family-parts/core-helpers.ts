@@ -147,7 +147,7 @@ export function createPptDeckCoreHelpers({
       routeStageId: stageId,
       canonicalStageId,
     });
-    if (loaded?.output_file && ['success', 'blocked'].includes(loaded.status)) {
+    if (loaded?.output_file && ['success', 'blocked', 'completed_with_quality_debt'].includes(loaded.status)) {
       return loaded.output_file;
     }
     return stageFolderArtifactPath({
@@ -169,7 +169,7 @@ export function createPptDeckCoreHelpers({
       routeStageId: stageId,
       canonicalStageId: canonicalStageForRoute(stageId),
     });
-    return loaded?.status === 'success' || loaded?.status === 'blocked'
+    return ['success', 'blocked', 'completed_with_quality_debt'].includes(loaded?.status)
       ? loaded.artifact
       : null;
   }

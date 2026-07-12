@@ -100,6 +100,10 @@ Route-local repeated block 进入 OPL stall lineage；连续无 deliverable delt
 
 ### Default visual route 是 image-first，HTML/native PPTX 是显式可选路线
 
+Retry 是质量预算，不是 stage blocker。RCA 只要获得可消费 artifact 就推进；candidate、native shape-plan、视觉 review 与 repair 的轮数只决定可用于提高质量的预算。预算耗尽选择最佳 artifact 并记录 `completed_with_quality_debt`。质量债务阻止 ready claim，但不阻止下一 stage。只有零 artifact、损坏、权限/凭据、显式人工门、authority 或 identity/currentness 边界可以硬停止。
+
+Authoring route 在 deliverable 内有显式 lane lock。image/native/HTML 之间不能由自动 recovery 切换；新的显式 product-entry route 是唯一合法的换 lane 入口。
+
 `ppt_deck` 默认路线是 `storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_image_pages -> visual_director_review -> screenshot_review -> repair_image_pages -> export_pptx`。`author_image_pages` 通过 executor 的 image generation 能力生成完整 16:9 PNG 页面；`export_pptx` 装配整页图并不承诺 editable shapes。
 
 用户明确要求 HTML/CSS/网页时走 `render_html / fix_html`；用户明确要求可编辑、原生 PPTX 或 DrawingML 时走 `author_pptx_native / repair_pptx_native`。Native helper 继续受 RCA route、visual director review、screenshot review 和 export gate 约束，不能绕过 product-entry/runtime-family mainline。

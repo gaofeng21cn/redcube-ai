@@ -22,12 +22,10 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 ## 核心入口
 
-自动调用时使用 repo-local launcher：`npm run --prefix <redcube-ai-repo> redcube -- ...`。这个 launcher 的第一层公共语法暴露 OPL Foundry Agent series 读面：`status`、`inspect`、`interfaces`、`validate`、`doctor`、`peers`，也可用 `foundry <operation>`、`work <operation>` 或 RCA deck-oriented alias `deck <operation>`。这些命令只用于读取 series identity、spine、接口与边界，不是 visual truth、generic session shell、workbench metadata 或 product status/session wrapper owner；不要用 shell PATH lookup 或用户 PATH 上的裸 `redcube` 判断当前模块可用性。
+自动调用时使用 repo-local launcher：`npm run --prefix <redcube-ai-repo> redcube -- ...`。当前 RCA 只保留 direct domain handler / product-entry target；series identity、status、session、workbench 与 inspect wrappers 归 OPL generated surface。不要使用已退役的 repo-local `status`、`deck inspect` 或用户 PATH 上的裸 `redcube` 判断当前模块可用性。
 
-- `npm run --prefix <redcube-ai-repo> redcube -- status`
-- `npm run --prefix <redcube-ai-repo> redcube -- deck inspect`
-- `npm run --prefix <redcube-ai-repo> redcube -- product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`
 - `npm run --prefix <redcube-ai-repo> redcube -- domain-handler export --workspace-root <dir> --format json`
+- `npm run --prefix <redcube-ai-repo> redcube -- product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`
 - `npm run --prefix <redcube-ai-repo> redcube -- domain-handler dispatch --task <task.json> --format json`
 
 `domain-handler export` 暴露 RCA-owned `family_action_catalog` 和 OPL 可消费的 generated-interface handoff；CLI help、Foundry series grammar、MCP descriptors/routes、skill command contracts、product-entry action metadata、status/session/workbench metadata 的 generated descriptor owner 是 `OPL`，RCA 只提供 action/stage metadata、domain handler targets、series-readable direct diagnostic entry 和 visual authority functions。
@@ -57,9 +55,10 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 - `author_image_pages` 是默认视觉实现路线，通过 Responses `image_generation` 生成完整 16:9 PPT 页面 PNG；HTML routes 与 native editable PPTX routes 只能作为显式选择路线，不能替代默认 `author_image_pages -> screenshot_review -> export_pptx`。
 - `author_image_pages` 可复用同 key 的 image artifact cache；真实 image generation 只在 cache miss、显式重绘或 blocked-slide repair target 时发生，artifact 不记录 token。
-- `screenshot_review` 必须消费 PNG 与 prompt/style/image manifest，并执行 16:9、非空、重复、低信息密度、裁切、碎片化、字段泄漏与可选 OCR domain_action_adapter 检查；缺关键 artifact 或 hard-block 视觉 QA 时 fail-closed。
-- 截图质控未通过时，必须从明确 stage rerun 或 `repair_image_pages` 回修；`repair_image_pages` 只重绘 blocked slide ids，未阻断页复用并记录 preserved hashes，不能跳过 review gate 直接交付。
+- `screenshot_review` 必须消费可用 PNG 与 prompt/style/image manifest，并执行 16:9、非空、重复、低信息密度、裁切、碎片化、字段泄漏与可选 OCR 检查。普通视觉 QA、manifest/provenance 缺口只记录质量债务和 repair recommendation；没有任何可消费页面、文件损坏不可读或 authority/permission 边界才硬停止。
+- 截图质控未通过时，在预算内从明确 stage rerun 或 `repair_image_pages` 回修；`repair_image_pages` 只重绘需要修复的 slide ids，未阻断页复用并记录 preserved hashes。预算耗尽后携带最佳 artifact 进入后续 stage，不得声明 `visual_ready` 或 `export_ready`。
 - 用户明确要求 HTML / CSS / 网页时走 `render_html / fix_html`；用户明确要求可编辑 / 原生 PPTX / DrawingML 时走 `author_pptx_native / repair_pptx_native`。
+- authoring lane 在同一 deliverable 内锁定；外层失败处理不得自动从 image/native/HTML 切换到另一 lane。只有新的显式 product-entry route 选择可以更新该 lock。
 - `redcube image-ppt proof` 是 repo-owned lightweight proof helper，默认 mock、不调用真实图片 API、不注册第二公开 skill；live image generation 必须显式开启，常规回归不得使用完整“肠癌AI”长 PPT。
 
 ## PPT 长任务入口规则
@@ -86,6 +85,14 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 - 长 PPT 任务必须先拆成 `source/material intake -> plan -> deliverable -> review`，每段使用同一 session 可恢复推进
 - 不绕开 domain handler / product-entry contract 直接手改运行状态或 artifact state
 - 不把 OPL-hosted handoff 写成新的独立用户 skill；它继续是内部集成 contract
+
+## Progress-first stage policy
+
+- stage retry count 是质量预算，不是 transition gate；默认 4 轮 native shape-plan 也遵守这一规则。
+- 只要当前 stage 产生可读取、可被下一 stage 消费的 artifact，就以 `completed` 或 `completed_with_quality_debt` 推进。
+- 质量债务可以触发 repair recommendation，但不能生成 execution blocker，也不能让同一 stage 无限循环。
+- 质量债务必须阻止 `visual_ready`、`export_ready`、production-ready 等声明。
+- 只有零可消费 artifact、artifact 损坏不可读、权限/凭据、显式人工门、authority violation 或 stage identity/currentness mismatch 可以硬停止。
 
 ## 首先应读的文件
 

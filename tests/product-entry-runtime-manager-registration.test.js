@@ -16,4 +16,13 @@ test('product-entry does not reconstruct the OPL Runtime Manager registration', 
   assert.equal(manifest.runtime.product_session_surface_ref, 'opl-generated:product_session');
   assert.equal(manifest.authority_boundary.generic_session_owner, 'one-person-lab');
   assert.equal(manifest.authority_boundary.projection_can_claim_domain_ready, false);
+  assert.equal(manifest.standard_domain_agent_skeleton.surface_kind, 'standard_domain_agent_skeleton');
+  assert.deepEqual(manifest.standard_domain_agent_skeleton.repo_source_boundary.required_dirs, [
+    'agent',
+    'contracts',
+    'runtime',
+    'docs',
+  ]);
+  assert.equal(manifest.standard_domain_agent_skeleton.artifact_boundary.repo_contains_real_artifacts, false);
+  assert.equal(manifest.standard_domain_agent_skeleton.artifact_boundary.artifact_roots_are_locators, true);
 });

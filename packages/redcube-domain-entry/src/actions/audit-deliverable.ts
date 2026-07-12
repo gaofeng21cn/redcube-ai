@@ -39,6 +39,23 @@ function mergeAuditReports(reports) {
     };
   }
 
+  const qualityDebtReport = normalized.find((report) => report.status === 'quality_debt');
+  if (qualityDebtReport) {
+    return {
+      status: 'pass_with_quality_debt',
+      issues,
+      rerun_from_stage: qualityDebtReport.rerun_from_stage,
+      recommended_action: 'continue_with_quality_debt',
+      quality_debt: {
+        reasons: issues,
+        recommended_repair_stage: qualityDebtReport.rerun_from_stage,
+        recommended_repair_action: qualityDebtReport.recommended_action,
+        blocks_stage_transition: false,
+        blocks_ready_claims: true,
+      },
+    };
+  }
+
   return {
     status: 'pass',
     issues,
@@ -226,7 +243,7 @@ export async function auditDeliverable(request) {
   return {
     surface_kind: 'audit',
     ...mergedReport,
-    recommended_action: mergedReport.status === 'pass' ? 'run_deliverable_route' : mergedReport.recommended_action,
+    recommended_action: mergedReport.status === 'block' ? mergedReport.recommended_action : 'run_deliverable_route',
     quality_summary: baselineAudit.quality_summary,
     review_state: reviewState,
     publication_projection: publicationProjection,

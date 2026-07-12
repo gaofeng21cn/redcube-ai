@@ -469,18 +469,16 @@ import {
       reviewMarkdown,
       buildScreenshotReviewMarkdown(contract, artifact, primarySurface(generationRuntime)),
     );
-    if (artifact.status === 'pass') {
-      artifact.artifact_refs = [
-        ...new Set([
-          ...safeArray(artifact.artifact_refs),
-          ...promoteStableView(
-            getDeliverableViewSurfacePaths(deliverablePaths, deliverablePaths.deliverableId),
-            renderArtifact.html_bundle.html_file,
-            renderArtifact.html_bundle.slides_file,
-          ),
-        ]),
-      ];
-    }
+    artifact.artifact_refs = [
+      ...new Set([
+        ...safeArray(artifact.artifact_refs),
+        ...promoteStableView(
+          getDeliverableViewSurfacePaths(deliverablePaths, deliverablePaths.deliverableId),
+          renderArtifact.html_bundle.html_file,
+          renderArtifact.html_bundle.slides_file,
+        ),
+      ]),
+    ];
     return artifact;
   }
 
@@ -495,14 +493,14 @@ import {
     }
     if (route === 'screenshot_review') {
       const directorReview = readStageArtifact(storedContract, deliverablePaths, 'visual_director_review');
-      if (!directorReview || directorReview.status !== 'pass') {
-        throw new Error('Route screenshot_review requires visual_director_review to pass before audit');
+      if (!directorReview) {
+        throw new Error('Route screenshot_review requires a consumable visual_director_review artifact before audit');
       }
     }
     if (route === 'export_bundle') {
       const reviewArtifact = readStageArtifact(storedContract, deliverablePaths, 'screenshot_review');
-      if (!reviewArtifact || reviewArtifact.status !== 'pass') {
-        throw new Error('Route export_bundle requires screenshot_review to pass before export');
+      if (!reviewArtifact) {
+        throw new Error('Route export_bundle requires a consumable screenshot_review artifact before export');
       }
     }
     if (route === 'screenshot_review' && mode === 'optimize_existing' && !safeText(baselineDeliverableId)) {

@@ -67,7 +67,7 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 
 - `visual_pack_compiler_handoff`: carries review evidence refs, artifact inventory refs, repair target refs, handoff candidate refs, and forbidden-authority flags only.
 - Stage-control route decisions: consume this skill's verdict / repair target refs when selecting continue, repair, route-back, human gate, or typed blocker; stage-control does not own the visual reasoning.
-- RCA reviewer method: owns the flexible judgment over pixels, story arc, source fidelity, density, visible leaks, weak-vs-blocking classification, and blocked-page-only repair scope.
+- RCA reviewer method: owns the flexible judgment over pixels, story arc, source fidelity, density, visible leaks, quality-debt classification, and page-local repair scope. Only the explicit hard-stop whitelist may become an execution blocker.
 - Contract surfaces may reject missing, stale, mismatched, or authority-violating refs; they may not turn mechanical completeness into review pass, handoff approval, or production readiness.
 
 ## Workbench Lessons To Preserve
@@ -107,12 +107,13 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 
 ## Blockers And Repair Targets
 
-Return `typed_blocker` when:
+Return `typed_blocker` only when:
 
-- Required screenshots, contact sheet, shape manifest, source refs, or review artifacts are missing or unreadable.
-- Screenshots do not correspond to the current deck/page ids.
-- Source fidelity cannot be checked because approved source truth is unavailable.
-- Render proof or artifact inventory is inconsistent enough that review would be false authority.
+- There are zero readable screenshots or the only visual artifact is corrupt/unreadable.
+- Screenshots belong to a different deck/page identity and therefore violate stage identity/currentness.
+- Permission, credential, explicit human approval, source authority, or artifact authority prevents review.
+
+Partial screenshots, missing contact sheet/shape manifest/source refs/render proof/inventory, uncertain source fidelity, visual defects, and incomplete page coverage are quality debt when any current readable visual artifact exists. They trigger bounded repair recommendations and block ready claims, not the next stage.
 
 Return `repair_target` when:
 

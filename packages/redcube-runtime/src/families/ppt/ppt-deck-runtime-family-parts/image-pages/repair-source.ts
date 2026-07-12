@@ -97,7 +97,7 @@ export function createImagePageRepairSourceParts({
   } {
     for (const stageId of ['screenshot_review', 'visual_director_review']) {
       const artifact = readStageArtifact(contract, deliverablePaths, stageId);
-      if (safeText(artifact?.status) === 'block'
+      if (['block', 'completed_with_quality_debt'].includes(safeText(artifact?.status))
         && repairReviewRerunFromStage(artifact) === 'repair_image_pages') {
         return { stageId, artifact };
       }

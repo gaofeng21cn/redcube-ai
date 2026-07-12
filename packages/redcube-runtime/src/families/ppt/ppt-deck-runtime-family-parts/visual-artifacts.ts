@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
+import { authoringLaneForRoute, lockedAuthoringLane } from '../../../progress-first.js';
+
 type JsonRecord = Record<string, any>;
 type ImagePagesRoute = 'author_image_pages' | 'repair_image_pages';
 
@@ -90,6 +92,7 @@ export function createPptDeckVisualArtifactParts(deps: VisualArtifactDeps) {
   }
 
   function currentVisualStageId(contract: JsonRecord, deliverablePaths: JsonRecord): string {
+    const authoringLaneLock = lockedAuthoringLane(contract);
     const htmlStage = currentHtmlStageId(contract, deliverablePaths);
     const htmlMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, htmlStage));
     const nativeStage = currentNativePptStageId(contract, deliverablePaths);
@@ -104,12 +107,14 @@ export function createPptDeckVisualArtifactParts(deps: VisualArtifactDeps) {
       { stage: htmlStage, mtimeMs: htmlMtimeMs },
       { stage: nativeStage, mtimeMs: nativeMtimeMs },
       { stage: imageStage, mtimeMs: imageMtimeMs },
-    ].filter((item) => item.stage && item.mtimeMs > 0);
+    ].filter((item) => item.stage
+      && item.mtimeMs > 0
+      && (!authoringLaneLock || authoringLaneForRoute(item.stage) === authoringLaneLock));
     if (candidates.length > 0) {
       candidates.sort((left, right) => right.mtimeMs - left.mtimeMs);
       return candidates[0].stage;
     }
-    return nativeStage || imageStage || '';
+    return '';
   }
 
   function readCurrentVisualArtifact(contract: JsonRecord, deliverablePaths: JsonRecord): JsonRecord | null {

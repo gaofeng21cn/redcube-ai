@@ -101,7 +101,7 @@ test('auditDeliverable blocks optimize_existing task without baseline', async ()
   assert.equal(report.recommended_action, 'bind_baseline_deliverable');
 });
 
-test('auditDeliverable uses canonical source readiness for block and pass states', async () => {
+test('auditDeliverable uses canonical source readiness for quality-debt and pass states', async () => {
   const missingRoot = workspace('redcube-review-loop-missing-source-');
   await createDeck(missingRoot);
   const missing = await auditDeliverable({
@@ -111,10 +111,11 @@ test('auditDeliverable uses canonical source readiness for block and pass states
     deliverableId: DECK_ID,
     mode: 'draft_new',
   });
-  assert.equal(missing.status, 'block');
+  assert.equal(missing.status, 'pass_with_quality_debt');
   assert.equal(missing.issues.includes('source_audit_missing'), true);
   assert.equal(missing.rerun_from_stage, 'source_readiness');
-  assert.equal(missing.recommended_action, 'run_source_research');
+  assert.equal(missing.recommended_action, 'run_deliverable_route');
+  assert.equal(missing.quality_debt?.blocks_stage_transition, false);
   assert.equal(missing.source_readiness_summary?.status, 'missing');
   assert.equal(missing.source_readiness_summary?.canonical_source?.kind, 'shared_source_truth.source_readiness_gate');
 

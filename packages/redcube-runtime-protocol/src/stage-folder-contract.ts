@@ -34,7 +34,7 @@ const RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY = Object.freeze({
   substrate_owner: 'one-person-lab',
   domain_authority_owner: 'redcube_ai',
   opl_role: 'stage_artifact_runtime_owner',
-  rca_role: 'visual_stage_role_and_owner_receipt_adapter',
+  rca_role: 'visual_stage_role_progress_receipt_quality_debt_and_owner_authority_adapter',
   stage_folder_current_pointer_role: 'artifact_attempt_pointer_not_opl_stage_run_current_pointer',
   stage_folder_terminal_status_role: 'domain_owner_closeout_receipt_projection_not_opl_stage_run_terminal_state',
   stage_transition_authority_required_for_opl_stage_run_current: true,
@@ -173,10 +173,25 @@ export function writeStageFolderArtifact(input): any {
   const paths = publicPaths(input);
   const output = outputName(input);
   const ownerReceiptRefs = unique(input.ownerReceiptRefs || input.owner_receipt_refs);
+  const qualityDebtRefs = unique(input.qualityDebtRefs || input.quality_debt_refs);
   const typedBlockerRefs = unique(input.typedBlockerRefs || input.typed_blocker_refs);
-  const terminalStatus = safeText(input.status) === 'blocked' || typedBlockerRefs.length ? 'blocked' : 'success';
-  if (terminalStatus === 'success' && ownerReceiptRefs.length === 0) throw new Error('RCA Stage Folder success closeout requires explicit ownerReceiptRefs');
-  if (terminalStatus === 'blocked' && typedBlockerRefs.length === 0) throw new Error('RCA Stage Folder blocked closeout requires explicit typedBlockerRefs');
+  const artifactReadable = fs.existsSync(input.artifactFile) && fs.statSync(input.artifactFile).isFile();
+  if (!artifactReadable && typedBlockerRefs.length === 0) {
+    throw new Error('RCA Stage Folder closeout requires a readable artifact or explicit typedBlockerRefs');
+  }
+  const terminalStatus = typedBlockerRefs.length > 0
+    ? 'blocked'
+    : ownerReceiptRefs.length > 0
+      ? 'success'
+      : 'completed_with_quality_debt';
+  const effectiveQualityDebtRefs = terminalStatus === 'completed_with_quality_debt'
+    ? (qualityDebtRefs.length > 0
+        ? qualityDebtRefs
+        : [`rca-quality-debt:${safeText(input.canonicalStageId || input.canonical_stage_id)}:${safeText(input.routeStageId || input.route_stage_id)}:${path.basename(paths.attempt_dir)}`])
+    : [];
+  const progressDeltaReceiptRef = terminalStatus === 'completed_with_quality_debt'
+    ? `rca-progress-delta:${safeText(input.canonicalStageId || input.canonical_stage_id)}:${safeText(input.routeStageId || input.route_stage_id)}:${path.basename(paths.attempt_dir)}`
+    : null;
 
   if (fs.existsSync(input.artifactFile)) {
     writeDomainArtifact({ ...attemptLocator, role: 'output', relative_path: output, body: fs.readFileSync(input.artifactFile) });
@@ -203,16 +218,47 @@ export function writeStageFolderArtifact(input): any {
   if (typedBlockerRefs.length) {
     writeDomainArtifact({ ...attemptLocator, role: 'evidence', relative_path: 'typed-blocker-ref.json', body: `${JSON.stringify({ surface_kind: 'domain_typed_blocker_ref', typed_blocker_refs: typedBlockerRefs, blocking_reasons: unique(input.blockingReasons || input.blocking_reasons) }, null, 2)}\n` });
   }
+  if (effectiveQualityDebtRefs.length) {
+    writeDomainArtifact({
+      ...attemptLocator,
+      role: 'evidence',
+      relative_path: 'quality-debt-ref.json',
+      body: `${JSON.stringify({
+        surface_kind: 'rca_stage_quality_debt_ref',
+        quality_debt_refs: effectiveQualityDebtRefs,
+        blocking_reasons: unique(input.blockingReasons || input.blocking_reasons),
+        blocks_stage_transition: false,
+        blocks_quality_export_or_ready_claims: true,
+      }, null, 2)}\n`,
+    });
+  }
+  if (progressDeltaReceiptRef) {
+    writeDomainArtifact({
+      ...attemptLocator,
+      role: 'receipt',
+      relative_path: 'progress-delta-receipt.json',
+      body: `${JSON.stringify({
+        surface_kind: 'rca_progress_delta_receipt',
+        receipt_ref: progressDeltaReceiptRef,
+        produced_refs: [`outputs/${output}`],
+        quality_debt_refs: effectiveQualityDebtRefs,
+        stage_transition_authorized: true,
+        quality_or_ready_claim_authorized: false,
+      }, null, 2)}\n`,
+    });
+  }
   const committed = commitStageArtifactAttemptRuntime({
     ...attemptLocator,
     terminal_status: terminalStatus,
     required_outputs: [output],
     owner_receipt_refs: ownerReceiptRefs,
+    quality_debt_refs: effectiveQualityDebtRefs,
     typed_blocker_refs: typedBlockerRefs,
   });
   const outputHash = committed.manifest.output_hashes.find((entry) => entry.path === output) || null;
   const stageReceipts = [
     ...ownerReceiptRefs.map((receiptRef) => ({ receipt_kind: 'domain_owner_receipt', receipt_ref: receiptRef, receipt_file: 'receipts/domain-owner-receipt.json', output_roles: outputRoles, route_stage_id: interfacePayload.route_stage_id, owner: 'redcube_ai' })),
+    ...(progressDeltaReceiptRef ? [{ receipt_kind: 'progress_delta_receipt', receipt_ref: progressDeltaReceiptRef, receipt_file: 'receipts/progress-delta-receipt.json', output_roles: outputRoles, route_stage_id: interfacePayload.route_stage_id, owner: 'redcube_ai' }] : []),
     ...typedBlockerRefs.map((typedBlockerRef) => ({ receipt_kind: 'domain_typed_blocker', typed_blocker_ref: typedBlockerRef, evidence_file: 'evidence/typed-blocker-ref.json', output_roles: outputRoles, route_stage_id: interfacePayload.route_stage_id, owner: 'redcube_ai' })),
   ];
   const outputRefs = outputRoles.map((role) => ({
@@ -221,6 +267,8 @@ export function writeStageFolderArtifact(input): any {
     output_file: path.join(paths.outputs_dir, output),
     manifest_ref: 'manifest.json',
     receipt_ref: ownerReceiptRefs.length ? 'receipts/domain-owner-receipt.json' : null,
+    progress_delta_receipt_ref: progressDeltaReceiptRef ? 'receipts/progress-delta-receipt.json' : null,
+    quality_debt_ref: effectiveQualityDebtRefs.length ? 'evidence/quality-debt-ref.json' : null,
     typed_blocker_ref: typedBlockerRefs.length ? 'evidence/typed-blocker-ref.json' : null,
     sha256: outputHash?.sha256 || null,
     bytes: outputHash?.bytes || null,
@@ -261,6 +309,8 @@ export function writeStageFolderArtifact(input): any {
     output_file: path.join(paths.outputs_dir, output),
     manifest: domainManifest,
     receipt_file: path.join(paths.receipts_dir, 'domain-owner-receipt.json'),
+    progress_receipt_file: path.join(paths.receipts_dir, 'progress-delta-receipt.json'),
+    quality_debt_evidence_file: path.join(paths.evidence_dir, 'quality-debt-ref.json'),
     blocker_evidence_file: path.join(paths.evidence_dir, 'typed-blocker-ref.json'),
     artifact_refs: [...descriptorRefs, paths.manifest_file, paths.current_file, paths.latest_pointer, path.join(paths.outputs_dir, output)],
   };
@@ -297,7 +347,11 @@ export function readStageFolderArtifact(input): any {
   const domainInterface = fs.existsSync(interfaceFile) ? readJson(interfaceFile) : {};
   return {
     status: selectedAttempt.status,
-    artifact: ['success', 'blocked'].includes(selectedAttempt.status) && outputFile && fs.existsSync(outputFile) ? readJson(outputFile) : null,
+    artifact: ['success', 'completed_with_quality_debt', 'blocked'].includes(selectedAttempt.status)
+      && outputFile
+      && fs.existsSync(outputFile)
+      ? readJson(outputFile)
+      : null,
     manifest: { ...persistedManifest, ...domainInterface, output_file: outputFile },
     manifest_file: paths.manifest_file,
     output_file: outputFile,

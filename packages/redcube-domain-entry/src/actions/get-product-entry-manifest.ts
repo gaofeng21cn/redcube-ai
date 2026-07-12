@@ -30,6 +30,45 @@ function buildTypedBlockerRefs() {
   };
 }
 
+function buildStandardDomainAgentSkeleton() {
+  return {
+    surface_kind: 'standard_domain_agent_skeleton',
+    version: 'standard-domain-agent-skeleton.v1',
+    agent_id: 'rca',
+    repo_source_boundary: {
+      required_dirs: ['agent', 'contracts', 'runtime', 'docs'],
+      optional_dirs: ['packages', 'python', 'plugins', 'tests'],
+      forbidden_dirs: ['artifacts'],
+      runtime_artifacts_live_in_source_repo: false,
+    },
+    contracts: {
+      descriptor_refs: [
+        'contracts/domain_descriptor.json',
+        'contracts/pack_compiler_input.json',
+        'agent/stages/manifest.json',
+      ],
+      sidecar_refs: [],
+      quality_gate_refs: [
+        'agent/quality_gates/visual_authority_boundaries.md',
+        'agent/quality_gates/screenshot_review.md',
+      ],
+    },
+    artifact_boundary: {
+      repo_contains_real_artifacts: false,
+      artifact_roots_are_locators: true,
+      workspace_artifact_locator_refs: ['contracts/artifact_locator_contract.json'],
+      runtime_artifact_locator_refs: ['contracts/artifact_locator_contract.json#/runtime_artifact_roots'],
+    },
+    authority_boundary: {
+      opl: 'framework_transport_and_projection_only',
+      domain: 'truth_quality_artifact_owner',
+      opl_can_write_domain_truth: false,
+      opl_can_authorize_quality_or_export: false,
+      opl_can_mutate_artifact_body: false,
+    },
+  };
+}
+
 export async function getProductEntryManifest(request: Record<string, unknown> = {}) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
   const runtime = {
@@ -49,6 +88,7 @@ export async function getProductEntryManifest(request: Record<string, unknown> =
     manifest_version: 'rca-domain-authority-refs.v1',
     agent_id: 'rca',
     target_domain_id: 'redcube_ai',
+    standard_domain_agent_skeleton: buildStandardDomainAgentSkeleton(),
     formal_entry: {
       default: 'CLI',
       supported_protocols: ['MCP'],

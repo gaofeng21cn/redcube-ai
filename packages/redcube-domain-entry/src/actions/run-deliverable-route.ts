@@ -15,11 +15,9 @@ export async function runDeliverableRoute(request: RunDeliverableRouteRequest): 
   const routed = await runRouteWithRecoveryAndContinuation(routedRequest);
   let result = routed.result;
   if (request.route === 'fix_html') {
-    const qualityBlocked = safeText(result.run?.status) === 'quality_blocked';
-    if (qualityBlocked || !safeText(request.stopAfterStage)) {
+    if (!safeText(request.stopAfterStage)) {
       result = hydrateResultArtifactFromStage(request, result, 'fix_html');
     }
-    if (qualityBlocked) result = { ...result, ok: true };
   }
   return buildRouteRunDomainEntryResponse({
     request: routedRequest,

@@ -24,6 +24,11 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 
 ## RCA Domain Authority 与标准 Agent 目标
 
+- Retry、candidate race、shape-plan preflight、review 与 repair loop 只能作为质量预算，不能作为 stage transition gate；有可消费 artifact 必须推进，并把未达标项记录为 `completed_with_quality_debt`。
+- 质量债务不得生成 execution typed blocker，不得阻断后续 stage，但必须阻止 `visual_ready`、`export_ready`、handoffable、domain-ready 或 production-ready 声明。
+- Hard stop 白名单仅包含零可消费 artifact、artifact 损坏不可读、权限/凭据、显式人工门、authority violation 与 stage identity/currentness mismatch。
+- 同一 deliverable 的 image/native/HTML authoring lane 必须显式锁定；不得以 fallback 或 recovery 为由自动跨 lane。
+
 - 当前 OPL stage-led 对齐 surface 只供 OPL discovery、queue、wakeup、handoff、receipt、retry/dead-letter 和 operator projection 使用；不得授权 OPL 生成 visual route、review verdict、publication projection truth 或 canonical artifact。
 - RCA 的 executor-first policy 固定为 `codex_cli` production 默认与 `fail_closed` production route。`fallback_with_proof` 只允许 explicit `experimental_proof` lane，且必须写入 proof；不得让非默认 executor 静默回 Codex、静默替换 Codex，或被写成与 Codex 质量/行为等价。
 - RCA 的目标态高于当前实现分布。旧 repo-local managed DAG、attempt/state-machine runner 和 managed-run store 已物理删除；当前 session store、workspace/source intake、memory/artifact lifecycle、review/repair transport、operator projection、CLI/MCP/product-entry/domain_action_adapter/status wrapper 或 executor adapter 只能作为 OPL generated/hosted consumer、refs-only adapter、declarative pack input、minimal authority function 或迁移输入。

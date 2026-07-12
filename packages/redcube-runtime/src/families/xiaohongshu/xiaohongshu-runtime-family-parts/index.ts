@@ -214,8 +214,8 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
   }
   if (route === 'publish_copy' || route === 'export_bundle') {
     const reviewArtifact = shared.readStageArtifact(contract, deliverablePaths, 'screenshot_review');
-    if (!reviewArtifact || reviewArtifact.status !== 'pass') {
-      throw new Error(`Route ${route} requires screenshot_review to pass before export`);
+    if (!reviewArtifact) {
+      throw new Error(`Route ${route} requires a consumable screenshot_review artifact before export`);
     }
   }
   const currentHtmlStage = shared.currentHtmlStageId(contract, deliverablePaths);
@@ -240,8 +240,8 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
   }
   if (route === 'screenshot_review') {
     const directorReviewArtifact = shared.readStageArtifact(contract, deliverablePaths, 'visual_director_review');
-    if (!directorReviewArtifact || directorReviewArtifact.status !== 'pass') {
-      throw new Error('Route screenshot_review requires visual_director_review to pass before audit');
+    if (!directorReviewArtifact) {
+      throw new Error('Route screenshot_review requires a consumable visual_director_review artifact before audit');
     }
     const directorReviewMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, 'visual_director_review'));
     if (directorReviewMtimeMs < currentVisualMtimeMs) {

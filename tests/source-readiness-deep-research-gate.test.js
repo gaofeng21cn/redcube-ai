@@ -13,7 +13,7 @@ import {
 } from './product-domain-action-test-api.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 
-test('auditDeliverable blocks when source_audit passes but planning_ready is still false', async () => {
+test('auditDeliverable records source gaps as quality debt while allowing planning to continue', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-gate-'));
 
   await intakeSource({
@@ -41,9 +41,10 @@ test('auditDeliverable blocks when source_audit passes but planning_ready is sti
     mode: 'draft_new',
   });
 
-  assert.equal(report.status, 'block');
+  assert.equal(report.status, 'pass_with_quality_debt');
   assert.equal(report.issues.includes('source_readiness_not_planning_ready'), true);
-  assert.equal(report.recommended_action, 'run_source_research');
+  assert.equal(report.recommended_action, 'run_deliverable_route');
+  assert.equal(report.quality_debt?.blocks_stage_transition, false);
   assert.equal(report.source_readiness_summary?.canonical_source?.kind, 'shared_source_truth.source_readiness_gate');
   assert.equal(report.source_readiness_summary?.planning_ready, false);
   assert.equal(report.source_readiness_summary?.sufficiency_status, 'augmentation_required');

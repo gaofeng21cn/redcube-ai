@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFileSync } from 'node:fs';
+import { existsSync as nodeExistsSync, readFileSync } from 'node:fs';
 import { runRedCubePythonHelper, type RedCubePythonNativeHelper } from '@redcube/runtime-protocol';
 import { createPptDeckVisualArtifactParts } from './visual-artifacts.js';
 import { createNativePptArtifactInputParts } from './native-ppt/artifact-input.js';
@@ -65,7 +65,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
   const {
     CODEX_DEFAULT_ADAPTER,
     CREATIVE_MATERIALIZED_FROM,
-    NATIVE_PPT_ENGINE_CONTRACT,
+    NATIVE_PPT_ENGINE_CONTRACT: configuredNativePptEngineContract,
     PYTHON_NATIVE,
     attachCommon,
     buildAuthoringContext,
@@ -85,6 +85,11 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     stageArtifactPath,
     writeJson,
   } = deps;
+  const NATIVE_PPT_ENGINE_CONTRACT = safeText(
+    configuredNativePptEngineContract,
+    path.resolve(process.cwd(), 'contracts/runtime-program/ppt-native-python-engine-contract.json'),
+  );
+  const fileExists = typeof existsSync === 'function' ? existsSync : nodeExistsSync;
   const {
     buildRepairEvidence,
   } = createNativePptRepairEvidenceParts({ safeArray, safeText });
@@ -100,7 +105,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
   let cachedNativeEngineContract: JsonRecord | null = null;
   function expectedNativeEngineContract(): JsonRecord {
     if (cachedNativeEngineContract) return cachedNativeEngineContract;
-    if (!existsSync(NATIVE_PPT_ENGINE_CONTRACT)) {
+    if (!fileExists(NATIVE_PPT_ENGINE_CONTRACT)) {
       throw new Error(`Missing native PPT engine contract: ${NATIVE_PPT_ENGINE_CONTRACT}`);
     }
     cachedNativeEngineContract = JSON.parse(readFileSync(NATIVE_PPT_ENGINE_CONTRACT, 'utf-8')) as JsonRecord;
@@ -391,6 +396,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       validationFeedback,
       attemptIndex,
       attemptArtifactRefs,
+      preflightPassed,
+      qualityBudget,
     } = generatedPlan;
     writeJson(paths.editableShapePlanFile, editableShapePlan);
     writeJson(paths.inputFile, buildNativeInputPayload({
@@ -403,7 +410,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       editableShapePlanFile: paths.editableShapePlanFile,
       repairFeedback,
     }));
-    const python = runPython(PYTHON_NATIVE, [
+    const pythonArgs = [
       '--input-json', paths.inputFile,
       '--mode', route === 'repair_pptx_native' ? 'repair' : 'author',
       '--output-pptx', paths.pptxFile,
@@ -412,7 +419,9 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       '--output-pdf', paths.pdfFile,
       '--repair-log', paths.repairLogFile,
       '--engine-contract', NATIVE_PPT_ENGINE_CONTRACT,
-    ]);
+      ...(preflightPassed === false ? ['--allow-quality-debt'] : []),
+    ];
+    const python = runPython(PYTHON_NATIVE, pythonArgs);
     const payload = python.payload;
     const engineContract = requireNativeEngineContract(payload);
     if (Number(payload.shape_manifest_schema_version || 0) !== 1) {
@@ -422,7 +431,13 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       ? JSON.parse(readFileSync(paths.shapeManifestFile, 'utf-8'))
       : {};
     assertNativeDeckCompleteness({ route, shapeManifest, payload, unitRepairScope });
-    const renderProof = requireTrueRenderProof(payload, shapeManifest);
+    const rawRenderProof = payload?.render_proof || shapeManifest?.render_proof || {};
+    const renderProofCandidateAvailable = safeText(rawRenderProof?.renderer_pipeline) === 'libreoffice_headless_pdf_png_v1'
+      && safeArray(rawRenderProof?.preview_screenshots).length > 0;
+    const renderProof = renderProofCandidateAvailable
+      ? requireTrueRenderProof(payload, shapeManifest)
+      : rawRenderProof;
+    const renderProofAvailable = renderProofCandidateAvailable && renderProof?.quality_valid === true;
     const manifestQualityPassed = nativeManifestQualityPassed(shapeManifest);
     writeJson(paths.shapeManifestFile, {
       ...shapeManifest,
@@ -435,8 +450,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       render_proof: renderProof,
       proof_flags: {
         ...(shapeManifest.proof_flags || {}),
-        true_render_proof: true,
-        libreoffice_headless_pdf_png_v1: safeText(renderProof.renderer_pipeline) === 'libreoffice_headless_pdf_png_v1',
+        true_render_proof: renderProofAvailable,
+        libreoffice_headless_pdf_png_v1: renderProofAvailable,
         synthetic_preview_allowed: false,
       },
     });
@@ -474,9 +489,22 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       || safeText(generationRuntime?.owner).includes('mock')
       || safeText(generationRuntime?.adapter_surface).includes('mock')
       || Boolean(editableShapePlan?.test_double_boundary);
+    const qualityDebtRecorded = preflightPassed === false || !manifestQualityPassed || !renderProofAvailable;
     return {
       ...attachCommon(route, contract, null, adapter),
-      status: 'completed',
+      status: qualityDebtRecorded ? 'completed_with_quality_debt' : 'completed',
+      quality_debt: qualityDebtRecorded ? {
+        status: 'recorded_non_blocking',
+        reasons: [
+          ...(preflightPassed === false ? ['native_shape_plan_preflight_budget_exhausted'] : []),
+          ...(!manifestQualityPassed ? ['native_manifest_quality_not_passed'] : []),
+          ...(!renderProofAvailable ? ['native_true_render_proof_unavailable'] : []),
+        ],
+        quality_budget: qualityBudget,
+        blocks_stage_transition: false,
+        blocks_visual_ready_claim: true,
+        blocks_export_ready_claim: true,
+      } : null,
       ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,
       unit_repair_scope: unitRepairScope,
       creative_execution: {
@@ -511,6 +539,9 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         ai_first_shape_plan_preflight: {
           attempts: attemptIndex,
           validator: validationFeedback,
+          passed: preflightPassed !== false,
+          quality_budget: qualityBudget,
+          transition_policy: 'quality_budget_not_stage_blocker',
           self_repair_used: attemptIndex > 1,
           attempt_artifact_refs: safeArray(attemptArtifactRefs).map((ref) => safeText(ref)).filter(Boolean),
         },

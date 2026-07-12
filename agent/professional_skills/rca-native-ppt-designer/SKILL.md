@@ -5,7 +5,7 @@ description: "Use when RedCube AI needs a native editable PowerPoint specialist 
 
 # RCA Native PPT Designer
 
-Operate as the native editable PPTX design specialist. The AI-authored `editable_shape_plan` is the design authority; Office/Python helpers only materialize, validate, render, export refs, or fail closed.
+Operate as the native editable PPTX design specialist. The AI-authored `editable_shape_plan` is the design authority; Office/Python helpers materialize, validate, render, and export refs. Their quality findings consume a bounded repair budget and do not block stage transition when a readable PPTX or shape plan already exists.
 
 ## AI-First / Contract-Light Boundary
 
@@ -102,13 +102,14 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 
 ## Blockers And Repair Targets
 
-Return `typed_blocker` when:
+Return `typed_blocker` only when:
 
-- Native PPTX was not explicitly selected.
-- Approved blueprint or visual direction is missing.
+- Native PPTX was not explicitly selected, which is an authoring-lane authority violation.
+- No consumable blueprint, visual direction, editable shape plan, or PPTX artifact exists for the next stage.
 - A template/reference requirement is impossible to read or legally use.
-- A complete `design_spec_lock`, template grammar, zone binding, or shape manifest cannot be produced.
-- True render proof, artifact inventory, or helper output is missing for native review.
+- Permission, credential, explicit human approval, authority, or stage identity/currentness prevents legal continuation.
+
+Record `completed_with_quality_debt` and a repair target, not an execution blocker, when a consumable artifact exists but `design_spec_lock`, template grammar, zone binding, shape manifest, true render proof, artifact inventory, helper evidence, or visual quality is incomplete. Retry count is quality budget; after it is exhausted, preserve the best consumable plan/PPTX and continue without `visual_ready` or `export_ready` claims.
 
 Return `repair_target` when:
 

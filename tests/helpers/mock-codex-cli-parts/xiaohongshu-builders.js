@@ -307,11 +307,23 @@ export function buildXhsSlideMarkup(slide, totalSlides, peakPage = false, author
 
 export function buildMockXhsRender(meta) {
   const slides = safeArray(meta?.context?.plan?.slides);
+  const variants = new Set(
+    safeText(process.env.REDCUBE_MOCK_XHS_RENDER_VARIANT)
+      .split(',')
+      .map((item) => safeText(item))
+      .filter(Boolean),
+  );
+  const omittedSlideId = safeText(process.env.REDCUBE_MOCK_XHS_RENDER_OMIT_SLIDE_ID);
   const peakPages = new Set(safeArray(meta?.context?.visual_direction?.peak_pages));
   const authorBranding = meta?.context?.author_branding || null;
   const canvas = xhsCanvasFromMeta(meta);
   return {
-    slides: slides.map((slide, index) => ({
+    slides: slides
+      .filter((slide, index) => (
+        (!variants.has('omit_last_slide') || index < slides.length - 1)
+        && (!omittedSlideId || safeText(slide?.slide_id) !== omittedSlideId)
+      ))
+      .map((slide, index) => ({
       slide_id: slide.slide_id,
       content_html: buildXhsSlideMarkup(
         { ...slide, slide_no: index + 1 },

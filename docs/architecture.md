@@ -5,6 +5,10 @@ Purpose: `current_architecture_and_owner_boundary`
 State: `current_truth`
 Machine boundary: 人读架构说明。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
+Progress-first transition 固定为：route handler 先执行 artifact admission，再解释质量 verdict。可消费 artifact 即关闭当前 attempt 并进入下一个 stage；视觉/内容质量的 `block`、`failed` 或 `rerun_required` 规范化为 `completed_with_quality_debt`，保留 repair recommendation 但不保留 execution typed blocker。continuation 只消费有限 repair budget，耗尽后选择最佳 artifact 进入 export。
+
+PPT/XHS authoring lane 通过 hydrated delivery constraint 锁定为 `image_pages`、`html` 或 `native_pptx`。review/export 只读取被锁定 lane 的 artifact；外层故障处理不能自动跨 lane，只有新的显式 product-entry route 可以更新 lock。
+
 对外主语：`RedCube AI` 是由 OPL 安装、注册和运行的 visual-deliverable Foundry Agent，不是独立应用或独立 runtime。RCA 持有视觉领域能力与交付权威；OPL 持有 Framework 安装、Temporal/provider runtime、generated/hosted interfaces 和通用平台能力。
 
 ## 主链路

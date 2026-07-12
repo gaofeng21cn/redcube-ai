@@ -219,6 +219,15 @@ export function createXiaohongshuImagePageRuntimeHelpers(deps) {
 
   async function callImageGeneration({ config, prompt, toolOptions, route, slideId, imageFile }) {
     if (process.env.REDCUBE_IMAGE_GENERATION_MOCK === '1') {
+      const failedSlideIds = new Set(
+        safeText(process.env.REDCUBE_IMAGE_GENERATION_MOCK_FAIL_SLIDE_IDS)
+          .split(',')
+          .map((value) => value.trim())
+          .filter(Boolean),
+      );
+      if (failedSlideIds.has(slideId)) {
+        throw new Error(`mock image generation failed for ${slideId}`);
+      }
       const mockBytes = solidPngFixture(CANVAS.width, CANVAS.height, `${route}:${slideId}:${prompt}`);
       return {
         id: `resp_mock_${sha256(`${route}:${slideId}:${prompt}`).slice(0, 16)}`,

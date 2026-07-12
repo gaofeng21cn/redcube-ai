@@ -203,7 +203,7 @@
       "sparse oversized card",
       "optional OCR manifest domain_action_adapter"
     ],
-    "hard_block_checks": [
+    "ready_claim_block_checks": [
       "overflow_free",
       "occlusion_free",
       "visual_density_ok",
@@ -265,7 +265,8 @@
       "status": "landed",
       "scope": "blocked_slide_ids_only",
       "preserve_unblocked_pages": true,
-      "fail_closed_when_prior_png_missing": true
+      "missing_prior_png_quality_debt_when_other_pages_are_consumable": true,
+      "zero_consumable_png_hard_stop": true
     },
     "operator_ux": {
       "status": "landed",

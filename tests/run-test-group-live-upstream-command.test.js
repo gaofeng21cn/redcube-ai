@@ -77,6 +77,7 @@ test('run-test-group routes Python cache outside the checkout', () => {
   assert.match(runner, /NPM_CONFIG_CACHE/);
   assert.match(runner, /NODE_COMPILE_CACHE/);
   assert.match(runner, /XDG_CACHE_HOME/);
+  assert.match(runner, /process\.env\.OPL_STATE_DIR = path\.join\(repoTempRoot, 'opl-state'\)/);
   assert.match(runner, /pathIsInsideRepo/);
   assert.match(runner, /-p no:cacheprovider/);
   assert.match(runner, /cache_dir=\$\{path\.join\(pythonCacheRoot, 'pytest-cache'\)\}/);
@@ -95,7 +96,11 @@ test('verification scripts expose repo temp hygiene entrypoints', () => {
   assert.match(verifyScript, /scripts\/verify-lane\.ts "\$lane" --verify-wrapper "\$@"/);
   assert.match(
     readFileSync('scripts/run-with-repo-temp-env.sh', 'utf-8'),
-    /node_modules\/opl-framework\/bin\/opl[\s\S]*packages link-framework[\s\S]*--check/,
+    /node_modules\/opl-framework\/bin\/opl[\s\S]*connect[\s\S]*agent-packages[\s\S]*link-framework[\s\S]*--check/,
+  );
+  assert.match(
+    readFileSync('scripts/run-with-repo-temp-env.sh', 'utf-8'),
+    /export OPL_STATE_DIR="\$\{repo_temp_root\}\/opl-state"/,
   );
   assert.match(verifyLaneScript, /run\('scripts\/repo-hygiene\.sh', \['--fix'\]\)/);
   assert.match(verifyLaneScript, /run\('scripts\/repo-hygiene\.sh'\)/);

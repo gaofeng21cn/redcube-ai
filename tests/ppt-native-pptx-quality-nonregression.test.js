@@ -95,7 +95,8 @@ function assertQualityContract(contract) {
     'composition_signature',
     'preview_screenshot_sha256',
   ], 'shape_manifest.required_per_slide_metrics');
-  assert.equal(contract.shape_manifest_contract.fail_closed_when_missing, true);
+  assert.equal(contract.shape_manifest_contract.quality_debt_when_missing, true);
+  assert.match(contract.shape_manifest_contract.review_behavior, /block ready claims but not stage transition/);
   assert.equal(contract.editable_shape_plan_contract.creative_owner, 'llm_agent');
   assert.equal(contract.editable_shape_plan_contract.python_helper_role, 'execute_validate_export_only');
   assert.equal(contract.editable_shape_plan_contract.template_substitution_allowed, false);

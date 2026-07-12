@@ -61,7 +61,7 @@ test('StageRun kernel profile preserves RCA authority and rejects runtime overcl
     'stage_folder',
     'stage_manifest',
     'role_artifacts',
-    'owner_receipt_or_typed_blocker',
+    'progress_receipt_or_owner_answer_or_hard_stop',
   ]);
   assert.deepEqual(profile.domain_authority_retained, [
     'visual_truth',
@@ -80,6 +80,17 @@ test('StageRun kernel profile preserves RCA authority and rejects runtime overcl
   ]) {
     assert.equal(profile.stage_run_state_machine[key], false, key);
   }
+  assert.equal(
+    profile.stage_run_state_machine.validated_consumable_artifact_progress_counts_as_transition,
+    true,
+  );
+  assert.equal(profile.stage_run_state_machine.quality_debt_counts_as_quality_acceptance, false);
+  assert.equal(
+    profile.transition_authority.terminal_transition_authority,
+    'consumable_artifact_progress_or_owner_answer_or_hard_stop',
+  );
+  assert.equal(profile.transition_authority.quality_budget_exhaustion_blocks_transition, false);
+  assert.equal(profile.transition_authority.owner_receipt_required_for_quality_or_ready_claim, true);
   assert.equal(profile.opl_contract_refs.owner, 'one-person-lab');
   assert.equal(profile.opl_contract_refs.domain_repo_role, 'consumer_profile_ref_only');
   assert.equal(profile.opl_contract_refs.repo_local_file_required, false);
@@ -135,6 +146,7 @@ test('owner-chain live progress refs keep open evidence gates explicit', () => {
   assert.equal(temporalPolicy.owner_chain_completion_audit.completion_status, 'blocked_requires_real_visual_stage_owner_acceptance');
   assert.equal(temporalPolicy.owner_chain_completion_audit.declares_owner_chain_complete, false);
   assert.deepEqual(temporalPolicy.owner_chain_completion_audit.accepted_terminal_evidence_refs, [
+    'progress_delta_receipt_ref',
     'owner_receipt_ref',
     'typed_blocker_ref',
     'human_gate_ref',

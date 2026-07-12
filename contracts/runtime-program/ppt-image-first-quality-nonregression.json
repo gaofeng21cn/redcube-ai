@@ -116,7 +116,8 @@
     "freshly_rendered_slide_ids_ref": "workspace-runtime-ref:repair-image-pages:<run-id>#/quality_non_regression_read_model/repair_scope/freshly_rendered_slide_ids",
     "scope": "blocked_slide_ids_only",
     "unblocked_slide_policy": "reuse_prior_png_and_record_preserved_hashes",
-    "fail_closed_when_prior_png_missing": true,
+    "missing_prior_png_quality_debt_when_other_pages_are_consumable": true,
+    "zero_consumable_png_hard_stop": true,
     "repair_may_touch_unblocked_pages": false
   },
   "export_pptx_policy": {
@@ -135,7 +136,7 @@
     "screenshot_review_required": true,
     "export_pptx_required": true,
     "quality_gates_may_be_lowered": false,
-    "hard_block_checks_may_be_removed": false,
+    "ready_claim_block_checks_may_be_removed": false,
     "fact_governance_may_be_bypassed": false,
     "verified_asset_policy_may_be_bypassed": false,
     "audience_language_policy_may_be_bypassed": false,

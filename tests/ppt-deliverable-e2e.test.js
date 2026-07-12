@@ -84,6 +84,45 @@ test('ppt HTML workflow auto-recovers planning dependencies', async () => {
   });
 });
 
+test('ppt HTML workflow advances with quality debt when one generated page is missing', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-html-partial-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-html-partial',
+      title: '肠癌 AI 讲课 deck',
+      goal: '验证 HTML 缺一页仍可推进',
+    });
+    process.env.REDCUBE_MOCK_PPT_RENDER_VARIANT = 'omit_last_slide';
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-html-partial',
+      route: 'render_html',
+    });
+    delete process.env.REDCUBE_MOCK_PPT_RENDER_VARIANT;
+    assert.equal(result.ok, true);
+    const artifact = readJson(result.artifactFile);
+    assert.equal(artifact.status, 'completed_with_quality_debt');
+    assert.equal(artifact.html_bundle.actual_page_count > 0, true);
+    assert.equal(artifact.html_bundle.actual_page_count < artifact.html_bundle.expected_page_count, true);
+    for (const route of ['visual_director_review', 'screenshot_review']) {
+      const downstream = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-html-partial',
+        route,
+      });
+      assert.equal(downstream.ok, true, route);
+    }
+  });
+});
+
 test('ppt HTML workflow fails closed when its shell asset is missing', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-fail-closed-'));

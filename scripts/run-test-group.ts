@@ -81,6 +81,7 @@ mkdirSync(path.join(repoTempRoot, 'uv', 'project-venv'), { recursive: true });
 mkdirSync(path.join(repoTempRoot, 'npm', 'cache'), { recursive: true });
 mkdirSync(path.join(repoTempRoot, 'node', 'compile-cache'), { recursive: true });
 mkdirSync(path.join(repoTempRoot, 'xdg-cache'), { recursive: true });
+mkdirSync(path.join(repoTempRoot, 'opl-state'), { recursive: true });
 
 function externalEnvValue(name, fallback) {
   const current = process.env[name];
@@ -108,6 +109,7 @@ process.env.NODE_COMPILE_CACHE = externalEnvValue(
   path.join(repoTempRoot, 'node', 'compile-cache'),
 );
 process.env.XDG_CACHE_HOME = externalEnvValue('XDG_CACHE_HOME', path.join(repoTempRoot, 'xdg-cache'));
+process.env.OPL_STATE_DIR = path.join(repoTempRoot, 'opl-state');
 
 const hygieneResult = spawnSync('scripts/repo-hygiene.sh', {
   cwd: repoRoot,

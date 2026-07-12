@@ -22,9 +22,9 @@
       "stages/<nn-stage>/current.json",
       "stages/<nn-stage>/latest"
     ],
-    "completion_rule": "success requires required output roles, valid role manifest, owner receipt refs, and receipt file",
-    "blocked_rule": "blocked requires typed blocker refs and evidence file",
-    "orphan_rule": "outputs without valid role manifest/receipt/evidence are orphan artifacts and never complete a stage",
+    "completion_rule": "required output roles plus a valid role manifest advance with a progress receipt; owner receipt is additionally required for quality/export/ready claims",
+    "blocked_rule": "only zero readable artifact or another legal hard stop uses typed blocker refs and evidence file",
+    "orphan_rule": "outputs without a valid role manifest and progress/owner/hard-stop receipt are orphan artifacts and never complete a stage",
     "program_identity_rule": "RCA derives program_id from workspace root so same topic_id/deliverable_id in different workspaces cannot collide in shared OPL runtime-state"
   },
   "workspace_runtime_artifact_root": {

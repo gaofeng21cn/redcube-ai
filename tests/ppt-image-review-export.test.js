@@ -292,7 +292,7 @@ test('ppt image-first route reviews PNG pages and exports non-editable full-page
   }
 });
 
-test('ppt image-first screenshot review fails closed when PNG manifest refs are missing', async () => {
+test('ppt image-first screenshot review records missing PNG manifest refs as non-blocking quality debt', async () => {
   const fixture = makeFixture({ missingManifest: true });
   const director = await fixture.stageParts.buildDirectorReview(fixture.contract, fixture.deliverablePaths, 'test-adapter');
   fixture.artifacts.set('visual_director_review', { ...director, status: 'pass' });
@@ -305,17 +305,18 @@ test('ppt image-first screenshot review fails closed when PNG manifest refs are 
     mode: 'draft_new',
   });
   assert.equal(screenshot.status, 'block');
-  assert.deepEqual(screenshot.owner_receipt_refs, []);
-  assert.deepEqual(screenshot.typed_blocker_refs, [
-    'rca-typed-blocker:review-export:ppt_deck:screenshot_review:deck-image',
+  assert.deepEqual(screenshot.owner_receipt_refs, [
+    'rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-image',
   ]);
-  assert.equal(screenshot.typed_blocker.blocker_kind, 'missing_required_artifact');
+  assert.deepEqual(screenshot.typed_blocker_refs, []);
+  assert.equal(screenshot.typed_blocker, null);
+  assert.equal(screenshot.quality_debt.blocks_stage_transition, false);
   assert.equal(screenshot.review_state_patch.rerun_from_stage, 'repair_image_pages');
   assert.equal(screenshot.checks.block_content_fit_ok, false);
   assert.equal(screenshot.slide_reviews[0].issues.includes('image_page_manifest_missing'), true);
 });
 
-test('ppt image-first screenshot review fails closed on operator language and layout legibility policy leaks', async () => {
+test('ppt image-first screenshot review records non-blocking debt for language and layout quality leaks', async () => {
   const fixture = makeFixture({
     promptManifestPatch: {
       visible_text_audit: {

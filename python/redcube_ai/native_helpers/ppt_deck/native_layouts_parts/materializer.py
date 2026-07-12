@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 
 from redcube_ai.native_helpers.ppt_deck.native_layout_constants import SLIDE_HEIGHT_IN, SLIDE_WIDTH_IN
-from redcube_ai.native_helpers.ppt_deck.native_manifest_qa import fail_closed_on_manifest_qa
+from redcube_ai.native_helpers.ppt_deck.native_manifest_qa import fail_closed_on_manifest_qa, manifest_qa_failures
 from redcube_ai.native_helpers.ppt_deck.native_package import (
     copy_template_source,
     patch_chart_data,
@@ -821,13 +821,21 @@ def _bind_manifest_to_package(manifest_slides: list[dict], package_readback: dic
         manifest_slide['text_box_count'] = int((package_slide.get('object_counts') or {}).get('text_box') or 0)
 
 
-def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, evaluate_native_slide_quality, template_intake=None):
+def build_deck(
+    slides,
+    output_pptx: Path,
+    svg_ir_dir: Path,
+    repaired_slide_ids,
+    evaluate_native_slide_quality,
+    template_intake=None,
+    allow_quality_debt: bool = False,
+):
     _assert_animation_targets(slides)
     manifest_slides = []
     for index, slide_data in enumerate(slides, 1):
         slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')
         failures = validate_ai_first_design_plan(slide_data)
-        if failures:
+        if failures and not allow_quality_debt:
             raise RuntimeError(
                 'native PPT AI-first editable_shape_plan failed: '
                 + json.dumps(failures, ensure_ascii=False, sort_keys=True)
@@ -872,9 +880,15 @@ def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, 
             'checks': quality['checks'],
             'metrics': quality['metrics'],
             'issues': quality['issues'],
+            'shape_plan_quality_debt': [
+                *safe_list(slide_data.get('_plan_quality_debt')),
+                *failures,
+            ],
             'repaired': slide_id in repaired_slide_ids,
         })
-    fail_closed_on_manifest_qa(manifest_slides)
+    qa_failures = manifest_qa_failures(manifest_slides)
+    if not allow_quality_debt:
+        fail_closed_on_manifest_qa(manifest_slides)
     for slide in manifest_slides:
         slide.pop('_deck_layout_rhythm', None)
     officecli_gate = materialize_native_pptx(slides, output_pptx, template_intake=template_intake)
@@ -888,4 +902,19 @@ def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, 
         'officecli_gate': officecli_gate,
         'package_readback': officecli_gate['package_readback'],
         'template_preservation': officecli_gate['template_preservation'],
+        'quality_debt': {
+            'status': 'recorded_non_blocking',
+            'shape_plan_failures': [
+                {
+                    'slide_id': slide.get('slide_id'),
+                    'failures': slide.get('shape_plan_quality_debt'),
+                }
+                for slide in manifest_slides
+                if slide.get('shape_plan_quality_debt')
+            ],
+            'manifest_qa_failures': qa_failures,
+            'blocks_materialization': False,
+        } if allow_quality_debt and (
+            qa_failures or any(slide.get('shape_plan_quality_debt') for slide in manifest_slides)
+        ) else None,
     }

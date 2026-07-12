@@ -33,11 +33,12 @@
     "stage_folder",
     "stage_manifest",
     "role_artifacts",
-    "owner_receipt_or_typed_blocker"
+    "progress_receipt_or_owner_answer_or_hard_stop"
   ],
   "required_object_models": [
     "StageRun",
     "RoleArtifactRef",
+    "ProgressDeltaReceipt",
     "OwnerReceipt",
     "TypedBlocker",
     "ReadModel"
@@ -46,7 +47,9 @@
     "provider_completion_counts_as_domain_accepted": false,
     "file_presence_counts_as_stage_complete": false,
     "latest_json_counts_as_domain_accepted": false,
-    "read_model_counts_as_transition_authority": false
+    "read_model_counts_as_transition_authority": false,
+    "validated_consumable_artifact_progress_counts_as_transition": true,
+    "quality_debt_counts_as_quality_acceptance": false
   },
   "launch_admission_policy": {
     "hard_blockers": [
@@ -77,9 +80,11 @@
     "replay_packet_default": false
   },
   "transition_authority": {
-    "terminal_transition_authority": "owner_receipt_or_typed_blocker",
+    "terminal_transition_authority": "consumable_artifact_progress_or_owner_answer_or_hard_stop",
     "provider_completion_counts_as_transition": false,
-    "file_presence_counts_as_transition": false
+    "file_presence_counts_as_transition": false,
+    "quality_budget_exhaustion_blocks_transition": false,
+    "owner_receipt_required_for_quality_or_ready_claim": true
   },
   "authority_boundary": {
     "opl_can_write_domain_truth": false,
@@ -96,7 +101,7 @@
     "claims_allowed": [
       "controlled_fixture_trace_shape_present",
       "refs_only_stage_run_assets_followable",
-      "owner_receipt_or_typed_blocker_closeout_shape_present",
+      "progress_receipt_or_owner_answer_or_hard_stop_closeout_shape_present",
       "legacy_runtime_residue_guard_declared"
     ],
     "claims_forbidden": [
@@ -178,7 +183,7 @@
     "default_operator_readout": "controlled_canary_fixture_only",
     "must_say": [
       "controlled_fixture_not_live_domain_progress",
-      "owner_receipt_or_typed_blocker_closeout_required",
+      "progress_receipt_or_owner_answer_or_hard_stop_closeout_required",
       "tool_and_render_refs_are_affordance_or_evidence_refs",
       "legacy_runtime_residue_is_not_active_runtime_owner"
     ],
@@ -211,7 +216,7 @@
       "evolution_and_revision",
       "meta_review_learning",
       "independent_quality_gate",
-      "owner_receipt_or_typed_blocker_closeout"
+      "progress_receipt_or_owner_answer_or_hard_stop_closeout"
     ],
     "required_role_artifacts": [
       "candidate_pool_ref",

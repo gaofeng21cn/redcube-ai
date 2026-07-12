@@ -188,8 +188,8 @@ test('RCA stage folder keeps long OPL attempt ref normalization stable across wr
   });
 });
 
-test('RCA stage folder success closeout fails closed without explicit owner receipt refs', () => {
-  withTempOplState((stateRoot) => {
+test('RCA stage folder advances a readable artifact without owner receipt as quality debt', () => {
+  withTempOplState(() => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-missing-owner-ref-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
     const base = {
@@ -206,24 +206,27 @@ test('RCA stage folder success closeout fails closed without explicit owner rece
     };
     const artifactFile = stageFolderOutputPath(base);
     writeJson(artifactFile, { route: 'author_image_pages', status: 'ok' });
-    const pointers = stageFolderAttemptPaths(base);
+    const written = writeStageFolderArtifact({
+      ...base,
+      artifactFile,
+    });
+    const loaded = readStageFolderArtifact({
+      deliverablePaths: paths,
+      routeStageId: 'author_image_pages',
+      canonicalStageId: 'artifact_creation',
+    });
 
-    assert.throws(
-      () => writeStageFolderArtifact({
-        ...base,
-        artifactFile,
-      }),
-      /requires explicit ownerReceiptRefs/,
-    );
-    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'current.json')), false);
-    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'latest.json')), false);
-    assert.equal(existsSync(pointers.latest_pointer), false);
-    assert.equal(existsSync(pointers.stage_current_file), false);
+    assert.equal(written.manifest.status, 'completed_with_quality_debt');
+    assert.deepEqual(written.manifest.owner_receipt_refs, []);
+    assert.equal(existsSync(written.progress_receipt_file), true);
+    assert.equal(existsSync(written.quality_debt_evidence_file), true);
+    assert.equal(loaded?.status, 'completed_with_quality_debt');
+    assert.equal(loaded?.artifact.route, 'author_image_pages');
   });
 });
 
-test('RCA stage folder blocked closeout fails closed without explicit typed blocker refs', () => {
-  withTempOplState((stateRoot) => {
+test('RCA stage folder converts a readable quality block without typed blocker into quality debt', () => {
+  withTempOplState(() => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-missing-blocker-ref-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
     const base = {
@@ -240,19 +243,42 @@ test('RCA stage folder blocked closeout fails closed without explicit typed bloc
     };
     const artifactFile = stageFolderOutputPath(base);
     writeJson(artifactFile, { route: 'screenshot_review', status: 'block' });
-    const pointers = stageFolderAttemptPaths(base);
+    const written = writeStageFolderArtifact({
+      ...base,
+      artifactFile,
+    });
+
+    assert.equal(written.manifest.status, 'completed_with_quality_debt');
+    assert.deepEqual(written.manifest.typed_blocker_refs, []);
+    assert.equal(existsSync(written.progress_receipt_file), true);
+    assert.equal(existsSync(written.quality_debt_evidence_file), true);
+  });
+});
+
+test('RCA stage folder hard-stops when neither readable artifact nor typed blocker exists', () => {
+  withTempOplState(() => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-zero-artifact-'));
+    const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
+    const base = {
+      deliverablePaths: paths,
+      programId: paths.programId,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      routeStageId: 'screenshot_review',
+      canonicalStageId: 'review_and_revision',
+      stageOrder: 5,
+      attemptId: 'attempt-zero-artifact',
+      outputName: 'screenshot_review.json',
+      status: 'blocked',
+    };
 
     assert.throws(
       () => writeStageFolderArtifact({
         ...base,
-        artifactFile,
+        artifactFile: stageFolderOutputPath(base),
       }),
-      /requires explicit typedBlockerRefs/,
+      /requires a readable artifact or explicit typedBlockerRefs/,
     );
-    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'current.json')), false);
-    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'latest.json')), false);
-    assert.equal(existsSync(pointers.latest_pointer), false);
-    assert.equal(existsSync(pointers.stage_current_file), false);
   });
 });
 

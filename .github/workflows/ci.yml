@@ -60,7 +60,7 @@ jobs:
 
       - name: Link OPL Framework
         run: |
-          "$OPL_BIN" packages link-framework --agent-root "$GITHUB_WORKSPACE" --json
+          "$OPL_BIN" connect agent-packages link-framework --agent-root "$GITHUB_WORKSPACE" --json
 
       - name: Run build and typecheck
         run: npm run typecheck
@@ -133,7 +133,7 @@ jobs:
 
       - name: Link OPL Framework
         run: |
-          "$OPL_BIN" packages link-framework --agent-root "$GITHUB_WORKSPACE" --json
+          "$OPL_BIN" connect agent-packages link-framework --agent-root "$GITHUB_WORKSPACE" --json
 
       - name: Run native PPT true proof
         run: tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof
@@ -209,7 +209,7 @@ jobs:
 
       - name: Link OPL Framework
         run: |
-          "$OPL_BIN" packages link-framework --agent-root "$GITHUB_WORKSPACE" --json
+          "$OPL_BIN" connect agent-packages link-framework --agent-root "$GITHUB_WORKSPACE" --json
 
       - name: Run image PPT proof
         run: tools/image-ppt-proof/run.sh --output-dir artifacts/image-ppt-proof --mock-image-generation

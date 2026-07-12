@@ -5,7 +5,9 @@ Purpose: `current_status_and_gap_readout`
 State: `current_truth`
 Machine boundary: 人读状态面。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
-Last reviewed: `2026-07-11`
+Last reviewed: `2026-07-12`
+
+Progress-first 已进入 route runtime、candidate race、native shape-plan、PPT/XHS image pages、review/repair continuation 与 export：可消费 artifact 以 `completed` / `completed_with_quality_debt` 推进；默认 native shape-plan 4 轮及 review repair 轮数是质量预算，不再是 pass-or-stop 门。Native PPT 在 editable PPTX 已物化但 template/manifest/render proof 未达标时继续交付 PPTX；Image route 单页失败继续其他页，至少一张可读 PNG 即推进，零 PNG 才硬失败。普通质量债务不生成 execution typed blocker，但会阻止 ready claim。Authoring lane lock 防止 image/native/HTML 静默切换。
 
 Plugin native profile pointer: `contracts/opl-native-profile.json` 只声明 OPL Flow / OPL Doc 插件同步与 drift 检查所需的 repo-native profile；它不是 visual truth、runtime truth、artifact authority、review/export verdict、owner receipt 或 production-ready 证据。
 

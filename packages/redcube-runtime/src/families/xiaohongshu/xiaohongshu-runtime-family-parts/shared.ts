@@ -14,6 +14,7 @@ import {
   stageFolderArtifactPath,
   stageOrderForCanonicalStage,
 } from '@redcube/runtime-protocol';
+import { authoringLaneForRoute, lockedAuthoringLane } from '../../../progress-first.js';
 import { readJson, writeJson } from '../../../runtime-utils.js';
 
 export { readJson, writeJson };
@@ -291,6 +292,7 @@ export function isImagePagesArtifact(artifact) {
 }
 
 export function currentVisualStageId(contract, deliverablePaths) {
+  const authoringLaneLock = lockedAuthoringLane(contract);
   const htmlStage = currentHtmlStageId(contract, deliverablePaths);
   const htmlMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, htmlStage));
   const imageStage = currentImagePagesStageId(contract, deliverablePaths);
@@ -298,12 +300,14 @@ export function currentVisualStageId(contract, deliverablePaths) {
   const candidates = [
     { stage: htmlStage, mtimeMs: htmlMtimeMs },
     { stage: imageStage, mtimeMs: imageMtimeMs },
-  ].filter((item) => item.stage && item.mtimeMs > 0);
+  ].filter((item) => item.stage
+    && item.mtimeMs > 0
+    && (!authoringLaneLock || authoringLaneForRoute(item.stage) === authoringLaneLock));
   if (candidates.length > 0) {
     candidates.sort((left, right) => right.mtimeMs - left.mtimeMs);
     return candidates[0].stage;
   }
-  return imageStage || '';
+  return '';
 }
 
 export function readCurrentVisualArtifact(contract, deliverablePaths) {
@@ -587,7 +591,7 @@ export function readStageArtifact(contract, deliverablePaths, stageId) {
     routeStageId: stageId,
     canonicalStageId: canonicalStageForRoute(stageId),
   });
-  return loaded?.status === 'success' || loaded?.status === 'blocked'
+  return ['success', 'blocked', 'completed_with_quality_debt'].includes(loaded?.status)
     ? loaded.artifact
     : null;
 }

@@ -219,12 +219,14 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     deliverableId,
     pptxPath,
     pdfPath,
+    qualityDebtReasons = [],
   }: {
     workspaceRoot: string;
     contract: JsonRecord;
     deliverableId: string;
     pptxPath: string;
     pdfPath: string;
+    qualityDebtReasons?: string[];
   }) {
     const finalDeliveryDir = ensureDir(path.join(workspaceRoot, '交付成果'));
     const baseName = sanitizeDeliveryFileBase(contract?.title, deliverableId);
@@ -240,13 +242,14 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     }
     const manifest = {
       surface_kind: 'ppt_deck_final_delivery',
-      current: 'output_ready',
+      current: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : 'output_ready',
       title: safeText(contract?.title),
       deliverable_id: deliverableId,
-      pptx_file: finalPptxFile,
-      pdf_file: finalPdfFile,
+      pptx_file: fileExists(finalPptxFile) ? finalPptxFile : null,
+      pdf_file: fileExists(finalPdfFile) ? finalPdfFile : null,
       source_pptx_file: pptxPath,
       source_pdf_file: pdfPath,
+      quality_debt_reasons: qualityDebtReasons,
       updated_at: new Date().toISOString(),
     };
     writeText(manifestFile, `${JSON.stringify(manifest, null, 2)}\n`);
@@ -254,9 +257,10 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       '# 交付成果',
       '',
       `- 讲题：${safeText(contract?.title)}`,
-      '- 当前状态：output_ready',
-      `- PPTX：${path.basename(finalPptxFile)}`,
-      `- PDF：${path.basename(finalPdfFile)}`,
+      `- 当前状态：${qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : 'output_ready'}`,
+      `- PPTX：${fileExists(finalPptxFile) ? path.basename(finalPptxFile) : '未生成'}`,
+      `- PDF：${fileExists(finalPdfFile) ? path.basename(finalPdfFile) : '未生成'}`,
+      ...(qualityDebtReasons.length > 0 ? [`- 质量债务：${qualityDebtReasons.join('、')}`] : []),
       '',
       '规则：',
       '- 这里是给用户直接取用的当前最终版入口。',
@@ -348,18 +352,17 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     if (!sourcePptx || !fileExists(sourcePptx)) {
       throw new Error(`Route export_pptx requires native PPTX source before export: ${sourcePptx}`);
     }
-    if (!sourcePdf || !fileExists(sourcePdf)) {
-      throw new Error(`Route export_pptx requires native PPTX preview PDF before export: ${sourcePdf}`);
-    }
+    const qualityDebtReasons = [];
+    if (!sourcePdf || !fileExists(sourcePdf)) qualityDebtReasons.push('native_preview_pdf_unavailable');
     const shapeManifest = readJsonIfPresent(shapeManifestFile);
     const rendererProof = shapeManifest.render_proof || bundle.render_proof || {};
     if (shapeManifest?.proof_flags?.libreoffice_headless_pdf_png_v1 !== true) {
-      throw new Error('Route export_pptx requires native shape manifest LibreOffice headless PDF/PNG v1 proof before native export');
+      qualityDebtReasons.push('native_render_proof_flag_missing');
     }
     if (safeText(rendererProof?.source_surface_kind) !== 'native_pptx'
       || safeText(rendererProof?.renderer_pipeline) !== 'libreoffice_headless_pdf_png_v1'
       || rendererProof?.synthetic_preview !== false) {
-      throw new Error('Route export_pptx requires native renderer proof from libreoffice_headless_pdf_png_v1 before native export');
+      qualityDebtReasons.push('native_renderer_proof_unavailable');
     }
     const currentPptxSha = fileSha256(sourcePptx);
     const packagePptxSha = safeText(
@@ -367,15 +370,14 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       || shapeManifest?.officecli_gate?.package_readback?.pptx_sha256,
     );
     const renderedPptxSha = safeText(rendererProof?.source_pptx_sha256);
-    if (!currentPptxSha
-      || !packagePptxSha
-      || !renderedPptxSha
-      || currentPptxSha !== packagePptxSha
-      || currentPptxSha !== renderedPptxSha) {
-      throw new Error('Native PPTX SHA mismatch: current file, package readback, and render proof must identify the same PPTX');
+    if (!currentPptxSha || !packagePptxSha || currentPptxSha !== packagePptxSha) {
+      throw new Error('Native PPTX SHA mismatch: current file and package readback must identify the same PPTX');
+    }
+    if (!renderedPptxSha || currentPptxSha !== renderedPptxSha) {
+      qualityDebtReasons.push('native_rendered_pptx_sha_unavailable_or_stale');
     }
     copyFileSync(sourcePptx, pptxFile);
-    copyFileSync(sourcePdf, pdfFile);
+    if (sourcePdf && fileExists(sourcePdf)) copyFileSync(sourcePdf, pdfFile);
     const pageCount = Number(bundle.page_count || safeArray(bundle.slides).length);
     const previewMetrics = {
       page_count: pageCount,
@@ -388,7 +390,8 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       contract,
       deliverableId: safeText(contract?.deliverable_id),
       pptxPath: pptxFile,
-      pdfPath: pdfFile,
+      pdfPath: fileExists(pdfFile) ? pdfFile : '',
+      qualityDebtReasons,
     });
     const sourceArtifacts = {
       pptx_file: sourcePptx,
@@ -428,7 +431,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     };
     const operatorProofSummary = {
       proof_surface: 'native_export_bundle_operator_proof_summary_v1',
-      status: 'output_ready',
+      status: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : 'output_ready',
       source_visual_route: safeText(renderArtifact.route),
       renderer_pipeline: safeText(rendererProof?.renderer_pipeline),
       libreoffice_headless_pdf_png_v1: shapeManifestSummary.libreoffice_headless_pdf_png_v1,
@@ -442,7 +445,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     const artifactGalleryIndexFile = path.join(artifactGalleryDir, 'index.json');
     const artifactGalleryIndex = {
       surface_kind: 'native_export_operator_artifact_gallery_v1',
-      status: 'output_ready',
+      status: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : 'output_ready',
       title: safeText(contract?.title),
       deliverable_id: safeText(contract?.deliverable_id),
       source_visual_route: safeText(renderArtifact.route),
@@ -501,7 +504,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       family: 'ppt_deck',
       route: 'export_pptx',
       deliverableId: safeText(contract?.deliverable_id),
-      status: 'completed',
+      status: qualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'completed',
       reviewExportRefs: [
         ...safeArray(reviewArtifact?.review_export_refs),
         ...safeArray(reviewArtifact?.owner_receipt_refs),
@@ -511,10 +514,16 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     return {
       ...attachCommon('export_pptx', contract, null, adapter),
       ...closeout,
-      status: 'completed',
+      status: qualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'completed',
+      quality_debt: qualityDebtReasons.length > 0 ? {
+        status: 'recorded_non_blocking',
+        reasons: qualityDebtReasons,
+        blocks_stage_transition: false,
+        blocks_ready_claims: true,
+      } : null,
       review_state_patch: {
-        current_status: 'completed',
-        ready_for_export: true,
+        current_status: qualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'completed',
+        ready_for_export: qualityDebtReasons.length === 0,
         latest_review_stage: 'export_pptx',
         pending_reviews: [],
         blocking_reasons: [],
@@ -529,6 +538,12 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         review_receipt_refs: safeArray(reviewArtifact?.owner_receipt_refs),
         visual_memory_proposal: buildExportVisualMemoryProposal(reviewArtifact, closeout, artifactRefs),
         source_visual_route: safeText(renderArtifact.route),
+        quality_debt: qualityDebtReasons.length > 0 ? {
+          status: 'recorded_non_blocking',
+          reasons: qualityDebtReasons,
+          blocks_stage_transition: false,
+          blocks_ready_claims: true,
+        } : null,
         source_pptx: sourcePptx,
         source_html: null,
         native_ppt_shape_manifest: shapeManifestFile,
@@ -538,7 +553,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         renderer_proof: {
           source_surface_kind: 'native_pptx',
           renderer_kind: safeText(rendererProof?.renderer_kind),
-          renderer_pipeline: 'libreoffice_headless_pdf_png_v1',
+          renderer_pipeline: safeText(rendererProof?.renderer_pipeline) || null,
           runtime: safeText(rendererProof?.runtime),
           libreoffice_version: safeText(rendererProof?.libreoffice_version),
           poppler_version: safeText(rendererProof?.poppler_version),
@@ -559,7 +574,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         final_delivery: finalDelivery,
         review_capture: reviewArtifact.review_capture || null,
         delivery_state: {
-          current: 'output_ready',
+          current: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : 'output_ready',
           next: null,
         },
         page_count: pageCount,
@@ -619,9 +634,20 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     });
     const screenshotsDir = exportCapture.screenshotsDir;
     const imagePagesExportInput = isImagePagesArtifact?.(renderArtifact) === true;
-    const stableViewHtmlFile = imagePagesExportInput ? '' : getDeliverableViewSurfacePaths(deliverablePaths, deliverableId).stableHtmlFile;
+    const upstreamQualityDebtReasons = [...new Set([
+      ...safeArray(renderArtifact?.quality_debt?.reasons),
+      ...safeArray(reviewArtifact?.quality_debt?.reasons),
+      ...safeArray(reviewArtifact?.quality_debt_reasons),
+    ].map((reason) => safeText(reason)).filter(Boolean))];
+    const viewPaths = getDeliverableViewSurfacePaths(deliverablePaths, deliverableId);
+    let stableViewHtmlFile = imagePagesExportInput ? '' : viewPaths.stableHtmlFile;
     if (!imagePagesExportInput && !fileExists(stableViewHtmlFile)) {
-      throw new Error(`Route export_pptx requires reviewed stable HTML surface before export: ${stableViewHtmlFile}`);
+      const candidateHtmlFile = safeText(renderArtifact?.html_bundle?.html_file);
+      if (!candidateHtmlFile || !fileExists(candidateHtmlFile)) {
+        throw new Error(`Route export_pptx requires a consumable HTML surface before export: ${stableViewHtmlFile}`);
+      }
+      stableViewHtmlFile = candidateHtmlFile;
+      upstreamQualityDebtReasons.push('html_candidate_not_promoted_by_review');
     }
     const previewHash = hashExportPreviewInput({ stableViewHtmlFile, reviewArtifact });
     const priorExportArtifact = readStageArtifact(contract, deliverablePaths, 'export_pptx');
@@ -639,12 +665,14 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     const conversionCommand = cachedPreview
       ? []
       : python.argv;
+    const normalizedUpstreamQualityDebtReasons = [...new Set(upstreamQualityDebtReasons)];
     const finalDelivery = syncWorkspaceFinalDelivery({
       workspaceRoot,
       contract,
       deliverableId,
       pptxPath,
       pdfPath,
+      qualityDebtReasons: normalizedUpstreamQualityDebtReasons,
     });
     const imageGallery = imagePagesExportInput
       ? buildImagePagesArtifactGallery({
@@ -685,10 +713,16 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     return {
       ...attachCommon('export_pptx', contract, null, adapter),
       ...closeout,
-      status: 'completed',
+      status: normalizedUpstreamQualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'completed',
+      quality_debt: normalizedUpstreamQualityDebtReasons.length > 0 ? {
+        status: 'recorded_non_blocking',
+        reasons: normalizedUpstreamQualityDebtReasons,
+        blocks_stage_transition: false,
+        blocks_ready_claims: true,
+      } : null,
       review_state_patch: {
-        current_status: 'completed',
-        ready_for_export: true,
+        current_status: normalizedUpstreamQualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'completed',
+        ready_for_export: normalizedUpstreamQualityDebtReasons.length === 0,
         latest_review_stage: 'export_pptx',
         pending_reviews: [],
         blocking_reasons: [],

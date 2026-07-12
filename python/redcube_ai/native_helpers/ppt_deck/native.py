@@ -307,7 +307,12 @@ def load_engine_contract(contract_file: Path) -> dict:
     return contract
 
 
-def normalize_slide_data(payload: dict, validator_contract: dict | None = None) -> list:
+def normalize_slide_data(
+    payload: dict,
+    validator_contract: dict | None = None,
+    *,
+    allow_quality_debt: bool = False,
+) -> list:
     plan = payload.get('editable_shape_plan') or {}
     sample_layout_profile = (
         payload.get('native_ppt_sample_layout_profile')
@@ -325,15 +330,21 @@ def normalize_slide_data(payload: dict, validator_contract: dict | None = None) 
         minimum_layout_archetypes,
         validator_contract,
     )
-    if missing_design_spec_lock:
+    plan_quality_debt = []
+    if missing_design_spec_lock and not allow_quality_debt:
         fail(
             'ai_first_design_spec_lock_missing: editable_shape_plan.design_spec_lock requires '
             'AI-authored design system, grid, typography, palette, layout rhythm, borrowed design discipline, '
             'and QA gates before shape coordinates: '
             + json.dumps(missing_design_spec_lock, ensure_ascii=False, sort_keys=True)
         )
+    if missing_design_spec_lock:
+        plan_quality_debt.append({
+            'reason': 'ai_first_design_spec_lock_missing',
+            'missing_fields': missing_design_spec_lock,
+        })
     grammar_failures = validate_template_layout_grammar(plan)
-    if grammar_failures:
+    if grammar_failures and not allow_quality_debt:
         fail(
             'ai_first_template_layout_grammar_missing: editable_shape_plan.template_layout_grammar '
             'requires llm_agent owner, required=true, archetype catalog, and execute-selected-zones materializer boundary: '
@@ -375,7 +386,7 @@ def normalize_slide_data(payload: dict, validator_contract: dict | None = None) 
             else {}
         )
         selected_archetype = safe_text(template_binding.get('selected_archetype'))
-        if selected_archetype and allowed_archetypes and selected_archetype not in allowed_archetypes:
+        if selected_archetype and allowed_archetypes and selected_archetype not in allowed_archetypes and not allow_quality_debt:
             fail(
                 'ai_first_template_layout_binding_invalid: '
                 f'slide {slide_id} selected_archetype is not in editable_shape_plan.template_layout_grammar.archetype_catalog'
@@ -386,6 +397,17 @@ def normalize_slide_data(payload: dict, validator_contract: dict | None = None) 
         merged['_editable_native_shapes'] = plan_shapes
         merged['_typography_plan'] = typography_plan
         merged['_deck_layout_rhythm'] = design_spec_lock.get('layout_rhythm') if isinstance(design_spec_lock.get('layout_rhythm'), dict) else {}
+        merged['_plan_quality_debt'] = [
+            *plan_quality_debt,
+            *([{
+                'reason': 'ai_first_template_layout_grammar_missing',
+                'grammar_failures': grammar_failures,
+            }] if grammar_failures else []),
+            *([{
+                'reason': 'ai_first_template_layout_binding_invalid',
+                'selected_archetype': selected_archetype,
+            }] if selected_archetype and allowed_archetypes and selected_archetype not in allowed_archetypes else []),
+        ]
         slides.append(merged)
     if not slides:
         fail('native PPT authoring requires at least one valid slide object')
@@ -760,6 +782,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--renderer', choices=['auto', RENDERER_KIND], default='auto')
     parser.add_argument('--repair-log')
     parser.add_argument('--engine-contract', default=str(DEFAULT_ENGINE_CONTRACT_FILE))
+    parser.add_argument('--allow-quality-debt', action='store_true')
     return parser.parse_args()
 
 
@@ -775,7 +798,11 @@ def main() -> None:
     payload = json.loads(Path(args.input_json).read_text(encoding='utf-8'))
     engine_contract_file = Path(args.engine_contract).resolve()
     engine_contract = load_engine_contract(engine_contract_file)
-    slides = normalize_slide_data(payload, engine_contract.get('shape_plan_validator') or {})
+    slides = normalize_slide_data(
+        payload,
+        engine_contract.get('shape_plan_validator') or {},
+        allow_quality_debt=args.allow_quality_debt,
+    )
     repair_feedback = safe_list(payload.get('repair_feedback'))
     repaired_slide_ids = {
         safe_text(item.get('slide_id'))
@@ -802,6 +829,7 @@ def main() -> None:
             repaired_slide_ids,
             evaluate_native_slide_quality,
             template_intake=template_intake,
+            allow_quality_debt=args.allow_quality_debt,
         )
     except (RuntimeError, ValueError) as exc:
         fail(str(exc))
@@ -810,8 +838,33 @@ def main() -> None:
     package_readback = deck_build['package_readback']
     template_preservation = deck_build['template_preservation']
     output_pdf = Path(args.output_pdf).resolve() if args.output_pdf else None
-    render_proof = render_pptx(output_pptx, preview_dir, output_pdf, renderer_name=args.renderer)
-    manifest_slides = attach_rendered_previews(manifest_slides, render_proof)
+    render_quality_debt = None
+    try:
+        render_proof = render_pptx(output_pptx, preview_dir, output_pdf, renderer_name=args.renderer)
+        manifest_slides = attach_rendered_previews(manifest_slides, render_proof)
+    except SystemExit as exc:
+        if not args.allow_quality_debt:
+            raise
+        render_quality_debt = {
+            'reason': 'native_true_render_proof_unavailable',
+            'message': safe_text(exc),
+            'blocks_stage_transition': False,
+            'blocks_visual_ready_claim': True,
+            'blocks_export_ready_claim': True,
+        }
+        render_proof = {
+            'status': 'unavailable_with_quality_debt',
+            'source_surface_kind': 'native_pptx',
+            'renderer_kind': None,
+            'renderer_pipeline': None,
+            'synthetic_preview': False,
+            'pptx_file': str(output_pptx),
+            'pdf_file': None,
+            'source_pptx_sha256': file_sha256(output_pptx),
+            'preview_screenshots': [],
+            'preview_png_hashes': [],
+            'quality_debt': render_quality_debt,
+        }
     preview_files = safe_list(render_proof.get('preview_screenshots'))
     repair_log_file = Path(args.repair_log).resolve() if args.repair_log else None
     repair_log = {
@@ -931,11 +984,15 @@ def main() -> None:
         'preview_screenshots': preview_files,
         'slides': manifest_slides,
         'repair_log': repair_log,
+        'quality_debt': {
+            **(deck_build.get('quality_debt') or {}),
+            **({'render_proof': render_quality_debt} if render_quality_debt else {}),
+        } if deck_build.get('quality_debt') or render_quality_debt else None,
     }
     shape_manifest.parent.mkdir(parents=True, exist_ok=True)
     shape_manifest.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
     result = {
-        'status': 'completed',
+        'status': 'completed_with_quality_debt' if deck_build.get('quality_debt') else 'completed',
         'builder': manifest['builder'],
         'capability': manifest['capability'],
         'engine_contract': engine_contract,
@@ -960,6 +1017,7 @@ def main() -> None:
         'slides': manifest_slides,
         'repair_log_file': str(repair_log_file) if repair_log_file else None,
         'repair_log': repair_log,
+        'quality_debt': manifest.get('quality_debt'),
     }
     print(json.dumps(result, ensure_ascii=False))
 

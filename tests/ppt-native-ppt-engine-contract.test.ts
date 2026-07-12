@@ -205,7 +205,11 @@ test('native PPT proof lane records the Python engine contract as the single own
     proofLane.candidate_route_model.runtime_executor_proof.engine_capabilities.true_render_proof_required,
     true,
   );
-  assert.equal(engineContract.native_ppt_quality_surface.fail_closed_when_missing, true);
+  assert.equal(engineContract.native_ppt_quality_surface.quality_debt_when_missing, true);
+  assert.match(
+    engineContract.native_ppt_quality_surface.review_behavior,
+    /block ready claims but not stage transition/,
+  );
   assert.equal(
     currentProgram.current_state.exploration_lanes.ppt_native_authoring_proof_lane.engine_contract,
     'contracts/runtime-program/ppt-native-python-engine-contract.json',

@@ -28,7 +28,7 @@ test('ppt image-first production contract absorbs long-deck fact and asset gover
   assert.equal(activeLane.long_deck_production_contract.full_colorectal_ai_long_deck_regression_allowed_by_default, false);
 });
 
-test('ppt image-first production contract blocks internal-language, title-zone, and table-legibility regressions', () => {
+test('ppt image-first production contract keeps regressions as ready-claim blockers without stopping progress', () => {
   const contract = readJson('contracts/runtime-program/ppt-image-first-production-route.json');
   const currentProgram = readCurrentProgramContract();
   const activeLane = currentProgram.current_state.exploration_lanes.ppt_image_first_production_route;
@@ -46,13 +46,15 @@ test('ppt image-first production contract blocks internal-language, title-zone, 
   assert.equal(contract.review_export_gates.mechanical_checks.includes('operator language leak'), true);
   assert.equal(contract.review_export_gates.mechanical_checks.includes('title safe zone obstruction'), true);
   assert.equal(contract.review_export_gates.mechanical_checks.includes('table font below 11pt'), true);
-  assert.equal(contract.review_export_gates.hard_block_checks.includes('external_audience_language_ok'), true);
-  assert.equal(contract.review_export_gates.hard_block_checks.includes('title_safe_zone_clear'), true);
-  assert.equal(contract.review_export_gates.hard_block_checks.includes('table_legibility_ok'), true);
-  assert.equal(contract.review_export_gates.hard_block_checks.includes('layout_density_ok'), true);
+  assert.equal(contract.review_export_gates.ready_claim_block_checks.includes('external_audience_language_ok'), true);
+  assert.equal(contract.review_export_gates.ready_claim_block_checks.includes('title_safe_zone_clear'), true);
+  assert.equal(contract.review_export_gates.ready_claim_block_checks.includes('table_legibility_ok'), true);
+  assert.equal(contract.review_export_gates.ready_claim_block_checks.includes('layout_density_ok'), true);
 
   assert.deepEqual(
-    activeLane.visual_qa_hardening.hard_block_checks.slice(-4),
+    activeLane.visual_qa_hardening.ready_claim_block_checks.slice(-4),
     ['external_audience_language_ok', 'title_safe_zone_clear', 'table_legibility_ok', 'layout_density_ok'],
   );
+  assert.equal(activeLane.visual_qa_hardening.zero_consumable_png_hard_stop, true);
+  assert.equal(activeLane.visual_qa_hardening.missing_or_partial_manifest_quality_debt, true);
 });

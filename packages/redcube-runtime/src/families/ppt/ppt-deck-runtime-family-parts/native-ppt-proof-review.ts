@@ -30,7 +30,7 @@ export function createNativePptProofReviewParts({
       && expected.every((value, index) => actual[index] === value);
   }
 
-  function requireNativePptShaBinding(bundle: JsonRecord, shapeManifest: JsonRecord): void {
+  function requireNativePptShaBinding(bundle: JsonRecord, shapeManifest: JsonRecord): boolean {
     const renderProof = shapeManifest?.render_proof || bundle?.render_proof || {};
     const packageReadback = shapeManifest?.package_readback
       || shapeManifest?.officecli_gate?.package_readback
@@ -42,9 +42,10 @@ export function createNativePptProofReviewParts({
       : '';
     const packageSha = safeText(packageReadback?.pptx_sha256);
     const renderSha = safeText(renderProof?.source_pptx_sha256);
-    if (!currentSha || !packageSha || !renderSha || currentSha !== packageSha || currentSha !== renderSha) {
-      throw new Error('Native PPTX SHA mismatch: current file, package readback, and render proof must identify the same PPTX');
+    if (!currentSha || !packageSha || currentSha !== packageSha) {
+      throw new Error('Native PPTX SHA mismatch: current file and package readback must identify the same PPTX');
     }
+    return Boolean(renderSha && currentSha === renderSha);
   }
 
   function requireNativeEngineContract(payload: JsonRecord): JsonRecord {
@@ -75,7 +76,7 @@ export function createNativePptProofReviewParts({
   function requireTrueRenderProof(payload: JsonRecord, shapeManifest: JsonRecord): JsonRecord {
     const expected = expectedNativeEngineContract()?.true_render_proof || {};
     const proof = payload?.render_proof || shapeManifest?.render_proof || {};
-    requireNativePptShaBinding(payload, shapeManifest);
+    const renderShaBound = requireNativePptShaBinding(payload, shapeManifest);
     const previewScreenshots = safeArray(proof?.preview_screenshots || payload?.preview_screenshots);
     const valid = safeText(proof?.source_surface_kind) === 'native_pptx'
       && safeText(proof?.renderer_kind) === safeText(expected?.renderer_kind)
@@ -89,10 +90,8 @@ export function createNativePptProofReviewParts({
         || shapeManifest?.proof_flags?.libreoffice_headless_pdf_png_v1 === true
       )
       && previewScreenshots.length > 0
+      && renderShaBound
       && previewScreenshots.every((file) => existsSync(safeText(file)));
-    if (!valid) {
-      throw new Error('Native PPT route requires LibreOffice headless true-render proof; stale desktop-app, synthetic, or missing preview proof is blocked');
-    }
     return {
       ...proof,
       source_surface_kind: 'native_pptx',
@@ -103,6 +102,7 @@ export function createNativePptProofReviewParts({
       synthetic_preview: false,
       required: true,
       preview_screenshots: previewScreenshots.map((file) => safeText(file)).filter(Boolean),
+      quality_valid: valid,
     };
   }
 

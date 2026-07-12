@@ -68,13 +68,13 @@ export function buildCreativeRunOutput(meta) {
         }
         return output;
       }
-      const rawPrompt = safeText(meta?.__raw_prompt);
-      if (!rawPrompt.includes('ai_first_text_panel_safe_area_violation')
-        || !rawPrompt.includes('panel_shape_id')
-        || !rawPrompt.includes('panel_safe_bounds')
-        || !rawPrompt.includes('required_delta_in')
-        || !rawPrompt.includes('required_inset_in')
-        || !rawPrompt.includes('0.15in inset')) {
+      const invocationContract = `${safeText(meta?.__raw_prompt)}\n${safeText(meta?.__structured_output_schema)}`;
+      if (!invocationContract.includes('ai_first_text_panel_safe_area_violation')
+        || !invocationContract.includes('panel_shape_id')
+        || !invocationContract.includes('panel_safe_bounds')
+        || !invocationContract.includes('required_delta_in')
+        || !invocationContract.includes('required_inset_in')
+        || !invocationContract.includes('0.15in inset')) {
         throw new Error('mock expected native preflight retry output contract with panel_shape_id and required_inset_in');
       }
       return output;
@@ -101,11 +101,11 @@ export function buildCreativeRunOutput(meta) {
         }
         return output;
       }
-      const rawPrompt = safeText(meta?.__raw_prompt);
-      if (!rawPrompt.includes('passed_structure_preservation_contract')
-        || !rawPrompt.includes('template_layout_binding')
-        || !rawPrompt.includes('deck_layout_rhythm_plan')
-        || (!rawPrompt.includes('page_number_missing') && !rawPrompt.includes('page_number'))) {
+      const invocationContract = `${safeText(meta?.__raw_prompt)}\n${safeText(meta?.__structured_output_schema)}`;
+      if (!invocationContract.includes('passed_structure_preservation_contract')
+        || !invocationContract.includes('template_layout_binding')
+        || !invocationContract.includes('deck_layout_rhythm_plan')
+        || (!invocationContract.includes('page_number_missing') && !invocationContract.includes('page_number'))) {
         throw new Error('mock expected native retry contract to preserve passed layout structure while fixing page number');
       }
       if (hasPageNumberFeedback) {
@@ -127,10 +127,10 @@ export function buildCreativeRunOutput(meta) {
     if (mutateKind === 'drop_structural_shape_layout_zone_once') {
       const hasStructuralFeedback = Boolean(meta?.context?.native_shape_plan_validation_feedback?.required_structural_fixes);
       if (hasStructuralFeedback) {
-        const rawPrompt = safeText(meta?.__raw_prompt);
-        if (!rawPrompt.includes('structural_shape_binding_required')
-          || !rawPrompt.includes('rails, connectors, proof bands')
-          || !rawPrompt.includes('layout_zone_id')) {
+        const invocationContract = `${safeText(meta?.__raw_prompt)}\n${safeText(meta?.__structured_output_schema)}`;
+        if (!invocationContract.includes('structural_shape_binding_required')
+          || !invocationContract.includes('rails, connectors, proof bands')
+          || !invocationContract.includes('layout_zone_id')) {
           throw new Error('mock expected native structural retry contract to require zone binding for structural shapes');
         }
         return output;
@@ -248,7 +248,7 @@ export function withEnv(overrides) {
   };
 }
 
-export function buildMockCodexLastMessage(prompt) {
+export function buildMockCodexLastMessage(prompt, outputSchema = '') {
   const text = String(prompt || '');
   if (/Reply with READY only\./i.test(text)) {
     return 'READY';
@@ -259,6 +259,7 @@ export function buildMockCodexLastMessage(prompt) {
     throw new Error('mock codex cli received unsupported prompt');
   }
   creativeMeta.__raw_prompt = text;
+  creativeMeta.__structured_output_schema = safeText(outputSchema);
   return formatCreativeRunOutput(buildCreativeRunOutput(creativeMeta));
 }
 

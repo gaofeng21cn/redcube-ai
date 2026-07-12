@@ -10,7 +10,7 @@ repo_root="$(cd "$(dirname "$0")/.." && pwd -P)"
 opl_bin="${OPL_BIN:-${repo_root}/node_modules/opl-framework/bin/opl}"
 framework_link_check_status=0
 framework_link_check_output="$(
-  "${opl_bin}" packages link-framework \
+  "${opl_bin}" connect agent-packages link-framework \
     --agent-root "${repo_root}" \
     --check \
     --json 2>&1
@@ -43,7 +43,8 @@ mkdir -p \
   "${repo_temp_root}/uv/project-venv" \
   "${repo_temp_root}/npm/cache" \
   "${repo_temp_root}/node/compile-cache" \
-  "${repo_temp_root}/xdg-cache"
+  "${repo_temp_root}/xdg-cache" \
+  "${repo_temp_root}/opl-state"
 
 export TMPDIR="${repo_temp_root}/tmp/"
 export OPL_REPO_TEMP_ENV_ACTIVE=1
@@ -57,5 +58,6 @@ export NPM_CONFIG_CACHE="${repo_temp_root}/npm/cache"
 export npm_config_cache="${NPM_CONFIG_CACHE}"
 export NODE_COMPILE_CACHE="${repo_temp_root}/node/compile-cache"
 export XDG_CACHE_HOME="${repo_temp_root}/xdg-cache"
+export OPL_STATE_DIR="${repo_temp_root}/opl-state"
 
 "$@"

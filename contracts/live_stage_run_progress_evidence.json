@@ -246,6 +246,7 @@
     "source_owner_chain_ref": "contracts/owner_chain_live_progress_evidence.json#/owner_chain_completion_audit",
     "completion_status": "blocked_requires_real_visual_stage_owner_acceptance",
     "accepted_terminal_evidence_refs": [
+      "progress_delta_receipt_ref",
       "owner_receipt_ref",
       "typed_blocker_ref",
       "human_gate_ref",

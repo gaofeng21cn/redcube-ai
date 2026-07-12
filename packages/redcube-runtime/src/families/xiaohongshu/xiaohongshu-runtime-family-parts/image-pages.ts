@@ -216,6 +216,7 @@ export function createXiaohongshuImagePageParts(deps) {
     };
     const promptEntries = [];
     const generationMetadata = [];
+    const generationFailures = [];
     const manifestSlides = [];
     for (const slide of allSlides) {
       const slideId = safeText(slide?.slide_id);
@@ -231,7 +232,13 @@ export function createXiaohongshuImagePageParts(deps) {
         continue;
       }
       if (route === 'repair_image_pages' && !targetSet.has(slideId)) {
-        throw new Error(`repair_image_pages requires prior image page for preserved slide: ${slideId}`);
+        generationFailures.push({
+          slide_id: slideId,
+          error: 'repair_image_pages has no prior image page to preserve',
+          failure_kind: 'missing_prior_page_quality_debt',
+          occurred_at: new Date().toISOString(),
+        });
+        continue;
       }
       const prompt = pagePrompt({
         route,
@@ -246,21 +253,6 @@ export function createXiaohongshuImagePageParts(deps) {
       const promptFile = path.join(paths.promptDir, `${slideId}.prompt.txt`);
       const promptManifestFile = path.join(paths.promptDir, `${slideId}.prompt.json`);
       const styleManifestFile = path.join(paths.styleDir, `${slideId}.style.json`);
-      const response = await callImageGeneration({
-        config,
-        prompt,
-        toolOptions,
-        route,
-        slideId,
-        imageFile,
-      });
-      const imageCall = responseImageCall(response);
-      const imageBase64 = normalizeImageBase64(response);
-      if (!imageBase64) throw new Error(`Codex native imagegen did not return PNG data for ${slideId}`);
-      const imageBytes = Buffer.from(imageBase64, 'base64');
-      writeFileSync(imageFile, imageBytes);
-      const imageHash = sha256(imageBytes);
-      const dimensions = pngDimensions(imageBytes);
       writeFileSync(promptFile, prompt, 'utf-8');
       const promptManifest = {
         kind: 'xiaohongshu_image_page_prompt_manifest',
@@ -281,6 +273,74 @@ export function createXiaohongshuImagePageParts(deps) {
       const slideStyleManifest = { ...styleManifest, slide_id: slideId, title: safeText(slide?.title) };
       writeJson(promptManifestFile, promptManifest);
       writeJson(styleManifestFile, slideStyleManifest);
+      promptEntries.push({
+        slide_id: slideId,
+        prompt_file: promptFile,
+        prompt_manifest_file: promptManifestFile,
+        style_manifest_file: styleManifestFile,
+        prompt_hash: promptHash,
+      });
+      let response;
+      try {
+        response = await callImageGeneration({
+          config,
+          prompt,
+          toolOptions,
+          route,
+          slideId,
+          imageFile,
+        });
+      } catch (error) {
+        generationFailures.push({
+          slide_id: slideId,
+          error: error instanceof Error ? error.message : String(error),
+          prompt_file: promptFile,
+          prompt_manifest_file: promptManifestFile,
+          style_manifest_file: styleManifestFile,
+          occurred_at: new Date().toISOString(),
+        });
+        if (priorSlide) {
+          manifestSlides.push({
+            ...priorSlide,
+            source_route: safeText(priorSlide?.source_route, 'author_image_pages'),
+            preserved: true,
+            repair_failed_preserved: true,
+            preserved_from_image_file: safeText(priorSlide?.image_file || priorSlide?.png_file),
+            preserved_slide_hash: safeText(priorSlide?.hash),
+          });
+        }
+        continue;
+      }
+      const imageCall = responseImageCall(response);
+      const imageBase64 = normalizeImageBase64(response);
+      if (!imageBase64) {
+        generationFailures.push({
+          slide_id: slideId,
+          error: 'Codex native imagegen did not return PNG data',
+          prompt_file: promptFile,
+          prompt_manifest_file: promptManifestFile,
+          style_manifest_file: styleManifestFile,
+          occurred_at: new Date().toISOString(),
+        });
+        if (priorSlide) manifestSlides.push({ ...priorSlide, preserved: true, repair_failed_preserved: true });
+        continue;
+      }
+      const imageBytes = Buffer.from(imageBase64, 'base64');
+      const dimensions = pngDimensions(imageBytes);
+      if (!dimensions) {
+        generationFailures.push({
+          slide_id: slideId,
+          error: 'Codex native imagegen output is not a readable PNG',
+          prompt_file: promptFile,
+          prompt_manifest_file: promptManifestFile,
+          style_manifest_file: styleManifestFile,
+          occurred_at: new Date().toISOString(),
+        });
+        if (priorSlide) manifestSlides.push({ ...priorSlide, preserved: true, repair_failed_preserved: true });
+        continue;
+      }
+      writeFileSync(imageFile, imageBytes);
+      const imageHash = sha256(imageBytes);
       const metadata = {
         provider: safeText(config.provider),
         base_url_host: safeText(config.base_url_host),
@@ -305,13 +365,6 @@ export function createXiaohongshuImagePageParts(deps) {
         generated_at: new Date().toISOString(),
       };
       generationMetadata.push(metadata);
-      promptEntries.push({
-        slide_id: slideId,
-        prompt_file: promptFile,
-        prompt_manifest_file: promptManifestFile,
-        style_manifest_file: styleManifestFile,
-        prompt_hash: promptHash,
-      });
       manifestSlides.push({
         slide_id: slideId,
         title: safeText(slide?.title),
@@ -343,6 +396,13 @@ export function createXiaohongshuImagePageParts(deps) {
       hash: safeText(slide?.hash || slide?.sha256),
       sha256: safeText(slide?.sha256 || slide?.hash),
     }));
+    if (bundlePages.length === 0) {
+      const error = new Error(`Xiaohongshu image authoring produced no consumable PNG artifacts: ${generationFailures.map((item) => safeText(item?.slide_id)).filter(Boolean).join(', ')}`);
+      error.failure_kind = 'missing_consumable_artifact';
+      error.hard_stop_kind = 'missing_consumable_artifact';
+      error.artifact_refs = promptEntries.flatMap((entry) => [entry.prompt_file, entry.prompt_manifest_file, entry.style_manifest_file]);
+      throw error;
+    }
     const imagePagesBundle = {
       kind: 'xiaohongshu_image_pages_bundle',
       source_visual_route: route,
@@ -391,11 +451,25 @@ export function createXiaohongshuImagePageParts(deps) {
     };
     writeJson(paths.promptManifestFile, { kind: 'xiaohongshu_image_page_prompt_manifest', route, prompts: promptEntries });
     writeJson(paths.styleManifestFile, styleManifest);
-    writeJson(paths.metadataFile, { kind: 'xiaohongshu_image_generation_metadata', route, calls: generationMetadata });
+    writeJson(paths.metadataFile, {
+      kind: 'xiaohongshu_image_generation_metadata',
+      route,
+      calls: generationMetadata,
+      failures: generationFailures,
+      status: generationFailures.length > 0 ? 'completed_with_quality_debt' : 'completed',
+    });
     writeJson(paths.manifestFile, manifest);
     return {
       ...attachCommon(route, contract, null, adapter),
-      status: 'completed',
+      status: generationFailures.length > 0 ? 'completed_with_quality_debt' : 'completed',
+      quality_debt: generationFailures.length > 0 ? {
+        status: 'recorded_non_blocking',
+        reasons: ['image_generation_partial_failure'],
+        failed_slide_ids: generationFailures.map((item) => safeText(item?.slide_id)).filter(Boolean),
+        failures: generationFailures,
+        blocks_stage_transition: false,
+        blocks_ready_claims: true,
+      } : null,
       creative_execution: {
         ...creativeExecution(route, null, adapter),
         overlay: 'image_page_authoring',
@@ -415,6 +489,7 @@ export function createXiaohongshuImagePageParts(deps) {
       image_pages_bundle: imagePagesBundle,
       image_page_manifest: manifest,
       image_generation_calls: generationMetadata,
+      image_generation_failures: generationFailures,
       repair_image_pages: route === 'repair_image_pages'
         ? {
             source_review_stage: 'screenshot_review',

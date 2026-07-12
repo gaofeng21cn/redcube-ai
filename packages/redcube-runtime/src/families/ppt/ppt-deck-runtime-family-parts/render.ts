@@ -395,15 +395,33 @@ export function createPptDeckRenderStageParts(deps) {
     if (slideHtmlList.length === 0) {
       throw new Error(`upstream ppt ${route} must contain at least one slide`);
     }
-    const slideHtmlById = new Map(slideHtmlList.map((item) => [
-      safeText(item.slide_id),
-      validateRenderedSlideContent(item.content_html, safeText(item.slide_id)),
-    ]));
+    const renderFailures = [];
+    const slideHtmlById = new Map();
+    for (const item of slideHtmlList) {
+      const slideId = safeText(item.slide_id);
+      try {
+        slideHtmlById.set(slideId, validateRenderedSlideContent(item.content_html, slideId));
+      } catch (error) {
+        renderFailures.push({
+          slide_id: slideId,
+          error: error instanceof Error ? error.message : String(error),
+          failure_kind: 'unusable_html_page',
+        });
+      }
+    }
     const revisionFocusBySlideId = buildRenderRevisionFocusMap(revisionContext);
-    const slidesMarkup = safeArray(blueprintArtifact?.slide_blueprint?.slides).map((slide) => {
+    const blueprintSlides = safeArray(blueprintArtifact?.slide_blueprint?.slides);
+    const slidesMarkup = blueprintSlides.flatMap((slide) => {
       const rawContent = slideHtmlById.get(slide.slide_id);
       if (!rawContent) {
-        throw new Error(`upstream ppt ${route} missing slide: ${slide.slide_id}`);
+        if (!renderFailures.some((failure) => failure.slide_id === slide.slide_id)) {
+          renderFailures.push({
+            slide_id: slide.slide_id,
+            error: `upstream ppt ${route} missing slide`,
+            failure_kind: 'missing_html_page',
+          });
+        }
+        return [];
       }
       const recipeDecision = creativeSourceStamp({
         route,
@@ -436,7 +454,7 @@ export function createPptDeckRenderStageParts(deps) {
         }, slide.slide_id),
         slide.slide_id,
       );
-      return {
+      return [{
         slide_id: slide.slide_id,
         slide_no: slide.slide_no,
         title: renderedSlideTitle(content, slide.title),
@@ -472,8 +490,14 @@ export function createPptDeckRenderStageParts(deps) {
         },
         markup_contract_source: CREATIVE_MATERIALIZED_FROM,
         content,
-      };
+      }];
     });
+    if (slidesMarkup.length === 0) {
+      const error = new Error(`upstream ppt ${route} produced no consumable HTML pages`);
+      error.failure_kind = 'missing_consumable_artifact';
+      error.hard_stop_kind = 'missing_consumable_artifact';
+      throw error;
+    }
     const contractRender = renderContract(contract);
     const renderPlan = {
       render_strategy: safeText(contractRender.render_strategy, 'upstream_structured_ai_html'),
@@ -531,8 +555,23 @@ export function createPptDeckRenderStageParts(deps) {
           source_review_stages: ['visual_director_review', 'screenshot_review'],
         }
       : null;
+    const renderSummary = safeArray(data?.render_summary).length > 0
+      ? normalizeStringList(data?.render_summary, `${route}.render_summary`, { min: 1, max: 4 })
+      : ['HTML page authoring completed with missing summary quality debt.'];
+    if (safeArray(data?.render_summary).length === 0) {
+      renderFailures.push({ failure_kind: 'missing_render_summary', error: 'render_summary missing' });
+    }
     return {
       ...attachCommon(route, contract, generationRuntime, adapter),
+      status: renderFailures.length > 0 ? 'completed_with_quality_debt' : 'completed',
+      quality_debt: renderFailures.length > 0 ? {
+        status: 'recorded_non_blocking',
+        reasons: ['html_authoring_partial_failure'],
+        failures: renderFailures,
+        failed_slide_ids: renderFailures.map((failure) => safeText(failure?.slide_id)).filter(Boolean),
+        blocks_stage_transition: false,
+        blocks_ready_claims: true,
+      } : null,
       creative_execution: creativeExecution(
         contract.lifecycle_model?.route_to_stage?.[route] || contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship',
         generationRuntime,
@@ -549,7 +588,10 @@ export function createPptDeckRenderStageParts(deps) {
         page_count: slidesMarkup.length,
         render_strategy: renderPlan.render_strategy,
         generator_instructions: renderPlan.generator_instructions,
-        render_summary: normalizeStringList(data?.render_summary, `${route}.render_summary`, { min: 1, max: 4 }),
+        expected_page_count: blueprintSlides.length,
+        actual_page_count: slidesMarkup.length,
+        page_count_gate_pass: slidesMarkup.length === blueprintSlides.length,
+        render_summary: renderSummary,
         render_execution: renderExecution || null,
         html_design_companion: renderPlan.html_design_companion,
         html_route_quality_companion: renderPlan.html_route_quality_companion,

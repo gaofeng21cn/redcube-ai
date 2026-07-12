@@ -372,6 +372,7 @@ export function createPosterOnepagerCoreAssemblyHelpers(deps) {
   }
 
   function buildExportBundle(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+    const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
     const reviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
     const stableViewHtmlFile = getDeliverableViewSurfacePaths(
       deliverablePaths,
@@ -381,25 +382,47 @@ export function createPosterOnepagerCoreAssemblyHelpers(deps) {
       throw new Error(`Route export_bundle requires reviewed stable HTML surface before export: ${stableViewHtmlFile}`);
     }
     const manifestFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}-publish-manifest.json`);
+    const qualityDebtReasons = [...new Set([
+      ...safeArray(directorReviewArtifact?.quality_debt?.reasons),
+      ...safeArray(reviewArtifact?.quality_debt?.reasons),
+      ...safeArray(directorReviewArtifact?.blocking_reasons),
+      ...safeArray(reviewArtifact?.blocking_reasons),
+      ...safeArray(directorReviewArtifact?.review_state_patch?.quality_debt_reasons),
+      ...safeArray(reviewArtifact?.review_state_patch?.quality_debt_reasons),
+      ...(['block', 'failed', 'completed_with_quality_debt'].includes(safeText(directorReviewArtifact?.status))
+        ? ['visual_director_review_quality_debt']
+        : []),
+      ...(['block', 'failed', 'completed_with_quality_debt'].includes(safeText(reviewArtifact?.status))
+        ? ['screenshot_review_quality_debt']
+        : []),
+    ].map((reason) => safeText(reason)).filter(Boolean))];
+    const hasQualityDebt = qualityDebtReasons.length > 0;
     const exportBundle = {
       source_html: stableViewHtmlFile,
       png_files: safeArray(reviewArtifact.slide_reviews).map((slide) => slide.screenshot_file).filter(Boolean),
       review_markdown: safeText(reviewArtifact.report_markdown),
       publish_manifest_file: manifestFile,
       delivery_state: {
-        current: 'output_ready',
-        next: null,
+        current: hasQualityDebt ? 'output_with_quality_debt' : 'output_ready',
+        next: hasQualityDebt ? 'review_quality_debt_before_ready_claim' : null,
       },
     };
     writeJson(manifestFile, exportBundle);
     return {
       ...attachCommon('export_bundle', contract, null, adapter),
-      status: 'completed',
+      status: hasQualityDebt ? 'completed_with_quality_debt' : 'completed',
+      quality_debt: hasQualityDebt ? {
+        status: 'recorded_non_blocking',
+        reasons: qualityDebtReasons,
+        blocks_stage_transition: false,
+        blocks_visual_ready_claim: true,
+        blocks_export_ready_claim: true,
+      } : null,
       export_bundle: exportBundle,
       artifact_refs: [manifestFile, stableViewHtmlFile, exportBundle.review_markdown, ...exportBundle.png_files].filter(Boolean),
       review_state_patch: {
-        current_status: 'completed',
-        ready_for_export: true,
+        current_status: hasQualityDebt ? 'completed_with_quality_debt' : 'completed',
+        ready_for_export: !hasQualityDebt,
         latest_review_stage: 'export_bundle',
         latest_checks: {
           director_intent_landed: true,
@@ -409,11 +432,11 @@ export function createPosterOnepagerCoreAssemblyHelpers(deps) {
           occlusion_free: true,
           visual_density_ok: true,
         },
-        pending_reviews: [],
+        pending_reviews: qualityDebtReasons,
         blocking_reasons: [],
         rerun_from_stage: null,
         rerun_policy: {
-          status: 'idle',
+          status: hasQualityDebt ? 'quality_debt_recorded' : 'idle',
           rerun_from_stage: null,
         },
       },

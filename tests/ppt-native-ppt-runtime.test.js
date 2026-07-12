@@ -146,13 +146,16 @@ test('native PPT review uses semantic_kind after package materialization', async
       deliverableId,
       route: 'screenshot_review',
     });
-    assert.equal(screenshotReview.ok, false);
+    assert.equal(screenshotReview.ok, true);
     const reviewArtifact = readRouteStageArtifact(
       workspaceRoot,
       'topic-a',
       deliverableId,
       'screenshot_review',
     );
+    assert.equal(reviewArtifact.status, 'completed_with_quality_debt');
+    assert.equal(reviewArtifact.quality_debt?.blocks_stage_transition, false);
+    assert.equal(reviewArtifact.review_state_patch?.ready_for_export, false);
     assert.match(JSON.stringify(reviewArtifact), /native_chart_metrics_missing/);
   });
 });

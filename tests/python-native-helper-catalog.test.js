@@ -74,10 +74,13 @@ function assertNativeTrueRenderRendererPolicy(policy, label) {
     repo_owned_installer: 'tools/native-ppt-proof/install-deps.sh',
     proof_container: 'tools/native-ppt-proof/Dockerfile',
   }, `${label}.bootstrap_policy`);
-  assert.deepEqual(policy.fail_closed_blocker, {
-    typed_blocker: 'missing_renderer_dependency',
-    emitted_when: 'capability_probe_and_auto_bootstrap_cannot_resolve_supported_renderer',
-  }, `${label}.fail_closed_blocker`);
+  assert.equal(policy.required_for_ready_claim, true, `${label}.required_for_ready_claim`);
+  assert.equal(
+    policy.missing_policy,
+    'completed_with_quality_debt_when_pptx_is_consumable',
+    `${label}.missing_policy`,
+  );
+  assert.equal(policy.hard_stop_when_missing, 'no_consumable_pptx_artifact', `${label}.hard_stop_when_missing`);
   assert.equal(policy.synthetic_preview_allowed, false, `${label}.synthetic_preview_allowed`);
   assert.equal(policy.html_render_substitute_allowed, false, `${label}.html_render_substitute_allowed`);
   assert.equal(policy.officecli_validate_substitute_allowed, false, `${label}.officecli_validate_substitute_allowed`);

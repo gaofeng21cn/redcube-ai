@@ -20,6 +20,10 @@ import {
   failRouteExecutionRef,
   startRouteExecutionRef,
 } from './route-execution-refs.js';
+import {
+  admitStageArtifactForProgress,
+  isHardStopArtifact,
+} from './progress-first.js';
 
 function requireSafeSegment(name, value) {
   const text = String(value || '').trim();
@@ -357,10 +361,10 @@ function blockedChecksFromArtifact(artifact = {}) {
   ]);
 }
 
-function isQualityBlockedArtifact(artifact = {}) {
-  const rerunPolicy = artifact?.review_state_patch?.rerun_policy || {};
-  return String(artifact?.status || '').trim() === 'block'
-    || String(rerunPolicy?.status || '').trim() === 'rerun_required';
+function isQualityDebtArtifact(artifact = {}) {
+  return String(artifact?.status || '').trim() === 'completed_with_quality_debt'
+    || artifact?.progress_first?.quality_debt_recorded === true
+    || artifact?.quality_debt?.status === 'recorded_non_blocking';
 }
 
 function generationRuntimeFromArtifact(artifact = {}) {
@@ -546,7 +550,9 @@ function buildCompletedRouteResponse({
   crossProviderAttemptIndex = null,
   startedEvent = null,
 }) {
-  const routeRunStatus = isQualityBlockedArtifact(routeResult.artifact) ? 'quality_blocked' : 'completed';
+  const routeRunStatus = isQualityDebtArtifact(routeResult.artifact)
+    ? 'completed_with_quality_debt'
+    : 'completed';
   const completedRun = completeRouteExecutionRef({
     runId: run.run_id,
     run,
@@ -559,12 +565,14 @@ function buildCompletedRouteResponse({
     executor,
     telemetry: buildRoutePromptTelemetry(routeResult),
     status: routeRunStatus,
-    errorKind: routeRunStatus === 'quality_blocked' ? 'quality_blocked' : null,
+    errorKind: null,
     crossProviderAttemptIndex,
   });
 
   const completedEvent = {
-    type: routeRunStatus === 'quality_blocked' ? 'run_quality_blocked' : 'run_completed',
+    type: routeRunStatus === 'completed_with_quality_debt'
+      ? 'run_completed_with_quality_debt'
+      : 'run_completed',
     route: safeRoute,
     overlay,
     deliverable_id: deliverableId,
@@ -590,6 +598,7 @@ function normalizeRouteFailure(error) {
   const failure = new Error(failureMessage);
   failure.code = error?.code || null;
   failure.failure_kind = error?.failure_kind || error?.failureKind || null;
+  failure.hard_stop_kind = error?.hard_stop_kind || null;
   failure.target_slide_ids = Array.isArray(error?.target_slide_ids) ? error.target_slide_ids : [];
   failure.blocking_reasons = Array.isArray(error?.blocking_reasons) ? error.blocking_reasons : [];
   failure.recommended_action = String(error?.recommended_action || '').trim() || null;
@@ -599,7 +608,7 @@ function normalizeRouteFailure(error) {
   failure.requiresHumanConfirmation = error?.requiresHumanConfirmation === true;
   failure.requiresExternalSecret = error?.requiresExternalSecret === true;
   const failureKind = String(failure.failure_kind || failure.code || '').trim();
-  const qualityBlocked = failureKind === 'quality_blocked' || /^Route .+ blocked/.test(failureMessage);
+  const qualityBlocked = !failure.hard_stop_kind && failureKind === 'quality_blocked';
   if (qualityBlocked) {
     failure.code = failure.code || 'quality_blocked';
     failure.failure_kind = 'quality_blocked';
@@ -611,9 +620,14 @@ function normalizeRouteFailure(error) {
 }
 
 function failedArtifactForError(error, failure) {
-  return failure.artifact_file && existsSync(failure.artifact_file)
-    ? JSON.parse(readFileSync(failure.artifact_file, 'utf-8'))
-    : (error?.artifact || null);
+  if (failure.artifact_file && existsSync(failure.artifact_file)) {
+    try {
+      return JSON.parse(readFileSync(failure.artifact_file, 'utf-8'));
+    } catch {
+      return null;
+    }
+  }
+  return error?.artifact || null;
 }
 
 function buildFailedRouteResponse({
@@ -628,6 +642,38 @@ function buildFailedRouteResponse({
 }) {
   const { failure, qualityBlocked } = normalizeRouteFailure(error);
   const failedArtifact = failedArtifactForError(error, failure);
+  const admittedArtifact = failedArtifact
+    ? admitStageArtifactForProgress(failedArtifact, { route: safeRoute })
+    : null;
+  if (
+    qualityBlocked
+    && admittedArtifact?.status === 'completed_with_quality_debt'
+    && !isHardStopArtifact(admittedArtifact)
+  ) {
+    if (failure.artifact_file) {
+      writeFileSync(failure.artifact_file, `${JSON.stringify(admittedArtifact, null, 2)}\n`, 'utf-8');
+    }
+    return buildCompletedRouteResponse({
+      workspaceRoot,
+      run,
+      safeRoute,
+      overlay,
+      deliverableId,
+      routeResult: {
+        ok: true,
+        artifact: admittedArtifact,
+        artifact_file: failure.artifact_file,
+        artifact_refs: [...new Set([
+          failure.artifact_file,
+          ...failure.artifact_refs,
+          ...(Array.isArray(admittedArtifact.artifact_refs) ? admittedArtifact.artifact_refs : []),
+        ].filter(Boolean))],
+        cache_status: admittedArtifact?.route_cache?.cache_status || 'quality_debt_recovered',
+      },
+      executor,
+      startedEvent,
+    });
+  }
   const failedRun = failRouteExecutionRef({
     run,
     currentStage: safeRoute,
@@ -651,8 +697,7 @@ function buildFailedRouteResponse({
     error: failedRun.error,
   };
 
-  const includeFailedArtifact = qualityBlocked
-    || failure.failure_kind === 'repeated_block_without_input_change';
+  const includeFailedArtifact = Boolean(failedArtifact);
   return {
     ok: false,
     run: failedRun,

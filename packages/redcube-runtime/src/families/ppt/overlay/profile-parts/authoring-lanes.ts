@@ -221,11 +221,9 @@ export const NATIVE_PPT_PROOF_LANE = Object.freeze({
       'desktop_powerpoint_automation',
       'apple_script_preview',
     ],
-    fail_closed_when_missing: true,
-    fail_closed_blocker: {
-      typed_blocker: 'missing_renderer_dependency',
-      emitted_when: 'capability_probe_and_auto_bootstrap_cannot_resolve_supported_renderer',
-    },
+    required_for_ready_claim: true,
+    missing_policy: 'completed_with_quality_debt_when_pptx_is_consumable',
+    hard_stop_when_missing: 'no_consumable_pptx_artifact',
   },
   export_contract_delta: {
     source_artifact_field: 'export_bundle.source_pptx',

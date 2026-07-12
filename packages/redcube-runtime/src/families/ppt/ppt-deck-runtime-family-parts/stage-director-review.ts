@@ -216,6 +216,7 @@ export function createPptDeckDirectorReviewParts(deps) {
       route: 'visual_director_review',
       deliverableId: deliverablePaths.deliverableId || contract?.deliverable_id,
       status,
+      hardStop: !renderArtifact,
       blockerKind: reviewExportBlockerKind({
         route: 'visual_director_review',
         failedChecks: status === 'pass' ? [] : ['visual_director_review_blocked'],

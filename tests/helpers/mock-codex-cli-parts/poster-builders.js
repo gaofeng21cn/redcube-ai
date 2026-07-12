@@ -165,14 +165,20 @@ export function buildMockPosterRender(meta) {
 }
 
 export function buildMockPosterDirectorReview() {
+  const forceBlock = safeText(process.env.REDCUBE_MOCK_POSTER_REVIEW_VARIANT)
+    .split(',')
+    .map((item) => safeText(item))
+    .includes('force_director_block');
   return {
     director_intent_landed: true,
     anti_template_ok: true,
-    message_hierarchy_clear: true,
+    message_hierarchy_clear: !forceBlock,
     evidence_trace_clear: true,
-    weak_regions: [],
-    rewrite_action: 'none',
-    review_summary: 'headline、证据与动作层级成立，可进入 screenshot_review。',
+    weak_regions: forceBlock ? ['action_footer'] : [],
+    rewrite_action: forceBlock ? 'revise_render_html' : 'none',
+    review_summary: forceBlock
+      ? '动作收束仍可改进，但当前海报可继续进入截图审阅。'
+      : 'headline、证据与动作层级成立，可进入 screenshot_review。',
   };
 }
 
@@ -192,18 +198,20 @@ export function buildMockPosterScreenshotReview(meta) {
       }
     }
   }
+  const forceBlock = variants.has('force_block');
   return {
     director_intent_landed: true,
     anti_template_ok: true,
-    message_hierarchy_clear: true,
-    weak_regions: [],
-    review_summary: '单页海报的 headline、证据栏和动作收束都在最终截图里成立。',
+    message_hierarchy_clear: !forceBlock,
+    weak_regions: forceBlock ? ['P01'] : [],
+    review_summary: forceBlock
+      ? '最终截图可交付，但动作区层级仍需后续优化。'
+      : '单页海报的 headline、证据栏和动作收束都在最终截图里成立。',
     slide_reviews: slides.map((slide) => ({
       slide_id: safeText(slide?.slide_id),
-      judgement: 'pass',
-      visual_findings: ['主标题抓手明确，证据和动作路径连续。'],
-      recommended_fix: 'none',
+      judgement: forceBlock ? 'block' : 'pass',
+      visual_findings: [forceBlock ? '动作区层级仍需优化。' : '主标题抓手明确，证据和动作路径连续。'],
+      recommended_fix: forceBlock ? 'revise_render_html' : 'none',
     })),
   };
 }
-

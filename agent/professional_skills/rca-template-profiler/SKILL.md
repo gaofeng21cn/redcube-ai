@@ -106,12 +106,13 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 
 ## Blockers And Repair Targets
 
-Return `typed_blocker` when:
+Return `typed_blocker` only when:
 
-- The template/reference deck is missing, unreadable, corrupted, or unavailable under the current work boundary.
-- The user requires a brand/template constraint that conflicts with readability or source truth.
-- The template has no capacity for the requested page count or content density.
-- The route requires native editable output but only screenshot/image evidence is available.
+- A required template/reference deck is unreadable, corrupted, unavailable because of permission/credential limits, or cannot legally be used.
+- A brand/template conflict requires an explicit owner decision before any profile artifact can be produced.
+- Authority or stage identity/currentness makes the referenced template invalid for this deliverable.
+
+When a consumable profile can still be produced, missing optional references, low template capacity, route mismatch, density/readability risk, incomplete placeholder inventory, or screenshot-only evidence is quality debt plus a downstream route recommendation. It must not block stage transition; it only blocks fidelity, native-editability, `visual_ready`, and `export_ready` claims.
 
 Return `repair_target` when:
 

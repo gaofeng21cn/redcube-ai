@@ -5,6 +5,8 @@ Purpose: `current_project_role_and_boundary`
 State: `current_truth`
 Machine boundary: 人读项目概览。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
+RCA 采用 progress-first：retry/repair 次数是提高当前 stage 质量的预算，不是 transition gate。只要 stage 已产生可被下一 stage 消费的 artifact，就以 `completed` 或 `completed_with_quality_debt` 推进；质量债务阻止 `visual_ready`、`export_ready` 和 production-ready 声明，但不阻止后续 stage。硬停止只保留给零可消费 artifact、artifact 损坏、权限/凭据、显式人工门、authority violation 与 identity/currentness mismatch。
+
 ## 项目是什么
 
 `RedCube AI` 是独立持有视觉领域语义与交付权威、但由 OPL 安装、注册和运行的 visual-deliverable Foundry Agent；它不是独立应用或独立 runtime。

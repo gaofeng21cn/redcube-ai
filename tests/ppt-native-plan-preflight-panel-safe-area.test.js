@@ -53,7 +53,7 @@ test('native PPT AI shape plan retry carries panel safe-area fixes with containi
   });
 });
 
-test('native PPT final preflight failure records attempt refs for live blocker audit', async () => {
+test('native PPT final preflight failure consumes quality budget and keeps the best shape plan', async () => {
   await withMockNativePptRuntime(async () => {
     const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-final-preflight-refs-');
     await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-final-preflight-refs' });
@@ -70,18 +70,17 @@ test('native PPT final preflight failure records attempt refs for live blocker a
         deliverableId: 'deck-final-preflight-refs',
         route: 'author_pptx_native',
       });
-      assert.equal(nativeResult.ok, false);
-      assert.match(
-        String(nativeResult.error?.message || nativeResult.error || ''),
-        /did not pass preflight after 2 attempt/i,
-      );
+      assert.equal(nativeResult.ok, true);
+      assert.equal(nativeResult.artifact.status, 'completed_with_quality_debt');
+      assert.equal(nativeResult.artifact.quality_debt.blocks_stage_transition, false);
+      assert.equal(nativeResult.artifact.native_ppt_bundle.ai_first_shape_plan_preflight.passed, false);
       assert.equal(nativeResult.run.artifact_refs.length >= 4, true);
       assert.equal(
         nativeResult.run.artifact_refs.some((file) => file.endsWith('plan-validation-input-attempt-02-validation.json')),
         true,
       );
       assert.equal(
-        nativeResult.run.error.artifact_refs.some((file) => file.endsWith('plan-validation-input-attempt-01.json')),
+        nativeResult.run.artifact_refs.some((file) => file.endsWith('plan-validation-input-attempt-01.json')),
         true,
       );
     } finally {

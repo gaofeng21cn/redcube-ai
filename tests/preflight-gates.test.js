@@ -42,7 +42,7 @@ async function withMockCodexRuntime(testFn) {
   }
 }
 
-test('xiaohongshu screenshot_review fails fast on deterministic HTML preflight before AI visual review', async () => {
+test('xiaohongshu screenshot_review records deterministic preflight debt and continues', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-preflight-'));
     await completeSourceReadiness({
@@ -109,26 +109,28 @@ test('xiaohongshu screenshot_review fails fast on deterministic HTML preflight b
       deliverableId: 'note-a',
       route: 'screenshot_review',
     });
-    assert.equal(result.ok, false);
-    assert.equal(result.run.status, 'quality_blocked');
-    assert.equal(result.run.error_kind, 'quality_blocked');
-    assert.equal(result.run.error.failure_kind, 'quality_blocked');
+    assert.equal(result.ok, true);
+    assert.equal(result.run.status, 'completed_with_quality_debt');
+    assert.equal(result.run.error_kind, null);
     const qualityGate = readJson(result.artifactFile);
-    assert.equal(qualityGate.status, 'block');
+    assert.equal(qualityGate.status, 'completed_with_quality_debt');
+    assert.equal(qualityGate.quality_debt.blocks_stage_transition, false);
+    assert.equal(qualityGate.quality_debt.blocks_export_ready_claim, true);
     assert.equal(qualityGate.preflight_gate.status, 'block');
     assert.equal(qualityGate.preflight_gate.ai_review_skipped, true);
     assert.deepEqual(qualityGate.review_state_patch.rerun_policy, {
-      status: 'rerun_required',
+      status: 'quality_budget_recommended',
       rerun_from_stage: 'fix_html',
       default_route: 'fix_html',
       scope: 'page',
       target_slide_ids: qualityGate.preflight_gate.target_slide_ids,
       source_review_stage: 'preflight_gate',
+      blocks_stage_transition: false,
     });
   });
 });
 
-test('ppt screenshot_review fails fast on deterministic HTML preflight before AI visual review', async () => {
+test('ppt screenshot_review records deterministic preflight debt and continues', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-preflight-'));
     await createDeliverable({
@@ -191,21 +193,25 @@ test('ppt screenshot_review fails fast on deterministic HTML preflight before AI
       deliverableId: 'deck-a',
       route: 'screenshot_review',
     });
-    assert.equal(result.ok, false);
+    assert.equal(result.ok, true);
+    assert.equal(result.run.status, 'completed_with_quality_debt');
     const qualityGate = readJson(result.artifactFile);
-    assert.equal(qualityGate.status, 'block');
+    assert.equal(qualityGate.status, 'completed_with_quality_debt');
+    assert.equal(qualityGate.quality_debt.blocks_stage_transition, false);
+    assert.equal(qualityGate.quality_debt.blocks_export_ready_claim, true);
     assert.equal(qualityGate.preflight_gate.status, 'block');
     assert.equal(qualityGate.preflight_gate.ai_review_skipped, true);
     assert.equal(qualityGate.preflight_gate.gate_model, 'deterministic_ppt_screenshot_review_preflight');
     assert.equal(qualityGate.preflight_gate.failures[0].missing_anchors.includes('data-qa-block'), true);
     assert.equal(qualityGate.preflight_gate.failures[0].missing_slide_metadata.includes('data-title'), true);
     assert.deepEqual(qualityGate.review_state_patch.rerun_policy, {
-      status: 'rerun_required',
+      status: 'quality_budget_recommended',
       rerun_from_stage: 'fix_html',
       default_route: 'fix_html',
       scope: 'slide',
       target_slide_ids: qualityGate.preflight_gate.target_slide_ids,
       source_review_stage: 'preflight_gate',
+      blocks_stage_transition: false,
     });
   });
 });

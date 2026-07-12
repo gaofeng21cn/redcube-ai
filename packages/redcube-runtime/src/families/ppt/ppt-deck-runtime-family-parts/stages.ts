@@ -808,14 +808,14 @@ export function createPptDeckStageParts(deps) {
     const rerunPolicy = artifact?.review_state_patch?.rerun_policy || {};
     return safeText(artifact?.review_state_patch?.rerun_from_stage)
       || (
-        safeText(rerunPolicy?.status) === 'rerun_required'
+        ['rerun_required', 'quality_budget_recommended'].includes(safeText(rerunPolicy?.status))
           ? safeText(rerunPolicy?.rerun_from_stage)
           : ''
       );
   }
 
   function reviewArtifactRequestsRoute(artifact, routeId) {
-    return safeText(artifact?.status) === 'block'
+    return ['block', 'completed_with_quality_debt'].includes(safeText(artifact?.status))
       && reviewArtifactRerunFromStage(artifact) === routeId;
   }
 
@@ -893,11 +893,8 @@ export function createPptDeckStageParts(deps) {
     }
     if (route === 'screenshot_review') {
       const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
-      const screenshotFeedbackOnlyRoute = reviewArtifactRequestsRoute(directorReviewArtifact, 'repair_pptx_native')
-        ? 'repair_pptx_native'
-        : '';
-      if (!directorReviewArtifact || (directorReviewArtifact.status !== 'pass' && !screenshotFeedbackOnlyRoute)) {
-        throw new Error('Route screenshot_review requires visual_director_review to pass before audit');
+      if (!directorReviewArtifact) {
+        throw new Error('Route screenshot_review requires a consumable visual_director_review artifact before audit');
       }
       const directorReviewMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'visual_director_review');
       if (directorReviewMtimeMs < currentVisualMtimeMs) {
@@ -906,8 +903,8 @@ export function createPptDeckStageParts(deps) {
     }
     if (route === 'export_pptx') {
       const reviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
-      if (!reviewArtifact || reviewArtifact.status !== 'pass') {
-        throw new Error('Route export_pptx requires screenshot_review to pass before export');
+      if (!reviewArtifact) {
+        throw new Error('Route export_pptx requires a consumable screenshot_review artifact before export');
       }
       const screenshotReviewMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'screenshot_review');
       if (screenshotReviewMtimeMs < currentVisualMtimeMs) {

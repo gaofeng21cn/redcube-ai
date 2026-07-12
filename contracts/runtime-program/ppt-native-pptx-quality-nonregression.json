@@ -141,8 +141,8 @@
       "shape_manifest#/slides/*/preview_screenshot_sha256",
       "shape_manifest#/slides/*/preview_screenshot_dimensions"
     ],
-    "fail_closed_when_missing": true,
-    "review_behavior": "screenshot_review consumes native shape manifest metrics and blocks on missing or failing quality checks"
+    "quality_debt_when_missing": true,
+    "review_behavior": "screenshot_review consumes native shape manifest metrics; missing or failing quality checks block ready claims but not stage transition"
   },
   "editable_shape_plan_contract": {
     "required": true,
@@ -173,7 +173,9 @@
     "title_underline_motif_allowed": false,
     "concrete_layout_variant_repetition_limit": 2,
     "helper_can_replace_ai_creative_owner": false,
-    "fail_closed_when_missing": true,
+    "required_for_ready_claim": true,
+    "missing_policy": "completed_with_quality_debt_when_pptx_is_consumable",
+    "hard_stop_when_missing": "no_consumable_pptx_artifact",
     "template_layout_grammar_required": true,
     "per_slide_layout_binding_required": true,
     "materializer_executes_selected_archetype_zones_only": true,

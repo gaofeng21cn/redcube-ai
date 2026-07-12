@@ -173,11 +173,9 @@
       "desktop_powerpoint_automation",
       "apple_script_preview"
     ],
-    "fail_closed_when_missing": true,
-    "fail_closed_blocker": {
-      "typed_blocker": "missing_renderer_dependency",
-      "emitted_when": "capability_probe_and_auto_bootstrap_cannot_resolve_supported_renderer"
-    }
+    "required_for_ready_claim": true,
+    "missing_policy": "completed_with_quality_debt_when_pptx_is_consumable",
+    "hard_stop_when_missing": "no_consumable_pptx_artifact"
   },
   "clean_room_boundary": {
     "owner": "redcube_ai",
@@ -289,8 +287,10 @@
       "table",
       "metric_grid"
     ],
-    "chart_table_metric_grid_fail_closed": true,
-    "fail_closed_when_missing": true
+    "chart_table_metric_grid_quality_debt_when_missing": true,
+    "quality_debt_when_missing": true,
+    "review_behavior": "screenshot_review consumes native shape manifest metrics; missing or failing quality checks block ready claims but not stage transition",
+    "chart_table_metric_grid_review_behavior": "missing editable chart/table/metric-grid metrics record page quality debt and repair targets while a readable PPTX continues"
   },
   "production_hardening": {
     "live_product_entry_proof": "tests/product-entry-native-ppt-live-proof.test.js",

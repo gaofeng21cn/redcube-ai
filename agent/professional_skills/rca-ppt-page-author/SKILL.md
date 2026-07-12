@@ -72,7 +72,7 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 - `progressive_disclosure`: keep page-level hierarchy obvious at first glance; secondary detail moves to notes, appendix, or the next slide.
 - `image_first_page_payload`: `slide_id`, current `style_ref`, prompt text, visible label budget, forbidden text, expected 16:9 output ref, import ref, and contact-sheet ref.
 - `page_visual_proof_packet`: generated/rendered page ref, pixel screenshot ref, 16:9 normalization ref, contact-sheet ref, route source ref, native shape manifest ref when applicable, preserved-page hashes for blocked-slide repairs, and unresolved QA risks.
-- `draft_to_review_gate`: generated/rendered page exists, 16:9 normalized page exists, contact sheet reviewed, and blocked pages have named repair targets before package/export stages consume it.
+- `draft_to_review_gate`: generated/rendered page exists and is consumable; 16:9, contact-sheet, density, or repair gaps become named quality debt and repair targets before package/export consumes the best available page.
 - `repeated_failure_triage`: slide id, previous repair evidence, current pixel/contact-sheet finding, owner stage, preserve/redraw decision, and whether route arbitration is required.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
@@ -85,12 +85,14 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 
 ## Blockers And Repair Targets
 
-Return `typed_blocker` when:
+Return `typed_blocker` only when:
 
-- Required upstream artifacts are missing, stale, or not approved.
-- The selected route conflicts with the requested deliverable, such as claiming native editable PPTX while only wrapping page images.
-- Materialization cannot proceed without missing assets, font constraints, template refs, or runtime evidence.
-- A helper/preflight failure cannot be repaired inside the current page contract.
+- No consumable upstream plan or no consumable page artifact can be produced.
+- The selected route conflicts with the authoring-lane authority lock, such as claiming native editable PPTX while only wrapping page images.
+- Permission, credential, explicit human approval, authority, or stage identity/currentness prevents continuation.
+- The only produced artifact is corrupt or unreadable.
+
+Missing optional assets, fonts, template refs, runtime evidence, helper/preflight proof, layout quality, or partial page failures become `completed_with_quality_debt` when at least one readable page artifact exists. Preserve successful pages, spend the bounded repair budget on failed pages, then continue with the best available page set without ready claims.
 
 Return `repair_target` when:
 

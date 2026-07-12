@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { buildMockCodexLastMessage } from './mock-codex-cli.js';
 
@@ -14,6 +14,7 @@ function parseArgs(argv) {
   }
   return {
     lastMessageFile: String(args.get('--output-last-message') || '').trim(),
+    outputSchemaFile: String(args.get('--output-schema') || '').trim(),
   };
 }
 
@@ -30,14 +31,15 @@ function readStdin() {
 }
 
 async function main(argv = process.argv) {
-  const { lastMessageFile } = parseArgs(argv);
+  const { lastMessageFile, outputSchemaFile } = parseArgs(argv);
   if (!lastMessageFile) {
     throw new Error('--output-last-message 不能为空');
   }
 
   const stdin = await readStdin();
   const prompt = stdin.trim() ? stdin : String(argv.at(-1) || '');
-  const output = buildMockCodexLastMessage(prompt);
+  const outputSchema = outputSchemaFile ? readFileSync(outputSchemaFile, 'utf-8') : '';
+  const output = buildMockCodexLastMessage(prompt, outputSchema);
   mkdirSync(path.dirname(lastMessageFile), { recursive: true });
   writeFileSync(lastMessageFile, output, 'utf-8');
 

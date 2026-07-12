@@ -18,7 +18,15 @@ import { getDefaultOverlayRegistry } from './default-registries.js';
 import { resolveExecutorAdapter } from './executors/index.js';
 import { loadSharedSourceTruth } from './shared-source-truth.js';
 import { fileContentHash, helperOutputRefsForArtifact } from './stage-folder-helper-refs.js';
+import {
+  admitStageArtifactForProgress,
+  authoringLaneForRoute,
+  hasConsumableStageArtifact,
+  lockedAuthoringLane,
+  markQualityBudgetExhausted,
+} from './progress-first.js';
 import { safeText } from './runtime-utils.js';
+import { runtimeCurrentnessReceipt } from './runtime-currentness.js';
 function requireSafeSegment(name, value) {
   const text = String(value || '').trim();
   if (!text) {
@@ -43,7 +51,7 @@ function loadHydratedContract(deliverablePaths, storedDeliverable) {
   };
 }
 const overlayRegistry = getDefaultOverlayRegistry();
-const REPEATED_BLOCK_FAIL_FAST_ROUTES = new Set([
+const QUALITY_BUDGET_ROUTES = new Set([
   'render_html',
   'fix_html',
   'author_image_pages',
@@ -51,7 +59,7 @@ const REPEATED_BLOCK_FAIL_FAST_ROUTES = new Set([
   'visual_director_review',
   'screenshot_review',
 ]);
-const REPEATED_BLOCK_FAIL_FAST_OVERLAYS = new Set(['ppt_deck', 'xiaohongshu']);
+const QUALITY_BUDGET_OVERLAYS = new Set(['ppt_deck', 'xiaohongshu']);
 function routeStageDefinitions(contract) {
   return [
     ...(Array.isArray(contract?.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
@@ -420,13 +428,23 @@ function refSegment(value, fallback) {
 }
 
 function ownerReceiptRefsForRoute({ artifact, overlay, route, deliverableId }) {
-  if (artifact?.status === 'block' || artifact?.status === 'failed') return [];
+  if (['block', 'failed', 'completed_with_quality_debt'].includes(artifact?.status)) return [];
   const explicitRefs = uniqueStrings([
     ...safeArray(artifact?.owner_receipt_refs),
     ...safeArray(artifact?.receipt_refs),
   ]);
   if (explicitRefs.length > 0) return explicitRefs;
   return [`rca-owner-receipt:visual-stage:${refSegment(overlay, 'overlay')}:${refSegment(route, 'route')}:${refSegment(deliverableId, 'deliverable')}`];
+}
+
+function qualityDebtRefsForRoute({ artifact, overlay, route, deliverableId }) {
+  if (artifact?.status !== 'completed_with_quality_debt') return [];
+  const explicitRefs = uniqueStrings([
+    ...safeArray(artifact?.quality_debt_refs),
+    ...safeArray(artifact?.quality_debt?.debt_refs),
+  ]);
+  if (explicitRefs.length > 0) return explicitRefs;
+  return [`rca-quality-debt:visual-stage:${refSegment(overlay, 'overlay')}:${refSegment(route, 'route')}:${refSegment(deliverableId, 'deliverable')}`];
 }
 
 function typedBlockerRefsForRoute({ artifact }) {
@@ -464,6 +482,7 @@ function attachRouteArtifactCloseoutRefs({ artifact, overlay, route, deliverable
   return {
     ...artifact,
     owner_receipt_refs: ownerReceiptRefsForRoute({ artifact, overlay, route, deliverableId }),
+    quality_debt_refs: qualityDebtRefsForRoute({ artifact, overlay, route, deliverableId }),
     typed_blocker_refs: [],
   };
 }
@@ -494,6 +513,7 @@ export function refreshStageFolderRouteArtifact({
     outputName: path.basename(artifactFile),
     requiredOutputs: [path.basename(artifactFile)],
     ownerReceiptRefs: ownerReceiptRefsForRoute({ artifact, overlay, route, deliverableId }),
+    qualityDebtRefs: qualityDebtRefsForRoute({ artifact, overlay, route, deliverableId }),
     typedBlockerRefs: typedBlockerRefsForRoute({ artifact }),
     blockingReasons: safeArray(artifact?.blocking_reasons),
     artifactRefs: safeArray(artifact?.artifact_refs),
@@ -502,10 +522,11 @@ export function refreshStageFolderRouteArtifact({
   });
 }
 
-function attachRouteCache(artifact, routeCacheKey) {
+function attachRouteCache(artifact, routeCacheKey, route) {
   const artifactWithBlockingSignature = attachBlockingSignature(artifact);
+  const admittedArtifact = admitStageArtifactForProgress(artifactWithBlockingSignature, { route });
   return {
-    ...artifactWithBlockingSignature,
+    ...admittedArtifact,
     route_cache: {
       cache_status: 'miss',
       cache_key: routeCacheKey,
@@ -516,9 +537,9 @@ function attachRouteCache(artifact, routeCacheKey) {
   };
 }
 
-function failFastEnabledForRoute({ overlay, route }) {
-  return REPEATED_BLOCK_FAIL_FAST_OVERLAYS.has(overlay)
-    && REPEATED_BLOCK_FAIL_FAST_ROUTES.has(route);
+function qualityBudgetEnabledForRoute({ overlay, route }) {
+  return QUALITY_BUDGET_OVERLAYS.has(overlay)
+    && QUALITY_BUDGET_ROUTES.has(route);
 }
 
 function buildRepeatedBlockFailFastArtifact({
@@ -534,7 +555,6 @@ function buildRepeatedBlockFailFastArtifact({
   const targetSlideIds = uniqueStrings(priorSignature?.target_slide_ids);
   const blockingReasons = uniqueStrings(priorSignature?.blocking_reasons);
   const blockedChecks = uniqueStrings(priorSignature?.blocked_checks);
-  const typedBlockerRef = `rca-typed-blocker:repeated-block:${overlay}:${route}:${deliverableId}`;
   const repeatBudget = {
     max_repeats: 2,
     remaining_repeats: 0,
@@ -552,27 +572,22 @@ function buildRepeatedBlockFailFastArtifact({
     blocking_reasons: blockingReasons,
     blocked_checks: blockedChecks,
   };
-  return {
+  return markQualityBudgetExhausted({
     ...priorArtifact,
-    status: 'failed',
-    failure_kind: 'repeated_block_without_input_change',
-    typed_blocker_refs: uniqueStrings([
-      ...safeArray(priorArtifact?.typed_blocker_refs),
-      ...safeArray(priorArtifact?.blocker_refs),
-      safeText(priorArtifact?.blocker_ref),
-      typedBlockerRef,
-    ]),
-    blocker_ref: typedBlockerRef,
-    blocker_kind: 'repeated_block_without_input_change',
+    status: 'completed_with_quality_debt',
+    failure_kind: null,
+    typed_blocker_refs: [],
+    blocker_ref: null,
+    blocker_kind: null,
     route,
     overlay,
     topic_id: topicId,
     deliverable_id: deliverableId,
     target_slide_ids: targetSlideIds,
     blocking_reasons: blockingReasons,
-    repeated_block_fail_fast: {
+    quality_budget_exhaustion: {
       schema_version: 1,
-      failure_kind: 'repeated_block_without_input_change',
+      status: 'exhausted_continue_with_best_artifact',
       route,
       overlay,
       target_slide_ids: targetSlideIds,
@@ -585,18 +600,21 @@ function buildRepeatedBlockFailFastArtifact({
       },
       stall_lineage: stallLineage,
       repeat_budget: repeatBudget,
-      recommended_action: 'change_input_or_route_to_page_local_fix',
-      quality_gate_policy: 'fail_fast_does_not_turn_blocked_into_pass',
+      recommended_action: 'continue_with_best_available_artifact',
+      quality_gate_policy: 'retry_budget_improves_quality_and_never_blocks_transition',
     },
     stall_lineage: stallLineage,
     route_cache: {
       ...(priorArtifact.route_cache || {}),
-      cache_status: 'blocked_fail_fast',
+      cache_status: 'quality_budget_exhausted',
       cache_key: routeCacheKey,
       input_hash: routeCacheKey,
       reused_from_artifact_file: artifactFile,
     },
-  };
+  }, {
+    route,
+    attempts: repeatBudget.max_repeats,
+  });
 }
 
 function readRepeatedBlockFailFastArtifact({
@@ -609,7 +627,7 @@ function readRepeatedBlockFailFastArtifact({
   topicId,
   deliverableId,
 }) {
-  if (!failFastEnabledForRoute({ overlay, route })) return null;
+  if (!qualityBudgetEnabledForRoute({ overlay, route })) return null;
   const loaded = readStageFolderArtifact({
     deliverablePaths,
     routeStageId: route,
@@ -660,6 +678,17 @@ export function validateDeliverableRouteInput({
     route: safeRoute,
     workspaceRoot,
   });
+  const requestedAuthoringLane = authoringLaneForRoute(safeRoute);
+  const contractAuthoringLane = lockedAuthoringLane(contract);
+  if (requestedAuthoringLane && contractAuthoringLane && requestedAuthoringLane !== contractAuthoringLane) {
+    const error = new Error(
+      `Route ${safeRoute} conflicts with authoring route lock ${contractAuthoringLane}; an explicit product-entry route selection is required to switch lanes`,
+    );
+    error.code = 'authoring_route_lock_mismatch';
+    error.failure_kind = 'authority_boundary_violation';
+    error.hard_stop_kind = 'authority_boundary_violation';
+    throw error;
+  }
   const stageContract = routeStageDefinitions(contract).find(
     (stage) => stage?.stage_id === safeRoute,
   ) || null;
@@ -820,19 +849,31 @@ export async function executeDeliverableRouteLocally({
       artifact: closeoutArtifact,
       oplRouteAttemptIndex,
     });
-    const error = new Error(`Route ${safeRoute} fail-fast: repeated block without input change`);
-    error.code = 'repeated_block_without_input_change';
-    error.failure_kind = 'repeated_block_without_input_change';
-    error.target_slide_ids = closeoutArtifact.repeated_block_fail_fast.target_slide_ids;
-    error.blocking_reasons = closeoutArtifact.repeated_block_fail_fast.blocking_reasons;
-    error.recommended_action = closeoutArtifact.repeated_block_fail_fast.recommended_action;
-    error.artifact_file = artifactFile;
-    error.artifact_refs = Array.isArray(stageFolderRefs?.artifact_refs) ? stageFolderRefs.artifact_refs : [];
-    error.stall_lineage = closeoutArtifact.repeated_block_fail_fast.stall_lineage;
-    throw error;
+    return {
+      ok: true,
+      route: safeRoute,
+      overlay,
+      topic_id: topicId,
+      deliverable_id: deliverableId,
+      artifact: closeoutArtifact,
+      artifact_file: artifactFile,
+      artifact_refs: Array.from(new Set([
+        artifactFile,
+        ...(Array.isArray(stageFolderRefs?.artifact_refs) ? stageFolderRefs.artifact_refs : []),
+      ])),
+      cache_status: 'quality_budget_exhausted',
+      executor: {
+        adapter: executor.adapter,
+        primary: executor.primary,
+        execution_surface: executor.execution_surface,
+        creative_execution: executor.creative_execution,
+        execution_model: executor.execution_model,
+      },
+    };
   }
 
-  const routeArtifact = attachRouteCache(await executor.runRoute({
+  const routeArtifact = attachRouteCache({
+    ...await executor.runRoute({
     workspaceRoot,
     overlay,
     route: safeRoute,
@@ -843,7 +884,9 @@ export async function executeDeliverableRouteLocally({
     deliverablePaths,
     mode,
     baselineDeliverableId,
-  }), routeCacheKey);
+    }),
+    runtime_currentness_receipt: runtimeCurrentnessReceipt(),
+  }, routeCacheKey, safeRoute);
   const artifact = attachRouteArtifactCloseoutRefs({
     overlay,
     route: safeRoute,
@@ -878,6 +921,14 @@ export async function executeDeliverableRouteLocally({
   }
 
   if (artifact?.status === 'block' || artifact?.status === 'failed') {
+    const missingConsumableArtifact = !hasConsumableStageArtifact(artifact);
+    const hardStopKind = safeText(
+      artifact?.hard_stop_kind
+        || artifact?.error_kind
+        || artifact?.failure_kind
+        || artifact?.blocker_kind,
+      missingConsumableArtifact ? 'missing_consumable_artifact' : 'route_failure',
+    );
     const blockingReasons = uniqueStrings([
       ...safeArray(artifact?.blocking_reasons),
       ...safeArray(artifact?.review_state_patch?.blocking_reasons),
@@ -891,8 +942,9 @@ export async function executeDeliverableRouteLocally({
         ? `Route ${safeRoute} blocked: ${JSON.stringify(artifact?.checks || artifact?.issues || {})}`
         : `Route ${safeRoute} blocked`,
     );
-    error.code = 'quality_blocked';
-    error.failure_kind = 'quality_blocked';
+    error.code = hardStopKind;
+    error.failure_kind = hardStopKind;
+    error.hard_stop_kind = hardStopKind;
     error.target_slide_ids = uniqueStrings([
       ...safeArray(artifact?.target_slide_ids),
       ...safeArray(artifact?.preflight_gate?.target_slide_ids),

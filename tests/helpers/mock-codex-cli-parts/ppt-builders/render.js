@@ -152,7 +152,9 @@ export function buildMockPptRender(meta) {
     }
   }
   return {
-    slides: slides.map((slide) => ({
+    slides: slides
+      .filter((_, index) => !variants.has('omit_last_slide') || index < slides.length - 1)
+      .map((slide) => ({
       slide_id: slide.slide_id,
       content_html: (() => {
         if (variants.has('require_revision_context')) {

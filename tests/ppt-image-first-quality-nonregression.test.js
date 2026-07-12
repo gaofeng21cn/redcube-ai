@@ -246,7 +246,7 @@ test('ppt image-first quality non-regression contract preserves fact, asset, aud
   assert.equal(contract.nonregression_policy.screenshot_review_required, true);
   assert.equal(contract.nonregression_policy.export_pptx_required, true);
   assert.equal(contract.nonregression_policy.quality_gates_may_be_lowered, false);
-  assert.equal(contract.nonregression_policy.hard_block_checks_may_be_removed, false);
+  assert.equal(contract.nonregression_policy.ready_claim_block_checks_may_be_removed, false);
   assert.equal(contract.nonregression_policy.agent_lab_score_can_replace_rca_visual_verdict, false);
 
   assert.equal(contract.export_pptx_policy.full_slide_image_pages_required, true);
@@ -272,7 +272,8 @@ test('ppt image-first quality non-regression contract exposes Agent Lab refs wit
   assert.equal(contract.blocked_page_only_repair_policy.source_review_stage, 'screenshot_review');
   assert.equal(contract.blocked_page_only_repair_policy.scope, 'blocked_slide_ids_only');
   assert.equal(contract.blocked_page_only_repair_policy.unblocked_slide_policy, 'reuse_prior_png_and_record_preserved_hashes');
-  assert.equal(contract.blocked_page_only_repair_policy.fail_closed_when_prior_png_missing, true);
+  assert.equal(contract.blocked_page_only_repair_policy.missing_prior_png_quality_debt_when_other_pages_are_consumable, true);
+  assert.equal(contract.blocked_page_only_repair_policy.zero_consumable_png_hard_stop, true);
   assert.equal(contract.blocked_page_only_repair_policy.repair_may_touch_unblocked_pages, false);
 
   assert.equal(contract.forbidden_authority_flags.no_forbidden_write, true);

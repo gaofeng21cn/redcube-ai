@@ -106,7 +106,21 @@ export async function buildOplStageExecutionPlan({
       requested_stop_after_stage: safeText(stopAfterStage) || null,
       approval_required: approvalRequired,
       gate_status: approvalRequired ? 'requested' : 'approved',
-      stop_policy: 'opl_provider_runs_until_explicit_stop_after_stage_or_rca_review_gate',
+      stop_policy: 'opl_provider_runs_until_explicit_stop_after_stage_or_hard_stop_boundary',
+      progress_first_policy: {
+        contract_id: 'rca.progress_first_stage_admission.v1',
+        artifact_advances_stage: true,
+        retries_are_quality_budget: true,
+        quality_debt_blocks_transition: false,
+        review_gate_blocks_transition: false,
+        hard_stop_kinds: [
+          'missing_consumable_artifact',
+          'permission_or_credential_boundary',
+          'explicit_human_gate',
+          'authority_boundary_violation',
+          'stale_or_mismatched_stage_identity',
+        ],
+      },
       user_intent: safeText(userIntent) || null,
       requested_mode: safeText(mode, 'draft_new'),
       baseline_deliverable_id: safeText(baselineDeliverableId) || null,
@@ -119,6 +133,10 @@ export async function buildOplStageExecutionPlan({
       provider_attempt_ref: `${planRef}:${stage.stage_id}`,
       depends_on: stage.requires_stages,
       output_artifact_ref: stage.output_artifact,
+      transition_policy: {
+        consumable_artifact_advances: true,
+        quality_budget_not_transition_gate: true,
+      },
       owner_split: {
         stage_attempt_owner: OPL_STAGE_ATTEMPT_OWNER,
         route_handler_owner: RCA_DOMAIN_OWNER,

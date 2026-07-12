@@ -312,6 +312,102 @@ test('xiaohongshu image-first workflow publishes and exports real files', async 
   });
 });
 
+test('xiaohongshu image authoring advances with quality debt when one page generation fails', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-image-partial-'));
+    const deliverableId = 'note-partial-image';
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-a',
+      deliverableId,
+      title: '甲状腺门诊小红书科普',
+      goal: '验证单页图像失败不会阻断后续交付',
+    });
+    await runXhsRoutes({
+      workspaceRoot,
+      deliverableId,
+      routes: ['research', 'storyline', 'single_note_plan', 'visual_direction'],
+    });
+    process.env.REDCUBE_IMAGE_GENERATION_MOCK = '1';
+    process.env.REDCUBE_IMAGE_GENERATION_MOCK_FAIL_SLIDE_IDS = 'N02';
+    try {
+      const authoredResult = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'xiaohongshu',
+        topicId: 'topic-a',
+        deliverableId,
+        route: 'author_image_pages',
+      });
+      assert.equal(authoredResult.ok, true);
+      const authored = readJson(authoredResult.artifactFile);
+      assert.equal(authored.status, 'completed_with_quality_debt');
+      assert.deepEqual(authored.quality_debt.failed_slide_ids, ['N02']);
+      assert.equal(authored.image_pages_bundle.page_count > 0, true);
+      assert.equal(authored.image_pages_bundle.pages.some((page) => page.slide_id === 'N02'), false);
+
+      const downstream = await runXhsRoutes({
+        workspaceRoot,
+        deliverableId,
+        routes: ['visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle'],
+      });
+      assert.equal(downstream.every(({ result }) => result.ok), true);
+      const exported = routeArtifact(downstream, 'export_bundle');
+      assert.equal(exported.status, 'completed_with_quality_debt');
+      assert.equal(exported.quality_debt.blocks_stage_transition, false);
+      assert.equal(exported.review_state_patch.ready_for_export, false);
+      assert.equal(exported.export_bundle.publish_image_files.length > 0, true);
+    } finally {
+      delete process.env.REDCUBE_IMAGE_GENERATION_MOCK_FAIL_SLIDE_IDS;
+    }
+  });
+});
+
+test('xiaohongshu HTML authoring advances with quality debt when one page is missing', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-html-partial-'));
+    const deliverableId = 'note-html-partial';
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-a',
+      deliverableId,
+      title: '甲状腺门诊小红书科普 HTML',
+      goal: '验证 HTML 缺一页仍可推进',
+    });
+    await runXhsRoutes({
+      workspaceRoot,
+      deliverableId,
+      routes: ['research', 'storyline', 'single_note_plan', 'visual_direction'],
+    });
+    process.env.REDCUBE_MOCK_XHS_RENDER_OMIT_SLIDE_ID = 'N02';
+    const renderedResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId,
+      route: 'render_html',
+    });
+    delete process.env.REDCUBE_MOCK_XHS_RENDER_OMIT_SLIDE_ID;
+    assert.equal(renderedResult.ok, true, JSON.stringify(renderedResult));
+    const rendered = readJson(renderedResult.artifactFile);
+    assert.equal(rendered.status, 'completed_with_quality_debt');
+    assert.equal(rendered.html_bundle.actual_page_count > 0, true);
+    assert.equal(rendered.html_bundle.actual_page_count < rendered.html_bundle.expected_page_count, true);
+    const downstream = await runXhsRoutes({
+      workspaceRoot,
+      deliverableId,
+      routes: ['visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle'],
+    });
+    assert.equal(downstream.every(({ result }) => result.ok), true);
+    const exported = routeArtifact(downstream, 'export_bundle');
+    assert.equal(exported.status, 'completed_with_quality_debt');
+    assert.equal(exported.review_state_patch.ready_for_export, false);
+  });
+});
+
 test('xiaohongshu explicit HTML renderer remains an executable alternate workflow', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-html-'));

@@ -150,7 +150,9 @@ const SURFACE_VALIDATORS = {
     && Array.isArray(content.render_contract.native_ppt_proof_lane?.true_render_proof?.supported_renderers)
     && content.render_contract.native_ppt_proof_lane.true_render_proof.supported_renderers[0]?.renderer_pipeline === 'libreoffice_headless_pdf_png_v1'
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.bootstrap_policy?.repo_owned_installer === 'tools/native-ppt-proof/install-deps.sh'
-    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.fail_closed_blocker?.typed_blocker === 'missing_renderer_dependency'
+    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.required_for_ready_claim === true
+    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.missing_policy === 'completed_with_quality_debt_when_pptx_is_consumable'
+    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.hard_stop_when_missing === 'no_consumable_pptx_artifact'
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.html_render_substitute_allowed === false
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.officecli_validate_substitute_allowed === false
     && Array.isArray(content.render_contract.selectable_explicit_routes)

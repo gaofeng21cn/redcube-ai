@@ -54,12 +54,17 @@ export async function generateStructuredArtifactViaCodexCli({
     throw new Error('promptRelativePath 不能为空');
   }
 
+  const outputSchema = safeFamily === 'ppt_deck'
+    && ['author_pptx_native', 'repair_pptx_native'].includes(safeRoute)
+    ? outputContract
+    : null;
   const input = buildGenerationInput({
     family: safeFamily,
     route: safeRoute,
     promptRelativePath: safePromptRelativePath,
     context,
     outputContract,
+    outputContractDelivery: outputSchema ? 'attached_schema' : 'inline',
     localFileInspection,
   });
   const prompt = [
@@ -67,6 +72,15 @@ export async function generateStructuredArtifactViaCodexCli({
     '',
     input,
   ].join('\n');
+  const outputSchemaBytes = outputSchema
+    ? Buffer.byteLength(JSON.stringify(outputSchema), 'utf-8')
+    : 0;
+  const requestBytes = Buffer.byteLength(prompt, 'utf-8') + outputSchemaBytes;
+  const structuredOutputTelemetry = {
+    output_schema_attached: Boolean(outputSchema),
+    output_schema_bytes: outputSchemaBytes,
+    estimated_request_tokens: Math.ceil(requestBytes / 4),
+  };
   const resolvedTimeoutMs = resolveGenerationTimeoutMs(timeoutMs, localFileInspection, {
     family: safeFamily,
     route: safeRoute,
@@ -92,6 +106,7 @@ export async function generateStructuredArtifactViaCodexCli({
       localFileInspection,
       usage,
     }),
+    ...structuredOutputTelemetry,
     usage,
   });
   const attachFailureRuntime = (error, runtime) => {
@@ -110,6 +125,7 @@ export async function generateStructuredArtifactViaCodexCli({
       cwd,
       timeoutMs: resolvedTimeoutMs,
       spawnSyncImpl,
+      outputSchema,
     });
   } catch (error) {
     throw attachFailureRuntime(error, buildFailureRuntime({ error }));
@@ -152,6 +168,7 @@ export async function generateStructuredArtifactViaCodexCli({
         localFileInspection,
         usage,
       }),
+      ...structuredOutputTelemetry,
       usage,
     },
   };
@@ -326,6 +343,8 @@ function buildNativeImagegenPrompt({
       ok: true,
       image_file: outputFile,
       mode: 'codex_native_imagegen',
+      receipt_type: 'codex_native_imagegen_materialization_receipt',
+      native_image_generation_used: true,
     }),
   ].join('\n');
 }
@@ -378,10 +397,13 @@ export async function generateImageViaCodexNativeImagegen({
       safeText(execution.codexRun.error, `Codex native imagegen task failed: ${safeFamily}:${safeRoute}:${slideId}`),
     );
   }
-  if (!codexRunUsedNativeImageGeneration(execution.codexRun.events, safeOutputFile)) {
-    throw new Error('Codex native imagegen task did not provide native image_generation/generated_images provenance');
-  }
   const taskResult = parseNativeImagegenTaskResult(execution.codexRun.output);
+  const nativeToolEventObserved = codexRunUsedNativeImageGeneration(
+    execution.codexRun.events,
+    safeOutputFile,
+  );
+  const executorDeclaredNativeImagegen = safeText(taskResult?.mode) === 'codex_native_imagegen'
+    && taskResult?.native_image_generation_used !== false;
   const generatedImageFile = generatedImageFileFromTaskResult(taskResult, safeOutputFile)
     || generatedImageProvenanceFromEvents(execution.codexRun.events);
   if (!existsSync(safeOutputFile)) {
@@ -403,6 +425,31 @@ export async function generateImageViaCodexNativeImagegen({
   const usage = terminalUsage(execution.codexRun.events);
   const promptHash = createHash('sha256').update(safePrompt).digest('hex');
   const imageHash = createHash('sha256').update(imageBytes).digest('hex');
+  const provenanceStatus = nativeToolEventObserved
+    ? 'verified_native_tool_event'
+    : executorDeclaredNativeImagegen
+      ? 'executor_declared_native_imagegen'
+      : 'materialized_png_without_native_event';
+  const provenanceQualityDebt = nativeToolEventObserved ? null : {
+    status: 'recorded_non_blocking',
+    reason: 'native_imagegen_event_receipt_unavailable',
+    provenance_status: provenanceStatus,
+    blocks_stage_transition: false,
+    blocks_verified_provenance_claim: true,
+  };
+  const structuredReceipt = {
+    receipt_type: 'codex_native_imagegen_materialization_receipt',
+    run_id: execution.codexRun.run_id,
+    session_id: execution.codexRun.session_id,
+    capability_requested: 'image_generation',
+    native_tool_event_observed: nativeToolEventObserved,
+    executor_declared_native_imagegen: executorDeclaredNativeImagegen,
+    provenance_status: provenanceStatus,
+    source_file: generatedImageFile || null,
+    target_file: safeOutputFile,
+    image_sha256: imageHash,
+    dimensions,
+  };
   return {
     imageFile: safeOutputFile,
     imageBytes,
@@ -429,6 +476,9 @@ export async function generateImageViaCodexNativeImagegen({
       imagegen_mode: 'built_in_tool',
       codex_generated_image_file: generatedImageFile || null,
       materialized_from_codex_generated_image: Boolean(generatedImageFile),
+      structured_receipt: structuredReceipt,
+      provenance_status: provenanceStatus,
+      provenance_quality_debt: provenanceQualityDebt,
       usage,
     },
   };

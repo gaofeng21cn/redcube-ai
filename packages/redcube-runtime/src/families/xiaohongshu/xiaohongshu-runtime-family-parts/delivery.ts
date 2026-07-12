@@ -267,6 +267,13 @@ export function createXiaohongshuDeliveryParts(deps) {
     const copy = readStageArtifact(contract, deliverablePaths, 'publish_copy');
     const renderArtifact = readCurrentVisualArtifact(contract, deliverablePaths);
     const imagePagesInput = isImagePagesArtifact(renderArtifact);
+    const qualityDebtReasons = [...new Set([
+      ...safeArray(renderArtifact?.quality_debt?.reasons),
+      ...safeArray(review?.quality_debt?.reasons),
+      ...safeArray(review?.quality_debt_reasons),
+      ...safeArray(copy?.quality_debt?.reasons),
+      ...safeArray(copy?.quality_debt_reasons),
+    ].map((reason) => safeText(reason)).filter(Boolean))];
     const stableHtmlFile = imagePagesInput ? '' : getDeliverableViewSurfacePaths(deliverablePaths).stableHtmlFile;
     if (!imagePagesInput && !existsSync(stableHtmlFile)) {
       throw new Error(`Route export_bundle requires reviewed stable HTML surface before export: ${stableHtmlFile}`);
@@ -311,9 +318,10 @@ export function createXiaohongshuDeliveryParts(deps) {
       preview_cache: exportPreviewCacheMetadata(previewCacheStatus, previewHash),
       preview_metrics: previewMetrics,
       delivery_state: {
-        current: 'output_ready',
+        current: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : 'output_ready',
         next: 'published_pending_human',
       },
+      quality_debt_reasons: qualityDebtReasons,
     };
     writeJson(manifestFile, exportBundle);
     writeJson(publishManifestFile, exportBundle);
@@ -330,7 +338,13 @@ export function createXiaohongshuDeliveryParts(deps) {
     }));
     return {
       ...attachCommon('export_bundle', contract, null, adapter),
-      status: 'completed',
+      status: qualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'completed',
+      quality_debt: qualityDebtReasons.length > 0 ? {
+        status: 'recorded_non_blocking',
+        reasons: qualityDebtReasons,
+        blocks_stage_transition: false,
+        blocks_ready_claims: true,
+      } : null,
       export_bundle: exportBundle,
       series_surfaces: computeSeriesSurfaces(contract, deliverablePaths, exportBundle),
       artifact_refs: [
@@ -347,8 +361,8 @@ export function createXiaohongshuDeliveryParts(deps) {
         ...publishPngFiles,
       ].filter(Boolean),
       review_state_patch: {
-        current_status: 'publish_ready',
-        ready_for_export: true,
+        current_status: qualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'publish_ready',
+        ready_for_export: qualityDebtReasons.length === 0,
         latest_review_stage: 'export_bundle',
         latest_checks: {
           platform_copy_complete: true,

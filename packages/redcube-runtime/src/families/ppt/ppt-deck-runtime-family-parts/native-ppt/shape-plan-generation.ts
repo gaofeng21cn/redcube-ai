@@ -13,6 +13,8 @@ interface NativePlanAttempt {
   attemptIndex: number;
   executorRetryCount: number;
   attemptArtifactRefs: string[];
+  preflightPassed: boolean;
+  qualityBudget: JsonRecord;
 }
 
 interface NativePptShapePlanGenerationDeps {
@@ -169,7 +171,16 @@ export function createNativePptShapePlanGenerationParts({
           editableShapePlan = normalizeEditableShapePlan(normalizedInput, route);
         } catch (error) {
           if (error instanceof Error) {
-            (error as Error & { nativeShapePlanCandidate?: JsonRecord }).nativeShapePlanCandidate = normalizedInput;
+            const failure = error as Error & {
+              nativeShapePlanCandidate?: JsonRecord;
+              nativeGenerationRuntime?: JsonRecord;
+              nativeShapePlanOutputContract?: JsonRecord;
+              nativeExecutorRetryCount?: number;
+            };
+            failure.nativeShapePlanCandidate = normalizedInput;
+            failure.nativeGenerationRuntime = generationRuntime;
+            failure.nativeShapePlanOutputContract = shapePlanOutputContract;
+            failure.nativeExecutorRetryCount = executorRetryIndex;
           }
           throw error;
         }
@@ -264,6 +275,7 @@ export function createNativePptShapePlanGenerationParts({
         });
       } catch (error) {
         const candidate = (error as Error & { nativeShapePlanCandidate?: JsonRecord })?.nativeShapePlanCandidate;
+        const candidatePlan = candidate?.editable_shape_plan || candidate?.shape_plan || {};
         if (candidate && typeof candidate === 'object') {
           const attemptCandidateFile = nativePlanPreflightParts.nativeAttemptArtifactFile(validationInputFile, attemptIndex, '-candidate');
           writeJson(attemptCandidateFile, candidate);
@@ -292,17 +304,30 @@ export function createNativePptShapePlanGenerationParts({
         writeJson(attemptValidationFile, structuralFeedback);
         attemptArtifactRefs.push(attemptValidationFile);
         validationFeedback = structuralFeedback;
-        if (attemptIndex >= maxAttempts) {
+        if (safeArray(candidatePlan?.slides).length > 0) {
+          const failure = error as Error & {
+            nativeGenerationRuntime?: JsonRecord;
+            nativeShapePlanOutputContract?: JsonRecord;
+            nativeExecutorRetryCount?: number;
+          };
           lastAttempt = {
-            editableShapePlan: {},
-            generationRuntime: {},
-            modelContract: null,
-            shapePlanOutputContract: null,
+            editableShapePlan: candidatePlan,
+            generationRuntime: failure.nativeGenerationRuntime || {},
+            modelContract: candidate?.ai_first_editing_contract || null,
+            shapePlanOutputContract: failure.nativeShapePlanOutputContract || null,
             validationFeedback,
             attemptIndex,
-            executorRetryCount: 0,
+            executorRetryCount: Number(failure.nativeExecutorRetryCount || 0),
             attemptArtifactRefs: [...attemptArtifactRefs],
+            preflightPassed: false,
+            qualityBudget: {
+              status: attemptIndex >= maxAttempts ? 'exhausted' : 'in_progress',
+              attempts_allowed: maxAttempts,
+              attempts_used: attemptIndex,
+            },
           };
+        }
+        if (attemptIndex >= maxAttempts) {
           continue;
         }
         continue;
@@ -341,6 +366,12 @@ export function createNativePptShapePlanGenerationParts({
         validationFeedback: validation.payload,
         attemptIndex,
         attemptArtifactRefs: [...attemptArtifactRefs],
+        preflightPassed: validation.payload?.ok === true,
+        qualityBudget: {
+          status: validation.payload?.ok === true ? 'satisfied' : 'in_progress',
+          attempts_allowed: maxAttempts,
+          attempts_used: attemptIndex,
+        },
       };
       if (validation.payload?.ok === true) {
         return lastAttempt;
@@ -352,7 +383,19 @@ export function createNativePptShapePlanGenerationParts({
         previousValidationFeedback: validationFeedback,
       });
     }
-    const error = new Error(`Native PPT ${route} AI-first editable_shape_plan did not pass preflight after ${maxAttempts} attempt(s): ${JSON.stringify(lastAttempt?.validationFeedback || validationFeedback)}`);
+    if (lastAttempt && safeArray(lastAttempt.editableShapePlan?.slides).length > 0) {
+      return {
+        ...lastAttempt,
+        preflightPassed: false,
+        qualityBudget: {
+          status: 'exhausted',
+          attempts_allowed: maxAttempts,
+          attempts_used: lastAttempt.attemptIndex,
+          transition_policy: 'continue_with_best_available_shape_plan',
+        },
+      };
+    }
+    const error = new Error(`Native PPT ${route} produced no consumable editable_shape_plan after ${maxAttempts} attempt(s): ${JSON.stringify(lastAttempt?.validationFeedback || validationFeedback)}`);
     if (attemptArtifactRefs.length > 0) {
       (error as Error & { artifact_refs?: string[] }).artifact_refs = [...attemptArtifactRefs];
     }

@@ -12,7 +12,7 @@ interface CandidatePlanInput {
 interface CandidatePlanCandidate {
   candidate_id: string;
   status: 'planned';
-  must_pass_gate: string;
+  quality_gate_ref: string;
 }
 
 interface CandidateRacePlan {
@@ -85,11 +85,11 @@ export function planCandidateRace({
     candidate_count: count,
     quality_gate: safeText(qualityGate, 'screenshot_review'),
     reuse_claimed: false,
-    quality_gate_policy: 'all_candidates_must_pass_same_contract_before_selection',
+    quality_gate_policy: 'quality_budget_prefers_pass_and_selects_best_available_artifact',
     candidates: Array.from({ length: count }, (_, index) => ({
       candidate_id: `${normalizedRoute}-candidate-${index + 1}`,
       status: 'planned',
-      must_pass_gate: safeText(qualityGate, 'screenshot_review'),
+      quality_gate_ref: safeText(qualityGate, 'screenshot_review'),
     })),
   };
 }
@@ -114,10 +114,12 @@ export function selectCandidateRaceWinner({ candidates = [] }: CandidateSelectio
   const passing = normalizedCandidates
     .filter((candidate) => candidate.gate_status === 'pass')
     .sort((left, right) => right.score - left.score || left.candidate_id.localeCompare(right.candidate_id));
-  if (passing.length === 0) {
-    throw new Error('No passing candidate available for quality-preserving selection');
+  const ranked = normalizedCandidates
+    .sort((left, right) => right.score - left.score || left.candidate_id.localeCompare(right.candidate_id));
+  const winner = passing[0] || ranked[0];
+  if (!winner) {
+    throw new Error('No materialized candidate available for progress-first selection');
   }
-  const winner = passing[0];
   const rejectedCandidates = normalizedCandidates
     .filter((candidate) => candidate.candidate_id !== winner.candidate_id)
     .sort((left, right) => {
@@ -130,7 +132,9 @@ export function selectCandidateRaceWinner({ candidates = [] }: CandidateSelectio
     selection_kind: 'quality_preserving_candidate_selection',
     winner,
     rejected_candidates: rejectedCandidates,
-    quality_gate_policy: 'blocked_candidates_never_win',
+    quality_gate_policy: passing.length > 0
+      ? 'passing_candidate_preferred'
+      : 'quality_budget_exhausted_select_best_available',
   };
 }
 
@@ -175,7 +179,11 @@ export async function runCandidateRaceRoute({
       };
     }
   }));
-  const selection = selectCandidateRaceWinner({ candidates: candidateResults });
+  const materializedCandidates = candidateResults.filter((candidate) => candidate.artifact);
+  if (materializedCandidates.length === 0) {
+    throw new Error('No materialized candidate available after candidate quality budget');
+  }
+  const selection = selectCandidateRaceWinner({ candidates: materializedCandidates });
   const winner = candidateResults.find((candidate) => candidate.candidate_id === selection.winner.candidate_id);
   if (!winner) {
     throw new Error(`Selected candidate is missing from race results: ${selection.winner.candidate_id}`);
@@ -184,7 +192,9 @@ export async function runCandidateRaceRoute({
     artifact: winner.artifact,
     race: {
       ...plan,
-      status: 'selected_passing_candidate',
+      status: selection.winner.gate_status === 'pass'
+        ? 'selected_passing_candidate'
+        : 'selected_best_available_with_quality_debt',
       candidates: candidateResults.map((candidate) => ({
         candidate_id: candidate.candidate_id,
         gate_status: candidate.gate_status,

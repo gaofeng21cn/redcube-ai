@@ -42,6 +42,11 @@ test('runDeliverableRoute reuses a fresh gated stage artifact when the route cac
     });
     assert.equal(first.ok, true);
     assert.equal(first.summary.cache_status, 'miss');
+    assert.equal(first.artifact.runtime_currentness_receipt.surface_kind, 'rca_runtime_currentness_receipt');
+    assert.equal(Boolean(first.artifact.runtime_currentness_receipt.source_revision), true);
+    assert.equal(first.artifact.runtime_currentness_receipt.rca_version, '0.1.0');
+    assert.equal(first.artifact.runtime_currentness_receipt.plugin_version, '0.1.0');
+    assert.equal(first.artifact.runtime_currentness_receipt.blocks_stage_transition, false);
 
     const second = await runDeliverableRoute({
       workspaceRoot,
@@ -117,6 +122,49 @@ test('route cache hits do not rewrite upstream artifacts or invalidate dependent
     assert.equal(cachedOutline.ok, true);
     assert.equal(cachedOutline.summary.cache_status, 'hit');
     assert.equal(cachedOutline.run.stage_results[0].status, 'cached');
+  });
+});
+
+test('authoring route lock rejects automatic cross-lane fallback', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-lock-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'route lock deck',
+      goal: '验证 image lane 不会静默切换 HTML',
+      constraints: {
+        authoring_route_lock: {
+          lane_id: 'image_pages',
+          selected_route: 'author_image_pages',
+          automatic_cross_lane_fallback_allowed: false,
+        },
+      },
+    });
+    for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+    await assert.rejects(
+      runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'render_html',
+      }),
+      (error) => error?.failure_kind === 'authority_boundary_violation'
+        && /authoring route lock image_pages/.test(error.message),
+    );
   });
 });
 
@@ -223,7 +271,7 @@ test('runDeliverableRoute rejects missing OPL attempt evidence without local dia
   assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'events')), false);
 });
 
-test('PPT and xiaohongshu HTML routes fail fast on repeated blocked artifacts with unchanged route cache input', async () => {
+test('PPT and xiaohongshu HTML routes exhaust quality budget and continue with the prior artifact', async () => {
   await withMockCodexRuntime(async () => {
     const pptWorkspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-ppt-fastfail-'));
     await createDeliverable({
@@ -324,26 +372,22 @@ test('PPT and xiaohongshu HTML routes fail fast on repeated blocked artifacts wi
           route: 'render_html',
         });
 
-        assert.equal(blocked.ok, false);
-        assert.equal(blocked.run.status, 'failed');
-        assert.equal(blocked.run.error.failure_kind, 'repeated_block_without_input_change');
-        assert.equal(blocked.run.error.code, 'repeated_block_without_input_change');
-        assert.deepEqual(blocked.run.error.target_slide_ids, scenario.targetSlideIds);
-        assert.deepEqual(blocked.run.error.blocking_reasons, scenario.blockingReasons);
-        assert.equal(blocked.run.error.recommended_action, 'change_input_or_route_to_page_local_fix');
-        assert.equal(blocked.run.stall_lineage.lineage_id, `repeated-block:${scenario.overlay}:render_html:${scenario.deliverableId}`);
-        assert.equal(blocked.run.stall_lineage.repeated_block_count, 2);
-        assert.deepEqual(blocked.run.stall_lineage.repeat_budget, {
+        assert.equal(blocked.ok, true);
+        assert.equal(blocked.run.status, 'completed_with_quality_debt');
+        assert.equal(blocked.artifact.status, 'completed_with_quality_debt');
+        assert.equal(blocked.artifact.progress_first.advance_allowed, true);
+        assert.equal(blocked.artifact.quality_debt.blocks_stage_transition, false);
+        assert.deepEqual(blocked.artifact.target_slide_ids, scenario.targetSlideIds);
+        assert.deepEqual(blocked.artifact.quality_budget_exhaustion.blocking_reasons, scenario.blockingReasons);
+        assert.equal(blocked.artifact.stall_lineage.lineage_id, `repeated-block:${scenario.overlay}:render_html:${scenario.deliverableId}`);
+        assert.equal(blocked.artifact.stall_lineage.repeated_block_count, 2);
+        assert.deepEqual(blocked.artifact.stall_lineage.repeat_budget, {
           max_repeats: 2,
           remaining_repeats: 0,
           budget_exhausted: true,
         });
-        assert.equal(blocked.artifact.repeated_block_fail_fast.stall_lineage.lineage_id, blocked.run.stall_lineage.lineage_id);
-        assert.deepEqual(
-          blocked.artifact.repeated_block_fail_fast.repeat_budget,
-          blocked.run.stall_lineage.repeat_budget,
-        );
-        assert.doesNotMatch(blocked.run.error.message, /mock forced route failure/);
+        assert.equal(blocked.artifact.quality_budget_exhaustion.recommended_action, 'continue_with_best_available_artifact');
+        assert.equal(blocked.artifact.typed_blocker_refs.length, 0);
       }
 
       const visualDirectionFile = pptVisualDirectionResult.artifactFile;
