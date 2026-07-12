@@ -193,6 +193,43 @@
       "deterministic_chart_coordinate_checks"
     ]
   },
+  "shape_plan_validator": {
+    "contract_version": 1,
+    "minimum_layout_archetypes": 3,
+    "sample_minimum_layout_archetypes": 2,
+    "required_owner": "llm_agent",
+    "minimum_title_pt": 34,
+    "minimum_body_pt": 18,
+    "minimum_edge_margin_in": 0.6,
+    "minimum_inter_block_gap_in": 0.32,
+    "minimum_repeated_concrete_composition_limit": 1,
+    "minimum_distinct_composition_share": 0.75,
+    "professional_design_brief_required_fields": [
+      "design_register",
+      "reference_style_family",
+      "first_glance_hierarchy",
+      "template_profile_strategy",
+      "capacity_strategy"
+    ],
+    "required_borrowed_principles": [
+      "ppt_master_style_spec_lock",
+      "template_layout_grammar",
+      "template_profile",
+      "semantic_layout_selection",
+      "reference_deck_analysis",
+      "per_page_visual_plan",
+      "layout_rhythm",
+      "rendered_quality_gate"
+    ],
+    "required_qa_gates": [
+      "bounds",
+      "font_floor",
+      "text_fit",
+      "structural_visual",
+      "layout_variety"
+    ],
+    "professional_design_brief_forbidden_patterns_required": true
+  },
   "native_ppt_quality_surface": {
     "quality_model": "shape_manifest_layout_metrics_v1",
     "source_surface_kind": "native_pptx",

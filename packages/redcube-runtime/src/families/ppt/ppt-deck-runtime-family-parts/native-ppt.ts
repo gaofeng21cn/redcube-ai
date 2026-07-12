@@ -97,10 +97,20 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     safeArray,
     safeText,
   });
+  const shapePlanValidator = (() => {
+    if (typeof existsSync !== 'function' || typeof NATIVE_PPT_ENGINE_CONTRACT !== 'string'
+      || !existsSync(NATIVE_PPT_ENGINE_CONTRACT)) {
+      return {};
+    }
+    const contract = JSON.parse(readFileSync(NATIVE_PPT_ENGINE_CONTRACT, 'utf-8')) as JsonRecord;
+    return contract.shape_plan_validator && typeof contract.shape_plan_validator === 'object'
+      ? contract.shape_plan_validator
+      : {};
+  })();
   const {
     normalizeEditableShapePlan,
     structuralFeedbackFromPlanError,
-  } = createNativePptShapePlanNormalizeParts({ safeArray, safeText });
+  } = createNativePptShapePlanNormalizeParts({ safeArray, safeText, shapePlanValidator });
   const {
     isCodexInvocationFailure,
     writeExecutorAttemptDiagnostic,

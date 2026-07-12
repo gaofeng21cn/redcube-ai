@@ -121,7 +121,12 @@ def file_sha256(file: Path) -> str:
     return digest.hexdigest()
 
 
-def missing_design_spec_lock_fields(design_spec_lock: dict, minimum_layout_archetypes: int = 3) -> list[str]:
+def missing_design_spec_lock_fields(
+    design_spec_lock: dict,
+    minimum_layout_archetypes: int = 3,
+    validator_contract: dict | None = None,
+) -> list[str]:
+    validator = validator_contract or {}
     palette = design_spec_lock.get('palette') if isinstance(design_spec_lock.get('palette'), dict) else {}
     typography = design_spec_lock.get('typography') if isinstance(design_spec_lock.get('typography'), dict) else {}
     grid = design_spec_lock.get('grid') if isinstance(design_spec_lock.get('grid'), dict) else {}
@@ -144,8 +149,9 @@ def missing_design_spec_lock_fields(design_spec_lock: dict, minimum_layout_arche
     missing = []
     if not safe_text(design_spec_lock.get('spec_id')):
         missing.append('spec_id')
-    if safe_text(design_spec_lock.get('owner')) != 'llm_agent':
-        missing.append('owner=llm_agent')
+    required_owner = safe_text(validator.get('required_owner')) or 'llm_agent'
+    if safe_text(design_spec_lock.get('owner')) != required_owner:
+        missing.append(f'owner={required_owner}')
     if not safe_text(design_spec_lock.get('motif')):
         missing.append('motif')
     if len(safe_list(design_spec_lock.get('layout_archetypes'))) < minimum_layout_archetypes:
@@ -160,53 +166,63 @@ def missing_design_spec_lock_fields(design_spec_lock: dict, minimum_layout_arche
         title_pt_min = float(typography.get('title_pt_min') or typography.get('title_min_pt') or 0)
     except (TypeError, ValueError):
         title_pt_min = 0
-    if title_pt_min < 34:
-        missing.append('typography.title_pt_min>=34')
+    minimum_title_pt = float(validator.get('minimum_title_pt') or 34)
+    if title_pt_min < minimum_title_pt:
+        missing.append(f'typography.title_pt_min>={minimum_title_pt:g}')
     try:
         body_pt_min = float(typography.get('body_pt_min') or typography.get('body_min_pt') or 0)
     except (TypeError, ValueError):
         body_pt_min = 0
-    if body_pt_min < 18:
-        missing.append('typography.body_pt_min>=18')
+    minimum_body_pt = float(validator.get('minimum_body_pt') or 18)
+    if body_pt_min < minimum_body_pt:
+        missing.append(f'typography.body_pt_min>={minimum_body_pt:g}')
     try:
         edge_margin = float(grid.get('edge_margin_in_min') or 0)
     except (TypeError, ValueError):
         edge_margin = 0
-    if edge_margin < 0.6:
-        missing.append('grid.edge_margin_in_min>=0.6')
+    minimum_edge_margin = float(validator.get('minimum_edge_margin_in') or 0.6)
+    if edge_margin < minimum_edge_margin:
+        missing.append(f'grid.edge_margin_in_min>={minimum_edge_margin:g}')
     try:
         inter_block_gap = float(grid.get('inter_block_gap_in_min') or 0)
     except (TypeError, ValueError):
         inter_block_gap = 0
-    if inter_block_gap < 0.32:
-        missing.append('grid.inter_block_gap_in_min>=0.32')
+    minimum_inter_block_gap = float(validator.get('minimum_inter_block_gap_in') or 0.32)
+    if inter_block_gap < minimum_inter_block_gap:
+        missing.append(f'grid.inter_block_gap_in_min>={minimum_inter_block_gap:g}')
     try:
         repetition_limit = float(layout_rhythm.get('repeated_concrete_composition_limit') or 0)
     except (TypeError, ValueError):
         repetition_limit = 0
-    if repetition_limit < 1:
+    minimum_repetition_limit = float(validator.get('minimum_repeated_concrete_composition_limit') or 1)
+    if repetition_limit < minimum_repetition_limit:
         missing.append('layout_rhythm.repeated_concrete_composition_limit')
     try:
         distinct_share = float(layout_rhythm.get('required_distinct_composition_share') or 0)
     except (TypeError, ValueError):
         distinct_share = 0
-    if distinct_share < 0.75:
-        missing.append('layout_rhythm.required_distinct_composition_share>=0.75')
-    for field in [
+    minimum_distinct_share = float(validator.get('minimum_distinct_composition_share') or 0.75)
+    if distinct_share < minimum_distinct_share:
+        missing.append(f'layout_rhythm.required_distinct_composition_share>={minimum_distinct_share:g}')
+    professional_brief_fields = validator.get('professional_design_brief_required_fields') or [
         'design_register',
         'reference_style_family',
         'first_glance_hierarchy',
         'template_profile_strategy',
         'capacity_strategy',
-    ]:
+    ]
+    for field in professional_brief_fields:
         if not safe_text(professional_design_brief.get(field)):
             missing.append(f'professional_design_brief.{field}')
-    if len(safe_list(professional_design_brief.get('forbidden_amateur_patterns'))) == 0:
+    if validator.get('professional_design_brief_forbidden_patterns_required', True) is True \
+        and len(safe_list(professional_design_brief.get('forbidden_amateur_patterns'))) == 0:
         missing.append('professional_design_brief.forbidden_amateur_patterns')
-    for principle in sorted(REQUIRED_DESIGN_SPEC_DISCIPLINE):
+    required_borrowed_principles = validator.get('required_borrowed_principles') or sorted(REQUIRED_DESIGN_SPEC_DISCIPLINE)
+    for principle in required_borrowed_principles:
         if principle not in borrowed_principles:
             missing.append(f'borrowed_principles.{principle}')
-    for gate in sorted(REQUIRED_DESIGN_SPEC_QA_GATES):
+    required_qa_gates = validator.get('required_qa_gates') or sorted(REQUIRED_DESIGN_SPEC_QA_GATES)
+    for gate in required_qa_gates:
         if gate not in qa_gates:
             missing.append(f'qa_gates.{gate}')
     return missing
@@ -254,7 +270,7 @@ def load_engine_contract(contract_file: Path) -> dict:
     return contract
 
 
-def normalize_slide_data(payload: dict) -> list:
+def normalize_slide_data(payload: dict, validator_contract: dict | None = None) -> list:
     plan = payload.get('editable_shape_plan') or {}
     sample_layout_profile = (
         payload.get('native_ppt_sample_layout_profile')
@@ -262,8 +278,16 @@ def normalize_slide_data(payload: dict) -> list:
         else {}
     )
     design_spec_lock = plan.get('design_spec_lock') if isinstance(plan.get('design_spec_lock'), dict) else {}
-    minimum_layout_archetypes = 2 if safe_text(plan.get('authoring_mode')) == 'native_visual_sample_compact' else 3
-    missing_design_spec_lock = missing_design_spec_lock_fields(design_spec_lock, minimum_layout_archetypes)
+    minimum_layout_archetypes = (
+        int((validator_contract or {}).get('sample_minimum_layout_archetypes') or 2)
+        if safe_text(plan.get('authoring_mode')) == 'native_visual_sample_compact'
+        else int((validator_contract or {}).get('minimum_layout_archetypes') or 3)
+    )
+    missing_design_spec_lock = missing_design_spec_lock_fields(
+        design_spec_lock,
+        minimum_layout_archetypes,
+        validator_contract,
+    )
     if missing_design_spec_lock:
         fail(
             'ai_first_design_spec_lock_missing: editable_shape_plan.design_spec_lock requires '
@@ -331,12 +355,20 @@ def normalize_slide_data(payload: dict) -> list:
     return slides
 
 
-def normalize_slide_data_failures(payload: dict) -> list[dict]:
+def normalize_slide_data_failures(payload: dict, validator_contract: dict | None = None) -> list[dict]:
     plan = payload.get('editable_shape_plan') if isinstance(payload.get('editable_shape_plan'), dict) else {}
     failures = []
     design_spec_lock = plan.get('design_spec_lock') if isinstance(plan.get('design_spec_lock'), dict) else {}
-    minimum_layout_archetypes = 2 if safe_text(plan.get('authoring_mode')) == 'native_visual_sample_compact' else 3
-    missing_design_spec_lock = missing_design_spec_lock_fields(design_spec_lock, minimum_layout_archetypes)
+    minimum_layout_archetypes = (
+        int((validator_contract or {}).get('sample_minimum_layout_archetypes') or 2)
+        if safe_text(plan.get('authoring_mode')) == 'native_visual_sample_compact'
+        else int((validator_contract or {}).get('minimum_layout_archetypes') or 3)
+    )
+    missing_design_spec_lock = missing_design_spec_lock_fields(
+        design_spec_lock,
+        minimum_layout_archetypes,
+        validator_contract,
+    )
     if missing_design_spec_lock:
         failures.append({
             'reason': 'ai_first_design_spec_lock_missing',
@@ -353,15 +385,16 @@ def normalize_slide_data_failures(payload: dict) -> list[dict]:
 
 def validate_ai_first_shape_plan(input_json: Path, engine_contract_file: Path) -> dict:
     payload = json.loads(input_json.read_text(encoding='utf-8'))
-    load_engine_contract(engine_contract_file)
+    engine_contract = load_engine_contract(engine_contract_file)
+    validator_contract = engine_contract.get('shape_plan_validator') or {}
     try:
-        slides = normalize_slide_data(payload)
+        slides = normalize_slide_data(payload, validator_contract)
     except SystemExit as exc:
         return {
             'ok': False,
             'stage': 'normalize_slide_data',
             'exit_code': int(exc.code or 1) if isinstance(exc.code, int) else 1,
-            'failures': normalize_slide_data_failures(payload),
+            'failures': normalize_slide_data_failures(payload, validator_contract),
         }
     from redcube_ai.native_helpers.ppt_deck.native_layouts import validate_ai_first_design_plan
     failures = []
@@ -705,7 +738,7 @@ def main() -> None:
     payload = json.loads(Path(args.input_json).read_text(encoding='utf-8'))
     engine_contract_file = Path(args.engine_contract).resolve()
     engine_contract = load_engine_contract(engine_contract_file)
-    slides = normalize_slide_data(payload)
+    slides = normalize_slide_data(payload, engine_contract.get('shape_plan_validator') or {})
     repair_feedback = safe_list(payload.get('repair_feedback'))
     repaired_slide_ids = {
         safe_text(item.get('slide_id'))

@@ -49,11 +49,13 @@ const FORBIDDEN_BOUNDS_KEYS = ['x', 'y', 'w', 'h', 'left', 'top', 'right', 'bott
 interface NativePptShapePlanNormalizeDeps {
   safeArray(value: unknown): JsonRecord[];
   safeText(value: unknown, fallback?: string): string;
+  shapePlanValidator?: JsonRecord;
 }
 
 export function createNativePptShapePlanNormalizeParts({
   safeArray,
   safeText,
+  shapePlanValidator = {},
 }: NativePptShapePlanNormalizeDeps) {
   function animationTargetFailures(slides: JsonRecord[]): JsonRecord[] {
     const supportedShapeKinds = new Set(['text_box', 'shape', 'rect', 'rounded_rect', 'oval', 'path']);
@@ -126,6 +128,7 @@ export function createNativePptShapePlanNormalizeParts({
   }
 
   function missingDesignSpecLockFields(designSpecLock: JsonRecord, minimumLayoutArchetypes = 3): string[] {
+    const validator = shapePlanValidator;
     const missing: string[] = [];
     const palette = designSpecLock?.palette && typeof designSpecLock.palette === 'object' ? designSpecLock.palette : {};
     const typography = designSpecLock?.typography && typeof designSpecLock.typography === 'object'
@@ -135,10 +138,16 @@ export function createNativePptShapePlanNormalizeParts({
     const layoutRhythm = designSpecLock?.layout_rhythm && typeof designSpecLock.layout_rhythm === 'object'
       ? designSpecLock.layout_rhythm
       : {};
+    const professionalDesignBrief = designSpecLock?.professional_design_brief
+      && typeof designSpecLock.professional_design_brief === 'object'
+      ? designSpecLock.professional_design_brief
+      : {};
     const borrowedPrinciples = safeArray(designSpecLock?.borrowed_principles).map((item) => safeText(item)).filter(Boolean);
     const qaGates = safeArray(designSpecLock?.qa_gates).map((item) => safeText(item)).filter(Boolean);
     if (!safeText(designSpecLock?.spec_id)) missing.push('spec_id');
-    if (safeText(designSpecLock?.owner) !== 'llm_agent') missing.push('owner=llm_agent');
+    if (safeText(designSpecLock?.owner) !== safeText(validator.required_owner, 'llm_agent')) {
+      missing.push(`owner=${safeText(validator.required_owner, 'llm_agent')}`);
+    }
     if (!safeText(designSpecLock?.motif)) missing.push('motif');
     if (!Array.isArray(designSpecLock?.layout_archetypes) || designSpecLock.layout_archetypes.length < minimumLayoutArchetypes) {
       missing.push(`layout_archetypes>=${minimumLayoutArchetypes}`);
@@ -146,24 +155,50 @@ export function createNativePptShapePlanNormalizeParts({
     if (!safeText(palette?.background || palette?.canvas) || !safeText(palette?.ink) || !safeText(palette?.accent)) {
       missing.push('palette.background_or_canvas+ink+accent');
     }
-    if (Number(typography?.title_pt_min || typography?.title_min_pt || 0) < 34) {
-      missing.push('typography.title_pt_min>=34');
+    const minimumTitlePt = Number(validator.minimum_title_pt || 34);
+    if (Number(typography?.title_pt_min || typography?.title_min_pt || 0) < minimumTitlePt) {
+      missing.push(`typography.title_pt_min>=${minimumTitlePt}`);
     }
-    if (Number(typography?.body_pt_min || typography?.body_min_pt || 0) < 18) {
-      missing.push('typography.body_pt_min>=18');
+    const minimumBodyPt = Number(validator.minimum_body_pt || 18);
+    if (Number(typography?.body_pt_min || typography?.body_min_pt || 0) < minimumBodyPt) {
+      missing.push(`typography.body_pt_min>=${minimumBodyPt}`);
     }
-    if (Number(grid?.edge_margin_in_min || 0) < 0.6) missing.push('grid.edge_margin_in_min>=0.6');
-    if (Number(grid?.inter_block_gap_in_min || 0) < 0.32) missing.push('grid.inter_block_gap_in_min>=0.32');
-    if (Number(layoutRhythm?.repeated_concrete_composition_limit || 0) < 1) {
+    const minimumEdgeMargin = Number(validator.minimum_edge_margin_in || 0.6);
+    if (Number(grid?.edge_margin_in_min || 0) < minimumEdgeMargin) {
+      missing.push(`grid.edge_margin_in_min>=${minimumEdgeMargin}`);
+    }
+    const minimumInterBlockGap = Number(validator.minimum_inter_block_gap_in || 0.32);
+    if (Number(grid?.inter_block_gap_in_min || 0) < minimumInterBlockGap) {
+      missing.push(`grid.inter_block_gap_in_min>=${minimumInterBlockGap}`);
+    }
+    const minimumRepeatedCompositionLimit = Number(validator.minimum_repeated_concrete_composition_limit || 1);
+    if (Number(layoutRhythm?.repeated_concrete_composition_limit || 0) < minimumRepeatedCompositionLimit) {
       missing.push('layout_rhythm.repeated_concrete_composition_limit');
     }
-    if (Number(layoutRhythm?.required_distinct_composition_share || 0) < 0.75) {
-      missing.push('layout_rhythm.required_distinct_composition_share>=0.75');
+    const minimumDistinctCompositionShare = Number(validator.minimum_distinct_composition_share || 0.75);
+    if (Number(layoutRhythm?.required_distinct_composition_share || 0) < minimumDistinctCompositionShare) {
+      missing.push(`layout_rhythm.required_distinct_composition_share>=${minimumDistinctCompositionShare}`);
     }
-    for (const principle of REQUIRED_DESIGN_SPEC_DISCIPLINE) {
+    const professionalBriefFields = Array.isArray(validator.professional_design_brief_required_fields)
+      ? validator.professional_design_brief_required_fields.map((field) => safeText(field)).filter(Boolean)
+      : [];
+    for (const field of professionalBriefFields) {
+      if (!safeText(professionalDesignBrief?.[field])) missing.push(`professional_design_brief.${field}`);
+    }
+    if (validator.professional_design_brief_forbidden_patterns_required === true
+      && safeArray(professionalDesignBrief?.forbidden_amateur_patterns).length === 0) {
+      missing.push('professional_design_brief.forbidden_amateur_patterns');
+    }
+    const requiredBorrowedPrinciples = Array.isArray(validator.required_borrowed_principles)
+      ? validator.required_borrowed_principles.map((principle) => safeText(principle)).filter(Boolean)
+      : REQUIRED_DESIGN_SPEC_DISCIPLINE;
+    for (const principle of requiredBorrowedPrinciples) {
       if (!borrowedPrinciples.includes(principle)) missing.push(`borrowed_principles.${principle}`);
     }
-    for (const gate of REQUIRED_DESIGN_SPEC_QA_GATES) {
+    const requiredQaGates = Array.isArray(validator.required_qa_gates)
+      ? validator.required_qa_gates.map((gate) => safeText(gate)).filter(Boolean)
+      : REQUIRED_DESIGN_SPEC_QA_GATES;
+    for (const gate of requiredQaGates) {
       if (!qaGates.includes(gate)) missing.push(`qa_gates.${gate}`);
     }
     return missing;
@@ -503,7 +538,9 @@ export function createNativePptShapePlanNormalizeParts({
       : {};
     const missingDesignSpecLock = missingDesignSpecLockFields(
       designSpecLock,
-      sampleCompactPlan ? NATIVE_PPT_SAMPLE_ARCHETYPES.size : 3,
+      sampleCompactPlan
+        ? Number(shapePlanValidator.sample_minimum_layout_archetypes || NATIVE_PPT_SAMPLE_ARCHETYPES.size)
+        : Number(shapePlanValidator.minimum_layout_archetypes || 3),
     );
     if (missingDesignSpecLock.length > 0) {
       throw new Error(`Native PPT ${route} requires editable_shape_plan.design_spec_lock with AI-authored design system, grid, typography, palette, layout rhythm, borrowed design discipline, and QA gates before shape coordinates: ${JSON.stringify(missingDesignSpecLock)}`);
