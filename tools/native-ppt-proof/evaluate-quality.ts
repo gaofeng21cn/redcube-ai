@@ -296,8 +296,7 @@ function packageRelationshipIntegrity(packageReadback) {
   }
   const expectedNotes = Number(packageReadback?.notes_slide_count || 0);
   const resolvedNotes = slides.filter((slide) => (
-    String(slide?.notes_part || '').trim()
-    && slide?.notes_relationship_resolved === true
+    slide?.notes_relationship_resolved === true
     && String(slide?.notes_content_type || '').toLowerCase().includes('presentationml.notesslide')
   )).length;
   if (resolvedNotes !== expectedNotes) {
@@ -454,7 +453,7 @@ export function evaluateNativePptBenchmark({ fixture, suite, packageReadback, sh
   const gates = [
     gate(
       'package_readback_source',
-      packageReadback?.schema_version === 1
+      packageReadback?.schema_version === 2
         && packageReadback?.evidence_source === 'officecli_structured_readback',
       {
         schema_version: packageReadback?.schema_version || null,

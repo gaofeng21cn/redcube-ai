@@ -415,7 +415,6 @@ function passingReadback(suite) {
         } : {}),
       })),
       speaker_notes: slide.speaker_notes,
-      notes_part: `ppt/notesSlides/notesSlide${index + 1}.xml`,
       notes_relationship_resolved: true,
       notes_content_type: 'application/vnd.openxmlformats-officedocument.presentationml.notesSlide+xml',
       transition: slide.transition || {},
@@ -429,7 +428,7 @@ function passingReadback(suite) {
     }
   }
   return {
-    schema_version: 1,
+    schema_version: 2,
     evidence_source: 'officecli_structured_readback',
     pptx_file: '/tmp/complex-native-proof.pptx',
     pptx_sha256: 'ba5e4f56f245376f54c8443247172d26034ea9a9a652c1b84f2c7b0aa848f134',

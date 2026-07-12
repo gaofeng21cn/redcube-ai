@@ -22,22 +22,8 @@
           "med-autogrant",
           "redcube-ai"
         ],
-        "ready_to_reduce_domain_longline_tests": true,
-        "recommended_repo_test_disposition": [
-          {
-            "domain_id": "redcube-ai",
-            "keep_in_domain_repo": [
-              "visual quality scorer",
-              "render/export owner receipt fixture",
-              "artifact authority checks"
-            ],
-            "move_to_opl_agent_lab": [
-              "controlled visual-stage soak orchestration",
-              "hosted-attempt reconciliation projection",
-              "no-forbidden-write cross-domain regression"
-            ]
-          }
-        ]
+        "ready_to_reduce_domain_longline_tests": false,
+        "recommended_repo_test_disposition": []
       },
       "runs": [
         {
