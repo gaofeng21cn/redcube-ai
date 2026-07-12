@@ -34,6 +34,12 @@
     "visual_transition_adapter_profile": "contracts/visual_transition_adapter_profile.json",
     "visual_authority_kernel": "contracts/foundry-agent-os-domain-kernel-manifest.json"
   },
+  "standard_agent_interface": {
+    "version": "standard-agent-interface.v1",
+    "ref_kind": "repo_json_pointer",
+    "ref": "contracts/standard_agent_interface.json#/standard_agent_interface",
+    "projection_ref": "getProductEntryManifest#/standard_agent_interface"
+  },
   "authority_boundary": {
     "redcube_ai_owns_visual_truth": true,
     "redcube_ai_owns_route_truth": true,
