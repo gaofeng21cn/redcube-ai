@@ -233,6 +233,42 @@ def image_dimensions(file: Path) -> dict:
         return {'width': int(image.width), 'height': int(image.height)}
 
 
+def validate_shape_plan_validator(contract: dict) -> dict:
+    validator = contract.get('shape_plan_validator')
+    if not isinstance(validator, dict):
+        fail('engine contract shape_plan_validator missing')
+    numeric_fields = [
+        'minimum_layout_archetypes',
+        'sample_minimum_layout_archetypes',
+        'minimum_title_pt',
+        'minimum_body_pt',
+        'minimum_edge_margin_in',
+        'minimum_inter_block_gap_in',
+        'minimum_repeated_concrete_composition_limit',
+        'minimum_distinct_composition_share',
+    ]
+    for field in numeric_fields:
+        try:
+            value = float(validator.get(field))
+        except (TypeError, ValueError):
+            fail(f'engine contract shape_plan_validator numeric field invalid: {field}')
+        if value <= 0:
+            fail(f'engine contract shape_plan_validator numeric field invalid: {field}')
+    for field in [
+        'professional_design_brief_required_fields',
+        'required_borrowed_principles',
+        'required_qa_gates',
+    ]:
+        values = validator.get(field)
+        if not isinstance(values, list) or not values or any(not safe_text(value) for value in values):
+            fail(f'engine contract shape_plan_validator string array invalid: {field}')
+    if not safe_text(validator.get('required_owner')):
+        fail('engine contract shape_plan_validator required_owner invalid')
+    if validator.get('professional_design_brief_forbidden_patterns_required') is not True:
+        fail('engine contract shape_plan_validator professional brief policy invalid')
+    return validator
+
+
 def load_engine_contract(contract_file: Path) -> dict:
     if not contract_file.exists():
         fail(f'engine contract not found: {contract_file}')
@@ -267,6 +303,7 @@ def load_engine_contract(contract_file: Path) -> dict:
         fail('engine contract true_render_proof.renderer_pipeline mismatch')
     if render_proof.get('cross_platform_render_required') is not True:
         fail('engine contract true_render_proof.cross_platform_render_required mismatch')
+    validate_shape_plan_validator(contract)
     return contract
 
 

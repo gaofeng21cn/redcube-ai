@@ -97,15 +97,50 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     safeArray,
     safeText,
   });
-  const shapePlanValidator = (() => {
-    if (typeof existsSync !== 'function' || typeof NATIVE_PPT_ENGINE_CONTRACT !== 'string'
-      || !existsSync(NATIVE_PPT_ENGINE_CONTRACT)) {
-      return {};
+  let cachedNativeEngineContract: JsonRecord | null = null;
+  function expectedNativeEngineContract(): JsonRecord {
+    if (cachedNativeEngineContract) return cachedNativeEngineContract;
+    if (!existsSync(NATIVE_PPT_ENGINE_CONTRACT)) {
+      throw new Error(`Missing native PPT engine contract: ${NATIVE_PPT_ENGINE_CONTRACT}`);
     }
-    const contract = JSON.parse(readFileSync(NATIVE_PPT_ENGINE_CONTRACT, 'utf-8')) as JsonRecord;
-    return contract.shape_plan_validator && typeof contract.shape_plan_validator === 'object'
-      ? contract.shape_plan_validator
-      : {};
+    cachedNativeEngineContract = JSON.parse(readFileSync(NATIVE_PPT_ENGINE_CONTRACT, 'utf-8')) as JsonRecord;
+    return cachedNativeEngineContract;
+  }
+  const shapePlanValidator = (() => {
+    const validator = expectedNativeEngineContract().shape_plan_validator;
+    if (!validator || typeof validator !== 'object' || Array.isArray(validator)) {
+      throw new Error('Native PPT engine contract requires shape_plan_validator.');
+    }
+    const numericFields = [
+      'minimum_layout_archetypes',
+      'sample_minimum_layout_archetypes',
+      'minimum_title_pt',
+      'minimum_body_pt',
+      'minimum_edge_margin_in',
+      'minimum_inter_block_gap_in',
+      'minimum_repeated_concrete_composition_limit',
+      'minimum_distinct_composition_share',
+    ];
+    for (const field of numericFields) {
+      if (!Number.isFinite(Number(validator[field])) || Number(validator[field]) <= 0) {
+        throw new Error(`Native PPT shape_plan_validator requires positive numeric field: ${field}`);
+      }
+    }
+    for (const field of [
+      'professional_design_brief_required_fields',
+      'required_borrowed_principles',
+      'required_qa_gates',
+    ]) {
+      if (!Array.isArray(validator[field]) || validator[field].length === 0
+        || validator[field].some((value: unknown) => !safeText(value))) {
+        throw new Error(`Native PPT shape_plan_validator requires non-empty string array: ${field}`);
+      }
+    }
+    if (safeText(validator.required_owner) === ''
+      || validator.professional_design_brief_forbidden_patterns_required !== true) {
+      throw new Error('Native PPT shape_plan_validator owner and professional brief policy are invalid.');
+    }
+    return validator as JsonRecord;
   })();
   const {
     normalizeEditableShapePlan,
@@ -127,16 +162,6 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     safeArray,
     safeText,
   });
-
-  let cachedNativeEngineContract: JsonRecord | null = null;
-  function expectedNativeEngineContract(): JsonRecord {
-    if (cachedNativeEngineContract) return cachedNativeEngineContract;
-    if (!existsSync(NATIVE_PPT_ENGINE_CONTRACT)) {
-      throw new Error(`Missing native PPT engine contract: ${NATIVE_PPT_ENGINE_CONTRACT}`);
-    }
-    cachedNativeEngineContract = JSON.parse(readFileSync(NATIVE_PPT_ENGINE_CONTRACT, 'utf-8')) as JsonRecord;
-    return cachedNativeEngineContract;
-  }
 
   function runPython(helper: RedCubePythonNativeHelper, args: string[]): JsonRecord {
     return runRedCubePythonHelper(helper, args, {

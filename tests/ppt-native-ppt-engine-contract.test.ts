@@ -2,6 +2,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import {
   nativeEngineContract,
@@ -12,6 +14,7 @@ import {
   pythonTestEnv,
   resolveTestPythonCommand,
 } from './helpers/ppt-native-python-layout-fixtures.js';
+import { createPptDeckNativePptStageParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/native-ppt.js';
 import { createNativePptShapePlanNormalizeParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/native-ppt-shape-plan-normalize.js';
 
 function cloneJson(value: any): any {
@@ -207,6 +210,55 @@ test('native PPT proof lane records the Python engine contract as the single own
     currentProgram.current_state.exploration_lanes.ppt_native_authoring_proof_lane.engine_contract,
     'contracts/runtime-program/ppt-native-python-engine-contract.json',
   );
+});
+
+test('native PPT contract loaders fail closed when the shared validator contract is unavailable', () => {
+  const missingContract = path.join(os.tmpdir(), 'missing-native-ppt-engine-contract.json');
+  const noop = () => ({});
+  assert.throws(() => createPptDeckNativePptStageParts({
+    CODEX_DEFAULT_ADAPTER: 'codex',
+    CREATIVE_MATERIALIZED_FROM: 'test',
+    NATIVE_PPT_ENGINE_CONTRACT: missingContract,
+    PYTHON_NATIVE: {},
+    attachCommon: noop,
+    collectSlidesNeedingTargetedRevision: () => [],
+    creativeExecution: noop,
+    creativeSourceStamp: noop,
+    currentHtmlStageId: () => '',
+    ensureDir: (value: string) => value,
+    existsSync: () => false,
+    readCurrentHtmlArtifact: () => null,
+    readStageArtifact: () => null,
+    safeArray: (value: unknown) => (Array.isArray(value) ? value : []),
+    safeFileMtimeMs: () => 0,
+    safeText: (value: unknown, fallback = '') => String(value ?? fallback).trim(),
+    stageArtifactPath: () => '',
+    writeJson: () => {},
+  }), /Missing native PPT engine contract/);
+
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'redcube-native-ppt-invalid-contract-'));
+  try {
+    const invalidContract = cloneJson(nativeEngineContract());
+    delete invalidContract.shape_plan_validator;
+    const contractFile = path.join(root, 'engine-contract.json');
+    fs.writeFileSync(contractFile, `${JSON.stringify(invalidContract)}\n`);
+    const python = resolveTestPythonCommand();
+    assert.throws(() => execFileSync(
+      python.command,
+      [...(python.args || []), '-c', [
+        'from pathlib import Path',
+        'from redcube_ai.native_helpers.ppt_deck.native import load_engine_contract',
+        `load_engine_contract(Path(${JSON.stringify(contractFile)}))`,
+      ].join('; ')],
+      {
+        cwd: path.resolve('.'),
+        env: pythonTestEnv(),
+        encoding: 'utf-8',
+      },
+    ));
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('native PPT TS and Python shape-plan validators consume one contract rule set', () => {
