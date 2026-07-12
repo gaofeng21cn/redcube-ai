@@ -1,5 +1,28 @@
 {
   "surface_kind": "opl_domain_pack_compiler_input",
+  "implementation_profile": {
+    "profile_id": "opl.standard_domain_agent.v1",
+    "agent_identity": "declarative_standard_agent_pack",
+    "pack_formats": ["markdown", "json"],
+    "helpers": {
+      "optional": true,
+      "entries": [
+        {
+          "language": "typescript",
+          "role": "domain_helper",
+          "source_roots": ["packages/redcube-runtime/src/families/"]
+        },
+        {
+          "language": "python",
+          "role": "native_helper",
+          "source_roots": ["python/redcube_ai/native_helpers/"]
+        }
+      ],
+      "language_is_identity": false,
+      "rust_policy": "framework_hot_path_only"
+    },
+    "generated_surfaces_owner": "one-person-lab"
+  },
   "schema_version": 2,
   "lifecycle_state": "refs_only_anchor_after_private_pack_compiler_input_retirement",
   "domain_id": "redcube_ai",

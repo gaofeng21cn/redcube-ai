@@ -1,9 +1,12 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import test from 'node:test';
 import path from 'node:path';
 import { buildStandardAgentPrincipleAdoptionChecks } from '../node_modules/opl-framework/dist/modules/foundry-lab/standard-agent-principles.js';
 
 import { readJson } from './helpers/opl-agent-pack-contracts.js';
+
+const repoRoot = path.resolve(import.meta.dirname, '..');
 
 test('RCA root contracts expose OPL-owned standard surfaces with RCA refs-only profile boundaries', () => {
   const foundryProfile = readJson('contracts/foundry_agent_series.json');
@@ -99,6 +102,37 @@ test('RCA root contracts expose OPL-owned standard surfaces with RCA refs-only p
   );
   assert.equal(packRefs.required_domain_pack_paths.every((entry) => entry.startsWith('agent/')), true);
   assert.equal(packRefs.minimal_authority_surface_ids.includes('owner_receipt_signer'), true);
+
+  const implementationProfile = packRefs.implementation_profile;
+  assert.deepEqual(implementationProfile, {
+    profile_id: 'opl.standard_domain_agent.v1',
+    agent_identity: 'declarative_standard_agent_pack',
+    pack_formats: ['markdown', 'json'],
+    helpers: {
+      optional: true,
+      entries: [
+        {
+          language: 'typescript',
+          role: 'domain_helper',
+          source_roots: ['packages/redcube-runtime/src/families/'],
+        },
+        {
+          language: 'python',
+          role: 'native_helper',
+          source_roots: ['python/redcube_ai/native_helpers/'],
+        },
+      ],
+      language_is_identity: false,
+      rust_policy: 'framework_hot_path_only',
+    },
+    generated_surfaces_owner: 'one-person-lab',
+  });
+  for (const helper of implementationProfile.helpers.entries) {
+    assert.notEqual(helper.language, 'rust');
+    helper.source_roots.forEach((sourceRoot) => {
+      assert.equal(fs.statSync(path.join(repoRoot, sourceRoot)).isDirectory(), true, sourceRoot);
+    });
+  }
 });
 
 test('RCA standard-agent principles resolve current OPL stage references', () => {
