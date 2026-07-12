@@ -52,6 +52,12 @@ test('product-entry projects the RCA-owned standard agent interface for generic 
   assert.equal(standardInterface.version, 'opl_standard_agent_interface.v1');
   assert.deepEqual(standardInterface.workspace_binding, {
     locator_surface_kind: 'redcube_workspace',
+    default_profile_id: 'series',
+    workspace_kind: 'visual_theme_workspace',
+    project_kind: 'slide_deck',
+    project_collection_label: 'deliverables',
+    default_workspace_id: 'visual-workspace',
+    default_project_id: 'deck-001',
     required_locator_fields: ['workspace_root'],
     optional_locator_fields: [],
     entry_command_template: ['redcube', 'product', 'status', '--workspace-root', '{workspace_root}'],
