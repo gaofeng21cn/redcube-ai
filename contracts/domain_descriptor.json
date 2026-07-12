@@ -4,7 +4,7 @@
   "lifecycle_state": "domain_specific_descriptor_after_generic_surface_cutover",
   "domain_id": "redcube_ai",
   "domain_label": "RedCube AI",
-  "package_id": "redcube-ai",
+  "package_id": "rca",
   "package_role": "opl_compatible_visual_deliverable_domain_agent",
   "agent_kind": "visual_deliverable_agent",
   "owner": "redcube_ai",

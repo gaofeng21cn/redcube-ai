@@ -122,7 +122,7 @@ RCA 当前 file authority、artifact index 和 Git source control 足以承载 c
 
 ### Codex plugin scaffold/source locator 归一到 plugin 目录
 
-RCA Developer Mode 的 canonical Codex plugin scaffold/source locator 统一在 `plugins/redcube-ai/` 下维护，plugin manifest name 与 skill frontmatter name 都使用 repo slug `redcube-ai`。根层 `.codex-plugin/plugin.json`、repo-local installer、`plugins/rca/` legacy alias path 和第二套 skill/icon/marketplace truth 均不得恢复。
+RCA Developer Mode 的 canonical Codex plugin scaffold/source locator 统一在 `plugins/redcube-ai/` 下维护，plugin manifest name 与 skill frontmatter name 都使用 repo slug `redcube-ai`。这个名称只标识 Codex carrier；canonical OPL agent/package id 都是 `rca`，且不接受 `redcube-ai` package alias。根层 `.codex-plugin/plugin.json`、repo-local installer、`plugins/rca/` legacy alias path 和第二套 skill/icon/marketplace truth 均不得恢复。
 
 ## 历史压缩
 
