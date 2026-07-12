@@ -5,7 +5,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 # RedCube AI App Skill
 
-当 Codex 需要把 `RedCube AI` 作为正式 domain app 来操作，而不是把仓库当成临时脚本集合时，使用这个 plugin。canonical 机器名是 `redcube-ai`。
+当 Codex 需要把 `RedCube AI` 作为正式 domain app 来操作，而不是把仓库当成临时脚本集合时，使用这个 plugin。canonical OPL agent/package id 是 `rca`；`redcube-ai` 只是 repo、Codex plugin 与 skill carrier 名，不是第二个 package identity 或 alias。
 
 ## 这个 plugin 是什么
 
