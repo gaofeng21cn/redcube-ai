@@ -100,7 +100,7 @@
       },
       {
         "check_id": "opl_manifest_validation",
-        "command": "one-person-lab/bin/opl connect agent-packages validate-manifest --manifest-url <repo>/contracts/opl_agent_package_manifest.json --json"
+        "command": "one-person-lab/bin/opl packages validate-manifest --manifest-url <repo>/contracts/opl_agent_package_manifest.json --json"
       }
     ],
     "does_not_authorize_runtime_ready": true,

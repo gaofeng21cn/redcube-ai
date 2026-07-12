@@ -95,7 +95,7 @@ test('verification scripts expose repo temp hygiene entrypoints', () => {
   assert.match(verifyScript, /scripts\/verify-lane\.ts "\$lane" --verify-wrapper "\$@"/);
   assert.match(
     readFileSync('scripts/run-with-repo-temp-env.sh', 'utf-8'),
-    /node_modules\/opl-framework\/bin\/opl[\s\S]*connect agent-packages link-framework[\s\S]*--check/,
+    /node_modules\/opl-framework\/bin\/opl[\s\S]*packages link-framework[\s\S]*--check/,
   );
   assert.match(verifyLaneScript, /run\('scripts\/repo-hygiene\.sh', \['--fix'\]\)/);
   assert.match(verifyLaneScript, /run\('scripts\/repo-hygiene\.sh'\)/);
