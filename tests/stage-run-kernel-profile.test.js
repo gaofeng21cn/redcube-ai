@@ -76,21 +76,20 @@ test('StageRun kernel profile preserves RCA authority and rejects runtime overcl
     'provider_completion_counts_as_domain_accepted',
     'file_presence_counts_as_stage_complete',
     'latest_json_counts_as_domain_accepted',
-    'read_model_counts_as_transition_authority',
+    'read_model_can_select_semantic_route',
   ]) {
     assert.equal(profile.stage_run_state_machine[key], false, key);
   }
   assert.equal(
-    profile.stage_run_state_machine.validated_consumable_artifact_progress_counts_as_transition,
+    profile.stage_run_state_machine.readable_artifact_counts_as_progress_input,
     true,
   );
+  assert.equal(profile.stage_run_state_machine.codex_can_route_to_any_declared_stage, true);
   assert.equal(profile.stage_run_state_machine.quality_debt_counts_as_quality_acceptance, false);
-  assert.equal(
-    profile.transition_authority.terminal_transition_authority,
-    'consumable_artifact_progress_or_owner_answer_or_hard_stop',
-  );
-  assert.equal(profile.transition_authority.quality_budget_exhaustion_blocks_transition, false);
-  assert.equal(profile.transition_authority.owner_receipt_required_for_quality_or_ready_claim, true);
+  assert.equal(profile.codex_semantic_route_policy.semantic_owner, 'codex_cli');
+  assert.equal(profile.codex_semantic_route_policy.readable_artifact_allows_any_declared_stage, true);
+  assert.equal(profile.codex_semantic_route_policy.quality_budget_exhaustion_blocks_route, false);
+  assert.equal(profile.codex_semantic_route_policy.framework_can_accept_reject_rank_or_override_route, false);
   assert.equal(profile.opl_contract_refs.owner, 'one-person-lab');
   assert.equal(profile.opl_contract_refs.domain_repo_role, 'consumer_profile_ref_only');
   assert.equal(profile.opl_contract_refs.repo_local_file_required, false);

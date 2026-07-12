@@ -17,6 +17,7 @@ import {
   buildCodexExecutionModel,
 } from '@redcube/runtime-protocol';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '../../../relative-quality.js';
+import { admitStageArtifactForProgress } from '../../../progress-first.js';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 
 import * as shared from './shared.js';
@@ -208,14 +209,15 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
   const contract = shared.readJson(path.join(deliverablePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
   const required = shared.safeArray(contract?.stage_requirements?.[route]?.requires_artifacts)
     .filter((stageId) => !(route === 'visual_director_review' && stageId === 'author_image_pages'));
+  const findings = [];
   const missing = required.filter((stageId) => !shared.readStageArtifact(contract, deliverablePaths, stageId));
   if (missing.length > 0) {
-    throw new Error(`Route ${route} requires completed stage artifacts: ${missing.join(', ')}`);
+    findings.push(`missing_upstream_artifacts:${missing.join(',')}`);
   }
   if (route === 'publish_copy' || route === 'export_bundle') {
     const reviewArtifact = shared.readStageArtifact(contract, deliverablePaths, 'screenshot_review');
     if (!reviewArtifact) {
-      throw new Error(`Route ${route} requires a consumable screenshot_review artifact before export`);
+      findings.push('screenshot_review_artifact_missing');
     }
   }
   const currentHtmlStage = shared.currentHtmlStageId(contract, deliverablePaths);
@@ -225,31 +227,31 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
   if (route === shared.PAGE_FIX_ROUTE) {
     const screenshotReviewMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
     if (screenshotReviewMtimeMs < currentHtmlMtimeMs) {
-      throw new Error('Route fix_html requires screenshot_review based on the current HTML; rerun screenshot_review first');
+      findings.push('screenshot_review_stale_for_current_html');
     }
   }
   if (route === shared.IMAGE_REPAIR_ROUTE) {
     const screenshotReviewMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
     const authorMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, shared.IMAGE_AUTHOR_ROUTE));
     if (screenshotReviewMtimeMs < authorMtimeMs) {
-      throw new Error('Route repair_image_pages requires screenshot_review based on the current image pages; rerun screenshot_review first');
+      findings.push('screenshot_review_stale_for_current_image_pages');
     }
   }
   if (route === 'visual_director_review' && !currentVisualStage) {
-    throw new Error('Route visual_director_review requires author_image_pages or render_html before review');
+    findings.push('current_visual_artifact_missing');
   }
   if (route === 'screenshot_review') {
     const directorReviewArtifact = shared.readStageArtifact(contract, deliverablePaths, 'visual_director_review');
     if (!directorReviewArtifact) {
-      throw new Error('Route screenshot_review requires a consumable visual_director_review artifact before audit');
+      findings.push('visual_director_review_artifact_missing');
     }
     const directorReviewMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, 'visual_director_review'));
     if (directorReviewMtimeMs < currentVisualMtimeMs) {
-      throw new Error('Route screenshot_review requires visual_director_review to be rerun after the latest visual changes');
+      findings.push('visual_director_review_stale_for_current_visual');
     }
   }
   if (route === 'screenshot_review' && mode === 'optimize_existing' && !shared.safeText(baselineDeliverableId)) {
-    throw new Error('screenshot_review requires baselineDeliverableId in optimize_existing mode');
+    findings.push('baseline_deliverable_id_missing');
   }
   if (route === 'screenshot_review' && mode === 'optimize_existing' && shared.safeText(baselineDeliverableId)) {
     const baselineState = getReviewState({
@@ -258,23 +260,56 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
       deliverableId: baselineDeliverableId,
     }).state;
     if (!isBaselineApprovedState(baselineState)) {
-      throw new Error(`Baseline deliverable is not approved: ${baselineDeliverableId}`);
+      findings.push(`baseline_not_approved:${baselineDeliverableId}`);
     }
   }
   if (route === 'publish_copy' || route === 'export_bundle') {
     const screenshotReviewMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
     if (screenshotReviewMtimeMs < currentVisualMtimeMs) {
-      throw new Error(`Route ${route} requires screenshot_review to be rerun after the latest visual changes`);
+      findings.push('screenshot_review_stale_for_current_visual');
     }
   }
   if (route === 'export_bundle') {
     const publishCopyMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, 'publish_copy'));
     const screenshotReviewMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
     if (publishCopyMtimeMs < screenshotReviewMtimeMs) {
-      throw new Error('Route export_bundle requires publish_copy to be rerun after the latest screenshot_review');
+      findings.push('publish_copy_stale_for_current_screenshot_review');
     }
   }
-  return { deliverablePaths, contract };
+  return { deliverablePaths, contract, findings };
+}
+
+function isZeroArtifactHardFailure(error) {
+  if (error?.requiresHumanConfirmation === true || error?.requiresExternalSecret === true) return true;
+  if (['EACCES', 'EPERM', 'ENOENT'].includes(shared.safeText(error?.code))) return true;
+  return ['missing_consumable_artifact', 'unreadable_or_corrupt_artifact', 'permission_or_credential_boundary']
+    .includes(shared.safeText(error?.hard_stop_kind));
+}
+
+function degradedRouteArtifact(route, error, findings) {
+  const reasons = uniqueStrings([
+    ...shared.safeArray(findings),
+    ...shared.safeArray(error?.artifact?.normalization_findings),
+    shared.safeText(error?.message || error, 'stage_output_requires_normalization'),
+  ]);
+  return admitStageArtifactForProgress({
+    ...(error?.artifact && typeof error.artifact === 'object' ? error.artifact : {}),
+    status: 'completed_with_quality_debt',
+    route,
+    stage_attempt_diagnostic: {
+      error_name: shared.safeText(error?.name, 'Error'),
+      error_message: shared.safeText(error?.message || error),
+      failure_kind: shared.safeText(error?.failure_kind, 'normalization_or_materialization_quality_debt'),
+    },
+    normalization_findings: reasons,
+    quality_debt: {
+      status: 'recorded_non_blocking',
+      reasons,
+      blocks_stage_transition: false,
+      blocks_visual_ready_claim: true,
+      blocks_export_ready_claim: true,
+    },
+  }, { route });
 }
 
 function syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths) {
@@ -366,7 +401,7 @@ export async function runXiaohongshuRouteParts({
   baselineDeliverableId = '',
   adapter = CODEX_DEFAULT_ADAPTER,
 }) {
-  const { deliverablePaths } = ensurePrerequisites({
+  const { deliverablePaths, findings } = ensurePrerequisites({
     workspaceRoot,
     topicId,
     deliverableId,
@@ -376,8 +411,10 @@ export async function runXiaohongshuRouteParts({
   });
   const stageContract = shared.safeArray(contract?.stage_sequence?.stages).find((stage) => stage?.stage_id === route) || null;
   const sourceTruthConsumptionRole = ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE[route] || '';
-  const payload = await (async () => {
-    switch (route) {
+  let payload;
+  try {
+    payload = await (async () => {
+      switch (route) {
       case 'research':
         return authoringParts.buildResearch(contract, adapter);
       case 'storyline':
@@ -429,10 +466,31 @@ export async function runXiaohongshuRouteParts({
         return deliveryParts.buildPublishCopy(workspaceRoot, contract, deliverablePaths, adapter);
       case 'export_bundle':
         return deliveryParts.buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths, adapter);
-      default:
-        throw new Error(`Unsupported xiaohongshu route: ${route}`);
-    }
-  })();
+        default:
+          throw new Error(`Unsupported xiaohongshu route: ${route}`);
+      }
+    })();
+  } catch (error) {
+    if (isZeroArtifactHardFailure(error)) throw error;
+    payload = degradedRouteArtifact(route, error, findings);
+  }
+  if (shared.safeArray(findings).length > 0) {
+    payload = admitStageArtifactForProgress({
+      ...payload,
+      status: 'completed_with_quality_debt',
+      quality_debt: {
+        ...(payload?.quality_debt || {}),
+        status: 'recorded_non_blocking',
+        reasons: uniqueStrings([
+          ...shared.safeArray(payload?.quality_debt?.reasons),
+          ...findings,
+        ]),
+        blocks_stage_transition: false,
+        blocks_visual_ready_claim: true,
+        blocks_export_ready_claim: true,
+      },
+    }, { route });
+  }
   const closeoutRefs = routeCloseoutRefs({ route, deliverableId, payload });
   return {
     overlay: contract.overlay,

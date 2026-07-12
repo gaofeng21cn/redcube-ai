@@ -35,7 +35,8 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.match(skillText, /TypeScript orchestration \+ Python native helpers[\s\S]*已跟踪 JavaScript 已退役[\s\S]*不得把新 agent 工作写成 JavaScript/);
   assert.doesNotMatch(skillText, /\bmanaged runtime\b/i);
   assert.doesNotMatch(skillText, /\bgateway contract\b/i);
-  assert.match(skillText, /service-safe product-entry loop/);
+  assert.match(skillText, /OPL-hosted Codex execution plan/);
+  assert.match(skillText, /不自行补跑 predecessor、安排 repair 或遍历到 review\/export/);
   assert.match(skillText, /domain handler \/ product-entry contract/);
   assert.match(skillText, /storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_image_pages -> visual_director_review -> screenshot_review -> export_pptx/i);
   assert.match(skillText, /不得用通用 `Presentations`、`python-pptx`、artifact-tool 原生 deck、手写脚本或直接编辑文件来替代 RedCube/i);

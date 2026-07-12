@@ -35,10 +35,8 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
         'packages/redcube-domain-entry/src/actions/domain-handler.ts',
     },
     domain_authority_refs: {
-      visual_transition_spec_ref:
-        'opl_generated:product_entry_manifest#/visual_transition_spec',
-      visual_transition_adapter_profile_registry_ref:
-        'opl_generated:product_entry_manifest#/visual_transition_adapter_profile_registry',
+      ai_route_policy_ref:
+        'opl_generated:product_entry_manifest#/ai_route_policy',
       domain_memory_descriptor_locator_ref:
         'opl_generated:product_entry_manifest#/domain_authority_refs/domain_memory_descriptor_locator',
       controlled_visual_stage_attempt_ref:

@@ -44,14 +44,13 @@
     "contract_ref": "opl.standard_domain_agent_scaffold_and_generic_primitives.v1",
     "owner": "opl",
     "consumer": "redcube_ai",
-    "status": "functional_consumer_follow_through_landed",
+    "status": "stage_run_transport_consumer_follow_through_landed",
     "projection_mode": "consumer_projection_only",
     "rca_surface_role": "visual_domain_authority_pack_plus_thin_program_surface",
-    "completion_scope": "functional_consumer_follow_through_complete_not_live_soak",
+    "completion_scope": "stage_run_transport_follow_through_complete_not_live_soak",
     "live_soak_claimed": false,
     "rca_does_not_own": [
       "standard_domain_agent_scaffold",
-      "functional_harness",
       "generic_runtime",
       "generic_scheduler",
       "daemon",
@@ -60,7 +59,6 @@
       "attempt_ledger",
       "typed_closeout_transport",
       "generic_runner",
-      "generic_transition_runner",
       "workbench_shell",
       "memory_transport",
       "memory_refs_only_writeback_chain",
@@ -72,7 +70,6 @@
     ],
     "opl_owned_generic_primitives": [
       "standard_domain_agent_scaffold",
-      "functional_harness",
       "generic_runtime",
       "generic_scheduler",
       "daemon",
@@ -81,7 +78,6 @@
       "attempt_ledger",
       "typed_closeout_transport",
       "generic_runner",
-      "generic_transition_runner",
       "workbench_shell",
       "memory_transport",
       "memory_refs_only_writeback_chain",
@@ -101,19 +97,18 @@
       "typed_blocker",
       "safe_action_refs"
     ],
-    "functional_harness_consumer_coverage": {
-      "harness_role": "functional_harness_consumer",
+    "stage_run_transport_coverage": {
+      "transport_role": "stage_run_transport_consumer",
       "coverage_status": "domain_authority_pack_landed",
-      "pass_claim_scope": "consumer_contract_coverage_only",
-      "opl_harness_pass_is_visual_ready": false,
-      "opl_harness_pass_is_exportable": false,
-      "opl_harness_pass_is_handoffable": false,
-      "opl_harness_pass_is_artifact_producing_owner_receipt": false,
+      "receipt_claim_scope": "transport_receipt_only",
+      "opl_transport_receipt_is_visual_ready": false,
+      "opl_transport_receipt_is_exportable": false,
+      "opl_transport_receipt_is_handoffable": false,
+      "opl_transport_receipt_is_artifact_producing_owner_receipt": false,
       "rca_generic_runtime_owner": false,
       "covered_chains": [
         "memory_refs_only_writeback_chain",
-        "queue_stage_attempt_typed_closeout",
-        "generic_transition_runner",
+        "stage_run_attempt_transport",
         "restart_dead_letter_repair_human_gate_state_chain"
       ],
       "chain_authority": {
@@ -131,7 +126,7 @@
           ],
           "memory_body_written_by_opl": false
         },
-        "queue_stage_attempt_typed_closeout": {
+        "stage_run_attempt_transport": {
           "owner": "opl",
           "rca_retains": [
             "visual_truth",
@@ -144,21 +139,7 @@
             "attempt_source_refs",
             "typed_closeout_receipt_refs"
           ],
-          "artifact_produced_by_harness_pass": false
-        },
-        "generic_transition_runner": {
-          "owner": "opl",
-          "rca_retains": [
-            "visual_transition_spec",
-            "typed_blocker",
-            "safe_action_refs"
-          ],
-          "rca_exports_only": [
-            "transition_spec_ref",
-            "transition_result_refs",
-            "owner_receipt_refs"
-          ],
-          "visual_ready_declared_by_runner": false
+          "artifact_produced_by_transport_receipt": false
         },
         "restart_dead_letter_repair_human_gate_state_chain": {
           "owner": "opl",
@@ -181,7 +162,7 @@
       "service-safe domain entry",
       "domain-handler projection backed by internal domain_action_adapter implementation",
       "stage control projection",
-      "visual transition spec",
+      "AI route context",
       "artifact locator refs",
       "review/export gate refs",
       "owner receipt refs",
@@ -210,7 +191,7 @@
         "primitive": "review_repair_transport",
         "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/quality_projection",
         "manifest_ref": "/review_state",
-        "domain_action_adapter_ref": "/domain_authority_refs/visual_transition_spec_ref"
+        "domain_action_adapter_ref": "/domain_authority_refs/ai_route_policy_ref"
       },
       {
         "primitive": "native_helper_generic_envelope",
@@ -234,7 +215,6 @@
       "rca_generic_attempt_ledger_owner": false,
       "rca_typed_closeout_transport_owner": false,
       "rca_generic_runner_owner": false,
-      "rca_generic_transition_runner_owner": false,
       "rca_generic_workbench_owner": false,
       "rca_memory_transport_owner": false,
       "rca_memory_refs_only_writeback_chain_owner": false,
@@ -664,23 +644,14 @@
     "manifest_ref": "/lifecycle_guarded_apply_proof",
     "authority_role": "guarded_workspace_artifact_lifecycle_apply_refs"
   },
-  "visual_transition_spec": {
-    "surface_kind": "visual_transition_spec_projection_ref",
-    "surface_id": "visual_transition_spec",
+  "ai_route_policy": {
+    "surface_kind": "ai_route_policy_projection_ref",
+    "surface_id": "ai_route_policy",
     "projection_mode": "canonical_ref_only_no_body_copy",
     "body_copy_in_adoption": false,
-    "generated_readback_ref": "opl_generated:product_entry_manifest#/visual_transition_spec",
-    "manifest_ref": "/visual_transition_spec",
-    "authority_role": "rca_visual_transition_table_and_guard_refs"
-  },
-  "visual_transition_evaluator": {
-    "surface_kind": "visual_transition_evaluator_projection_ref",
-    "surface_id": "visual_transition_evaluator",
-    "projection_mode": "canonical_ref_only_no_body_copy",
-    "body_copy_in_adoption": false,
-    "generated_readback_ref": "opl_generated:product_entry_manifest#/visual_transition_evaluator",
-    "manifest_ref": "/visual_transition_evaluator",
-    "authority_role": "guard_ref_evaluator_action"
+    "generated_readback_ref": "opl_generated:product_entry_manifest#/ai_route_policy",
+    "manifest_ref": "/ai_route_policy",
+    "authority_role": "codex_selected_progress_route_declared_stage_scope"
   },
   "controlled_visual_stage_attempt": {
     "surface_kind": "controlled_visual_stage_attempt_projection_ref",

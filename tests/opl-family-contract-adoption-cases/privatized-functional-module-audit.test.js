@@ -175,6 +175,9 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
       } else if (entry.module_id === 'visual_authority_functions') {
         assert.equal(entry.opl_owned_generic_primitive_consumer, false, entry.module_id);
         assert.equal(entry.opl_absorb_candidate, false, entry.module_id);
+      } else if (entry.module_id === 'native_helper_envelope') {
+        assert.equal(entry.opl_owned_generic_primitive_consumer, true, entry.module_id);
+        assert.equal(entry.opl_absorb_candidate, false, entry.module_id);
       } else {
         assert.equal(entry.opl_owned_generic_primitive_consumer, true, entry.module_id);
         assert.equal(entry.opl_absorb_candidate, true, entry.module_id);
@@ -294,7 +297,6 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     'status_projection_wrapper',
     'session_wrapper',
     'workbench_wrapper',
-    'functional_harness_wrapper',
   ];
   const expectedDescriptorScope = [
     'cli',

@@ -74,7 +74,7 @@ test('RCA bridge residue exposes exit gates without claiming generic ownership',
       assert.equal(entry.bridge_exit_gate.opl_can_store_artifact_blob, false, entry.module_id);
       assert.equal(
         entry.bridge_exit_gate.declares_replacement_complete,
-        entry.module_id === 'product_entry_continuity_refs_adapter',
+        ['product_entry_continuity_refs_adapter', 'native_helper_envelope'].includes(entry.module_id),
         entry.module_id,
       );
       if (entry.module_id === 'product_entry_continuity_refs_adapter') {
@@ -145,15 +145,15 @@ test('OPL default callers see RCA deletion evidence refs without delete authorit
   const readiness = payload.agent_default_caller_readiness;
   assert.equal(readiness.status, 'ready_domain_evidence_required');
   assert.equal(readiness.summary.generated_default_caller_surface_count, 8);
-  assert.equal(readiness.summary.missing_domain_owner_receipt_or_typed_blocker_count, 1);
-  assert.equal(readiness.summary.missing_no_forbidden_write_proof_count, 1);
-  assert.equal(readiness.summary.missing_tombstone_or_provenance_ref_count, 1);
+  assert.equal(readiness.summary.missing_domain_owner_receipt_or_typed_blocker_count, 0);
+  assert.equal(readiness.summary.missing_no_forbidden_write_proof_count, 0);
+  assert.equal(readiness.summary.missing_tombstone_or_provenance_ref_count, 0);
   assert.equal(readiness.migration_gate_policy.physical_delete_authorized_by_this_report, false);
   assert.equal(readiness.authority_boundary.report_can_authorize_domain_repo_physical_delete, false);
 
   const report = readiness.reports[0];
   assert.equal(report.deletion_gate.physical_delete_authorized, false);
-  assert.equal(report.deletion_gate.evidence_worklist_count, 1);
+  assert.equal(report.deletion_gate.evidence_worklist_count, 0);
   assert.equal(report.deletion_gate.default_caller_delete_ready, false);
   assert.equal(report.private_platform_residue_deletion_gate.status, 'empty');
   assert.equal(report.private_platform_residue_deletion_gate.residue_gate_count, 0);

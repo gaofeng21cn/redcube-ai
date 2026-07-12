@@ -3,19 +3,26 @@
   "implementation_profile": {
     "profile_id": "opl.standard_domain_agent.v1",
     "agent_identity": "declarative_standard_agent_pack",
-    "pack_formats": ["markdown", "json"],
+    "pack_formats": [
+      "markdown",
+      "json"
+    ],
     "helpers": {
       "optional": true,
       "entries": [
         {
           "language": "typescript",
           "role": "domain_helper",
-          "source_roots": ["packages/redcube-runtime/src/families/"]
+          "source_roots": [
+            "packages/redcube-runtime/src/families/"
+          ]
         },
         {
           "language": "python",
           "role": "native_helper",
-          "source_roots": ["python/redcube_ai/native_helpers/"]
+          "source_roots": [
+            "python/redcube_ai/native_helpers/"
+          ]
         }
       ],
       "language_is_identity": false,
@@ -95,8 +102,7 @@
     "agent_lab_cost_profile_source_ref": "contracts/agent_lab_cost_profile.json",
     "functional_privatization_audit_source_ref": "contracts/functional_privatization_audit.json",
     "generated_surface_handoff_source_ref": "contracts/generated_surface_handoff.json",
-    "capability_map_source_ref": "contracts/capability_map.json",
-    "visual_transition_adapter_profile_source_ref": "contracts/visual_transition_adapter_profile.json"
+    "capability_map_source_ref": "contracts/capability_map.json"
   },
   "authority_boundary": {
     "opl_can_write_domain_truth": false,
@@ -124,14 +130,12 @@
     "deliverable_family_graph",
     "stage_action_metadata",
     "source_readiness_policy",
-    "visual_transition_spec",
+    "ai_route_policy",
     "review_export_policy",
     "artifact_locator_policy",
     "memory_locator_policy",
     "receipt_schema",
     "authority_function_manifest",
-    "oracle_fixtures",
-    "visual_transition_adapter_profile",
     "agent_lab_cost_profile",
     "tool_affordance_catalog",
     "cognitive_kernel_adoption_contract",
@@ -431,7 +435,6 @@
     "product_entry_manifest",
     "domain_handler",
     "status_read_model",
-    "workbench_drilldown",
-    "functional_harness_cases"
+    "workbench_drilldown"
   ]
 }

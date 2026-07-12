@@ -521,24 +521,21 @@
       "classification": "domain_handler_target",
       "current_rca_role": "visual_route_attempt_domain_handler_target_not_generic_route_attempt_shell",
       "allowed_outputs": [
-        "visual_route_precondition_refs",
-        "allowed_next_stage_refs",
-        "route_dependency_recovery_refs",
-        "stop_after_stage_continuation_refs",
+        "single_route_artifact_refs",
+        "quality_debt_refs",
         "repair_target_refs",
-        "stage_artifact_contract_refs",
         "domain_entry_response_refs",
         "typed_blocker"
       ],
       "default_caller_cutover_gate": {
         "generated_route_attempt_shell_owner": "one-person-lab",
-        "current_status": "source_split_landed_default_caller_tail",
-        "rca_role_after_cutover": "visual_route_handler_target_and_precondition_refs",
+        "current_status": "single_route_domain_handler_target",
+        "rca_role_after_cutover": "visual_route_handler_target_without_route_selection_authority",
         "rca_owns_generic_route_attempt_shell": false,
         "rca_owns_retry_dead_letter_transport": false,
         "rca_owns_attempt_ledger": false,
-        "physical_delete_authorized_now": false,
-        "physical_delete_requires_owner_receipt_ref": "rca-typed-blocker:private-platform-retirement:deliverable-route-attempt-shell:physical-delete-requires-explicit-owner-receipt",
+        "physical_delete_authorized_now": true,
+        "physical_delete_requires_owner_receipt_ref": null,
         "no_forbidden_write_ref": "no-forbidden-write:rca/default-caller-deletion/deliverable_route_attempt_shell/domain-handler-boundary"
       },
       "legacy_name_allowance": {
@@ -550,7 +547,7 @@
           "refs_only_read_model",
           "negative_test_guard"
         ],
-        "rationale": "runDeliverableRoute and its parts remain a RCA visual route domain handler target plus route dependency / continuation / repair refs; OPL owns the generic route attempt shell, retry/dead-letter, and attempt ledger.",
+        "rationale": "runDeliverableRoute is a single-route RCA visual handler target. OPL-hosted Codex owns route selection, dependency reasoning, continuation, retry transport, and attempt ledger.",
         "compatibility_alias_allowed": false,
         "callable_alias_allowed": false,
         "public_identity_allowed": false,

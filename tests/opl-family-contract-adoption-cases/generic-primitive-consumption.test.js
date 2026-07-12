@@ -13,7 +13,6 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
   const current = currentProgram();
   const expectedGenericPrimitives = [
     'standard_domain_agent_scaffold',
-    'functional_harness',
     'generic_runtime',
     'generic_scheduler',
     'daemon',
@@ -22,7 +21,6 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
     'attempt_ledger',
     'typed_closeout_transport',
     'generic_runner',
-    'generic_transition_runner',
     'workbench_shell',
     'memory_transport',
     'memory_refs_only_writeback_chain',
@@ -52,40 +50,35 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
     assert.equal(surface.contract_ref, 'opl.standard_domain_agent_scaffold_and_generic_primitives.v1');
     assert.equal(surface.owner, 'opl');
     assert.equal(surface.consumer, 'redcube_ai');
-    assert.equal(surface.status, 'functional_consumer_follow_through_landed');
+    assert.equal(surface.status, 'stage_run_transport_consumer_follow_through_landed');
     assert.equal(surface.projection_mode, 'consumer_projection_only');
     assert.equal(surface.rca_surface_role, 'visual_domain_authority_pack_plus_thin_program_surface');
-    assert.equal(surface.completion_scope, 'functional_consumer_follow_through_complete_not_live_soak');
+    assert.equal(surface.completion_scope, 'stage_run_transport_follow_through_complete_not_live_soak');
     assert.equal(surface.live_soak_claimed, false);
     assert.deepEqual(surface.rca_does_not_own, expectedGenericPrimitives);
     assert.deepEqual(surface.rca_retained_authority, expectedRetainedAuthority);
-    assert.equal(surface.functional_harness_consumer_coverage.harness_role, 'functional_harness_consumer');
-    assert.equal(surface.functional_harness_consumer_coverage.pass_claim_scope, 'consumer_contract_coverage_only');
-    assert.equal(surface.functional_harness_consumer_coverage.opl_harness_pass_is_visual_ready, false);
-    assert.equal(surface.functional_harness_consumer_coverage.opl_harness_pass_is_exportable, false);
-    assert.equal(surface.functional_harness_consumer_coverage.opl_harness_pass_is_handoffable, false);
-    assert.equal(surface.functional_harness_consumer_coverage.opl_harness_pass_is_artifact_producing_owner_receipt, false);
-    assert.equal(surface.functional_harness_consumer_coverage.rca_generic_runtime_owner, false);
-    assert.deepEqual(surface.functional_harness_consumer_coverage.covered_chains, [
+    assert.equal(surface.stage_run_transport_coverage.transport_role, 'stage_run_transport_consumer');
+    assert.equal(surface.stage_run_transport_coverage.receipt_claim_scope, 'transport_receipt_only');
+    assert.equal(surface.stage_run_transport_coverage.opl_transport_receipt_is_visual_ready, false);
+    assert.equal(surface.stage_run_transport_coverage.opl_transport_receipt_is_exportable, false);
+    assert.equal(surface.stage_run_transport_coverage.opl_transport_receipt_is_handoffable, false);
+    assert.equal(surface.stage_run_transport_coverage.opl_transport_receipt_is_artifact_producing_owner_receipt, false);
+    assert.equal(surface.stage_run_transport_coverage.rca_generic_runtime_owner, false);
+    assert.deepEqual(surface.stage_run_transport_coverage.covered_chains, [
       'memory_refs_only_writeback_chain',
-      'queue_stage_attempt_typed_closeout',
-      'generic_transition_runner',
+      'stage_run_attempt_transport',
       'restart_dead_letter_repair_human_gate_state_chain',
     ]);
     assert.equal(
-      surface.functional_harness_consumer_coverage.chain_authority.memory_refs_only_writeback_chain.memory_body_written_by_opl,
+      surface.stage_run_transport_coverage.chain_authority.memory_refs_only_writeback_chain.memory_body_written_by_opl,
       false,
     );
     assert.equal(
-      surface.functional_harness_consumer_coverage.chain_authority.queue_stage_attempt_typed_closeout.artifact_produced_by_harness_pass,
+      surface.stage_run_transport_coverage.chain_authority.stage_run_attempt_transport.artifact_produced_by_transport_receipt,
       false,
     );
     assert.equal(
-      surface.functional_harness_consumer_coverage.chain_authority.generic_transition_runner.visual_ready_declared_by_runner,
-      false,
-    );
-    assert.equal(
-      surface.functional_harness_consumer_coverage.chain_authority.restart_dead_letter_repair_human_gate_state_chain.handoffable_declared_by_state_chain,
+      surface.stage_run_transport_coverage.chain_authority.restart_dead_letter_repair_human_gate_state_chain.handoffable_declared_by_state_chain,
       false,
     );
   }

@@ -211,12 +211,12 @@ Default-caller / source morphology current readout：runtime-family source、`ru
 `run-deliverable-route-parts/`、executor route-run refs-only parts 和 related route refs 的 path-level
 classification 归 `contracts/physical_source_morphology_policy.json#/active_surface_classifications`
 与 [RCA 私有实现与 OPL 迁移台账](./opl-private-implementation-migration-inventory.md)。本文只保留
-当前读法：这些 surfaces 可以是 RCA-owned visual route implementation、domain handler target、
-stage artifact / review-export refs、executor policy refs 或 refs-only route-run projections；它们不能成为
+当前读法：这些 surfaces 可以是 RCA-owned visual route implementation、single-route domain handler target、
+review-export refs、executor policy refs 或 refs-only route-run projections；它们不能成为
 RCA-owned generic runtime、session/workbench、attempt ledger、runtime record store、event log、
-generated wrapper owner 或 default-caller cutover evidence。2026-07-05 已进一步把 route recovery +
-`stop_after_stage` continuation 收成 `recovery.ts::runRouteWithRecoveryAndContinuation()` 共享薄入口，
-避免主 route 入口与 `fix_html` escalation 继续各保一份私有 attempt-shell glue。历史 dated slice、source-ref list、
+generated wrapper owner 或 default-caller cutover evidence。2026-07-12 已物理删除 route recovery、
+`stop_after_stage` continuation 与 review-driven repair scheduler；`runDeliverableRoute` 每次只执行一个
+Codex 明确选择的 route。历史 dated slice、source-ref list、
 legacy allowance 和 test closeout 过程归 `docs/history/process/`、machine contracts、source/tests
 或 git history。2026-07-06 CLI `deliverable run|execute` 的 OPL stage-plan request 也收成单一薄 builder；
 两个命令只保留 stop policy 差异，不再复制 workspace/runtime/session/return-surface payload。

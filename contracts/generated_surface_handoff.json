@@ -65,12 +65,6 @@
       "status": "descriptor_source_available"
     },
     {
-      "surface_id": "functional_harness_cases",
-      "owner": "one-person-lab",
-      "domain_repo_can_own_generated_surface": false,
-      "status": "descriptor_source_available"
-    },
-    {
       "surface_id": "product_entry",
       "owner": "one-person-lab",
       "domain_repo_can_own_generated_surface": false,

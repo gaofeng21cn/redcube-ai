@@ -152,7 +152,7 @@ export async function buildOplStageExecutionPlan({
       family_action_catalog_ref: 'contracts/action_catalog.json',
       family_stage_control_plane_ref: 'opl-generated:family_stage_control_plane',
       domain_memory_descriptor_ref: '/domain_memory_descriptor',
-      visual_transition_spec_ref: '/visual_transition_spec',
+      ai_route_policy_ref: '/ai_route_policy',
       artifact_locator_contract_ref: '/artifact_locator_contract',
       review_state_ref: '/review_state',
       publication_projection_ref: '/publication_projection',

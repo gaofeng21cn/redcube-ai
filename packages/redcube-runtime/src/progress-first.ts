@@ -6,6 +6,9 @@ export const PROGRESS_FIRST_STAGE_POLICY = Object.freeze({
   contract_id: 'rca.progress_first_stage_admission.v1',
   retry_semantics: 'quality_budget_not_transition_gate',
   transition_rule: 'consumable_stage_artifact_advances',
+  next_stage_may_start: true,
+  route_selection_owner: 'codex_cli',
+  route_may_skip_repeat_reverse_or_target_any_declared_stage: true,
   quality_claim_rule: 'quality_debt_never_implies_visual_or_export_ready',
   hard_stop_kinds: [
     'missing_consumable_artifact',
@@ -48,6 +51,7 @@ function failedChecks(artifact: JsonRecord): string[] {
     ...safeArray(artifact?.issues),
     ...safeArray(artifact?.review_state_patch?.blocking_reasons),
     ...safeArray(artifact?.review_state_patch?.pending_reviews),
+    ...safeArray(artifact?.quality_debt?.reasons),
     ...Object.entries(artifact?.checks || {})
       .filter(([, value]) => value === false)
       .map(([key]) => key),
@@ -70,7 +74,7 @@ export function hasConsumableStageArtifact(artifact: unknown): artifact is JsonR
 function qualityDebtRequired(artifact: JsonRecord): boolean {
   const status = safeText(artifact?.status);
   const rerunStatus = safeText(artifact?.review_state_patch?.rerun_policy?.status);
-  return ['block', 'blocked', 'failed', 'needs_revision'].includes(status)
+  return ['block', 'blocked', 'failed', 'needs_revision', 'completed_with_quality_debt'].includes(status)
     || rerunStatus === 'rerun_required'
     || failedChecks(artifact).length > 0;
 }
@@ -137,6 +141,9 @@ export function admitStageArtifactForProgress(
     },
     quality_debt: requiresQualityDebt
       ? {
+          ...(artifact?.quality_debt && typeof artifact.quality_debt === 'object'
+            ? artifact.quality_debt
+            : {}),
           status: 'recorded_non_blocking',
           original_status: originalStatus,
           reasons: debtReasons.length > 0 ? debtReasons : ['quality_gate_not_passed'],

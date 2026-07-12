@@ -36,7 +36,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 默认交付运行方式：
 
-- 对于不需要人工中途审阅的新交付，使用一次 `redcube product invoke`，不指定 `route`、不指定 `stop_after_stage`，让 RCA service-safe product-entry loop 按 `auto_to_terminal` 自主推进到 review/export gate。
+- 对于不需要人工中途审阅的新交付，使用一次 `redcube product invoke`，不指定 `route`、不指定 `stop_after_stage`，由 OPL-hosted Codex execution plan 按 `auto_to_terminal` 目标逐次选择 route。RCA route handler 每次只执行 Codex 明确选择的一个 stage，不自行补跑 predecessor、安排 repair 或遍历到 review/export。
 - 只有在用户明确要求先审阅计划、批准后继续、定点回修、重跑某个 stage，或 product-entry gate 已给出明确 `rerun_from_stage` 时，才使用 route-level invoke，例如 `--route repair_image_pages`。
 - entry-session domain snapshot refs 由 OPL generated session shell 消费；generic session shell、resume/workbench navigation 与默认 product/session wrapper 归 OPL generated surface，不应被当成外层 Codex 逐 stage 手工创作的替代品。
 
@@ -63,7 +63,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 ## PPT 长任务入口规则
 
-- 如果用户原始需求包含“不要一次性生成”“先给我看看”“审阅之后再继续”“先做故事主线/大纲/蓝图”等人工审阅语义，必须在 product-entry delivery request 中显式设置 `stop_after_stage`，默认停在可审阅的 plan stage；不得省略 stop policy 直接 auto-to-terminal。
+- 如果用户原始需求包含“不要一次性生成”“先给我看看”“审阅之后再继续”“先做故事主线/大纲/蓝图”等人工审阅语义，必须在 product-entry delivery request 中显式设置 `stop_after_stage`，默认停在可审阅的 plan stage；该字段只约束 OPL/Codex execution plan 的目标边界，不授权 RCA route handler 自动续跑。
 - 用户审阅通过的故事主线、详细大纲或逐页蓝图进入后续阶段时，必须作为批准合同继续沿用；后续 stage 只能扩写和视觉化，不能重新压缩为短 deck。
 
 当用户要求 RCA / RedCube AI 制作较长 PPT、资料较多的 deck、或任何容易超过单轮 prompt 的 visual deliverable 时，不要把完整任务压成一个巨大 prompt 直接生成。默认采用同一 `entry_session_id` 下的可恢复阶段流：
@@ -93,6 +93,8 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 - 质量债务可以触发 repair recommendation，但不能生成 execution blocker，也不能让同一 stage 无限循环。
 - 质量债务必须阻止 `visual_ready`、`export_ready`、production-ready 等声明。
 - 只有零可消费 artifact、artifact 损坏不可读、权限/凭据、显式人工门、authority violation 或 stage identity/currentness mismatch 可以硬停止。
+- Codex CLI 是唯一 stage 语义控制面；output schema、normalizer、validator、review helper 与静态 transition table 只能产生 findings，不能拒绝已有 raw/partial artifact。
+- Codex 可携带 review findings、失败尝试或负结果 route-back 到任一已声明 stage，重复进入 storyline/blueprint/visual/author/review stage 属于正常进度。
 
 ## 首先应读的文件
 

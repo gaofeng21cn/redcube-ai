@@ -19,7 +19,7 @@ import {
   withMockCodexRuntime,
 } from './shared.js';
 
-test('runDeliverableRoute auto-rehydrates stale deliverable surfaces when the current overlay contract declares the requested route', async () => {
+test('runDeliverableRoute rehydrates stale surfaces and starts a declared route with quality debt', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-rehydrate-'));
 
@@ -57,8 +57,11 @@ test('runDeliverableRoute auto-rehydrates stale deliverable surfaces when the cu
       route: 'repair_image_pages',
     });
 
-    assert.equal(result.ok, false);
-    assert.match(result.run.error.message, /requires completed stage artifacts|requires screenshot_review/i);
+    assert.equal(result.ok, true);
+    const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
+    assert.equal(artifact.status, 'completed_with_quality_debt');
+    assert.equal(artifact.progress_first.next_stage_may_start, true);
+    assert.equal(artifact.quality_debt.blocks_stage_transition, false);
 
     const refreshedContract = JSON.parse(readFileSync(contractFile, 'utf-8'));
     assert.equal(

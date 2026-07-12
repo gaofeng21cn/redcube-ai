@@ -4,7 +4,6 @@ import path from 'node:path';
 
 import type { RunDeliverableRouteRequest } from '../../types.js';
 import type {
-  DependencyRouteRun,
   RouteRunDomainEntryResponse,
   RuntimeRouteResult,
 } from './shared.js';
@@ -18,15 +17,9 @@ import {
 export function buildRouteRunDomainEntryResponse({
   request,
   result,
-  dependencyRouteRuns,
-  continuationRouteRuns,
-  recoveryTerminalReason,
 }: {
   request: RunDeliverableRouteRequest;
   result: RuntimeRouteResult;
-  dependencyRouteRuns: DependencyRouteRun[];
-  continuationRouteRuns: DependencyRouteRun[];
-  recoveryTerminalReason: string | null;
 }): RouteRunDomainEntryResponse {
   const deliverablePaths = getDeliverablePaths(
     request.workspaceRoot,
@@ -58,13 +51,10 @@ export function buildRouteRunDomainEntryResponse({
       cache_status: typeof result.cache_status === 'string' ? result.cache_status : 'miss',
       requested_route: request.route,
       executed_route: safeText(run?.current_stage) || request.route,
-      auto_recovered_dependency_routes: dependencyRouteRuns.map((entry) => entry.route),
-      continued_route_sequence: continuationRouteRuns.map((entry) => entry.route),
-      stop_after_stage: safeText(request.stopAfterStage) || null,
-      recovery_terminal_reason: recoveryTerminalReason,
+      route_selection_owner: 'codex_cli',
+      programmatic_route_continuation: false,
+      next_stage_may_start: result.ok === true,
     },
-    dependency_route_runs: dependencyRouteRuns,
-    continuation_route_runs: continuationRouteRuns,
     artifactFile: routeResultArtifactFile(result) || undefined,
     artifact: result.artifact || null,
     governance_surface: buildGovernanceSurfaceContract(hydratedContract),

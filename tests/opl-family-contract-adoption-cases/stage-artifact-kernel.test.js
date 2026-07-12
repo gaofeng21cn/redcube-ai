@@ -71,8 +71,12 @@ test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint',
   assert.equal(adoption.stage_folder_writer_closeout_authority.writer_may_synthesize_typed_blocker_refs, false);
   assert.equal(adoption.stage_folder_writer_closeout_authority.route_helper_may_synthesize_owner_receipt_refs, false);
   assert.equal(adoption.stage_folder_writer_closeout_authority.route_helper_may_synthesize_typed_blocker_refs, false);
-  assert.equal(adoption.native_helper_manifest.required, true);
-  assert.equal(adoption.native_helper_manifest.failure_shape, 'typed_blocker');
+  assert.equal(adoption.native_helper_manifest.required_for_canonical_current_or_ready_claim, true);
+  assert.equal(adoption.native_helper_manifest.required_for_progress, false);
+  assert.equal(
+    adoption.native_helper_manifest.failure_shape,
+    'quality_debt_or_hard_stop_only_when_no_readable_artifact',
+  );
   assert.equal(adoption.artifact_gallery_handoff_shell.owner, 'one-person-lab');
   assert.equal(adoption.artifact_gallery_handoff_shell.rca_role, 'artifact_authority_and_export_authorization_refs');
   assert.equal(adoption.kernel_refs.physical_stage_folder_source_of_truth, true);
@@ -80,6 +84,8 @@ test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint',
   assert.equal(adoption.kernel_refs.manifest_receipt_hash_required, true);
   assert.equal(adoption.kernel_refs.status_source_of_truth, 'physical_stage_folder');
   assert.equal(adoption.kernel_refs.orphan_artifact_is_completion, false);
+  assert.equal(adoption.kernel_refs.readable_orphan_artifact_is_progress_input, true);
+  assert.equal(adoption.kernel_refs.conformance_failure_blocks_stage_progress, false);
   assert.equal(adoption.opl_state_index_kernel_adoption.surface_kind, 'opl_state_index_kernel_sidecar_adoption');
   assert.equal(adoption.opl_state_index_kernel_adoption.owner, 'one-person-lab');
   assert.equal(adoption.opl_state_index_kernel_adoption.consumer, 'redcube_ai');

@@ -27,8 +27,7 @@ function compactManifestNoRegressionSources(manifest) {
     runtime_residue_retirement_ref: '/runtime_residue_retirement',
     domain_owner_receipt_contract_ref: '/domain_owner_receipt_contract',
     lifecycle_guarded_apply_proof_ref: '/lifecycle_guarded_apply_proof',
-    visual_transition_spec_ref: '/visual_transition_spec',
-    visual_transition_evaluator_ref: '/visual_transition_evaluator',
+    ai_route_policy_ref: '/ai_route_policy',
     controlled_soak_state: controlledSoak.state || 'deferred_typed_blocker',
     runtime_residue_retirement_status: runtimeResidue.status || 'unknown',
   };

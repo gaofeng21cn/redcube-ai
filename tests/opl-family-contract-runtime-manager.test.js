@@ -148,17 +148,15 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(lifecycleApply.domain_artifact_mutation_requires_domain_receipt, true);
   assert.equal(lifecycleApply.opl_can_apply_domain_artifact_mutation, false);
 
-  const transitionSpec = payload.current_state.active_baton.scope.visual_transition_spec;
-  assert.equal(transitionSpec.status, 'contract_landed_thin_evaluator_landed_runner_owned_by_opl');
-  assert.equal(transitionSpec.spec_id, 'rca.visual_transition_spec.v1');
-  assert.equal(transitionSpec.transition_count, 5);
-  assert.equal(transitionSpec.opl_can_execute_transition_spec, true);
-  assert.equal(transitionSpec.opl_can_declare_visual_ready, false);
-  assert.equal(transitionSpec.opl_can_declare_exportable, false);
-  assert.equal(transitionSpec.evaluator_descriptor_id, 'rca.visual_transition_evaluator.v1');
-  assert.equal(transitionSpec.evaluator_action, 'evaluate_visual_transition');
-  assert.equal(transitionSpec.family_transition_spec_descriptor_ref, '/visual_transition_spec/family_transition_spec_descriptor');
-  assert.equal(transitionSpec.repo_tracks_runner_state, false);
+  const aiRoutePolicy = payload.current_state.active_baton.scope.ai_route_policy;
+  assert.equal(aiRoutePolicy.status, 'single_codex_semantic_control_plane');
+  assert.equal(aiRoutePolicy.semantic_route_owner, 'codex_cli');
+  assert.equal(aiRoutePolicy.advance_repeat_skip_or_route_back_allowed, true);
+  assert.equal(aiRoutePolicy.route_back_to_any_declared_stage, true);
+  assert.equal(aiRoutePolicy.quality_debt_blocks_stage_transition, false);
+  assert.equal(aiRoutePolicy.static_transition_table_present, false);
+  assert.equal(aiRoutePolicy.transition_evaluator_present, false);
+  assert.equal(aiRoutePolicy.program_guard_can_select_or_reject_route, false);
 
   assert.equal(payload.current_state.active_baton.scope.physical_skeleton_follow_through, undefined);
   assert.equal(payload.current_state.active_baton.scope.review_helper_baseline_follow_through, undefined);

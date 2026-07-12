@@ -1,7 +1,5 @@
 // @ts-nocheck
-import { getProductEntryManifest } from '../get-product-entry-manifest.js';
 import { listDomainActionAdapterGuardedActionIds } from './guarded-action-catalog.js';
-import { evaluateVisualTransition } from './visual-transition-evaluator.js';
 import { emitWorkspaceReceiptProof as emitWorkspaceReceiptProofPack } from './workspace-receipt-proof.js';
 import {
   buildDispatchEnvelope,
@@ -46,15 +44,6 @@ export async function dispatchDomainActionAdapter(request) {
     result = await applyVisualMemoryWriteback(task);
   } else if (action === 'apply_visual_workspace_lifecycle') {
     result = await applyVisualWorkspaceLifecycle(task);
-  } else if (action === 'evaluate_visual_transition') {
-    const workspaceRoot = workspaceRootFromTask(task);
-    const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
-    result = evaluateVisualTransition({
-      task,
-      workspaceRoot,
-      visualTransitionSpec: manifest.visual_transition_spec,
-      buildTypedBlocker,
-    });
   } else if (action === 'emit_workspace_receipt_proof') {
     result = await emitWorkspaceReceiptProofPack({
       task,

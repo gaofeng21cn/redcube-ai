@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdtempSync, readFileSync, utimesSync } from 'node:fs';
+import { mkdtempSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -10,13 +10,6 @@ import {
   runDeliverableRoute,
 } from './product-domain-action-test-api.js';
 import {
-  canonicalStageForRoute,
-  getDeliverablePaths,
-  readStageFolderArtifact,
-  stageOrderForCanonicalStage,
-} from '@redcube/runtime-protocol';
-import {
-  buildMockCreativeOutput,
   startMockCodexCli,
   withEnv,
 } from './mock-codex-cli.js';
@@ -28,91 +21,8 @@ const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.js', import.meta.url)),
 ]);
 
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-function routeArtifactFile(result) {
-  const file = result?.artifactFile || result?.artifact_file || result?.error?.artifact_file || result?.run?.error?.artifact_file;
-  assert.equal(typeof file, 'string');
-  assert.notEqual(file.trim(), '');
-  return file;
-}
-
-function routeFailureContext(result) {
-  return JSON.stringify({
-    summary: result?.summary,
-    error: result?.error,
-    run_error: result?.run?.error,
-    dependency_route_runs: result?.dependency_route_runs,
-    continuation_route_runs: result?.continuation_route_runs,
-    artifact_status: result?.artifact?.status,
-    artifact_route: result?.artifact?.route,
-  }, null, 2);
-}
-
-function readStageArtifact(workspaceRoot, topicId, deliverableId, routeStageId) {
-  const canonicalStageId = canonicalStageForRoute(routeStageId);
-  const loaded = readStageFolderArtifact({
-    deliverablePaths: getDeliverablePaths(workspaceRoot, topicId, deliverableId),
-    routeStageId,
-    canonicalStageId,
-    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
-  });
-  assert.equal(Boolean(loaded?.artifact), true, routeStageId);
-  return loaded.artifact;
-}
-
-function declaredDependencyClosure(contract, route) {
-  const stages = [
-    ...(contract.stage_sequence?.stages || []),
-    ...(contract.stage_sequence?.alternate_stages || []),
-  ];
-  const stagesById = new Map(stages.map((stage) => [stage.stage_id, stage]));
-  const dependencies = new Set();
-  const pending = [route];
-  while (pending.length > 0) {
-    const stage = stagesById.get(pending.pop());
-    for (const dependency of [
-      ...(stage?.requires_stages || []),
-      ...(stage?.requires_review_from_any || []),
-    ]) {
-      if (dependencies.has(dependency)) continue;
-      dependencies.add(dependency);
-      pending.push(dependency);
-    }
-  }
-  return dependencies;
-}
-
-async function runPptRoute({ workspaceRoot, topicId = 'topic-a', deliverableId = 'deck-a', route, ...options }) {
-  return runDeliverableRoute({
-    workspaceRoot,
-    overlay: 'ppt_deck',
-    topicId,
-    deliverableId,
-    route,
-    ...options,
-  });
-}
-
-async function runPptRoutes({ workspaceRoot, topicId = 'topic-a', deliverableId = 'deck-a', routes }) {
-  const results = new Map();
-  for (const route of routes) {
-    const result = await runPptRoute({ workspaceRoot, topicId, deliverableId, route });
-    assert.equal(result.ok, true, `${deliverableId}:${route}`);
-    results.set(route, result);
-  }
-  return results;
-}
-
-async function withRouteEnv(env, testFn) {
-  const restoreEnv = withEnv(env);
-  try {
-    return await testFn();
-  } finally {
-    restoreEnv();
-  }
+function readArtifact(result) {
+  return JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
 }
 
 async function withMockCodexRuntime(testFn) {
@@ -129,509 +39,102 @@ async function withMockCodexRuntime(testFn) {
   }
 }
 
-async function createPptDeliverable({
-  workspaceRoot,
-  topicId = 'topic-a',
-  deliverableId = 'deck-a',
-  title,
-  goal,
-  brief = goal,
-  keywords,
-  profileId = 'lecture_student',
-}) {
+async function createDeck(workspaceRoot, deliverableId = 'deck-a') {
   await completeSourceReadiness({
     workspaceRoot,
-    topicId,
-    title,
-    brief,
-    keywords,
+    topicId: 'topic-a',
+    title: 'Single AI route control proof',
+    brief: '验证每次 domain route 调用只执行显式请求的 stage。',
+    keywords: ['ppt', 'progress-first', 'codex'],
   });
-
   await createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',
-    profileId,
-    topicId,
+    profileId: 'lecture_student',
+    topicId: 'topic-a',
     deliverableId,
-    title,
-    goal,
+    title: 'Single AI route control proof',
+    goal: '验证 RCA 不拥有第二套 stage 路由控制面',
   });
 }
 
-async function preparePptPlan({
-  workspaceRoot,
-  topicId = 'topic-a',
-  deliverableId,
-  title,
-  goal,
-  profileId = 'lecture_student',
-}) {
-  await createPptDeliverable({
+async function runRoute(workspaceRoot, route, options = {}) {
+  return runDeliverableRoute({
     workspaceRoot,
-    topicId,
-    deliverableId,
-    title,
-    goal,
-    brief: goal,
-    keywords: ['ppt', 'route', 'export'],
-    profileId,
-  });
-
-  await runPptRoutes({
-    workspaceRoot,
-    topicId,
-    deliverableId,
-    routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: options.deliverableId || 'deck-a',
+    route,
+    stopAfterStage: options.stopAfterStage,
   });
 }
 
-test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix_html', async () => {
+test('runDeliverableRoute executes only the explicitly requested route', async () => {
   await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-recovery-'));
-    await createPptDeliverable({
-      workspaceRoot,
-      title: 'Route recovery proof',
-      brief: '验证 direct route 在旧截图质控后自动补跑 fresh review。',
-      keywords: ['ppt', 'fix_html', 'recovery'],
-      profileId: 'lecture_peer',
-      goal: '验证 direct route recovery',
-    });
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-single-route-'));
+    await createDeck(workspaceRoot);
+    const result = await runRoute(workspaceRoot, 'render_html', { stopAfterStage: 'export_pptx' });
 
-    const routeResults = await runPptRoutes({
-      workspaceRoot,
-      routes: [
-        'storyline',
-        'detailed_outline',
-        'slide_blueprint',
-        'visual_direction',
-        'render_html',
-        'visual_director_review',
-        'screenshot_review',
-      ],
-    });
-
-    const renderBundleFile = routeArtifactFile(routeResults.get('render_html'));
-    await new Promise((resolve) => setTimeout(resolve, 30));
-    const touchedAt = new Date();
-    utimesSync(renderBundleFile, touchedAt, touchedAt);
-
-    await withRouteEnv({
-      REDCUBE_MOCK_PPT_SCREENSHOT_REVIEW_VARIANT: 'force_block',
-      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender',
-    }, async () => {
-      const result = await runPptRoute({
-        workspaceRoot,
-        route: 'fix_html',
-      });
-
-      assert.equal(result.ok, true, routeFailureContext(result));
-      assert.deepEqual(result.summary.auto_recovered_dependency_routes, [
-        'visual_director_review',
-        'screenshot_review',
-      ]);
-      assert.equal(result.summary.requested_route, 'fix_html');
-      assert.equal(result.summary.executed_route, 'screenshot_review');
-      assert.deepEqual(
-        result.dependency_route_runs.map((entry) => entry.route),
-        ['visual_director_review', 'screenshot_review'],
-      );
-      const deliverablePaths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
-      const deliverable = readJson(deliverablePaths.deliverableFile);
-      const contract = readJson(path.join(deliverablePaths.deliverableDir, deliverable.hydrated_contract_ref));
-      const declaredDependencies = declaredDependencyClosure(contract, 'fix_html');
-      assert.equal(
-        result.dependency_route_runs.every((entry) => declaredDependencies.has(entry.route)),
-        true,
-      );
-      assert.deepEqual(result.artifact?.render_execution?.freshly_rendered_slide_ids, ['S02']);
-      const fixArtifact = readJson(routeArtifactFile(result));
-      assert.deepEqual(fixArtifact.render_execution?.freshly_rendered_slide_ids, ['S02']);
-    });
+    assert.equal(result.ok, true);
+    assert.equal(result.summary.requested_route, 'render_html');
+    assert.equal(result.summary.executed_route, 'render_html');
+    assert.equal(result.summary.route_selection_owner, 'codex_cli');
+    assert.equal(result.summary.programmatic_route_continuation, false);
+    assert.equal(result.summary.next_stage_may_start, true);
+    assert.equal(Object.hasOwn(result.summary, 'auto_recovered_dependency_routes'), false);
+    assert.equal(Object.hasOwn(result.summary, 'continued_route_sequence'), false);
+    const artifact = readArtifact(result);
+    assert.equal(artifact.status, 'completed_with_quality_debt');
+    assert.equal(artifact.progress_first.next_stage_may_start, true);
   });
 });
 
-test('runDeliverableRoute continues from ppt fix_html to requested stop-after review gate', async () => {
+test('stopAfterStage is not interpreted by RCA as permission to schedule later stages', async () => {
   await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-stop-after-'));
-    await createPptDeliverable({
-      workspaceRoot,
-      title: 'Route stop-after proof',
-      brief: '验证 direct route 回修后会继续复审到指定 gate。',
-      keywords: ['ppt', 'fix_html', 'stop-after'],
-      profileId: 'lecture_peer',
-      goal: '验证 route stop-after continuation',
-    });
-
-    await runPptRoutes({
-      workspaceRoot,
-      routes: [
-        'storyline',
-        'detailed_outline',
-        'slide_blueprint',
-        'visual_direction',
-        'render_html',
-        'visual_director_review',
-      ],
-    });
-
-    await withRouteEnv({
-      REDCUBE_MOCK_PPT_SCREENSHOT_REVIEW_VARIANT: 'force_block',
-    }, async () => {
-      const blockedReview = await runPptRoute({
-        workspaceRoot,
-        route: 'screenshot_review',
-      });
-      assert.equal(blockedReview.ok, true);
-      assert.equal(blockedReview.artifact?.status, 'completed_with_quality_debt');
-    });
-
-    await withRouteEnv({
-      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender',
-    }, async () => {
-      const result = await runPptRoute({
-        workspaceRoot,
-        route: 'fix_html',
-        stopAfterStage: 'screenshot_review',
-      });
-
-      assert.equal(result.ok, true);
-      assert.equal(result.summary.requested_route, 'fix_html');
-      assert.equal(result.summary.executed_route, 'screenshot_review');
-      assert.equal(result.summary.stop_after_stage, 'screenshot_review');
-      assert.deepEqual(result.summary.continued_route_sequence, [
-        'visual_director_review',
-        'screenshot_review',
-      ]);
-      assert.deepEqual(
-        result.continuation_route_runs.map((entry) => entry.route),
-        ['visual_director_review', 'screenshot_review'],
-      );
-      assert.equal(result.artifact?.status, 'pass');
-    });
-  });
-});
-
-test('runDeliverableRoute continues explicit ppt visual routes through review and export', async () => {
-  await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-explicit-visual-export-'));
-    const routeCases = [
-      { deliverableId: 'deck-html', visualRoute: 'render_html' },
-      { deliverableId: 'deck-native', visualRoute: 'author_pptx_native' },
-    ];
-
-    for (const routeCase of routeCases) {
-      await preparePptPlan({
-        workspaceRoot,
-        deliverableId: routeCase.deliverableId,
-        title: `Explicit ${routeCase.visualRoute} export proof`,
-        goal: '验证显式 PPT 技术路线可以由 product-entry route 入口自主续跑到导出。',
-      });
-
-      const result = await runPptRoute({
-        workspaceRoot,
-        deliverableId: routeCase.deliverableId,
-        route: routeCase.visualRoute,
-        stopAfterStage: 'export_pptx',
-      });
-
-      assert.equal(result.ok, true, routeCase.visualRoute);
-      assert.equal(result.summary.requested_route, routeCase.visualRoute);
-      assert.equal(result.summary.executed_route, 'export_pptx');
-      assert.deepEqual(result.summary.continued_route_sequence, [
-        'visual_director_review',
-        'screenshot_review',
-        'export_pptx',
-      ]);
-      assert.deepEqual(
-        result.continuation_route_runs.map((entry) => entry.route),
-        ['visual_director_review', 'screenshot_review', 'export_pptx'],
-      );
-      assert.equal(result.artifact?.export_bundle?.delivery_state?.current, 'output_ready');
-      assert.equal(
-        result.artifact?.export_bundle?.source_visual_route
-          || result.artifact?.export_bundle?.review_capture?.source_visual_route,
-        routeCase.visualRoute,
-      );
-    }
-  });
-});
-
-test('runDeliverableRoute recovers explicit ppt visual route planning prerequisites before export', async () => {
-  await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-explicit-visual-plan-recovery-'));
-    await createPptDeliverable({
-      workspaceRoot,
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-no-route-scheduler-'));
+    await createDeck(workspaceRoot, 'deck-native');
+    const result = await runRoute(workspaceRoot, 'author_pptx_native', {
       deliverableId: 'deck-native',
-      title: 'Explicit native plan recovery proof',
-      brief: '验证显式 native PPT route 可以从空 plan 自主补齐 planning 依赖并导出。',
-      keywords: ['ppt', 'native', 'plan', 'recovery'],
-      goal: '验证显式 PPT 技术路线可以从 product-entry route 入口自主补齐计划并续跑到导出。',
-    });
-
-    const result = await runPptRoute({
-      workspaceRoot,
-      deliverableId: 'deck-native',
-      route: 'author_pptx_native',
       stopAfterStage: 'export_pptx',
     });
 
-    assert.equal(result.ok, true, routeFailureContext(result));
-    assert.equal(result.summary.requested_route, 'author_pptx_native');
-    assert.deepEqual(result.summary.auto_recovered_dependency_routes, [
+    assert.equal(result.ok, true);
+    assert.equal(result.summary.executed_route, 'author_pptx_native');
+    assert.equal(result.summary.programmatic_route_continuation, false);
+    const artifact = readArtifact(result);
+    assert.equal(artifact.status, 'completed_with_quality_debt');
+    assert.equal(artifact.quality_debt.blocks_stage_transition, false);
+  });
+});
+
+test('review quality debt recommends repair without automatically running repair or export', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-no-scheduler-'));
+    await createDeck(workspaceRoot);
+    for (const route of [
       'storyline',
       'detailed_outline',
       'slide_blueprint',
       'visual_direction',
-    ]);
-    assert.equal(result.summary.executed_route, 'export_pptx');
-    assert.deepEqual(result.summary.continued_route_sequence, [
+      'author_image_pages',
       'visual_director_review',
-      'screenshot_review',
-      'export_pptx',
-    ]);
-    assert.equal(result.artifact?.export_bundle?.delivery_state?.current, 'output_ready');
-    assert.equal(result.artifact?.export_bundle?.source_visual_route, 'author_pptx_native');
-  });
-});
+    ]) {
+      const result = await runRoute(workspaceRoot, route);
+      assert.equal(result.ok, true, route);
+    }
 
-test('runDeliverableRoute continues from ppt repair_image_pages through fresh review before export', async () => {
-  await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-image-repair-export-'));
-    await createPptDeliverable({
-      workspaceRoot,
-      title: 'Image repair export proof',
-      brief: '验证 image-first 回修后必须重新经过 visual review 与 screenshot review 才能导出。',
-      keywords: ['ppt', 'image-first', 'repair', 'export'],
-      goal: '验证 image-first repair 到 export 的自主续跑',
-    });
-
-    await runPptRoutes({
-      workspaceRoot,
-      routes: [
-        'storyline',
-        'detailed_outline',
-        'slide_blueprint',
-        'visual_direction',
-        'author_image_pages',
-        'visual_director_review',
-      ],
-    });
-
-    await withRouteEnv({
-      REDCUBE_MOCK_PPT_SCREENSHOT_REVIEW_VARIANT: 'force_block',
-    }, async () => {
-      const blockedReview = await runPptRoute({
-        workspaceRoot,
-        route: 'screenshot_review',
-      });
-      assert.equal(blockedReview.ok, true);
-      assert.equal(blockedReview.artifact?.status, 'completed_with_quality_debt');
-      assert.equal(blockedReview.summary.executed_route, 'screenshot_review');
-    });
-
-    const result = await runPptRoute({
-      workspaceRoot,
-      route: 'repair_image_pages',
-      stopAfterStage: 'export_pptx',
-    });
-
-    assert.equal(result.ok, true, routeFailureContext(result));
-    assert.equal(result.summary.requested_route, 'repair_image_pages');
-    assert.equal(result.summary.executed_route, 'export_pptx');
-    assert.deepEqual(result.summary.continued_route_sequence, [
-      'visual_director_review',
-      'screenshot_review',
-      'export_pptx',
-    ]);
-    assert.deepEqual(
-      result.continuation_route_runs.map((entry) => entry.route),
-      ['visual_director_review', 'screenshot_review', 'export_pptx'],
-    );
-    assert.equal(result.artifact?.export_bundle?.delivery_state?.current, 'output_ready');
-  });
-});
-
-test('runDeliverableRoute auto-repairs ppt image pages after visual director review blocks before export', async () => {
-  await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-director-image-repair-'));
-    await createPptDeliverable({
-      workspaceRoot,
-      title: 'Director image repair export proof',
-      brief: '验证 image-first visual director 阻断后能自动回修并继续导出。',
-      keywords: ['ppt', 'image-first', 'director-review', 'repair', 'export'],
-      goal: '验证 visual director review 到 image repair 再到 export 的自主续跑',
-    });
-
-    await runPptRoutes({
-      workspaceRoot,
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'author_image_pages'],
-    });
-
-    await withRouteEnv({
-      REDCUBE_MOCK_PPT_DIRECTOR_REVIEW_VARIANT: 'block_author_image_pages_until_repair',
-    }, async () => {
-      const result = await runPptRoute({
-        workspaceRoot,
-        route: 'visual_director_review',
-        stopAfterStage: 'export_pptx',
-      });
-
-      assert.equal(result.ok, true, routeFailureContext(result));
-      assert.equal(result.summary.requested_route, 'visual_director_review');
-      assert.equal(result.summary.executed_route, 'export_pptx');
-      assert.deepEqual(result.summary.continued_route_sequence, [
-        'repair_image_pages',
-        'visual_director_review',
-        'screenshot_review',
-        'export_pptx',
-      ]);
-      assert.deepEqual(
-        result.continuation_route_runs.map((entry) => entry.route),
-        ['repair_image_pages', 'visual_director_review', 'screenshot_review', 'export_pptx'],
-      );
-      assert.equal(result.artifact?.export_bundle?.delivery_state?.current, 'output_ready');
-
-      const repairArtifact = readStageArtifact(workspaceRoot, 'topic-a', 'deck-a', 'repair_image_pages');
-      assert.equal(repairArtifact.repair_image_pages?.source_review_stage, 'visual_director_review');
-      assert.deepEqual(repairArtifact.repair_image_pages?.blocked_slide_ids, ['S01']);
-    });
-  });
-});
-
-test('runDeliverableRoute can repair native PPT directly from visual director preflight block before export', async () => {
-  await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-director-native-repair-'));
-    await createPptDeliverable({
-      workspaceRoot,
-      deliverableId: 'deck-native',
-      title: 'Director native repair export proof',
-      brief: '验证 native PPT visual director 阻断后先补截图质控，再回修并继续导出。',
-      keywords: ['ppt', 'native', 'director-review', 'screenshot-review', 'repair', 'export'],
-      goal: '验证 visual director review 到 native repair 再到 export 的自主续跑',
-    });
-
-    await runPptRoutes({
-      workspaceRoot,
-      deliverableId: 'deck-native',
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'author_pptx_native'],
-    });
-
-    await withRouteEnv({
-      REDCUBE_MOCK_PPT_DIRECTOR_REVIEW_VARIANT: 'block_author_pptx_native_until_repair',
-    }, async () => {
-      const result = await runPptRoute({
-        workspaceRoot,
-        deliverableId: 'deck-native',
-        route: 'visual_director_review',
-        stopAfterStage: 'export_pptx',
-      });
-
-      assert.equal(result.ok, true, routeFailureContext(result));
-      assert.equal(result.summary.requested_route, 'visual_director_review');
-      assert.equal(result.summary.executed_route, 'export_pptx');
-      assert.deepEqual(result.summary.continued_route_sequence, [
-        'screenshot_review',
-        'repair_pptx_native',
-        'visual_director_review',
-        'screenshot_review',
-        'export_pptx',
-      ]);
-      assert.deepEqual(
-        result.continuation_route_runs.map((entry) => entry.route),
-        ['screenshot_review', 'repair_pptx_native', 'visual_director_review', 'screenshot_review', 'export_pptx'],
-      );
-      assert.equal(result.artifact?.export_bundle?.delivery_state?.current, 'output_ready');
-      assert.equal(result.artifact?.export_bundle?.source_visual_route, 'repair_pptx_native');
-
-      const repairArtifact = readStageArtifact(workspaceRoot, 'topic-a', 'deck-native', 'repair_pptx_native');
-      assert.equal(repairArtifact.native_ppt_repair_log?.consumed_review_stage, 'screenshot_review');
-      assert.equal(repairArtifact.native_ppt_bundle?.source_visual_route, 'repair_pptx_native');
-    });
-  });
-});
-
-test('runDeliverableRoute exhausts repeated screenshot repair budget and exports with quality debt', async () => {
-  await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-repeated-image-review-block-'));
-    await createPptDeliverable({
-      workspaceRoot,
-      title: 'Repeated image review block proof',
-      brief: '验证 image-first 截图质控回修后仍阻断时不会把中间 visual pass 当作导出成功。',
-      keywords: ['ppt', 'image-first', 'screenshot-review', 'quality-blocked'],
-      goal: '验证 repeated screenshot block 的终态语义',
-    });
-
-    await runPptRoutes({
-      workspaceRoot,
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'author_image_pages'],
-    });
-
-    await withRouteEnv({
-      REDCUBE_MOCK_PPT_SCREENSHOT_REVIEW_VARIANT: 'force_block',
-    }, async () => {
-      const result = await runPptRoute({
-        workspaceRoot,
-        route: 'visual_director_review',
-        stopAfterStage: 'export_pptx',
-      });
-
-      assert.equal(result.ok, true, routeFailureContext(result));
-      assert.equal(result.summary.requested_route, 'visual_director_review');
-      assert.equal(result.summary.executed_route, 'export_pptx', JSON.stringify({
-        summary: result.summary,
-        continuation_route_runs: result.continuation_route_runs,
-        artifact_status: result.artifact?.status,
-        artifact_route: result.artifact?.route,
-      }));
-      assert.equal(result.summary.stop_after_stage, 'export_pptx');
-      assert.equal(result.summary.continued_route_sequence[0], 'screenshot_review');
-      assert.equal(result.summary.continued_route_sequence.includes('repair_image_pages'), true);
-      assert.equal(result.summary.continued_route_sequence.at(-1), 'export_pptx');
-      assert.equal(result.artifact?.status, 'completed_with_quality_debt');
-      assert.equal(result.artifact?.route, 'export_pptx');
-      assert.equal(result.artifact?.quality_debt?.blocks_stage_transition, false);
-      assert.equal(result.artifact?.review_state_patch?.ready_for_export, false);
-    });
-  });
-});
-
-test('runDeliverableRoute records repeated fix_html review debt without a second executor pass', async () => {
-  await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-escalation-'));
-    await createPptDeliverable({
-      workspaceRoot,
-      title: 'Route escalation proof',
-      brief: '验证 fix_html 复审仍阻断时保持单次 executor pass。',
-      keywords: ['ppt', 'fix_html', 'agent_loop'],
-      profileId: 'lecture_peer',
-      goal: '验证 route escalation',
-    });
-
-    await runPptRoutes({
-      workspaceRoot,
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review'],
-    });
-
-    await withRouteEnv({
-      REDCUBE_MOCK_PPT_SCREENSHOT_REVIEW_VARIANT: 'force_block',
-      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender',
-    }, async () => {
-      const result = await runPptRoute({
-        workspaceRoot,
-        route: 'fix_html',
-      });
-
+    const restoreEnv = withEnv({ REDCUBE_MOCK_PPT_SCREENSHOT_REVIEW_VARIANT: 'force_block' });
+    try {
+      const result = await runRoute(workspaceRoot, 'screenshot_review', { stopAfterStage: 'export_pptx' });
       assert.equal(result.ok, true);
-      assert.equal(result.summary.requested_route, 'fix_html');
       assert.equal(result.summary.executed_route, 'screenshot_review');
-      assert.equal(result.summary.stop_after_stage, 'screenshot_review');
-      assert.equal('execution_proof' in result, false);
-
-      const reviewArtifact = readStageArtifact(workspaceRoot, 'topic-a', 'deck-a', 'screenshot_review');
-      assert.equal(reviewArtifact.status, 'completed_with_quality_debt');
-      assert.equal(reviewArtifact.quality_debt?.blocks_stage_transition, false);
-      assert.equal(reviewArtifact.review_state_patch?.ready_for_export, false);
-      assert.equal('execution_proof' in reviewArtifact, false);
-    });
+      assert.equal(result.summary.programmatic_route_continuation, false);
+      const artifact = readArtifact(result);
+      assert.equal(artifact.status, 'completed_with_quality_debt');
+      assert.equal(artifact.quality_debt.blocks_stage_transition, false);
+      assert.equal(artifact.progress_first.next_stage_may_start, true);
+    } finally {
+      restoreEnv();
+    }
   });
 });

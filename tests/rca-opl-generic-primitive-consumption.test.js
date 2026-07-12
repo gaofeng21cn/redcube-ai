@@ -13,7 +13,6 @@ test('RCA consumes OPL generic primitives as projections while retaining only vi
 
   const expectedGenericPrimitives = [
     'standard_domain_agent_scaffold',
-    'functional_harness',
     'generic_runtime',
     'generic_scheduler',
     'daemon',
@@ -22,7 +21,6 @@ test('RCA consumes OPL generic primitives as projections while retaining only vi
     'attempt_ledger',
     'typed_closeout_transport',
     'generic_runner',
-    'generic_transition_runner',
     'workbench_shell',
     'memory_transport',
     'memory_refs_only_writeback_chain',
@@ -61,19 +59,19 @@ test('RCA consumes OPL generic primitives as projections while retaining only vi
   ].map(resolveCanonicalProjection)) {
     assert.equal(surface.owner, 'opl');
     assert.equal(surface.consumer, 'redcube_ai');
-    assert.equal(surface.status, 'functional_consumer_follow_through_landed');
+    assert.equal(surface.status, 'stage_run_transport_consumer_follow_through_landed');
     assert.equal(surface.projection_mode, 'consumer_projection_only');
     assert.equal(surface.rca_surface_role, 'visual_domain_authority_pack_plus_thin_program_surface');
-    assert.equal(surface.completion_scope, 'functional_consumer_follow_through_complete_not_live_soak');
+    assert.equal(surface.completion_scope, 'stage_run_transport_follow_through_complete_not_live_soak');
     assert.equal(surface.live_soak_claimed, false);
     assert.deepEqual(surface.rca_does_not_own, expectedGenericPrimitives);
     assert.deepEqual(surface.rca_retained_authority, expectedRetainedAuthority);
-    assert.equal(surface.functional_harness_consumer_coverage.coverage_status, 'domain_authority_pack_landed');
-    assert.equal(surface.functional_harness_consumer_coverage.opl_harness_pass_is_visual_ready, false);
-    assert.equal(surface.functional_harness_consumer_coverage.opl_harness_pass_is_exportable, false);
-    assert.equal(surface.functional_harness_consumer_coverage.opl_harness_pass_is_handoffable, false);
-    assert.equal(surface.functional_harness_consumer_coverage.opl_harness_pass_is_artifact_producing_owner_receipt, false);
-    assert.equal(surface.functional_harness_consumer_coverage.rca_generic_runtime_owner, false);
+    assert.equal(surface.stage_run_transport_coverage.coverage_status, 'domain_authority_pack_landed');
+    assert.equal(surface.stage_run_transport_coverage.opl_transport_receipt_is_visual_ready, false);
+    assert.equal(surface.stage_run_transport_coverage.opl_transport_receipt_is_exportable, false);
+    assert.equal(surface.stage_run_transport_coverage.opl_transport_receipt_is_handoffable, false);
+    assert.equal(surface.stage_run_transport_coverage.opl_transport_receipt_is_artifact_producing_owner_receipt, false);
+    assert.equal(surface.stage_run_transport_coverage.rca_generic_runtime_owner, false);
   }
 
   assert.deepEqual(

@@ -108,9 +108,7 @@ export async function getProductEntryManifest(request: Record<string, unknown> =
     },
     declarative_stage_manifest_ref: DECLARATIVE_STAGE_MANIFEST_REF,
     family_stage_control_plane_ref: GENERATED_STAGE_CONTROL_PLANE_REF,
-    visual_transition_spec: domainAuthorityRefs.visual_transition_spec,
-    visual_transition_adapter_profile_registry:
-      domainAuthorityRefs.visual_transition_adapter_profile_registry,
+    ai_route_policy: domainAuthorityRefs.ai_route_policy,
     domain_evidence_refs: buildDomainEvidenceRefs(),
     typed_blocker_refs: buildTypedBlockerRefs(),
     receipt_refs: {

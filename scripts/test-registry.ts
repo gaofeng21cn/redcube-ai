@@ -68,7 +68,6 @@ export const TEST_REGISTRY = Object.freeze([
   { file: 'tests/opl-family-contract-runtime-manager.test.js', lane: 'meta' },
   { file: 'tests/opl-family-contract-adoption-source-shape.test.js', lane: 'meta' },
   { file: 'tests/opl-agent-lab-longline-migration.test.js', lane: 'meta' },
-  { file: 'tests/opl-transition-hosted-attempt-receipt.test.js', lane: 'meta' },
   { file: 'tests/pack-first-completion.test.js', lane: 'meta' },
   { file: 'tests/ppt-mainline-quality-closeout.test.js', lane: 'meta', fast: true },
   { file: 'tests/ppt-image-first-contract.test.js', lane: 'meta', fast: true },

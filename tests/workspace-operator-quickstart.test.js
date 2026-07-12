@@ -225,7 +225,7 @@ test('brand-new workspace quickstart converges doctor -> source research -> crea
   });
 });
 
-test('thin workspace source intake bootstraps topic truth but keeps audit blocked until planning_ready', () => {
+test('thin workspace source intake bootstraps topic truth and audit advances with readiness quality debt', () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-quickstart-thin-'));
   writeFileSync(path.join(workspaceRoot, 'redcube.workspace.json'), JSON.stringify({ workspace_version: 1, mode: 'agent_first_runtime' }, null, 2), 'utf-8');
 
@@ -242,8 +242,8 @@ test('thin workspace source intake bootstraps topic truth but keeps audit blocke
   assert.equal(created.ok, true);
 
   const audit = runCli(['deliverable', 'audit', '--workspace-root', workspaceRoot, '--overlay', 'xiaohongshu', '--topic-id', 'topic-thin', '--deliverable-id', 'note-a', '--mode', 'draft_new']);
-  assert.equal(audit.status, 'block');
-  assert.equal(audit.recommended_action, 'run_source_research');
+  assert.equal(audit.status, 'pass_with_quality_debt');
+  assert.equal(audit.recommended_action, 'run_deliverable_route');
   assert.equal(audit.source_readiness_summary?.planning_ready, false);
   assert.equal(audit.gate_summary?.source_planning_ready, false);
 

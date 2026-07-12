@@ -83,7 +83,9 @@
     "derived_index_rebuildable": true,
     "manifest_receipt_hash_required": true,
     "status_source_of_truth": "physical_stage_folder",
-    "orphan_artifact_is_completion": false
+    "orphan_artifact_is_completion": false,
+    "readable_orphan_artifact_is_progress_input": true,
+    "conformance_failure_blocks_stage_progress": false
   },
   "stage_artifact_runtime_ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
   "stage_artifact_runtime_contract_id": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
@@ -135,11 +137,13 @@
     "route_helper_may_synthesize_owner_receipt_refs": false,
     "route_helper_may_synthesize_typed_blocker_refs": false,
     "missing_terminal_refs_policy": "fail_closed_without_current_or_latest_pointer",
+    "readable_output_progress_without_terminal_refs": true,
     "route_run_completed_or_current_stage_is_terminal_acceptance": false,
     "current_owner_delta_writer_is_terminal_acceptance": false
   },
   "native_helper_manifest": {
-    "required": true,
+    "required_for_canonical_current_or_ready_claim": true,
+    "required_for_progress": false,
     "manifest_field": "helper_output_refs",
     "required_fields": [
       "role",
@@ -148,7 +152,7 @@
       "evidence_ref",
       "review_receipt_ref"
     ],
-    "failure_shape": "typed_blocker",
+    "failure_shape": "quality_debt_or_hard_stop_only_when_no_readable_artifact",
     "helper_output_is_completion_without_stage_receipt": false
   },
   "artifact_gallery_handoff_shell": {
@@ -260,6 +264,7 @@
       "app_workbench_artifact_drilldown"
     ],
     "file_presence_only_counts_as": "orphan_or_historical",
+    "readable_file_counts_as_progress_input": true,
     "provider_completion_counts_as_progress": false,
     "derived_index_authority": "refs_only_visual_artifact_projection"
   },
@@ -288,7 +293,7 @@
   ],
   "notes": [
     "RCA route handlers materialize OPL Stage Folder Contract attempts under the shared runtime-state root.",
-    "Only required outputs plus valid manifest, RCA owner receipt refs, and current/latest pointers can make an RCA visual stage current; file presence and provider completion remain non-authoritative."
+    "Required outputs plus valid manifest and pointers make an RCA visual stage canonical/current. Any readable output remains Codex progress input even when structure is incomplete; structure debt only blocks canonical, quality, export, or ready claims."
   ],
   "visual_ready_claimed": false,
   "exportable_claimed": false,

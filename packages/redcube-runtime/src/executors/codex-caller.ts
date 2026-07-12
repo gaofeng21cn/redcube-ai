@@ -54,17 +54,13 @@ export async function generateStructuredArtifactViaCodexCli({
     throw new Error('promptRelativePath 不能为空');
   }
 
-  const outputSchema = safeFamily === 'ppt_deck'
-    && ['author_pptx_native', 'repair_pptx_native'].includes(safeRoute)
-    ? outputContract
-    : null;
   const input = buildGenerationInput({
     family: safeFamily,
     route: safeRoute,
     promptRelativePath: safePromptRelativePath,
     context,
     outputContract,
-    outputContractDelivery: outputSchema ? 'attached_schema' : 'inline',
+    outputContractDelivery: 'inline_quality_guidance_only',
     localFileInspection,
   });
   const prompt = [
@@ -72,12 +68,11 @@ export async function generateStructuredArtifactViaCodexCli({
     '',
     input,
   ].join('\n');
-  const outputSchemaBytes = outputSchema
-    ? Buffer.byteLength(JSON.stringify(outputSchema), 'utf-8')
-    : 0;
+  const outputSchemaBytes = 0;
   const requestBytes = Buffer.byteLength(prompt, 'utf-8') + outputSchemaBytes;
   const structuredOutputTelemetry = {
-    output_schema_attached: Boolean(outputSchema),
+    output_schema_attached: false,
+    output_schema_control_plane_enabled: false,
     output_schema_bytes: outputSchemaBytes,
     estimated_request_tokens: Math.ceil(requestBytes / 4),
   };
@@ -125,7 +120,6 @@ export async function generateStructuredArtifactViaCodexCli({
       cwd,
       timeoutMs: resolvedTimeoutMs,
       spawnSyncImpl,
-      outputSchema,
     });
   } catch (error) {
     throw attachFailureRuntime(error, buildFailureRuntime({ error }));
@@ -146,7 +140,24 @@ export async function generateStructuredArtifactViaCodexCli({
 
   const data = extractMarkedJson(execution.codexRun.output);
   if (!data) {
-    throw new Error(`Codex structured generation returned invalid JSON for route: ${safeFamily}:${safeRoute}`);
+    const error = new Error(`Codex structured generation returned invalid JSON for route: ${safeFamily}:${safeRoute}`);
+    error.failure_kind = 'normalization_quality_debt';
+    error.raw_stage_output = safeText(execution.codexRun.output);
+    error.artifact = {
+      status: 'completed_with_quality_debt',
+      route: safeRoute,
+      family: safeFamily,
+      raw_stage_output: error.raw_stage_output,
+      normalization_findings: ['structured_json_parse_failed'],
+      artifact_refs: [],
+      route_back_selection_owner: 'codex_cli',
+      next_stage_may_start: true,
+    };
+    throw attachFailureRuntime(error, buildFailureRuntime({
+      usage: terminalUsage(execution.codexRun.events),
+      codexRun: execution.codexRun,
+      error,
+    }));
   }
   const usage = terminalUsage(execution.codexRun.events);
 

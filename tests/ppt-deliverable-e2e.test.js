@@ -52,7 +52,7 @@ async function runImageFirstChain(workspaceRoot, deliverableId) {
   return results;
 }
 
-test('ppt HTML workflow auto-recovers planning dependencies', async () => {
+test('ppt HTML workflow starts directly without a program-owned predecessor scheduler', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-html-'));
     await createDeliverable({
@@ -72,15 +72,13 @@ test('ppt HTML workflow auto-recovers planning dependencies', async () => {
       route: 'render_html',
     });
     assert.equal(result.ok, true);
-    assert.deepEqual(result.summary.auto_recovered_dependency_routes, [
-      'storyline',
-      'detailed_outline',
-      'slide_blueprint',
-      'visual_direction',
-    ]);
+    assert.equal(result.summary.programmatic_route_continuation, false);
     const artifact = readJson(result.artifactFile);
     assert.equal(artifact.route, 'render_html');
-    assert.equal(existsSync(artifact.html_bundle.html_file), true);
+    assert.equal(artifact.status, 'completed_with_quality_debt');
+    assert.equal(artifact.progress_first.next_stage_may_start, true);
+    assert.equal(artifact.quality_debt.blocks_stage_transition, false);
+    assert.match(artifact.stage_attempt_diagnostic.error_message, /slide|visual_direction/i);
   });
 });
 
@@ -96,6 +94,16 @@ test('ppt HTML workflow advances with quality debt when one generated page is mi
       title: '肠癌 AI 讲课 deck',
       goal: '验证 HTML 缺一页仍可推进',
     });
+    for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']) {
+      const planning = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-html-partial',
+        route,
+      });
+      assert.equal(planning.ok, true, route);
+    }
     process.env.REDCUBE_MOCK_PPT_RENDER_VARIANT = 'omit_last_slide';
     const result = await runDeliverableRoute({
       workspaceRoot,
@@ -156,7 +164,7 @@ test('ppt HTML workflow fails closed when its shell asset is missing', async () 
       deliverableId: 'deck-a',
       route: 'render_html',
     });
-    assert.equal(result.ok, false);
+    assert.equal(result.ok, false, JSON.stringify(result, null, 2));
     assert.match(result.run.error.message, /Missing prompt pack asset/i);
   });
 });

@@ -401,8 +401,7 @@ test('generateStructuredArtifactViaCodexCli records deterministic prompt telemet
   assert.equal(result.generationRuntime.estimated_prompt_tokens > 0, true);
 });
 
-test('native PPT structured generation passes the shape plan contract through Codex output-schema and cleans the temp file', async () => {
-  let schemaFile = '';
+test('native PPT structured generation keeps shape-plan guidance inline without a Codex output-schema control plane', async () => {
   let nativePrompt = '';
   const outputContract = {
     type: 'object',
@@ -425,10 +424,7 @@ test('native PPT structured generation passes the shape plan contract through Co
     contract: mockCodexContract(),
     spawnSyncImpl(_command, args, options) {
       nativePrompt = String(options.input);
-      const schemaFlagIndex = args.indexOf('--output-schema');
-      assert.notEqual(schemaFlagIndex, -1);
-      schemaFile = args[schemaFlagIndex + 1];
-      assert.deepEqual(JSON.parse(readFileSync(schemaFile, 'utf-8')), outputContract);
+      assert.equal(args.includes('--output-schema'), false);
       writeCodexLastMessage(args, JSON.stringify({ editable_shape_plan: { slides: [{}] } }));
       return {
         status: 0,
@@ -439,19 +435,16 @@ test('native PPT structured generation passes the shape plan contract through Co
     },
   });
   assert.equal(result.data.editable_shape_plan.slides.length, 1);
-  assert.match(nativePrompt, /output schema attached to this Codex invocation/);
-  assert.doesNotMatch(nativePrompt, /native-schema-only-/);
-  assert.equal((nativePrompt.match(/"blueprint"/g) || []).length, 1);
-  assert.equal(result.generationRuntime.output_schema_attached, true);
-  assert.equal(
-    result.generationRuntime.output_schema_bytes,
-    Buffer.byteLength(JSON.stringify(outputContract), 'utf-8'),
-  );
+  assert.match(nativePrompt, /## Output Contract/);
+  assert.match(nativePrompt, /native-schema-only-/);
+  assert.equal((nativePrompt.match(/"blueprint"/g) || []).length, 2);
+  assert.equal(result.generationRuntime.output_schema_attached, false);
+  assert.equal(result.generationRuntime.output_schema_control_plane_enabled, false);
+  assert.equal(result.generationRuntime.output_schema_bytes, 0);
   assert.equal(
     result.generationRuntime.estimated_request_tokens,
     Math.ceil((Buffer.byteLength(nativePrompt, 'utf-8') + result.generationRuntime.output_schema_bytes) / 4),
   );
-  assert.equal(existsSync(schemaFile), false);
 });
 
 test('generateImageViaCodexNativeImagegen delegates raster output to Codex native imagegen without provider tokens', async () => {

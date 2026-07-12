@@ -606,7 +606,7 @@
       "opl_absorb_candidate": true,
       "opl_replacement_expectation": {
         "owner": "opl",
-        "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/memory_refs_only_writeback_chain",
+        "expectation_ref": "/opl_generic_primitive_consumption/stage_run_transport_coverage/chain_authority/memory_refs_only_writeback_chain",
         "replacement_surface": "opl_memory_locator_writeback_transport",
         "expected_mode": "refs_only_adapter_to_opl_surface",
         "rca_consumes_as": "consumer_projection_only",
@@ -618,7 +618,7 @@
         "bridge_owner": "redcube_ai_refs_only_adapter_tail",
         "replacement_owner": "opl",
         "replacement_surface": "opl_memory_locator_writeback_transport",
-        "exit_gate_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/memory_refs_only_writeback_chain",
+        "exit_gate_ref": "/opl_generic_primitive_consumption/stage_run_transport_coverage/chain_authority/memory_refs_only_writeback_chain",
         "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
         "required_before_retire": [
           "domain_authority_refs_preserved",
@@ -833,7 +833,6 @@
       "audit_readout": "retain_domain_gate_project_transport_refs",
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/owner-boundary.ts",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-transition-evaluator.ts",
         "packages/redcube-domain-entry/src/actions/domain-authority-refs.ts",
         "packages/redcube-domain-entry/src/actions/domain-handler.ts"
       ],
@@ -1358,9 +1357,8 @@
         "packages/redcube-runtime/src/deliverable-routes.ts",
         "packages/redcube-runtime/src/executors/index.ts",
         "packages/redcube-domain-entry/src/actions/run-deliverable-route.ts",
-        "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/recovery.ts",
         "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/domain-entry-response.ts",
-        "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
+        "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/shared.ts",
         "packages/redcube-domain-entry/src/actions/domain-entry-contract.ts",
         "tests/rca-executor-backend-contract.test.ts"
       ],
@@ -1630,14 +1628,14 @@
         "OPL generated product status refs"
       ],
       "activeCallerStatus": "declarative_pack_input_active",
-      "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain-handler/status/session/workbench/harness surfaces.",
+      "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain-handler/status/session/workbench surfaces and StageRun transport.",
       "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
       "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
       "rca_projection_mode": "declarative_pack_refs_only",
       "rca_exports_only": [
         "stage_refs",
         "action_metadata_refs",
-        "visual_transition_refs",
+        "ai_route_context_refs",
         "receipt_schema_refs"
       ],
       "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
@@ -1681,7 +1679,7 @@
         "visual_stage_pack",
         "action_metadata",
         "authority_policy",
-        "oracle_fixtures"
+        "ai_route_policy"
       ],
       "retire_tombstone": false,
       "tombstone_required": false,
@@ -2203,12 +2201,10 @@
     "generic_runner",
     "workbench_shell",
     "standard_domain_agent_scaffold",
-    "functional_harness",
     "generic_runtime",
     "generic_scheduler",
     "stage_attempt_orchestrator",
     "typed_closeout_transport",
-    "generic_transition_runner",
     "memory_transport",
     "memory_refs_only_writeback_chain",
     "artifact_lifecycle",

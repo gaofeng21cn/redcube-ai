@@ -3,7 +3,7 @@
 export function buildDomainActionAdapterOwnerBoundary() {
   return {
     provider_role: 'stage_attempt_queue_wakeup_transport_only',
-    opl_role: 'typed_family_queue_and_control_plane',
+    opl_role: 'stage_run_transport_and_projection',
     rca_role: 'visual_domain_truth_review_artifact_owner',
     rca_surface_role: 'visual_domain_authority_pack_plus_thin_program_surface',
     generated_interface_owner: 'one-person-lab',
@@ -18,7 +18,6 @@ export function buildDomainActionAdapterOwnerBoundary() {
     opl_owns_review_verdict: false,
     provider_owns_publication_gate: false,
     opl_owns_publication_gate: false,
-    rca_owns_functional_harness: false,
     rca_owns_generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper: false,
     rca_owns_generic_runtime: false,
     rca_owns_generic_scheduler: false,
@@ -29,7 +28,6 @@ export function buildDomainActionAdapterOwnerBoundary() {
     rca_owns_generic_attempt_ledger: false,
     rca_owns_typed_closeout_transport: false,
     rca_owns_generic_runner: false,
-    rca_owns_generic_transition_runner: false,
     rca_owns_generic_workbench: false,
     rca_owns_visual_truth: true,
     rca_owns_review_publication_projection: true,

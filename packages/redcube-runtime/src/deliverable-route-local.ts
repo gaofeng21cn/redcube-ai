@@ -22,6 +22,7 @@ import {
   admitStageArtifactForProgress,
   authoringLaneForRoute,
   hasConsumableStageArtifact,
+  isHardStopArtifact,
   lockedAuthoringLane,
   markQualityBudgetExhausted,
 } from './progress-first.js';
@@ -537,6 +538,56 @@ function attachRouteCache(artifact, routeCacheKey, route) {
   };
 }
 
+function routeErrorMustHardStop(error) {
+  if (error?.requiresHumanConfirmation === true || error?.requiresExternalSecret === true) return true;
+  if (['EACCES', 'EPERM'].includes(String(error?.code || ''))) return true;
+  if (error?.artifact && isHardStopArtifact(error.artifact)) return true;
+  if (error?.hard_stop === true || error?.hard_stop_kind) return true;
+  const rawOutput = safeText(error?.raw_stage_output || error?.artifact?.raw_stage_output);
+  const artifactRefs = Array.isArray(error?.artifact_refs) ? error.artifact_refs.filter(Boolean) : [];
+  return error?.failure_kind === 'codex_cli_execution_blocked'
+    && !rawOutput
+    && artifactRefs.length === 0
+    && !error?.artifact;
+}
+
+function diagnosticProgressArtifactForError(error, route) {
+  const message = safeText(error?.message || error, 'stage output requires repair');
+  const rawOutput = safeText(error?.raw_stage_output || error?.artifact?.raw_stage_output);
+  const artifactRefs = Array.isArray(error?.artifact_refs) ? error.artifact_refs.filter(Boolean) : [];
+  return admitStageArtifactForProgress({
+    ...(error?.artifact && typeof error.artifact === 'object' ? error.artifact : {}),
+    status: 'completed_with_quality_debt',
+    route,
+    raw_stage_output: rawOutput || null,
+    artifact_refs: [...new Set(artifactRefs)],
+    normalization_findings: [...new Set([
+      ...(Array.isArray(error?.artifact?.normalization_findings) ? error.artifact.normalization_findings : []),
+      message,
+    ])],
+    stage_attempt_diagnostic: {
+      error_name: safeText(error?.name, 'Error'),
+      error_message: message,
+      failure_kind: safeText(error?.failure_kind, 'normalization_or_materialization_quality_debt'),
+    },
+    progress_first: {
+      transition_rule: 'diagnostic_or_partial_artifact_advances',
+      artifact_available: true,
+      advance_allowed: true,
+      next_stage_may_start: true,
+      route_back_selection_owner: 'codex_cli',
+      route_back_may_target_any_declared_stage: true,
+    },
+    quality_debt: {
+      status: 'recorded_non_blocking',
+      reasons: [message],
+      blocks_stage_transition: false,
+      blocks_visual_ready_claim: true,
+      blocks_export_ready_claim: true,
+    },
+  }, { route });
+}
+
 function qualityBudgetEnabledForRoute({ overlay, route }) {
   return QUALITY_BUDGET_OVERLAYS.has(overlay)
     && QUALITY_BUDGET_ROUTES.has(route);
@@ -872,19 +923,26 @@ export async function executeDeliverableRouteLocally({
     };
   }
 
+  let routePayload;
+  try {
+    routePayload = await executor.runRoute({
+      workspaceRoot,
+      overlay,
+      route: safeRoute,
+      topicId,
+      deliverableId,
+      contract,
+      stageContract,
+      deliverablePaths,
+      mode,
+      baselineDeliverableId,
+    });
+  } catch (error) {
+    if (routeErrorMustHardStop(error)) throw error;
+    routePayload = diagnosticProgressArtifactForError(error, safeRoute);
+  }
   const routeArtifact = attachRouteCache({
-    ...await executor.runRoute({
-    workspaceRoot,
-    overlay,
-    route: safeRoute,
-    topicId,
-    deliverableId,
-    contract,
-    stageContract,
-    deliverablePaths,
-    mode,
-    baselineDeliverableId,
-    }),
+    ...routePayload,
     runtime_currentness_receipt: runtimeCurrentnessReceipt(),
   }, routeCacheKey, safeRoute);
   const artifact = attachRouteArtifactCloseoutRefs({

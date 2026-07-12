@@ -52,7 +52,13 @@ export function promptMeta(contract, route) {
 export function readPromptPackText(relativePath) {
   const absolutePath = path.join(REPO_ROOT, relativePath);
   if (!existsSync(absolutePath)) {
-    throw new Error(`Missing prompt pack asset: ${relativePath}`);
+    const error = new Error(`Missing prompt pack asset: ${relativePath}`) as Error & {
+      code?: string;
+      hard_stop_kind?: string;
+    };
+    error.code = 'ENOENT';
+    error.hard_stop_kind = 'missing_consumable_artifact';
+    throw error;
   }
   return readFileSync(absolutePath, 'utf-8');
 }

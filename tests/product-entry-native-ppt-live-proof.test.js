@@ -79,7 +79,7 @@ async function invokeRoute({ workspaceRoot, entrySessionId, route, stopAfterStag
       deliverable_id: DELIVERABLE_ID,
       profile_id: 'lecture_student',
       title: '可编辑演示交付闭环验证',
-      goal: '证明从目标到可编辑演示文件的交付链路可以自动推进，并保留可复核的审查与导出证据。',
+      goal: '证明 Codex 显式选择各 stage 后可以完成可编辑演示交付，并保留可复核的审查与导出证据。',
       constraints: {
         native_visual_sample: true,
         expected_slide_count: 1,
@@ -132,7 +132,7 @@ function assertRealNativeRenderProof(renderProof) {
   }
 }
 
-test('live product-entry native PPT proof reaches review and export gates with real LibreOffice/Poppler render proof', { timeout: 120_000, concurrency: false }, async () => {
+test('live product-entry native PPT proof reaches review and export through Codex-selected routes', { timeout: 120_000, concurrency: false }, async () => {
   await withLiveNativePptProductEntryRuntime(async ({ runtimeStateRoot }) => {
     const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-live-product-');
     const entrySessionId = `session-native-ppt-live-proof-${path.basename(workspaceRoot)}`;
@@ -147,16 +147,19 @@ test('live product-entry native PPT proof reaches review and export gates with r
     assert.equal(sourceReadiness.planningReady, true);
     assert.equal(sourceReadiness.recommended_action, 'create_deliverable');
 
-    const planned = await invokeRoute({
-      workspaceRoot,
-      entrySessionId,
-      route: 'storyline',
-      stopAfterStage: 'visual_direction',
-      userIntent: '先完成 source-backed planning artifacts，然后进入可编辑演示文件生成与审查。',
-    });
-    assert.equal(planned.ok, true);
-    assert.equal(routeSurface(planned).summary.executed_route, 'visual_direction');
-    assert.equal(planned.summary.created_deliverable, true);
+    let planned = null;
+    for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']) {
+      planned = await invokeRoute({
+        workspaceRoot,
+        entrySessionId,
+        route,
+        userIntent: 'Codex 选择当前 planning stage，并保留产物供下一次 route 判断消费。',
+      });
+      assert.equal(planned.ok, true, route);
+      assert.equal(routeSurface(planned).summary.executed_route, route);
+      assert.equal(routeSurface(planned).summary.programmatic_route_continuation, false);
+    }
+    assert.equal(planned.summary.created_deliverable, false);
     assert.equal(planned.session_handoff_refs.entry_session_id, entrySessionId);
     assert.equal(existsSync(path.join(runtimeStateRoot, 'product-entry-sessions')), false);
 

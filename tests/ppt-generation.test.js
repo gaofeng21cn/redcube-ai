@@ -93,7 +93,7 @@ test('ppt authoring context passes full source materials instead of first-line e
   assert.equal(context.source_evidence_extraction_contract?.output_field, 'manuscript_evidence_table');
 });
 
-test('ppt manuscript sync blocks abstract outlines without visible paper evidence', async () => {
+test('ppt manuscript sync carries abstract outlines forward with visible quality debt', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-manuscript-density-'));
     const sourceFile = path.join(workspaceRoot, 'nfpitnet-paper-pack.md');
@@ -155,8 +155,10 @@ test('ppt manuscript sync blocks abstract outlines without visible paper evidenc
       restoreOutlineVariant();
     }
 
-    assert.equal(outlineResult.ok, false);
-    assert.match(outlineResult.run?.error?.message || '', /manuscript sync requires/);
+    assert.equal(outlineResult.ok, true);
+    const outlineDebt = readJson(routeArtifactFile(outlineResult));
+    assert.equal(outlineDebt.status, 'completed_with_quality_debt');
+    assert.match(JSON.stringify(outlineDebt), /manuscript sync requires/);
   });
 });
 
@@ -296,16 +298,16 @@ test('ppt claim spine lock preserves declared source refs across story stages an
 
     const { stageParts } = createPptDeckRuntimeCore();
     for (const route of ['author_image_pages', 'author_pptx_native']) {
-      assert.throws(
-        () => stageParts.ensurePrerequisites({
-          workspaceRoot,
-          topicId: 'topic-claim-lock',
-          deliverableId: 'deck-claim-lock',
-          route,
-          mode: 'draft_new',
-        }),
-        /claim_spine_lock|requires completed stage artifacts/,
-      );
+      const projection = stageParts.ensurePrerequisites({
+        workspaceRoot,
+        topicId: 'topic-claim-lock',
+        deliverableId: 'deck-claim-lock',
+        route,
+        mode: 'draft_new',
+      });
+      assert.equal(projection.blocks_stage_start, false);
+      assert.equal(projection.blocks_visual_or_export_ready_claim, true);
+      assert.match(projection.findings.join('\n'), /claim_spine_lock|upstream_artifacts/);
     }
 
     const tamperedBlueprint = structuredClone(blueprint);
@@ -315,16 +317,16 @@ test('ppt claim spine lock preserves declared source refs across story stages an
     writeFileSync(blueprintFile, `${JSON.stringify(tamperedBlueprint, null, 2)}\n`);
     writeFileSync(visualFile, `${JSON.stringify(tamperedVisual, null, 2)}\n`);
     for (const route of ['author_image_pages', 'author_pptx_native']) {
-      assert.throws(
-        () => stageParts.ensurePrerequisites({
-          workspaceRoot,
-          topicId: 'topic-claim-lock',
-          deliverableId: 'deck-claim-lock',
-          route,
-          mode: 'draft_new',
-        }),
-        /must preserve the canonical storyline claim_spine_lock without semantic drift|requires completed stage artifacts/,
-      );
+      const projection = stageParts.ensurePrerequisites({
+        workspaceRoot,
+        topicId: 'topic-claim-lock',
+        deliverableId: 'deck-claim-lock',
+        route,
+        mode: 'draft_new',
+      });
+      assert.equal(projection.blocks_stage_start, false);
+      assert.equal(projection.blocks_visual_or_export_ready_claim, true);
+      assert.match(projection.findings.join('\n'), /claim_spine_continuity_debt/);
     }
 
     await createDeliverable({
@@ -347,15 +349,14 @@ test('ppt claim spine lock preserves declared source refs across story stages an
     } finally {
       restoreClaimDrift();
     }
-    assert.equal(driftedOutlineResult.ok, false);
-    assert.match(
-      driftedOutlineResult.run?.error?.message || '',
-      /must preserve the canonical storyline claim_spine_lock without semantic drift|requires completed stage artifacts/,
-    );
+    assert.equal(driftedOutlineResult.ok, true);
+    const driftDebt = readJson(routeArtifactFile(driftedOutlineResult));
+    assert.equal(driftDebt.status, 'completed_with_quality_debt');
+    assert.match(JSON.stringify(driftDebt), /claim_spine_lock|semantic drift/);
   });
 });
 
-test('ppt claim spine lock fails closed at each authoring stage boundary', { concurrency: false }, async () => {
+test('ppt claim spine lock records nonblocking debt at each authoring stage boundary', { concurrency: false }, async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-claim-stage-boundary-'));
     const deliverableId = 'deck-claim-stage-boundary';
@@ -388,11 +389,10 @@ test('ppt claim spine lock fails closed at each authoring stage boundary', { con
     writeFileSync(outlineFile, `${JSON.stringify(outline, null, 2)}\n`);
 
     const rejectedBlueprint = await runRoute('slide_blueprint');
-    assert.equal(rejectedBlueprint.ok, false);
-    assert.match(
-      rejectedBlueprint.run?.error?.message || '',
-      /must preserve the canonical storyline claim_spine_lock without semantic drift|requires completed stage artifacts/,
-    );
+    assert.equal(rejectedBlueprint.ok, true);
+    const blueprintDebt = readJson(routeArtifactFile(rejectedBlueprint));
+    assert.equal(blueprintDebt.status, 'completed_with_quality_debt');
+    assert.match(JSON.stringify(blueprintDebt), /claim_spine_lock|semantic drift/);
 
     const visualDeliverableId = `${deliverableId}-visual`;
     await createDeliverable({
@@ -414,15 +414,14 @@ test('ppt claim spine lock fails closed at each authoring stage boundary', { con
     writeFileSync(blueprintFile, `${JSON.stringify(blueprint, null, 2)}\n`);
 
     const rejectedVisual = await runRoute('visual_direction', visualDeliverableId);
-    assert.equal(rejectedVisual.ok, false);
-    assert.match(
-      rejectedVisual.run?.error?.message || '',
-      /must preserve the canonical storyline claim_spine_lock without semantic drift|requires completed stage artifacts/,
-    );
+    assert.equal(rejectedVisual.ok, true);
+    const visualDebt = readJson(routeArtifactFile(rejectedVisual));
+    assert.equal(visualDebt.status, 'completed_with_quality_debt');
+    assert.match(JSON.stringify(visualDebt), /claim_spine_lock|semantic drift/);
   });
 });
 
-test('ppt claim spine lock rejects duplicate, oversized, and reversed mappings', { concurrency: false }, async () => {
+test('ppt claim spine lock carries duplicate, oversized, and reversed mappings as quality debt', { concurrency: false }, async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-claim-spine-invalid-'));
     const variants = [
@@ -472,8 +471,10 @@ test('ppt claim spine lock rejects duplicate, oversized, and reversed mappings',
       } finally {
         restoreInvalid();
       }
-      assert.equal(result.ok, false, variant);
-      assert.match(result.run?.error?.message || '', messagePattern, variant);
+      assert.equal(result.ok, true, variant);
+      const debt = readJson(routeArtifactFile(result));
+      assert.equal(debt.status, 'completed_with_quality_debt', variant);
+      assert.match(JSON.stringify(debt), messagePattern, variant);
     }
   });
 });

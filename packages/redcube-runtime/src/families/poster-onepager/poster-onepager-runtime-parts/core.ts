@@ -487,32 +487,33 @@ import {
     const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
     const storedContract = readJson(path.join(deliverablePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
     const required = safeArray(storedContract?.stage_requirements?.[route]?.requires_artifacts);
+    const findings = [];
     const missing = required.filter((stageId) => !readStageArtifact(storedContract, deliverablePaths, stageId));
     if (missing.length > 0) {
-      throw new Error(`Route ${route} requires completed stage artifacts: ${missing.join(', ')}`);
+      findings.push(`missing_upstream_artifacts:${missing.join(',')}`);
     }
     if (route === 'screenshot_review') {
       const directorReview = readStageArtifact(storedContract, deliverablePaths, 'visual_director_review');
       if (!directorReview) {
-        throw new Error('Route screenshot_review requires a consumable visual_director_review artifact before audit');
+        findings.push('visual_director_review_artifact_missing');
       }
     }
     if (route === 'export_bundle') {
       const reviewArtifact = readStageArtifact(storedContract, deliverablePaths, 'screenshot_review');
       if (!reviewArtifact) {
-        throw new Error('Route export_bundle requires a consumable screenshot_review artifact before export');
+        findings.push('screenshot_review_artifact_missing');
       }
     }
     if (route === 'screenshot_review' && mode === 'optimize_existing' && !safeText(baselineDeliverableId)) {
-      throw new Error('screenshot_review requires baselineDeliverableId in optimize_existing mode');
+      findings.push('baseline_deliverable_id_missing');
     }
     if (route === 'screenshot_review' && mode === 'optimize_existing' && safeText(baselineDeliverableId)) {
       const baselineState = getReviewState({ workspaceRoot, topicId, deliverableId: baselineDeliverableId }).state;
       if (!isBaselineApprovedState(baselineState)) {
-        throw new Error(`Baseline deliverable is not approved: ${baselineDeliverableId}`);
+        findings.push(`baseline_not_approved:${baselineDeliverableId}`);
       }
     }
-    return { deliverablePaths };
+    return { deliverablePaths, findings };
   }
 
 

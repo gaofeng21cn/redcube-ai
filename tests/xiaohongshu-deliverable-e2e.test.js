@@ -212,7 +212,7 @@ test('xiaohongshu style_reference_dir replaces built-in references for image aut
   });
 });
 
-test('xiaohongshu render_html fails closed without planning artifacts', async () => {
+test('xiaohongshu render_html starts without planning artifacts and records quality debt', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-fail-closed-'));
     await createDeliverable({
@@ -231,8 +231,12 @@ test('xiaohongshu render_html fails closed without planning artifacts', async ()
       deliverableId: 'note-a',
       route: 'render_html',
     });
-    assert.equal(result.ok, false);
-    assert.match(result.run.error.message, /render_html.*single_note_plan.*visual_direction/i);
+    assert.equal(result.ok, true);
+    const artifact = readJson(result.artifactFile);
+    assert.equal(artifact.status, 'completed_with_quality_debt');
+    assert.equal(artifact.progress_first.next_stage_may_start, true);
+    assert.equal(artifact.quality_debt.blocks_stage_transition, false);
+    assert.match(artifact.stage_attempt_diagnostic.error_message, /stages|single_note_plan|visual_direction/i);
   });
 });
 
@@ -268,7 +272,7 @@ test('xiaohongshu render_html fails closed when the hydrated shell asset is miss
       deliverableId,
       route: 'render_html',
     });
-    assert.equal(result.ok, false);
+    assert.equal(result.ok, false, JSON.stringify(result, null, 2));
     assert.match(result.run.error.message, /Missing prompt pack asset/i);
   });
 });
@@ -343,7 +347,7 @@ test('xiaohongshu image authoring advances with quality debt when one page gener
       assert.equal(authoredResult.ok, true);
       const authored = readJson(authoredResult.artifactFile);
       assert.equal(authored.status, 'completed_with_quality_debt');
-      assert.deepEqual(authored.quality_debt.failed_slide_ids, ['N02']);
+      assert.deepEqual(authored.quality_debt.failed_slide_ids, ['N02'], JSON.stringify(authored, null, 2));
       assert.equal(authored.image_pages_bundle.page_count > 0, true);
       assert.equal(authored.image_pages_bundle.pages.some((page) => page.slide_id === 'N02'), false);
 

@@ -445,10 +445,10 @@ function materializeRouteResult({
   crossProviderAttemptIndex,
 }) {
   const routeResult = raced.artifact;
-  routeResult.artifact = {
+  routeResult.artifact = admitStageArtifactForProgress({
     ...(routeResult.artifact || {}),
     candidate_race: raced.race,
-  };
+  }, { route: safeRoute });
   if (routeResult.cache_status === 'hit') {
     routeResult.artifact_refs = Array.from(new Set([
       ...(Array.isArray(routeResult.artifact_refs) ? routeResult.artifact_refs : []),
@@ -645,13 +645,38 @@ function buildFailedRouteResponse({
   const admittedArtifact = failedArtifact
     ? admitStageArtifactForProgress(failedArtifact, { route: safeRoute })
     : null;
-  if (
-    qualityBlocked
-    && admittedArtifact?.status === 'completed_with_quality_debt'
-    && !isHardStopArtifact(admittedArtifact)
-  ) {
+  const recoverableArtifactObserved = Boolean(
+    failedArtifact
+    && !isHardStopArtifact(failedArtifact)
+    && !failure.hard_stop_kind
+    && !failure.requiresHumanConfirmation
+    && !failure.requiresExternalSecret
+    && !['EACCES', 'EPERM'].includes(String(failure.code || '')),
+  );
+  if (recoverableArtifactObserved && admittedArtifact) {
+    const progressArtifact = {
+      ...admittedArtifact,
+      status: 'completed_with_quality_debt',
+      progress_first: {
+        ...(admittedArtifact.progress_first || {}),
+        transition_rule: 'any_diagnostic_or_partial_artifact_advances',
+        artifact_available: true,
+        advance_allowed: true,
+        next_stage_may_start: true,
+        route_back_selection_owner: 'codex_cli',
+        route_back_may_target_any_declared_stage: true,
+      },
+      quality_debt: {
+        ...(admittedArtifact.quality_debt || {}),
+        status: 'recorded_non_blocking',
+        reasons: admittedArtifact.quality_debt?.reasons || [failure.message],
+        blocks_stage_transition: false,
+        blocks_visual_ready_claim: true,
+        blocks_export_ready_claim: true,
+      },
+    };
     if (failure.artifact_file) {
-      writeFileSync(failure.artifact_file, `${JSON.stringify(admittedArtifact, null, 2)}\n`, 'utf-8');
+      writeFileSync(failure.artifact_file, `${JSON.stringify(progressArtifact, null, 2)}\n`, 'utf-8');
     }
     return buildCompletedRouteResponse({
       workspaceRoot,
@@ -661,14 +686,14 @@ function buildFailedRouteResponse({
       deliverableId,
       routeResult: {
         ok: true,
-        artifact: admittedArtifact,
+        artifact: progressArtifact,
         artifact_file: failure.artifact_file,
         artifact_refs: [...new Set([
           failure.artifact_file,
           ...failure.artifact_refs,
-          ...(Array.isArray(admittedArtifact.artifact_refs) ? admittedArtifact.artifact_refs : []),
+          ...(Array.isArray(progressArtifact.artifact_refs) ? progressArtifact.artifact_refs : []),
         ].filter(Boolean))],
-        cache_status: admittedArtifact?.route_cache?.cache_status || 'quality_debt_recovered',
+        cache_status: progressArtifact?.route_cache?.cache_status || 'quality_debt_recovered',
       },
       executor,
       startedEvent,

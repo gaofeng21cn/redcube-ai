@@ -56,7 +56,7 @@ test('native PPT lane authors editable PPTX and keeps review/export gates wired'
   });
 });
 
-test('native PPT review and export reject a PPTX whose SHA no longer matches package and render proof', async () => {
+test('native PPT review and export preserve SHA mismatch diagnostics as progress debt', async () => {
   await withMockNativePptRuntime(async () => {
     const reviewWorkspace = mkUserScopedTestWorkspace('redcube-native-ppt-stale-review-');
     await runNativePlanningChain({ workspaceRoot: reviewWorkspace, deliverableId: 'deck-stale-review' });
@@ -76,8 +76,10 @@ test('native PPT review and export reject a PPTX whose SHA no longer matches pac
       deliverableId: 'deck-stale-review',
       route: 'visual_director_review',
     });
-    assert.equal(staleReview.ok, false);
-    assert.match(staleReview.run.error.message, /PPTX SHA mismatch/);
+    assert.equal(staleReview.ok, true);
+    assert.equal(staleReview.artifact.status, 'completed_with_quality_debt');
+    assert.equal(staleReview.artifact.quality_debt.blocks_stage_transition, false);
+    assert.match(staleReview.artifact.stage_attempt_diagnostic.error_message, /PPTX SHA mismatch/);
 
     const exportWorkspace = mkUserScopedTestWorkspace('redcube-native-ppt-stale-export-');
     await runNativePlanningChain({ workspaceRoot: exportWorkspace, deliverableId: 'deck-stale-export' });
@@ -107,8 +109,10 @@ test('native PPT review and export reject a PPTX whose SHA no longer matches pac
       deliverableId: 'deck-stale-export',
       route: 'export_pptx',
     });
-    assert.equal(staleExport.ok, false);
-    assert.match(staleExport.run.error.message, /PPTX SHA mismatch/);
+    assert.equal(staleExport.ok, true);
+    assert.equal(staleExport.artifact.status, 'completed_with_quality_debt');
+    assert.equal(staleExport.artifact.quality_debt.blocks_stage_transition, false);
+    assert.match(staleExport.artifact.stage_attempt_diagnostic.error_message, /PPTX SHA mismatch/);
   });
 });
 

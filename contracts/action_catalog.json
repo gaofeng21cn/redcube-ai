@@ -139,7 +139,7 @@
         "terminal_stage_refs": [
           "package_and_handoff"
         ],
-        "route_policy": "ordered_stage_attempts_no_skip"
+        "route_policy": "ai_selected_progress_route"
       },
       "supported_surfaces": {
         "cli": {
@@ -315,7 +315,7 @@
         "terminal_stage_refs": [
           "package_and_handoff"
         ],
-        "route_policy": "ordered_stage_attempts_no_skip"
+        "route_policy": "ai_selected_progress_route"
       },
       "supported_surfaces": {
         "cli": {
@@ -334,7 +334,6 @@
           "emit_domain_owner_receipt",
           "apply_visual_memory_writeback",
           "apply_visual_workspace_lifecycle",
-          "evaluate_visual_transition",
           "emit_workspace_receipt_proof",
           "emit_external_work_order_owner_closeout",
           "notification_receipt"
@@ -389,7 +388,7 @@
         "terminal_stage_refs": [
           "artifact_creation"
         ],
-        "route_policy": "ordered_stage_attempts_no_skip"
+        "route_policy": "ai_selected_progress_route"
       },
       "supported_surfaces": {
         "cli": {
@@ -444,7 +443,7 @@
         "terminal_stage_refs": [
           "artifact_creation"
         ],
-        "route_policy": "ordered_stage_attempts_no_skip"
+        "route_policy": "ai_selected_progress_route"
       },
       "supported_surfaces": {
         "cli": {

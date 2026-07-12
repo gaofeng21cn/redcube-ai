@@ -386,34 +386,30 @@ export function createPptDeckRuntimeCore() {
   
   function normalizePptScreenshotAiSlideReviews(value, mechanicalSlideReviews) {
     const expectedSlideIds = new Set(mechanicalSlideReviews.map((slide) => slide.slide_id));
-    const reviews = safeArray(value).map((item, index) => {
-      const slideId = requireText(item?.slide_id, `screenshot_review.slide_reviews[${index}].slide_id`);
-      if (!expectedSlideIds.has(slideId)) {
-        throw new Error(`Unexpected screenshot_review.slide_reviews[${index}].slide_id: ${slideId}`);
-      }
+    const reviews = safeArray(value).map((item) => {
+      const slideId = safeText(item?.slide_id);
+      if (!slideId || !expectedSlideIds.has(slideId)) return null;
       const rawJudgement = safeText(item?.judgement, 'pass');
-      const judgement = normalizeAiVisualJudgement(rawJudgement);
-      if (!['pass', 'block'].includes(judgement)) {
-        throw new Error(`Invalid screenshot_review.slide_reviews[${index}].judgement: ${rawJudgement}`);
-      }
+      const normalizedJudgement = normalizeAiVisualJudgement(rawJudgement);
+      const judgement = ['pass', 'block'].includes(normalizedJudgement) ? normalizedJudgement : 'block';
       return {
         slide_id: slideId,
         judgement,
-        visual_findings: normalizeStringList(
-          item?.visual_findings,
-          `screenshot_review.slide_reviews[${index}].visual_findings`,
-          { min: 1, max: 4 },
-        ),
+        visual_findings: safeArray(item?.visual_findings).map((finding) => safeText(finding)).filter(Boolean).slice(0, 4).length > 0
+          ? safeArray(item?.visual_findings).map((finding) => safeText(finding)).filter(Boolean).slice(0, 4)
+          : ['review_output_incomplete_quality_debt'],
         recommended_fix: safeText(item?.recommended_fix, judgement === 'pass' ? 'none' : 'revise_render_html'),
       };
-    });
-    if (reviews.length !== mechanicalSlideReviews.length) {
-      throw new Error('screenshot_review.slide_reviews 必须覆盖全部截图页');
-    }
+    }).filter(Boolean);
     const covered = new Set(reviews.map((item) => item.slide_id));
     for (const slideId of expectedSlideIds) {
       if (!covered.has(slideId)) {
-        throw new Error(`Missing screenshot_review.slide_reviews entry for ${slideId}`);
+        reviews.push({
+          slide_id: slideId,
+          judgement: 'block',
+          visual_findings: ['missing_ai_review_quality_debt'],
+          recommended_fix: 'route_back_or_continue_with_quality_debt',
+        });
       }
     }
     return reviews;

@@ -9,7 +9,6 @@ export const OPL_GENERATED_SURFACE_TARGETS = Object.freeze([
   'status_projection_wrapper',
   'session_wrapper',
   'workbench_wrapper',
-  'functional_harness_wrapper',
 ]);
 
 export const OPL_GENERATED_DESCRIPTOR_SCOPE = Object.freeze([

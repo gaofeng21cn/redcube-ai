@@ -49,6 +49,39 @@ test('runDeliverableRoute supports poster_onepager routes on shared runtime', as
   });
 });
 
+test('poster_onepager starts a downstream route without program-owned prerequisite admission', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-poster-direct-stage-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'poster_onepager',
+      profileId: 'knowledge_poster',
+      topicId: 'topic-a',
+      deliverableId: 'poster-direct',
+      title: '甲状腺门诊知识海报',
+      goal: '验证任意 declared stage 均可直接启动',
+    });
+
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'poster_onepager',
+      topicId: 'topic-a',
+      deliverableId: 'poster-direct',
+      route: 'render_html',
+    });
+
+    assert.equal(result.ok, true);
+    const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
+    assert.equal(artifact.status, 'completed_with_quality_debt');
+    assert.equal(artifact.progress_first.next_stage_may_start, true);
+    assert.equal(artifact.quality_debt.blocks_stage_transition, false);
+    assert.equal(
+      artifact.quality_debt.reasons.some((reason) => reason.startsWith('missing_upstream_artifacts:')),
+      true,
+    );
+  });
+});
+
 test('poster_onepager mainline runs through review and export on shared runtime', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));

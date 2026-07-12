@@ -208,6 +208,54 @@ async function buildRoutePayload(context) {
   return buildPayload(context);
 }
 
+function isZeroArtifactHardFailure(error) {
+  if (error?.requiresHumanConfirmation === true || error?.requiresExternalSecret === true) return true;
+  if (['EACCES', 'EPERM', 'ENOENT'].includes(String(error?.code || ''))) return true;
+  const artifactRefs = safeArray(error?.artifact_refs).filter(Boolean);
+  const rawOutput = String(error?.raw_stage_output || error?.artifact?.raw_stage_output || '').trim();
+  return error?.failure_kind === 'codex_cli_execution_blocked'
+    && artifactRefs.length === 0
+    && !rawOutput
+    && !error?.artifact;
+}
+
+function degradedRouteArtifact({ route, error, prerequisiteProjection }) {
+  const rawOutput = String(error?.raw_stage_output || error?.artifact?.raw_stage_output || '').trim();
+  const findings = [
+    ...safeArray(prerequisiteProjection?.findings),
+    ...safeArray(error?.artifact?.normalization_findings),
+    String(error?.message || error || 'stage_output_requires_normalization'),
+  ].map((entry) => String(entry).trim()).filter(Boolean);
+  return {
+    ...(error?.artifact && typeof error.artifact === 'object' ? error.artifact : {}),
+    status: 'completed_with_quality_debt',
+    route,
+    raw_stage_output: rawOutput || null,
+    stage_attempt_diagnostic: {
+      error_name: String(error?.name || 'Error'),
+      error_message: String(error?.message || error),
+      failure_kind: String(error?.failure_kind || 'normalization_or_materialization_quality_debt'),
+    },
+    artifact_refs: [...new Set(safeArray(error?.artifact_refs).filter(Boolean))],
+    normalization_findings: [...new Set(findings)],
+    progress_first: {
+      transition_rule: 'any_readable_stage_artifact_advances',
+      artifact_available: true,
+      advance_allowed: true,
+      next_stage_may_start: true,
+      route_back_selection_owner: 'codex_cli',
+      route_back_may_target_any_declared_stage: true,
+    },
+    quality_debt: {
+      status: 'recorded_non_blocking',
+      reasons: [...new Set(findings)],
+      blocks_stage_transition: false,
+      blocks_visual_ready_claim: true,
+      blocks_export_ready_claim: true,
+    },
+  };
+}
+
 /**
  * @param {{
  *   workspaceRoot: string,
@@ -230,23 +278,55 @@ export async function runPptDeckRoute({
   baselineDeliverableId = '',
   adapter = CODEX_DEFAULT_ADAPTER,
 }) {
-  ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId });
+  const prerequisiteProjection = ensurePrerequisites({
+    workspaceRoot,
+    topicId,
+    deliverableId,
+    route,
+    mode,
+    baselineDeliverableId,
+  });
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const stageContract = [
     ...safeArray(contract.stage_sequence?.stages),
     ...safeArray(contract.stage_sequence?.alternate_stages),
   ].find((stage) => stage?.stage_id === route) || null;
-  let payload = await buildRoutePayload({
-    workspaceRoot,
-    topicId,
-    deliverableId,
-    route,
-    contract,
-    mode,
-    baselineDeliverableId,
-    adapter,
-    deliverablePaths,
-  });
+  let payload;
+  try {
+    payload = await buildRoutePayload({
+      workspaceRoot,
+      topicId,
+      deliverableId,
+      route,
+      contract,
+      mode,
+      baselineDeliverableId,
+      adapter,
+      deliverablePaths,
+    });
+  } catch (error) {
+    if (isZeroArtifactHardFailure(error)) throw error;
+    payload = degradedRouteArtifact({ route, error, prerequisiteProjection });
+  }
+  if (safeArray(prerequisiteProjection?.findings).length > 0) {
+    payload = {
+      ...payload,
+      status: 'completed_with_quality_debt',
+      quality_debt: {
+        ...(payload?.quality_debt || {}),
+        status: 'recorded_non_blocking',
+        reasons: [...new Set([
+          ...safeArray(payload?.quality_debt?.reasons),
+          ...safeArray(prerequisiteProjection.findings),
+        ])],
+        blocks_stage_transition: false,
+        blocks_visual_ready_claim: true,
+        blocks_export_ready_claim: true,
+      },
+      route_back_selection_owner: 'codex_cli',
+      next_stage_may_start: true,
+    };
+  }
   payload = attachRouteReviewReset(payload, route);
   payload = appendArtifactRefs(
     payload,

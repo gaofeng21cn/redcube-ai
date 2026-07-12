@@ -822,22 +822,27 @@ export function createPptDeckStageParts(deps) {
   function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId }) {
     const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
     const contract = readJson(path.join(deliverablePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
+    const findings = [];
     const missing = safeArray(deps.STAGE_REQUIREMENTS?.[route]?.requires_artifacts)
       .filter((stageId) => !readStageArtifact(contract, deliverablePaths, stageId));
     if (missing.length > 0) {
-      throw new Error(`Route ${route} requires completed stage artifacts: ${missing.join(', ')}`);
+      findings.push(`missing_upstream_artifacts:${missing.join(',')}`);
     }
     if (deps.STAGE_REQUIREMENTS?.[route]
       && !['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'].includes(route)) {
-      assertClaimSpineArtifactContinuity(
-        readStageArtifact(contract, deliverablePaths, 'storyline'),
-        readStageArtifact(contract, deliverablePaths, 'detailed_outline'),
-        readStageArtifact(contract, deliverablePaths, 'slide_blueprint'),
-        readStageArtifact(contract, deliverablePaths, 'visual_direction'),
-      );
+      try {
+        assertClaimSpineArtifactContinuity(
+          readStageArtifact(contract, deliverablePaths, 'storyline'),
+          readStageArtifact(contract, deliverablePaths, 'detailed_outline'),
+          readStageArtifact(contract, deliverablePaths, 'slide_blueprint'),
+          readStageArtifact(contract, deliverablePaths, 'visual_direction'),
+        );
+      } catch (error) {
+        findings.push(`claim_spine_continuity_debt:${safeText(error?.message || error)}`);
+      }
     }
     if (route === 'screenshot_review' && mode === 'optimize_existing' && !safeText(baselineDeliverableId)) {
-      throw new Error('screenshot_review requires baselineDeliverableId in optimize_existing mode');
+      findings.push('baseline_deliverable_id_missing');
     }
     if (route === 'screenshot_review' && mode === 'optimize_existing' && safeText(baselineDeliverableId)) {
       const baselineState = getReviewState({
@@ -846,7 +851,7 @@ export function createPptDeckStageParts(deps) {
         deliverableId: baselineDeliverableId,
       }).state;
       if (!isBaselineApprovedState(baselineState)) {
-        throw new Error(`Baseline deliverable is not approved: ${baselineDeliverableId}`);
+        findings.push(`baseline_not_approved:${baselineDeliverableId}`);
       }
     }
     const currentHtmlStage = currentHtmlStageId(contract, deliverablePaths);
@@ -856,7 +861,7 @@ export function createPptDeckStageParts(deps) {
     if (route === PAGE_FIX_ROUTE) {
       const screenshotReviewMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'screenshot_review');
       if (screenshotReviewMtimeMs < currentHtmlMtimeMs) {
-        throw new Error('Route fix_html requires screenshot_review based on the current HTML; rerun screenshot_review first');
+        findings.push('screenshot_review_stale_for_current_html');
       }
     }
     if (route === 'repair_pptx_native') {
@@ -869,7 +874,7 @@ export function createPptDeckStageParts(deps) {
       const hasFreshDirectorRepairRequest = directorReviewMtimeMs >= authorMtimeMs
         && reviewArtifactRequestsRoute(directorReviewArtifact, 'repair_pptx_native');
       if (!hasFreshScreenshotRepairRequest && !hasFreshDirectorRepairRequest) {
-        throw new Error('Route repair_pptx_native requires visual_director_review or screenshot_review based on the current native PPTX and requesting repair_pptx_native; rerun visual_director_review or screenshot_review first');
+        findings.push('repair_pptx_native_review_request_missing_or_stale');
       }
     }
     if (route === 'repair_image_pages') {
@@ -885,32 +890,38 @@ export function createPptDeckStageParts(deps) {
       const hasFreshDirectorRepairRequest = directorReviewMtimeMs >= currentImageMtimeMs
         && reviewArtifactRequestsRoute(directorReviewArtifact, 'repair_image_pages');
       if (!hasFreshScreenshotRepairRequest && !hasFreshDirectorRepairRequest) {
-        throw new Error('Route repair_image_pages requires visual_director_review or screenshot_review based on the current image pages and requesting repair_image_pages; rerun visual_director_review or screenshot_review first');
+        findings.push('repair_image_pages_review_request_missing_or_stale');
       }
     }
     if (route === 'visual_director_review' && !currentVisualStage) {
-      throw new Error('Route visual_director_review requires author_image_pages, render_html, or author_pptx_native before review');
+      findings.push('visual_artifact_missing_for_director_review');
     }
     if (route === 'screenshot_review') {
       const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
       if (!directorReviewArtifact) {
-        throw new Error('Route screenshot_review requires a consumable visual_director_review artifact before audit');
+        findings.push('visual_director_review_missing');
       }
       const directorReviewMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'visual_director_review');
       if (directorReviewMtimeMs < currentVisualMtimeMs) {
-        throw new Error('Route screenshot_review requires visual_director_review to be rerun after the latest visual changes');
+        findings.push('visual_director_review_stale');
       }
     }
     if (route === 'export_pptx') {
       const reviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
       if (!reviewArtifact) {
-        throw new Error('Route export_pptx requires a consumable screenshot_review artifact before export');
+        findings.push('screenshot_review_missing_for_export_claim');
       }
       const screenshotReviewMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'screenshot_review');
       if (screenshotReviewMtimeMs < currentVisualMtimeMs) {
-        throw new Error('Route export_pptx requires screenshot_review to be rerun after the latest visual changes');
+        findings.push('screenshot_review_stale_for_export_claim');
       }
     }
+    return {
+      findings,
+      blocks_stage_start: false,
+      blocks_visual_or_export_ready_claim: findings.length > 0,
+      route_back_selection_owner: 'codex_cli',
+    };
   }
 
 

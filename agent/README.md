@@ -9,9 +9,7 @@ Machine boundary: `agent/` 持有 stage semantics、prompt policy refs、stage s
 
 `contracts/foundry_agent_series.json` 是 RCA 对 OPL Foundry policy 的 refs-only consumer：它只 pin OPL canonical series/skeleton contract 与 shared policy release，使用 canonical `rca` agent identity，并把 generated stage control plane 的 target domain 保持为 `redcube_ai`。通用 lifecycle、workspace topology、closeout 和 public-series policy body 全部由 OPL 持有；RCA 只在 `visual_domain_delta_refs`、`contracts/domain_descriptor.json` 与本 pack 中保留 visual-material input、visual-deliverable stage semantics，以及 PPT/PDF/PNG/export handoff 的 domain refs。
 
-`contracts/visual_transition_adapter_profile.json` 是 RCA-owned visual transition adapter registry。product-entry 将其作为顶层 `visual_transition_adapter_profile_registry` 原样投影给 OPL Atlas；该 registry 仅提供 domain refs，不执行 domain action、不写 visual truth，也不签 owner receipt、typed blocker、quality 或 export verdict。
-
-product-entry 以 `{ref_kind: "generated_surface", ref: "opl-generated:family_stage_control_plane", source_ref: "agent/stages/manifest.json"}` 指向 OPL 生成的 stage plane，并把 `visual_transition_spec` 与 `visual_transition_adapter_profile_registry` 保持为顶层 RCA-owned Atlas input。`domain-handler export` 只公开 action-handler、domain-authority、evidence、typed-blocker、receipt 与 artifact-locator refs，不复制通用 runtime、workbench、operator 或 readiness projection。
+product-entry 以 `{ref_kind: "generated_surface", ref: "opl-generated:family_stage_control_plane", source_ref: "agent/stages/manifest.json"}` 指向 OPL 生成的 stage plane，并投影 `ai_route_policy`。该 policy 不执行或校验 semantic route；Codex CLI 是唯一 route owner。`domain-handler export` 只公开 action-handler、domain-authority、evidence、typed-blocker、receipt 与 artifact-locator refs，不复制通用 runtime、workbench、operator 或 readiness projection。
 
 ## Stage Prompt / Skill / Tool 分工
 

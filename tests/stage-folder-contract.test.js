@@ -118,7 +118,9 @@ test('RCA stage folder artifact write creates manifest, receipt, current pointer
       manifest.authority_boundary.stage_folder_terminal_status_role,
       'domain_owner_closeout_receipt_projection_not_opl_stage_run_terminal_state',
     );
-    assert.equal(manifest.authority_boundary.stage_transition_authority_required_for_opl_stage_run_current, true);
+    assert.equal(manifest.authority_boundary.codex_cli_route_context_is_semantic_owner, true);
+    assert.equal(manifest.authority_boundary.framework_stage_run_current_is_passive_projection, true);
+    assert.equal(manifest.authority_boundary.framework_can_accept_reject_or_override_codex_route, false);
     assert.equal(manifest.authority_boundary.can_write_opl_stage_run_current_pointer, false);
     assert.equal(manifest.authority_boundary.can_write_opl_stage_run_terminal_state, false);
     assert.equal(manifest.authority_boundary.can_publish_current_owner_delta, false);
@@ -349,7 +351,7 @@ test('RCA stage folder manifest exposes canonical output roles, stage receipts, 
   });
 });
 
-test('RCA blocked stage folder attempts expose typed blocker stage receipts', () => {
+test('RCA readable blocked attempts expose typed blocker evidence as quality debt', () => {
   withTempOplState(() => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-blocked-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
@@ -383,7 +385,7 @@ test('RCA blocked stage folder attempts expose typed blocker stage receipts', ()
       routeStageId: 'screenshot_review',
       canonicalStageId: 'review_and_revision',
     });
-    assert.equal(loaded?.status, 'blocked');
+    assert.equal(loaded?.status, 'completed_with_quality_debt');
     assert.equal(loaded?.artifact.status, 'block');
   });
 });
@@ -558,7 +560,7 @@ test('RCA route stage folder helper supplies deterministic owner receipt refs', 
   });
 });
 
-test('RCA stage folder artifact read marks output-only folders as orphan, not completed stage', () => {
+test('RCA stage folder artifact read advances output-only folders with quality debt', () => {
   withTempOplState(() => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-orphan-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
@@ -577,9 +579,9 @@ test('RCA stage folder artifact read marks output-only folders as orphan, not co
       routeStageId: 'author_image_pages',
     });
 
-    assert.equal(loaded?.status, 'orphan');
-    assert.equal(loaded?.artifact, null);
-    assert.deepEqual(loaded?.orphan_outputs, ['author_image_pages.json']);
+    assert.equal(loaded?.status, 'completed_with_quality_debt');
+    assert.deepEqual(loaded?.artifact, {});
+    assert.deepEqual(loaded?.orphan_outputs, []);
   });
 });
 

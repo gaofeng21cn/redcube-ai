@@ -71,13 +71,6 @@ const DOMAIN_ACTION_ADAPTER_GUARDED_ACTIONS = Object.freeze([
     api_surface: 'domainActionAdapterApplyVisualWorkspaceLifecycle',
   },
   {
-    action: 'evaluate_visual_transition',
-    effect: 'read_only_transition_guard_evaluation',
-    summary: 'Evaluate an RCA-owned visual_transition_spec transition against explicit guard refs and return next-stage metadata or a typed blocker; OPL keeps generic runner ownership.',
-    required_fields: ['workspace_root', 'transition_id', 'current_stage'],
-    api_surface: 'domainActionAdapterEvaluateVisualTransition',
-  },
-  {
     action: 'emit_workspace_receipt_proof',
     effect: 'guarded_workspace_receipt_proof_write',
     summary: 'Emit a workspace-runtime proof pack that chains RCA-owned memory, lifecycle, no-regression, and domain owner receipt refs without writing visual artifacts or OPL generic runtime state.',

@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 
 import {
   buildCodexExecArgs,
@@ -56,19 +56,12 @@ export async function runCodexPrompt({
   cwd = process.cwd(),
   timeoutMs = 120000,
   spawnSyncImpl = null,
-  outputSchema = null,
 } = {}) {
   if (!safeText(prompt)) throw new Error('Codex prompt 不能为空');
   const tempDir = path.join(os.tmpdir(), 'opl-domain-task-runtime', 'redcube-ai');
   mkdirSync(tempDir, { recursive: true });
   const runId = `run_codex_${randomUUID()}`;
   const lastMessageFile = path.join(tempDir, `${runId}.last-message.txt`);
-  const outputSchemaFile = outputSchema && typeof outputSchema === 'object'
-    ? path.join(tempDir, `${runId}.output-schema.json`)
-    : '';
-  if (outputSchemaFile) {
-    writeFileSync(outputSchemaFile, `${JSON.stringify(outputSchema, null, 2)}\n`, 'utf-8');
-  }
   const args = [
     ...contract.command.slice(1),
     ...buildCodexExecArgs(prompt, {
@@ -79,30 +72,24 @@ export async function runCodexPrompt({
       model: contract.model || undefined,
       reasoningEffort: contract.reasoning_effort || undefined,
       outputLastMessagePath: lastMessageFile,
-      outputSchemaPath: outputSchemaFile || undefined,
       promptViaStdin: true,
     }),
   ];
-  let result;
-  try {
-    result = typeof spawnSyncImpl === 'function'
-      ? spawnSyncImpl(contract.command[0], args, {
-          cwd: path.resolve(cwd),
-          encoding: 'utf-8',
-          maxBuffer: 20 * 1024 * 1024,
-          timeout: timeoutMs,
-          input: prompt,
-          env: process.env,
-        })
-      : await runCodexCommandStreaming(args, {
-          binaryPath: contract.command[0],
-          cwd: path.resolve(cwd),
-          timeoutMs,
-          stdin: prompt,
-        });
-  } finally {
-    if (outputSchemaFile && existsSync(outputSchemaFile)) unlinkSync(outputSchemaFile);
-  }
+  const result = typeof spawnSyncImpl === 'function'
+    ? spawnSyncImpl(contract.command[0], args, {
+        cwd: path.resolve(cwd),
+        encoding: 'utf-8',
+        maxBuffer: 20 * 1024 * 1024,
+        timeout: timeoutMs,
+        input: prompt,
+        env: process.env,
+      })
+    : await runCodexCommandStreaming(args, {
+        binaryPath: contract.command[0],
+        cwd: path.resolve(cwd),
+        timeoutMs,
+        stdin: prompt,
+      });
   if (result.error) throw result.error;
   const parsed = parseCodexExecOutput(result.stdout || '');
   return {

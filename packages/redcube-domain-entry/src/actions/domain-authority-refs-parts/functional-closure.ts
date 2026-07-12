@@ -1,7 +1,5 @@
 // @ts-nocheck
 
-import { readJson } from '../json-file.js';
-
 const DOMAIN_OWNER = 'redcube_ai';
 
 export function buildDomainOwnerReceiptContract() {
@@ -314,7 +312,7 @@ export function buildLifecycleGuardedApplyProof() {
   };
 }
 
-export function buildVisualTransitionSpec() {
+export function buildAiRoutePolicy() {
   const stageKinds = [
     'source_intake',
     'communication_strategy',
@@ -324,144 +322,30 @@ export function buildVisualTransitionSpec() {
     'package_and_handoff',
   ];
   return {
-    surface_kind: 'visual_transition_spec',
-    spec_id: 'rca.visual_transition_spec.v1',
+    surface_kind: 'rca_ai_route_policy',
+    policy_id: 'rca.ai_route_policy.v1',
     owner: DOMAIN_OWNER,
-    status: 'contract_landed_thin_evaluator_landed_runner_owned_by_opl',
-    transition_model: 'rca_owned_transition_table_oracle_fixture_refs_only',
-    source_contract: 'human_doc:rca_ideal_state_gap_plan#declare_visual_transition_spec',
-    covered_family_stage_kinds: stageKinds,
-    transition_table: [
-      {
-        transition_id: 'source_ready_to_strategy',
-        from_stage: 'source_intake',
-        to_stage: 'communication_strategy',
-        required_guard_refs: ['source_readiness_ref', 'source_gap_ref'],
-        owner_action: 'continue_to_communication_strategy',
-      },
-      {
-        transition_id: 'strategy_ready_to_visual_direction',
-        from_stage: 'communication_strategy',
-        to_stage: 'visual_direction',
-        required_guard_refs: ['communication_strategy_ref', 'audience_promise_ref'],
-        owner_action: 'continue_to_visual_direction',
-      },
-      {
-        transition_id: 'visual_direction_ready_to_artifact_creation',
-        from_stage: 'visual_direction',
-        to_stage: 'artifact_creation',
-        required_guard_refs: ['visual_direction_ref', 'route_selection_ref', 'artifact_locator_ref'],
-        owner_action: 'create_visual_artifacts',
-      },
-      {
-        transition_id: 'artifact_ready_to_review',
-        from_stage: 'artifact_creation',
-        to_stage: 'review_and_revision',
-        required_guard_refs: ['artifact_refs', 'prompt_manifest_ref', 'style_manifest_ref'],
-        owner_action: 'run_review_and_repair_gate',
-      },
-      {
-        transition_id: 'review_ready_to_package',
-        from_stage: 'review_and_revision',
-        to_stage: 'package_and_handoff',
-        required_guard_refs: ['review_state_ref', 'blocked_item_ref', 'export_proof_ref'],
-        owner_action: 'export_or_return_typed_blocker',
-      },
-    ],
-    guard_contract: {
-      guard_model: 'refs_and_typed_blockers_only',
-      required_guard_classes: [
-        'source_readiness',
-        'communication_strategy',
-        'visual_direction',
-        'artifact_locator',
-        'review_state',
-        'export_proof',
-      ],
-      allowed_blocker_kinds: [
-        'source_material_required',
-        'route_selection_required',
-        'artifact_refs_missing',
-        'review_blocked_items_present',
-        'export_proof_missing',
-        'domain_owner_receipt_required',
-      ],
+    status: 'single_codex_semantic_control_plane',
+    declared_stage_kinds: stageKinds,
+    route_policy: 'ai_selected_progress_route',
+    route_capabilities: {
+      advance: true,
+      repeat_current_stage: true,
+      skip_declared_stage: true,
+      route_back_to_any_declared_stage: true,
+      carry_raw_partial_failed_or_negative_artifacts: true,
     },
-    oracle_fixture: {
-      fixture_id: 'rca.visual_transition_oracle.fixture.v1',
-      fixture_model: 'transition_guard_expected_owner_action_refs_only',
-      covered_families: ['ppt_deck', 'xiaohongshu', 'poster_onepager'],
-      expected_return_shapes: [
-        'next_stage',
-        'repair_action',
-        'typed_blocker',
-        'domain_owner_receipt_ref',
-        'no_regression_evidence_ref',
-      ],
-      forbidden_oracle_fields: [
-        'visual_verdict',
-        'export_verdict',
-        'review_verdict',
-        'canonical_artifact_blob',
-        'memory_content_body',
-      ],
+    quality_debt_policy: {
+      blocks_stage_transition: false,
+      blocks_visual_export_acceptance_or_ready_claims: true,
     },
-    evaluator_descriptor: {
-      descriptor_id: 'rca.visual_transition_evaluator.v1',
-      surface_kind: 'visual_transition_evaluator',
-      status: 'thin_evaluator_landed_runner_owned_by_opl',
-      domain_action_adapter_action: 'evaluate_visual_transition',
-      input_model: 'transition_id_current_stage_and_explicit_guard_refs',
-      return_shapes: [
-        'visual_transition_evaluation',
-        'typed_blocker',
-      ],
-      output_refs: [
-        'next_stage',
-        'repair_action',
-        'typed_blocker',
-        'domain_owner_receipt_ref',
-        'no_regression_evidence_ref',
-        'transition_result_ref',
-      ],
-      refs_only: true,
-    },
-    family_transition_spec_descriptor: {
-      descriptor_id: 'rca.visual_transition.family_transition_spec_descriptor.v1',
-      source_visual_transition_spec_ref: '/visual_transition_spec',
-      opl_visual_ingestion_surface: 'one-person-lab/src/family-transition-visual-ingestion.ts',
-      opl_generic_runner_contract_ref: 'one-person-lab/contracts/opl-framework/family-transition-runner-contract.json',
-      rca_evaluator_ref: '/visual_transition_evaluator',
-      rca_bridge_evidence_ref: '/visual_transition_evaluator/bridge_evidence_projection',
-      descriptor_model: 'rca_visual_spec_to_opl_family_transition_spec_refs_only',
-      rca_implements_opl_generic_runner: false,
-      rca_writes_runner_state: false,
-    },
-    runner_boundary: {
-      opl_can_execute_transition_spec: true,
-      opl_can_retry_or_dead_letter: true,
-      opl_can_store_transition_metadata: true,
-      opl_can_declare_visual_ready: false,
-      opl_can_declare_exportable: false,
-      opl_can_mutate_artifacts: false,
-      domain_receipt_required_for_visual_closeout: true,
-      rca_can_evaluate_guard_refs: true,
-      rca_implements_generic_transition_runner: false,
-    },
-    repository_boundary: {
-      repo_tracks_transition_spec: true,
-      repo_tracks_oracle_fixture_contract: true,
-      repo_tracks_evaluator_contract: true,
-      repo_tracks_runner_state: false,
-      repo_tracks_visual_or_export_artifacts: false,
-      repo_tracks_receipt_instances: false,
+    authority_boundary: {
+      semantic_route_owner: 'codex_cli',
+      static_transition_table_present: false,
+      transition_evaluator_present: false,
+      program_guard_can_select_or_reject_route: false,
+      opl_role: 'transport_declared_stage_scope_and_attempt_lifecycle_only',
+      rca_role: 'visual_truth_quality_export_and_artifact_authority_only',
     },
   };
-}
-
-export function buildVisualTransitionAdapterProfileRegistry() {
-  return readJson(new URL(
-    '../../../../../contracts/visual_transition_adapter_profile.json',
-    import.meta.url,
-  ));
 }

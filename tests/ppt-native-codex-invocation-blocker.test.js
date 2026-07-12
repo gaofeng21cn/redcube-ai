@@ -14,7 +14,7 @@ import {
 import { runDeliverableRoute } from './product-domain-action-test-api.js';
 import { createNativePptExecutorAttemptDiagnosticParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/native-ppt-executor-attempt-diagnostic.js';
 
-test('native PPT Codex failures persist OPL attempt diagnostics without creating typed blockers', async () => {
+test('native PPT Codex failures advance with diagnostics and quality debt without typed blockers', async () => {
   await withMockNativePptRuntime(async () => {
     const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-codex-blocker-');
     await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-codex-blocker' });
@@ -45,11 +45,13 @@ test('native PPT Codex failures persist OPL attempt diagnostics without creating
       restoreRoute();
     }
 
-    assert.equal(nativeResult.ok, false);
-    assert.equal(nativeResult.run.status, 'failed');
-    assert.equal(nativeResult.run.error.failure_kind, 'codex_cli_execution_blocked');
-    assert.equal(nativeResult.run.error.artifact_file, blockerFile);
-    assert.equal(nativeResult.run.error.artifact_refs.includes(blockerFile), true);
+    assert.equal(nativeResult.ok, true);
+    assert.equal(nativeResult.run.status, 'completed_with_quality_debt');
+    assert.equal(nativeResult.artifact.status, 'completed_with_quality_debt');
+    assert.equal(nativeResult.artifact.progress_first.advance_allowed, true);
+    assert.equal(nativeResult.artifact.quality_debt.blocks_stage_transition, false);
+    assert.equal(nativeResult.artifactFile.endsWith('/outputs/native_ppt_bundle.json'), true);
+    assert.equal(nativeResult.run.artifact_refs.includes(nativeResult.artifactFile), true);
     assert.equal(nativeResult.run.artifact_refs.includes(blockerFile), true);
     assert.equal(existsSync(blockerFile), true);
 
