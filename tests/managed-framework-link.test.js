@@ -36,7 +36,7 @@ test('repo command wrapper runs only after the OPL-managed framework link check 
     fs.writeFileSync(fakeOplPath, [
       '#!/usr/bin/env bash',
       'printf "%s\\n" "$@" > "$OPL_TEST_ARGS_PATH"',
-      'printf \'{"error":"framework_link_missing","details":{"repair_command":"opl connect agent-packages link-framework --agent-root <repo> --json"}}\\n\'',
+      'printf \'{"error":"framework_link_missing","details":{"repair_command":"opl packages link-framework --agent-root <repo> --json"}}\\n\'',
       'exit 42',
       '',
     ].join('\n'));
@@ -63,8 +63,7 @@ test('repo command wrapper runs only after the OPL-managed framework link check 
     assert.equal(fs.existsSync(commandMarkerPath), false);
     assert.deepEqual(snapshotTree(agentRoot), before);
     assert.deepEqual(fs.readFileSync(argsPath, 'utf8').trim().split('\n'), [
-      'connect',
-      'agent-packages',
+      'packages',
       'link-framework',
       '--agent-root',
       fs.realpathSync(agentRoot),
