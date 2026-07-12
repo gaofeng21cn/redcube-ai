@@ -147,10 +147,9 @@ export function createPptDeckRenderRevisionParts(deps) {
           previous_route: PAGE_FIX_ROUTE,
           previous_target_slide_ids: Array.from(previousFixSlideIds),
           repeat_blocked_slide_ids: repeatBlockedSlideIds,
-          escalation_strategy: 'structure_level_repair_required',
-          structure_level_repair_required: true,
-          invalid_repair_patterns: ['padding_only', 'line_height_only', 'micro_font_scale_only'],
-          escalation_rule: '上一轮 fix_html 后仍被 screenshot_review 拦下的页面必须结构级简化、重排或扩大容器；如果仍是同一父容器 edge_clearance/block_content 问题，必须删除或合并至少一个次级说明句、芯片或装饰行；不得继续只做 padding、line-height 或微缩字号调整。',
+          escalation_strategy: 'reassess_failure_boundary_and_repair_scope',
+          prior_repair_failed: true,
+          escalation_rule: 'Use the current pixels and findings to re-diagnose the failure owner and choose a materially different smallest coherent repair or upstream route; do not replay an unchanged repair.',
         }
       : null;
     const screenshotSummary = screenshotReviewArtifact
@@ -226,7 +225,7 @@ export function createPptDeckRenderRevisionParts(deps) {
         ...operatorKeep.map((item) => `keep: ${item}`),
         ...operatorAvoid.map((item) => `avoid: ${item}`),
         ...(repeatBlockAfterFix
-          ? ['重复阻塞：上一轮 fix_html 后本页仍被 screenshot_review 拦下，说明微调不足。']
+          ? ['Prior targeted repair did not close the current screenshot findings; reassess the failure boundary and repair scope.']
           : []),
       ].filter(Boolean);
       const recommendedFixParts = [
@@ -236,7 +235,7 @@ export function createPptDeckRenderRevisionParts(deps) {
         ...operatorKeep.map((item) => `保留：${item}`),
         ...operatorAvoid.map((item) => `避免：${item}`),
         ...(repeatBlockAfterFix
-          ? ['重复阻塞强制规则：必须明显删减至少一个次级元素、重排结构或扩大主要容器；如果同一父容器仍有 edge_clearance/block_content 问题，必须删除或合并至少一个次级说明句、芯片或装饰行，不得仅调整 padding、line-height 或微缩字号。']
+          ? ['Choose a materially different repair or route based on the current pixels and findings; do not replay the unchanged prior adjustment.']
           : []),
       ].filter(Boolean);
       focusBySlideId.set(slideId, {
@@ -244,10 +243,7 @@ export function createPptDeckRenderRevisionParts(deps) {
         blocked_for_screenshot_review: blockedSlideIds.has(slideId),
         operator_requested_revision: operatorTargetSlideIds.has(slideId),
         repeat_block_after_fix: repeatBlockAfterFix,
-        structure_level_repair_required: repeatBlockAfterFix,
-        invalid_repair_patterns: repeatBlockAfterFix
-          ? ['padding_only', 'line_height_only', 'micro_font_scale_only']
-          : [],
+        prior_repair_failed: repeatBlockAfterFix,
         blocked_checks: safeArray(slideFeedback?.blocked_checks),
         ai_findings: aiFindings,
         recommended_fix: recommendedFixParts.join('；'),
@@ -255,7 +251,7 @@ export function createPptDeckRenderRevisionParts(deps) {
           ? normalizeInlineText(revisionContext?.visual_director_review?.review_summary, 220)
           : '',
         rewrite_priority: repeatBlockAfterFix
-          ? 'repeat_block_requires_structural_simplification'
+          ? 'repeat_block_requires_reassessment'
           : 'must_fix_before_new_variation',
       });
     }
@@ -555,9 +551,8 @@ export function createPptDeckRenderRevisionParts(deps) {
       repair_attempt: scopedRevisionContext?.repair_attempt
         ? {
             repeat_blocked_slide_ids: safeArray(scopedRevisionContext.repair_attempt.repeat_blocked_slide_ids),
-            escalation_strategy: 'structure_level_repair_required',
-            structure_level_repair_required: true,
-            invalid_repair_patterns: ['padding_only', 'line_height_only', 'micro_font_scale_only'],
+            escalation_strategy: 'reassess_failure_boundary_and_repair_scope',
+            prior_repair_failed: true,
           }
         : null,
     };

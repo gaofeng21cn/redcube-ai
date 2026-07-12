@@ -1,62 +1,17 @@
 # xiaohongshu / visual_direction
 
-视觉导演稿是 HTML 前硬前置。
-## AI-first 视觉导演合同
+## Goal
 
-- 必须基于当前 `single_note_plan.slides` 的真实页数、真实 `slide_id` 与页面内容生成视觉导演稿。
-- `rhythm_curve` 必须覆盖当前 plan 的每一页；不得照抄 N01-N06 示例，也不得把内容强行压成固定 6 页。
-- `peak_pages` 必须从当前 plan 的真实 `slide_id` 中选择，数量由内容峰值决定。
-- `page_family_ceiling` 由 AI 根据当前 note 的页面数量、layout family 分布与同构风险自行设定；它是视觉多样性约束，不是页数预算。
-- 不得把 `runtime_seed` 或输出 schema 中的占位值当成默认视觉方向。
+Create a coherent 3:4 visual thesis, rhythm, and mobile-reading system for the real pages in the current note plan.
 
-要求：
-- 必须显式包含 visual motif / rhythm curve / peak pages / page family ceiling / forbidden regressions / anti-template constraints / source language discipline / visual anchor system / signature exposure grammar
-- 不是“风格描述 + 颜色建议”
-- optimize_existing 时必须写出 baseline-relative forbidden regressions
-- 封面、机制峰值页和结尾页都要定义清楚的视觉锚点；XHS 优先 Font Awesome Free，emoji 只做补充
-- 禁止把孤立单字贴纸、随机图形或内部标签当成视觉锚点
-- 必须显式定义相邻可读块安全间距：副标题、主卡、步骤条、底部收束、署名之间要有清楚呼吸；视觉贴住按失败处理
-- 必须把最近成熟系列验证过的中密度手机可读原则写进导演稿：核心判断、3 个短模块、边界提示、下半区实质信息。
-- 必须输出页面差异策略：`unique_layout_count`、`max_consecutive_same_layout`、关键机制页是否有下半区模块、是否避免连续上重下空。
-- 当总页数 >= 8 时，必须规划至少 2 页机制/流程/图解类页面，且普通卡片堆叠页不得成为主要视觉 fallback。
+## Good Work
 
-## runtime_seed
+- Use real slide ids/content; do not impose a default six-page rhythm, peak list, family quota, sample palette, or repeated template.
+- Define motif, material/typography/palette, rhythm, peak pages, continuity, density, page-family reuse limits, source-language discipline, branding exposure, and regressions to avoid.
+- Make every page's first-glance action and information hierarchy clear. Use semantic anchors consistently; decoration and isolated labels cannot substitute for meaning.
+- Protect readable blocks, natural line breaks, lower-page information use, author signature, and spacing between title, body, action, close, and footer regions.
+- Route a capacity or content-structure problem back to the note plan before rendering rather than compressing it into illegible cards.
 
-下列 JSON 只说明字段形状，不提供默认 6 页节奏、固定峰值页或固定页面家族配额。
+## Handoff
 
-```json
-{
-  "visual_direction": {
-    "director_statement": "<AI-authored director statement for the current single_note_plan>",
-    "visual_motif": "<AI-authored visual motif>",
-    "material_rules": {
-      "paper_base": "<AI-authored paper/base material>",
-      "main_accent": "#2563EB",
-      "warning_accent": "#DC2626"
-    },
-    "rhythm_curve": [
-      {"slide_id":"<slide_id from current single_note_plan>","role":"<AI-authored visual role>"}
-    ],
-    "peak_pages": ["<slide_id from current single_note_plan>"],
-    "page_family_ceiling": {
-      "<layout_family from current single_note_plan>": "<AI-authored reuse ceiling for this note>"
-    },
-    "anti_template_constraints": [
-      "<AI-authored anti-template constraint>",
-      "<AI-authored anti-template constraint>"
-    ],
-    "production_quality_gates": {
-      "density_standard": "medium_density_mobile_readable",
-      "unique_layout_count_min": 3,
-      "max_consecutive_same_layout": 3,
-      "bottom_half_substantive_module_required": true,
-      "contact_sheet_review_expected_for_series": true
-    },
-    "source_language_discipline": "<AI-authored source-language discipline>",
-    "forbidden_regressions": [
-      "<AI-authored forbidden regression>",
-      "<AI-authored forbidden regression>"
-    ]
-  }
-}
-```
+Return the visual-direction object required by the attached output contract. The plan and direction jointly form the materialization basis; neither grants pixel-review or export approval.

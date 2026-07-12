@@ -1,47 +1,14 @@
 # xiaohongshu / series_plan
 
-Use this detailed asset when `storyline.mode_decision.result` is `series`. The professional method owner is `agent/professional_skills/rca-xhs-content-strategist/SKILL.md`; this file defines the family-specific handoff shape.
+Use this professional handoff only when the accepted storyline selects series mode.
 
-## AI-first series contract
+## Good Work
 
-- Build the series from full source truth, audience needs, and distinct reader tasks.
-- A narrative act is not a note quota. Split overloaded chapters until each note has one coherent question and a readable page estimate.
-- Each note must declare what it covers, which evidence anchors support it, what adjacent notes cover, and what must not be repeated.
-- For medicine-related content, use comparison, class, mechanism, decision context, or evidence-bound patient questions rather than a promotional single-drug profile.
-- For medical content, preserve evidence, uncertainty, and seek-care/action boundaries. `认知 -> 希望 -> 同行` is optional narrative guidance, not a substitute for source truth.
-- Normal dense notes may target 8-14 pages; no note may exceed 18 pages. Shorter notes remain valid when the reader task closes cleanly.
+- Split the full source by distinct reader questions and evidence responsibilities, not by a fixed act or note quota.
+- Give every chapter/note a role, scope, evidence anchors, readable page estimate, transition, and no-repeat boundary.
+- Keep medical evidence, uncertainty, and action/seek-care boundaries visible across the series; avoid promotional single-drug framing.
+- A note may be shorter when its reader task closes cleanly and may not exceed the platform ceiling defined by the note-planning contract.
 
-## Handoff Shape
+## Handoff
 
-```json
-{
-  "series_architecture": {
-    "status": "required",
-    "series_thesis": "<one source-grounded series thesis>",
-    "recommended_note_range": "<AI-authored range and rationale>",
-    "chapters": [
-      {
-        "chapter_id": "C01",
-        "chapter_role": "<reader progression role>",
-        "reader_question": "<question this chapter resolves>",
-        "topic_units": ["<source-grounded unit>"],
-        "transition": "<bridge to next chapter>"
-      }
-    ],
-    "note_briefs": [
-      {
-        "note_id": "N01",
-        "chapter_id": "C01",
-        "working_title": "<normally <=20 Chinese characters>",
-        "reader_question": "<one distinct question>",
-        "content_scope": "<included and excluded scope>",
-        "evidence_anchors": ["<public or source-grounded evidence anchor>"],
-        "estimated_pages": "<AI-authored estimate, max 18>",
-        "transition": "<previous/next bridge>",
-        "no_repeat_scope": ["<facts owned elsewhere in the series>"]
-      }
-    ],
-    "publication_arc": ["<sequence role and continuity instruction>"]
-  }
-}
-```
+Return the series architecture in the attached output shape. `rca-xhs-content-strategist` owns the professional judgment; schemas only validate the handoff.

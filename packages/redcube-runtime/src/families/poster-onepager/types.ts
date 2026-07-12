@@ -15,9 +15,9 @@ export type PosterLayoutFamily = 'hero_band' | 'evidence_columns' | 'pathway_str
 export type PosterRecipeId = 'poster.hero_band' | 'poster.evidence_columns' | 'poster.pathway_strip' | 'poster.action_footer';
 
 export interface PosterPackProvenanceStamp {
-  owner: 'runtime_artifact_provenance';
-  primary_surface: 'runtime_artifact_provenance';
-  stage_owner: 'runtime_artifact_provenance';
+  owner: string;
+  primary_surface: string;
+  stage_owner: string;
   route: string;
   lifecycle_stage: string;
   authored_surface: string;
@@ -62,24 +62,6 @@ export interface PosterStorylineArtifact {
     why_now: string;
     proof_promise: string;
     call_to_action: string;
-  };
-}
-
-interface PosterBlueprintSeedPanel {
-  panel_id: string;
-  region: PosterLayoutFamily;
-  label: string;
-  text: string;
-  support_points?: string[];
-}
-
-interface PosterBlueprintSeed {
-  poster_blueprint?: {
-    render_recipe_id?: PosterRecipeId;
-    headline?: string;
-    subheadline?: string;
-    panels?: PosterBlueprintSeedPanel[];
-    anchor_tracks?: string[];
   };
 }
 
@@ -136,25 +118,6 @@ export interface PosterBlueprintArtifact {
       require_visual_direction_before_html: boolean;
       forbid_template_route_tokens: string[];
       canvas: PosterCanvasContract;
-    };
-  };
-}
-
-interface PosterVisualDirectionSeed {
-  visual_direction?: {
-    visual_manifest?: string;
-    poster_motif?: string;
-    peak_region?: PosterLayoutFamily;
-    panel_emphasis?: Partial<Record<PosterLayoutFamily, string>>;
-    page_family_ceiling?: Partial<Record<PosterLayoutFamily, number>>;
-    anti_template_constraints?: string[];
-    forbidden_regressions?: string[];
-    final_instruction_to_html_generator?: string[];
-    palette?: {
-      paper?: string;
-      ink?: string;
-      accent?: string;
-      highlight?: string;
     };
   };
 }
@@ -234,7 +197,7 @@ export interface PosterRenderSlide {
     recipe_decision: PosterRenderSlide['creative_sources']['recipe_selection'];
     final_html_markup: PosterRenderSlide['creative_sources']['final_markup'];
   };
-  markup_contract_source: 'runtime_artifact_provenance';
+  markup_contract_source: 'codex_cli_json_output' | string;
   content: string;
 }
 
@@ -277,7 +240,6 @@ export interface PosterRenderArtifact {
 interface PosterBlueprintDependencies {
   safeText: (value: unknown, fallback?: string) => string;
   safeArray: <T>(value: unknown) => T[];
-  promptSeed: (contract: PosterHydratedContract, route: PosterPromptRoute, vars?: Record<string, string>) => PosterBlueprintSeed | PosterVisualDirectionSeed | null;
   attachCommon: (route: PosterStageRoute, contract: PosterHydratedContract) => Record<string, unknown>;
   CANVAS: PosterCanvasContract;
   BANNED_RENDER_TOKENS: string[];
@@ -287,14 +249,12 @@ interface PosterBlueprintDependencies {
 interface PosterVisualDirectionDependencies {
   safeText: (value: unknown, fallback?: string) => string;
   safeArray: <T>(value: unknown) => T[];
-  promptSeed: (contract: PosterHydratedContract, route: PosterPromptRoute, vars?: Record<string, string>) => PosterVisualDirectionSeed | null;
   attachCommon: (route: PosterStageRoute, contract: PosterHydratedContract) => Record<string, unknown>;
 }
 
 interface PosterRenderArtifactDependencies {
   readStageArtifact: (contract: PosterHydratedContract, deliverablePaths: PosterDeliverablePaths, stageId: string) => PosterBlueprintArtifact | PosterVisualDirectionArtifact | null;
   renderContract: (contract: PosterHydratedContract) => PosterRenderContract;
-  promptArtifact: (contract: PosterHydratedContract, route: 'render_html') => { render_markup_artifact?: { artifact_surface?: string; binding_model?: string; authored_markup_registry?: Record<string, string>; }; } | null;
   safeText: (value: unknown, fallback?: string) => string;
   safeArray: <T>(value: unknown) => T[];
   attachCommon: (route: PosterStageRoute, contract: PosterHydratedContract) => Record<string, unknown>;
@@ -368,7 +328,8 @@ export interface PosterRuntimePromptMeta {
   root: string;
   file: string;
   relative_path: string;
-  source: 'repo' | 'embedded';
+  source: 'repo';
+  body_sha256: string;
 }
 
 export interface PosterRuntimeReviewPolicy {

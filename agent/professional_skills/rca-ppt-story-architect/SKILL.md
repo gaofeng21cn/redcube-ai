@@ -5,6 +5,10 @@ description: "Use when RedCube AI needs a PPT story specialist to turn frozen so
 
 # RCA PPT Story Architect
 
+## Runtime Summary
+
+Turn the accepted source and audience goal into a claim spine, storyline, slide roles, evidence placement, and transitions. Preserve source meaning and public naming while allowing outline, blueprint, capacity, and visual discoveries to iterate. Route unsupported claims or structural overload upstream instead of solving them with layout.
+
 Operate as the PPT narrative specialist inside the RCA stage chain. Keep the stage prompt as the canonical schema owner; use this skill to make the story work professional, source-faithful, page-by-page, and ready for visual direction.
 
 ## AI-First / Contract-Light Boundary

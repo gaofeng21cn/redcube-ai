@@ -13,25 +13,34 @@ test('repo-local OPL agent package manifest keeps RCA package and authority boun
   const manifest = readJson('contracts/opl_agent_package_manifest.json');
   const domainDescriptor = readJson('contracts/domain_descriptor.json');
   const registration = readJson('contracts/opl_domain_manifest_registration.json');
+  const pluginManifest = readJson('plugins/redcube-ai/.codex-plugin/plugin.json');
 
   assert.equal(manifest.surface_kind, 'opl_agent_package_manifest.v1');
   assert.equal(manifest.agent_id, 'rca');
-  assert.equal(manifest.package_id, 'redcube-ai');
+  assert.equal(manifest.package_id, 'rca');
+  assert.equal(manifest.package_id, manifest.agent_id);
   assert.equal(manifest.source, 'first_party_repo_local');
-  assert.equal(manifest.source_contract.central_manifest_ref, 'one-person-lab/contracts/opl-framework/agent-packages/rca.json');
-  assert.equal(manifest.source_contract.central_package_id, 'redcube-ai');
+  assert.equal(manifest.source_contract.central_manifest_ref, 'contracts/opl-framework/packages/rca.json');
+  assert.equal(manifest.source_contract.central_package_id, 'rca');
+  assert.equal(manifest.source_contract.repo_slug, 'redcube-ai');
+  assert.equal(Object.hasOwn(manifest.source_contract, 'central_agent_id_alias'), false);
   assert.equal(manifest.source_contract.repo_canonical_agent_id, registration.agent_id);
   assert.equal(domainDescriptor.package_id, manifest.package_id);
 
   assert.equal(manifest.carrier_source_role, 'codex_plugin_default_carrier_not_package_truth');
   assert.equal(manifest.codex_surface.plugin_id, 'redcube-ai');
+  assert.equal(pluginManifest.name, 'redcube-ai');
+  assert.equal(pluginManifest.version, manifest.version);
+  assert.notEqual(pluginManifest.name, manifest.package_id);
   assert.deepEqual(manifest.codex_surface.required_skill_ids, ['redcube-ai']);
   assert.deepEqual(manifest.required_skill_ids, ['redcube-ai']);
   assert.deepEqual(manifest.distribution_payload.required_skill_pack_lock_refs, []);
   assert.equal(manifest.distribution_payload.live_download_proof, false);
   assert.equal(manifest.distribution_payload.installed_reload_proof, false);
   assert.equal(manifest.distribution_payload.install_truth, 'resolved_digest_lock');
-  assert.equal(manifest.rollback_ref, 'rollback-ref:redcube-ai/unavailable');
+  assert.equal(manifest.distribution_payload.payload_ref, 'ghcr.io/gaofeng21cn/one-person-lab-packages/rca:latest');
+  assert.equal(manifest.distribution_payload.oci_ref, 'ghcr.io/gaofeng21cn/one-person-lab-packages/rca:latest');
+  assert.equal(manifest.rollback_ref, 'rollback-ref:rca/unavailable');
 
   assert.equal(manifest.authority_boundary.package_core_owner, 'opl_connect_agent_package_registry');
   assert.equal(manifest.authority_boundary.domain_truth_owner, 'redcube_ai');

@@ -18,6 +18,7 @@ Professional skill routing:
 Detailed prompt locators:
 - `ppt_deck`: `prompts/ppt_deck/visual_direction.md`
 - `xiaohongshu`: `prompts/xiaohongshu/visual_direction.md`
+- `poster_onepager`: `prompts/poster_onepager/visual_direction.md`
 
 Authority boundary:
 - Visual direction acceptance is an AI-first RCA judgment surface.

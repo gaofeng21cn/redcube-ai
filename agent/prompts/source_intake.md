@@ -13,6 +13,7 @@ Canonical policy:
 Detailed prompt locators:
 - `ppt_deck`: source-readiness artifacts and source package refs only; storyline starts in `communication_strategy`.
 - `xiaohongshu`: `prompts/xiaohongshu/research.md`; storyline starts in `communication_strategy`.
+- `poster_onepager`: source-readiness artifacts and source package refs only; storyline starts in `communication_strategy`.
 
 Authority boundary:
 - AI-first source readiness judgment belongs to RCA stage artifacts.

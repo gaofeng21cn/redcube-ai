@@ -18,6 +18,7 @@ Professional skill routing:
 Detailed prompt locators:
 - `ppt_deck`: `prompts/ppt_deck/export_pptx.md`
 - `xiaohongshu`: `prompts/xiaohongshu/publish_copy.md`, `prompts/xiaohongshu/export_bundle.md`
+- `poster_onepager`: `prompts/poster_onepager/export_bundle.md`
 
 Authority boundary:
 - RCA owns export readiness, artifact mutation authorization, and owner receipt signing.

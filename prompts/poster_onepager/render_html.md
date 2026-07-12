@@ -1,52 +1,20 @@
 # poster_onepager / render_html
 
-将 poster_blueprint 与 visual_direction 落成单页 HTML 海报。
-要求：
-- 4:5 / 1080x1350 / 无滚动
-- final markup 必须由 AI 直接创作，代码只负责 shell boundary、审阅与 artifact persistence
-- 每页至少提供 2 个语义化 `data-qa-block`，并至少标记 1 个 `data-primary-point="true"`，供截图质控读取
-- 相邻读者可见 `data-qa-block`、headline、证据栏、路径条和 action footer 之间必须保留至少 6px 可见安全间距；视觉贴住、边缘几乎相接或底部动作区压正文都算失败
-- 禁止输出 `<script>` / `<style>` block；样式只能写在元素 inline style 上
-- 必须把 headline / 证据 / 动作同屏表达清楚
-- 不得把内部说明、模板注册表、slot 名称写进最终画面
+## Goal
 
-## runtime_seed
-```json
-{
-  "render_contract": {
-    "render_strategy": "prompt_director_first",
-    "shell_file": "render_shell.html",
-    "recipe_registry": {
-      "hero_band": "poster.hero_band",
-      "evidence_columns": "poster.evidence_columns",
-      "pathway_strip": "poster.pathway_strip",
-      "action_footer": "poster.action_footer",
-      "default": "poster.evidence_columns"
-    },
-    "shell_guards": [
-      "保留 slide-display-area / prev-btn / next-btn / slidesData",
-      "输出 render plan 供 review 与审计读取",
-      "每页必须是 audience-facing 成品，不得把内部提示或模板信息写进画面",
-      "禁止输出 <script> / <style> block；如需视觉样式，直接写 inline style",
-      "审阅依赖的根节点 metadata 由 runtime 注入，但 AI 仍需交付 review-ready 的 data-qa-block / data-primary-point 结构",
-      "相邻读者可见 data-qa-block、headline、证据栏、路径条和 action footer 之间必须保留至少 6px 可见安全间距；视觉贴住按失败处理"
-    ]
-  }
-}
-```
+Materialize the accepted poster blueprint and visual direction as one audience-facing, reviewable 1080x1350 HTML poster.
 
-## runtime_artifact
-```json
-{
-  "render_markup_artifact": {
-    "artifact_surface": "codex_cli_json_output",
-    "binding_model": "slides_data_shell_only",
-    "required_review_contract": [
-      "slide_root",
-      "data-qa-block",
-      "data-primary-point"
-    ],
-    "creative_authorship": "ai_first"
-  }
-}
-```
+## Good Work
+
+- Author the final composition directly from the headline, evidence, action, panel hierarchy, and visual thesis; do not use a fixed marketing template or historical product geometry.
+- Keep all visible content source-faithful and audience-facing. Prompt, slot, registry, route, review, and internal production language stay out of the poster.
+- Fit the 4:5 canvas without scrolling/overflow. Maintain readable hierarchy, natural wrapping, containment, and clear separation between headline, evidence, pathway/action, sources, and footer regions.
+- Use inline styles only and return matching root identity, at least two semantic `data-qa-block` regions, one `data-primary-point="true"`, and QA coverage for visible text.
+
+## Professional Dependency
+
+Blueprint and visual direction must be consumable before materialization. The HTML remains a draft until current rendered pixels are independently reviewed; any repair must be rerendered and freshly reviewed before export.
+
+## Handoff
+
+Return the render object required by the attached output contract. Runtime owns shell assembly, persistence, screenshot QA, repair routing, and export authority.

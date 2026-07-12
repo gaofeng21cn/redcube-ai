@@ -5,6 +5,10 @@ description: "Use when RedCube AI needs a PPT template or reference deck special
 
 # RCA Template Profiler
 
+## Runtime Summary
+
+When a template or reference deck is supplied, inspect that exact current source before route-specific styling or native binding. Extract semantic zones, hierarchy, placeholder/object capacity, rhythm, reusable constraints, stale references, and route caveats. The profile informs downstream design; it does not author pages or grant visual/export approval.
+
 Operate as the template and reference-deck analysis specialist. Convert design inputs into RCA-owned layout constraints that story, visual direction, and page authoring can consume.
 
 ## AI-First / Contract-Light Boundary

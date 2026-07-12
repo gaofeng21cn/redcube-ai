@@ -73,24 +73,33 @@ function readPromptGuidance(relativePath) {
   }
 
   const raw = readFileSync(absolutePath, 'utf-8');
-  const runtimeSectionIndex = raw.search(/^##\s+runtime_(seed|artifact)\b/m);
-  if (runtimeSectionIndex === -1) {
-    return raw.trim();
-  }
-  return raw.slice(0, runtimeSectionIndex).trim();
+  return raw.trim();
 }
 
 function routeKeyFor(family, route) {
   return `${safeText(family)}:${safeText(route)}`;
 }
 
-function readProfessionalSkillGuidance(skill, routeKey) {
+function readProfessionalSkillRuntimeSummary(skill, routeKey) {
   const relativePath = safeText(skill?.path);
   const absolutePath = path.join(REPO_ROOT, relativePath);
   if (!existsSync(absolutePath)) {
     throw new Error(`Missing RCA professional specialist skill guidance for ${routeKey}: ${relativePath}`);
   }
-  return readFileSync(absolutePath, 'utf-8').trim();
+  const lines = readFileSync(absolutePath, 'utf-8').split(/\r?\n/);
+  const start = lines.findIndex((line) => line.trim() === '## Runtime Summary');
+  const summaryLines = [];
+  if (start >= 0) {
+    for (const line of lines.slice(start + 1)) {
+      if (/^##\s+/.test(line) || (summaryLines.length > 0 && !line.trim())) break;
+      if (line.trim()) summaryLines.push(line);
+    }
+  }
+  const runtimeSummary = summaryLines.join('\n').trim();
+  if (!runtimeSummary) {
+    throw new Error(`Missing RCA professional specialist Runtime Summary for ${routeKey}: ${relativePath}`);
+  }
+  return { relativePath, runtimeSummary };
 }
 
 function buildProfessionalSkillGuidanceSection(family, route, context = {}) {
@@ -107,18 +116,19 @@ function buildProfessionalSkillGuidanceSection(family, route, context = {}) {
   }
 
   return [
-    '## RCA Professional Specialist Skill Guidance',
-    'Use only the repo-local declared specialist guidance below. Do not browse or inspect other files for skill guidance.',
+    '## RCA Professional Specialist Roles',
+    'Apply these skill-owned runtime methods. The complete skill remains the canonical professional source and is not repeated here.',
     '',
     ...skillIds.flatMap((skillId) => {
       const skill = PROFESSIONAL_SPECIALIST_SKILL_FILES[skillId];
       if (!skill) {
         throw new Error(`Missing RCA professional specialist skill mapping for ${routeKey}: ${skillId}`);
       }
+      const guidance = readProfessionalSkillRuntimeSummary(skill, routeKey);
       return [
         `### ${skill.title}`,
-        `Source: ${skill.path}`,
-        readProfessionalSkillGuidance(skill, routeKey),
+        `Source: ${guidance.relativePath}`,
+        guidance.runtimeSummary,
         '',
       ];
     }),

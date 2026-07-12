@@ -118,10 +118,6 @@ export function createPptDeckRuntimeCore() {
     promptMeta,
     resolvePromptPackAsset,
     readPromptPackText,
-    renderSeedValue,
-    promptSeed,
-    promptPackJsonSection,
-    promptArtifact,
     isOperatorContextMaterial,
     sharedSourceTruth,
     sharedSourceReadinessPack,
@@ -228,7 +224,7 @@ export function createPptDeckRuntimeCore() {
     route,
     lifecycleStage,
     authoredSurface,
-    materializedFrom = 'prompt_pack_seed',
+    materializedFrom = 'codex_cli_json_output',
     generationRuntime = null,
   }) {
     return {
