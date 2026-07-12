@@ -1,27 +1,16 @@
 # poster_onepager / storyline
 
-单页知识海报的故事主线必须先冻结导演判断，再进入 blueprint。
+## Goal
 
-## AI-first 主线合同
+Turn the complete accepted source and poster objective into one audience, one defensible promise, and one coherent action path.
 
-- 给出 `headline` / `subheadline` / `audience_judgement` / `why_now` / `proof_promise` / `call_to_action`。
-- `headline` 必须能独立成立，不依赖正文补解释。
-- 不允许把海报退化成信息堆叠或模板口号。
-- 必须基于 `source_materials_full_text` 和任务目标自行判断海报主张、受众、证据承诺与行动句；不得复制本 prompt 的占位结构为成稿。
+## Good Work
 
-## runtime_artifact
+- Author the headline, subheadline, audience judgment, why-now, proof promise, and call to action from the real source.
+- Make the headline independently meaningful without reducing the poster to a slogan or information pile.
+- Preserve evidence and uncertainty appropriate to the requested action; route unsupported promises upstream.
+- Let blueprint/canvas discoveries refine the smallest affected story decision while keeping approved judgments stable.
 
-下列 JSON 只说明字段形状，不提供默认 headline、默认受众或默认行动句。
+## Handoff
 
-```json
-{
-  "storyline": {
-    "headline": "<AI-authored poster headline>",
-    "subheadline": "<AI-authored poster subheadline>",
-    "audience_judgement": "<AI-authored audience judgement>",
-    "why_now": "<AI-authored why-now judgement>",
-    "proof_promise": "<AI-authored proof promise grounded in source_materials_full_text>",
-    "call_to_action": "<AI-authored call to action>"
-  }
-}
-```
+Return the storyline object required by the attached output contract, without fixed panel slots or sample copy.

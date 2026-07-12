@@ -1,82 +1,18 @@
 # xiaohongshu / single_note_plan
 
-单篇策划是正式 stage。
+## Goal
 
-## AI-first 策划合同
+Turn the accepted source/storyline into one complete, mobile-readable note plan with distinct page jobs and a visual-direction-ready handoff.
 
-- 至少 3 个标题备选。
-- 标题通常不超过 20 个中文字符；三个候选至少覆盖问题钩子、行动收益或避坑纠偏中的两类，医学主题禁止恐吓、绝对化和疗效承诺。
-- 每页必须给到 `page_goal` / `page_core_content` / `visual_presentation` / `source_language` / `progression_role` / `transition`。
-- 不能把视觉导演稿并入附注。
-- 不能只给粗粒度 outline。
-- 如果 `context.author_branding` 存在，封面或结尾必须预留 audience-facing 署名位；署名显示与副标要像内容品牌，而不是后台备注。
-- 每页都要提前规划视觉锚点与版心分布；小红书优先使用 Font Awesome Free，emoji 只做补充。
-- 每页从策划阶段就要规划相邻读者可见文字块、主卡、底部收束条之间的安全间距；副标题贴主卡、收藏条压正文、卡片互相贴住都属于版心失败。
-- 封面与结尾页都要有清楚的 audience-facing 视觉抓手；禁止把孤立单字贴纸、内部标签或无语义装饰当成锚点。
-- 标题和核心短句按自然语义组织；能单行成立的短句不要为了造型主动拆行。
-- 医学/健康/科普信息页默认采用“中密度 + 手机可读”：1 句核心判断、3 个短主信息模块、1 条边界提示；复杂机制页最多 4 个主模块。
-- 主信息模块优先 8-14 个汉字，最多约 18 个汉字；不要把 5-6 条长句塞进小卡片，也不要降级成只有标题和关键词标签。
-- 除封面、章节过渡和极简收束页外，每页下半区必须承载实质信息模块，不能只放图标、花草、装饰贴纸或留白。
-- 相邻页面至少变换主视觉动作和信息模块位置；系列或 8 页以上图文必须提前规划机制图、清单、流程、行动卡等不同布局原型。
-- `source_materials_full_text` 是完整资料输入，必须由 AI 阅读后决定页数、页面顺序、标题和内容；不得照抄本 prompt 的字段占位或历史默认页。
-- 总页数不得超过 18 页。高密度知识笔记通常可落在 8-14 页，但读者任务能更短闭环时不强行凑页。
-- 若上游 `storyline.mode` 为 `series`，必须先从 `series_architecture.note_briefs` 选择与当前 deliverable 目标一致的一篇，并输出 `series_context`；不得把整个系列压进一篇，也不得重复相邻篇目的事实职责。
-- 医学/健康页必须保留事实依据、判断逻辑、行动或就医边界；引用使用读者可理解的公开来源口径，不得显示内部文件名或无解释编号。
-- 涉及药物时，优先采用对比、品类、机制或决策语境，不生成宣传式单药介绍。
+## Good Work
 
-## runtime_seed
+- Read the full accepted source and choose page count/order from the reader task; 18 pages is the ceiling, not a target.
+- Offer grounded title options without fear, certainty, or efficacy exaggeration. Preserve author branding as audience-facing identity when supplied.
+- Give every page a reader goal, core judgment, evidence/boundary content, progression role, transition, visual action, density intent, and substantive composition.
+- Keep medical/action claims tied to understandable public evidence, uncertainty, and seek-care/action boundaries. Avoid promotional single-drug framing.
+- If the storyline is a series, select one note responsibility and carry previous/next/no-repeat context rather than compressing the whole series.
+- Vary page jobs and visual actions; readable density and information hierarchy matter more than fixed module counts or sample layouts.
 
-下列 JSON 只说明字段形状，不提供默认 6 页结构、固定标题或固定动作清单。
+## Handoff
 
-```json
-{
-  "plan": {
-    "series_context": {
-      "mode": "<single or series>",
-      "note_id": "<selected series note id or single>",
-      "series_role": "<current note responsibility>",
-      "previous_note": "<previous bridge or none>",
-      "next_note": "<next bridge or none>",
-      "no_repeat_scope": ["<facts owned by adjacent notes or none>"]
-    },
-    "title_options": [
-      "<AI-authored title option grounded in source_materials_full_text>",
-      "<AI-authored title option grounded in source_materials_full_text>",
-      "<AI-authored title option grounded in source_materials_full_text>"
-    ],
-    "slides": [
-      {
-        "slide_id": "<stable slide id, e.g. N01>",
-        "title": "<AI-authored audience-facing page title>",
-        "layout_family": "<cover_note | myth_compare | sequence_stack | process_track | evidence_strip | action_checklist>",
-        "render_recipe_id": "xhs.<allowed_recipe_id>",
-        "page_goal": "<private authoring goal>",
-        "progression_role": "<hook | tension | explain | mechanism_peak | evidence_peak | memory_close>",
-        "page_core_content": [
-          "<AI-authored core judgement from source_materials_full_text>",
-          "<AI-authored short main module from source_materials_full_text>",
-          "<AI-authored short main module from source_materials_full_text>",
-          "<AI-authored short main module from source_materials_full_text>",
-          "<AI-authored boundary note when medical/action risk exists>"
-        ],
-        "visual_presentation": {
-          "layout_family": "<layout family>",
-          "main_visual_action": "<AI-authored visual action>",
-          "action_primitive": "<AI-authored primitive>",
-          "lower_half_module": "<substantive lower-half module or explicit reason when cover/transition page>",
-          "density_target": "<medium_density_mobile_readable | cover_hook | memory_close>",
-          "anchor_tracks": [
-            "<visual anchor>",
-            "<visual anchor>",
-            "<visual anchor>"
-          ],
-          "anti_template_note": "<specific anti-template instruction for this page>"
-        },
-        "source_language": "<audience-readable source wording discipline>",
-        "speaker_notes": "<private speaker note, never visible card text>",
-        "transition": "<private transition>"
-      }
-    ]
-  }
-}
-```
+Return the single-note plan required by the attached output contract. Strategy defects route back here; rendering must not invent missing evidence, reader logic, or series boundaries.

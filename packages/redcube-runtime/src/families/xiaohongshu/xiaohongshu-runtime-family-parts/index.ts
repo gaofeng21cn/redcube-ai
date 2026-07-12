@@ -148,7 +148,7 @@ function runtimeCreativeSource(contractAsset, generationRuntime = null, adapter 
     primary_surface: primarySurface(generationRuntime),
     stage_owner: primarySurface(generationRuntime),
     adapter,
-    supporting_contract: shared.safeText(contractAsset, 'prompt_pack_seed'),
+    supporting_contract: shared.safeText(contractAsset, 'stage_prompt_and_attached_output_contract'),
   };
 }
 
@@ -170,7 +170,7 @@ function creativeSourceStamp({
   route,
   lifecycleStage,
   authoredSurface,
-  materializedFrom = 'prompt_pack_seed',
+  materializedFrom = 'codex_cli_json_output',
   generationRuntime = null,
   adapter = CODEX_DEFAULT_ADAPTER,
 }) {
@@ -187,7 +187,7 @@ function reviewAuthorship(overlay, generationRuntime = null, adapter = CODEX_DEF
   return {
     overlay,
     primary_surface: primarySurface(generationRuntime),
-    contract_asset: 'prompt_pack_seed',
+    contract_asset: 'stage_prompt_and_attached_output_contract',
   };
 }
 

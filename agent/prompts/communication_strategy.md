@@ -18,6 +18,7 @@ Professional skill routing:
 Detailed prompt locators:
 - `ppt_deck`: `prompts/ppt_deck/storyline.md`, `prompts/ppt_deck/detailed_outline.md`, `prompts/ppt_deck/slide_blueprint.md`
 - `xiaohongshu`: `prompts/xiaohongshu/storyline.md`, conditional `prompts/xiaohongshu/series_plan.md`, `prompts/xiaohongshu/single_note_plan.md`
+- `poster_onepager`: `prompts/poster_onepager/storyline.md`, `prompts/poster_onepager/poster_blueprint.md`
 
 Authority boundary:
 - Communication strategy is an AI-first RCA judgment surface.

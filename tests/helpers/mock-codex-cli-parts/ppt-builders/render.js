@@ -219,11 +219,14 @@ export function buildMockPptRender(meta) {
           if (revisionFocus?.repeat_block_after_fix !== true) {
             throw new Error(`mock ppt render expected repeat_block_after_fix escalation for ${slide.slide_id}: ${JSON.stringify(revisionFocus)}`);
           }
-          if (!/重复阻塞|结构级|删减|重排|扩大/.test(safeText(revisionFocus?.recommended_fix))) {
-            throw new Error(`mock ppt render expected structural escalation text for ${slide.slide_id}: ${JSON.stringify(revisionFocus)}`);
+          if (revisionFocus?.prior_repair_failed !== true) {
+            throw new Error(`mock ppt render expected prior_repair_failed for ${slide.slide_id}: ${JSON.stringify(revisionFocus)}`);
           }
-          if (!safeArray(revisionFocus?.ai_findings).some((item) => /重复阻塞|微调不足/.test(safeText(item)))) {
-            throw new Error(`mock ppt render expected repeat-block finding for ${slide.slide_id}: ${JSON.stringify(revisionFocus)}`);
+          if (!/materially different repair|reassess|failure boundary/i.test(safeText(revisionFocus?.recommended_fix))) {
+            throw new Error(`mock ppt render expected repair reassessment text for ${slide.slide_id}: ${JSON.stringify(revisionFocus)}`);
+          }
+          if (!safeArray(revisionFocus?.ai_findings).some((item) => /prior targeted repair|reassess/i.test(safeText(item)))) {
+            throw new Error(`mock ppt render expected prior-repair finding for ${slide.slide_id}: ${JSON.stringify(revisionFocus)}`);
           }
         }
         if (variants.has('require_scoped_revision_context')) {

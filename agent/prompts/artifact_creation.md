@@ -21,6 +21,7 @@ Professional skill routing:
 Detailed prompt locators:
 - `ppt_deck`: `prompts/ppt_deck/author_image_pages.md`, `prompts/ppt_deck/render_html.md`, `prompts/ppt_deck/author_pptx_native.md`
 - `xiaohongshu`: `prompts/xiaohongshu/author_image_pages.md`, `prompts/xiaohongshu/render_html.md`
+- `poster_onepager`: `prompts/poster_onepager/render_html.md`
 
 Authority boundary:
 - OPL can schedule attempts and hold runtime refs.

@@ -35,11 +35,9 @@ import {
 export {
   buildStorylineInputs,
   isSeries,
-  promptArtifact,
   promptMeta,
   promptPackRoot,
   promptRoute,
-  promptSeed,
   publicSources,
   readPromptPackText,
   resolveAuthorBranding,

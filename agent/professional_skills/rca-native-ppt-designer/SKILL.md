@@ -7,6 +7,10 @@ description: "Use when RedCube AI needs a native editable PowerPoint specialist 
 
 Operate as the native editable PPTX design specialist. The AI-authored `editable_shape_plan` is the design authority; Office/Python helpers materialize, validate, render, and export refs. Their quality findings consume a bounded repair budget and do not block stage transition when a readable PPTX or shape plan already exists.
 
+## Runtime Summary
+
+Use the accepted blueprint, visual direction, and template profile to author an explicit editable shape plan before helper materialization. Native means real editable objects, semantic zones, stable ids, and deliberate notes/motion, not a full-page image label. After materialization inspect package/readback and rendered pixels; repair the plan, rerender, and obtain fresh review before native/export claims.
+
 ## AI-First / Contract-Light Boundary
 
 - Use AI judgment here for editable design spec locks, shape grammar, zone binding, coordinate tradeoffs, native repair strategy, and when native editability is genuinely worth the route cost.

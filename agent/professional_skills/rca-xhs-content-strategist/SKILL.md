@@ -7,6 +7,10 @@ description: "Use when RedCube AI needs Xiaohongshu single-note or series conten
 
 Operate as the professional content strategist inside `communication_strategy`. Consume the source readiness result, decide whether the source supports one note or a series, design the narrative and note responsibilities, and hand an actionable brief to `single_note_plan`. Program code may validate and persist this work, but it must not author the strategy.
 
+## Runtime Summary
+
+Read the full accepted source and audience goal before choosing one note or a series. Build the claim and reader-task spine before note count, bind medical/action claims to evidence and uncertainty, and hand off distinct note/page roles with continuity. Route source insufficiency or strategy overload upstream; rendering cannot repair it.
+
 ## Inputs
 
 - Frozen `source_materials_full_text`, source refs, evidence gaps, and user constraints.

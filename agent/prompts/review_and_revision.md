@@ -20,6 +20,7 @@ Professional skill routing:
 Detailed prompt locators:
 - `ppt_deck`: `prompts/ppt_deck/director_review.md`, `prompts/ppt_deck/screenshot_review.md`, `prompts/ppt_deck/repair_image_pages.md`, `prompts/ppt_deck/fix_html.md`, `prompts/ppt_deck/repair_pptx_native.md`
 - `xiaohongshu`: `prompts/xiaohongshu/director_review.md`, `prompts/xiaohongshu/screenshot_review.md`, `prompts/xiaohongshu/repair_image_pages.md`, `prompts/xiaohongshu/fix_html.md`
+- `poster_onepager`: `prompts/poster_onepager/director_review.md`, `prompts/poster_onepager/screenshot_review.md`
 
 Authority boundary:
 - Review/export verdict and visual memory accept/reject are AI-first RCA authority surfaces, but accept/reject is a separate post-export memory-owner action rather than part of screenshot review.

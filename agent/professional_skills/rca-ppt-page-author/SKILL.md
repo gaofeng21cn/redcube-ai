@@ -5,6 +5,10 @@ description: "Use when RedCube AI needs a PPT page authoring specialist to creat
 
 # RCA PPT Page Author
 
+## Runtime Summary
+
+Author audience-facing pages from the accepted source, story/blueprint, visual direction, and selected route. Preserve claims, fit content at readable scale, choose semantic visuals, and emit route-appropriate proof expectations. Repair only blocked pages when possible; reroute story, direction, template, or route defects instead of hiding them with helper defaults.
+
 Operate as the page-level author inside RCA artifact creation. Produce page plans or artifacts only from approved upstream contracts, one page at a time, with enough detail for later screenshot and export QA.
 
 ## AI-First / Contract-Light Boundary
