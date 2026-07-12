@@ -1,12 +1,105 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import {
   nativeEngineContract,
   readJson,
 } from './helpers/ppt-native-ppt-runtime-fixtures.js';
 import { readCurrentProgramContract } from './helpers/current-program-contract.js';
+import {
+  pythonTestEnv,
+  resolveTestPythonCommand,
+} from './helpers/ppt-native-python-layout-fixtures.js';
+import { createNativePptShapePlanNormalizeParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/native-ppt-shape-plan-normalize.js';
+
+function cloneJson(value: any): any {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function shapePlanValidatorFixture(validator: any, compact = false): any {
+  const archetypeMinimum = Number(
+    compact ? validator.sample_minimum_layout_archetypes : validator.minimum_layout_archetypes,
+  );
+  return {
+    spec_id: 'native_pptx_contract_parity_fixture_v1',
+    owner: validator.required_owner,
+    motif: 'accent rail with structural connector system',
+    layout_archetypes: Array.from({ length: archetypeMinimum }, (_, index) => `archetype_${index + 1}`),
+    palette: { canvas: '#F6F2EA', ink: '#171C24', accent: '#B94624' },
+    typography: {
+      title_pt_min: Number(validator.minimum_title_pt),
+      body_pt_min: Number(validator.minimum_body_pt),
+    },
+    grid: {
+      edge_margin_in_min: Number(validator.minimum_edge_margin_in),
+      inter_block_gap_in_min: Number(validator.minimum_inter_block_gap_in),
+    },
+    layout_rhythm: {
+      repeated_concrete_composition_limit: Number(validator.minimum_repeated_concrete_composition_limit),
+      required_distinct_composition_share: Number(validator.minimum_distinct_composition_share),
+    },
+    professional_design_brief: {
+      ...Object.fromEntries(
+        validator.professional_design_brief_required_fields.map((field: string) => [field, `${field} fixture`]),
+      ),
+      forbidden_amateur_patterns: ['generic equal-card grid'],
+    },
+    borrowed_principles: [...validator.required_borrowed_principles],
+    qa_gates: [...validator.required_qa_gates],
+  };
+}
+
+function tsMissingDesignSpecFields({ validator, designSpecLock, compact = false }: any): string[] {
+  const parts = createNativePptShapePlanNormalizeParts({
+    safeArray: (value: unknown) => (Array.isArray(value) ? value : []),
+    safeText: (value: unknown, fallback = '') => String(value ?? fallback).trim(),
+    shapePlanValidator: validator,
+  });
+  try {
+    parts.normalizeEditableShapePlan({
+      editable_shape_plan: {
+        authoring_mode: compact ? 'native_visual_sample_compact' : 'native_visual_full',
+        design_spec_lock: designSpecLock,
+        slides: [{ slide_id: 'S01' }],
+      },
+    }, 'author_pptx_native');
+    return [];
+  } catch (error) {
+    const marker = 'before shape coordinates: ';
+    const message = String((error as Error)?.message || error);
+    const markerIndex = message.indexOf(marker);
+    if (markerIndex < 0) return [];
+    return JSON.parse(message.slice(markerIndex + marker.length));
+  }
+}
+
+function pythonMissingDesignSpecFields(fixtures: any[]): string[][] {
+  const python = resolveTestPythonCommand();
+  const script = `
+import json
+import sys
+from redcube_ai.native_helpers.ppt_deck.native import missing_design_spec_lock_fields
+
+payload = json.loads(sys.argv[1])
+results = []
+for fixture in payload:
+    minimum = fixture['validator']['sample_minimum_layout_archetypes'] if fixture['compact'] else fixture['validator']['minimum_layout_archetypes']
+    results.append(missing_design_spec_lock_fields(fixture['design_spec_lock'], int(minimum), fixture['validator']))
+print(json.dumps(results, ensure_ascii=False))
+`;
+  const output = execFileSync(
+    python.command,
+    [...(python.args || []), '-c', script, JSON.stringify(fixtures)],
+    {
+      cwd: path.resolve('.'),
+      env: pythonTestEnv(),
+      encoding: 'utf-8',
+    },
+  );
+  return JSON.parse(output.trim());
+}
 
 test('native PPT proof lane records the Python engine contract as the single ownership source', () => {
   const engineContract = nativeEngineContract();
@@ -114,6 +207,155 @@ test('native PPT proof lane records the Python engine contract as the single own
     currentProgram.current_state.exploration_lanes.ppt_native_authoring_proof_lane.engine_contract,
     'contracts/runtime-program/ppt-native-python-engine-contract.json',
   );
+});
+
+test('native PPT TS and Python shape-plan validators consume one contract rule set', () => {
+  const validator = nativeEngineContract().shape_plan_validator;
+  assert.equal(validator.contract_version, 1);
+  for (const field of [
+    'minimum_layout_archetypes',
+    'sample_minimum_layout_archetypes',
+    'minimum_title_pt',
+    'minimum_body_pt',
+    'minimum_edge_margin_in',
+    'minimum_inter_block_gap_in',
+    'minimum_repeated_concrete_composition_limit',
+    'minimum_distinct_composition_share',
+  ]) {
+    assert.equal(Number.isFinite(Number(validator[field])), true, field);
+    assert.equal(Number(validator[field]) > 0, true, field);
+  }
+  assert.equal(typeof validator.required_owner, 'string');
+  assert.ok(validator.professional_design_brief_required_fields.length > 0);
+  assert.ok(validator.required_borrowed_principles.length > 0);
+  assert.ok(validator.required_qa_gates.length > 0);
+
+  for (const compact of [false, true]) {
+    const base = shapePlanValidatorFixture(validator, compact);
+    const cases = [
+      { label: 'valid contract boundary', lock: base },
+      {
+        label: 'owner',
+        lock: { ...cloneJson(base), owner: 'human' },
+      },
+      {
+        label: 'layout archetype minimum',
+        lock: { ...cloneJson(base), layout_archetypes: base.layout_archetypes.slice(0, -1) },
+      },
+      {
+        label: 'title font floor',
+        lock: {
+          ...cloneJson(base),
+          typography: {
+            ...base.typography,
+            title_pt_min: Number(validator.minimum_title_pt) - 1,
+          },
+        },
+      },
+      {
+        label: 'body font floor',
+        lock: {
+          ...cloneJson(base),
+          typography: {
+            ...base.typography,
+            body_pt_min: Number(validator.minimum_body_pt) - 1,
+          },
+        },
+      },
+      {
+        label: 'edge margin floor',
+        lock: {
+          ...cloneJson(base),
+          grid: {
+            ...base.grid,
+            edge_margin_in_min: Number(validator.minimum_edge_margin_in) - 0.1,
+          },
+        },
+      },
+      {
+        label: 'inter-block gap floor',
+        lock: {
+          ...cloneJson(base),
+          grid: {
+            ...base.grid,
+            inter_block_gap_in_min: Number(validator.minimum_inter_block_gap_in) - 0.1,
+          },
+        },
+      },
+      {
+        label: 'layout repetition limit',
+        lock: {
+          ...cloneJson(base),
+          layout_rhythm: {
+            ...base.layout_rhythm,
+            repeated_concrete_composition_limit: Number(validator.minimum_repeated_concrete_composition_limit) - 1,
+          },
+        },
+      },
+      {
+        label: 'distinct composition share',
+        lock: {
+          ...cloneJson(base),
+          layout_rhythm: {
+            ...base.layout_rhythm,
+            required_distinct_composition_share: Number(validator.minimum_distinct_composition_share) - 0.01,
+          },
+        },
+      },
+      ...validator.professional_design_brief_required_fields.map((field: string) => ({
+        label: `professional design brief ${field}`,
+        lock: {
+          ...cloneJson(base),
+          professional_design_brief: {
+            ...base.professional_design_brief,
+            [field]: '',
+          },
+        },
+      })),
+      {
+        label: 'forbidden amateur patterns',
+        lock: {
+          ...cloneJson(base),
+          professional_design_brief: {
+            ...base.professional_design_brief,
+            forbidden_amateur_patterns: [],
+          },
+        },
+      },
+      ...validator.required_borrowed_principles.map((principle: string) => ({
+        label: `borrowed principle ${principle}`,
+        lock: {
+          ...cloneJson(base),
+          borrowed_principles: base.borrowed_principles.filter((item: string) => item !== principle),
+        },
+      })),
+      ...validator.required_qa_gates.map((gate: string) => ({
+        label: `QA gate ${gate}`,
+        lock: {
+          ...cloneJson(base),
+          qa_gates: base.qa_gates.filter((item: string) => item !== gate),
+        },
+      })),
+    ];
+
+    const pythonMissing = pythonMissingDesignSpecFields(cases.map((fixture) => ({
+      validator,
+      design_spec_lock: fixture.lock,
+      compact,
+    })));
+    for (const [index, fixture] of cases.entries()) {
+      const tsMissing = tsMissingDesignSpecFields({
+        validator,
+        designSpecLock: fixture.lock,
+        compact,
+      });
+      assert.deepEqual(
+        tsMissing,
+        pythonMissing[index],
+        `${compact ? 'compact' : 'full'} ${fixture.label}`,
+      );
+    }
+  }
 });
 
 test('native PPT professional registries land ppt-master learning without importing its runtime or assets', () => {
