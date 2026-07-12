@@ -42,14 +42,14 @@ test('product-entry projects the RCA-owned standard agent interface for generic 
   const standardInterface = manifest.standard_agent_interface;
 
   assert.deepEqual(domainDescriptor.standard_agent_interface, {
-    version: 'standard-agent-interface.v1',
+    version: 'opl_standard_agent_interface.v1',
     ref_kind: 'repo_json_pointer',
     ref: 'contracts/standard_agent_interface.json#/standard_agent_interface',
     projection_ref: 'getProductEntryManifest#/standard_agent_interface',
   });
   assert.equal(manifest.standard_agent_interface_ref, 'contracts/standard_agent_interface.json#/standard_agent_interface');
   assert.deepEqual(standardInterface, descriptor.standard_agent_interface);
-  assert.equal(standardInterface.version, 'standard-agent-interface.v1');
+  assert.equal(standardInterface.version, 'opl_standard_agent_interface.v1');
   assert.deepEqual(standardInterface.workspace_binding, {
     locator_surface_kind: 'redcube_workspace',
     required_locator_fields: ['workspace_root'],

@@ -3,7 +3,7 @@
   "owner": "redcube_ai",
   "consumer": "one-person-lab",
   "standard_agent_interface": {
-    "version": "standard-agent-interface.v1",
+    "version": "opl_standard_agent_interface.v1",
     "workspace_binding": {
       "locator_surface_kind": "redcube_workspace",
       "required_locator_fields": [
