@@ -46,7 +46,7 @@ test('RCA generated surface handoff is OPL-owned and root pack input is refs-onl
   assert.equal(bundle.bundle.target_domain_id, 'redcube_ai');
   assert.deepEqual(
     bundle.bundle.action_stage_routes.map((route) => route.action_id),
-    ['invoke_product_entry', 'dispatch_domain_handler', 'run_image_ppt_proof', 'run_native_ppt_proof'],
+    ['invoke_product_entry', 'run_image_ppt_proof', 'run_native_ppt_proof'],
   );
   assert.deepEqual(
     bundle.bundle.action_stage_routes.find((route) => route.action_id === 'invoke_product_entry').required_stage_refs,
@@ -61,27 +61,29 @@ test('RCA generated surface handoff is OPL-owned and root pack input is refs-onl
     ]),
   );
   assert.deepEqual(internalTargetDescriptors.cli, []);
+  assert.deepEqual(internalTargetDescriptors.mcp, []);
   assert.deepEqual(internalTargetDescriptors.skill, []);
+  assert.deepEqual(internalTargetDescriptors.product_entry, []);
   assert.deepEqual(internalTargetDescriptors.openai_tool, []);
   assert.deepEqual(internalTargetDescriptors.ai_sdk, []);
-  assert.equal(internalTargetDescriptors.mcp.length, 1);
-  assert.equal(internalTargetDescriptors.mcp[0].descriptor_only, true);
-  assert.equal(internalTargetDescriptors.mcp[0].public_runtime, false);
-  assert.equal(internalTargetDescriptors.product_entry.length, 1);
 
   assert.equal(actionTargets.surface_kind, 'family_action_catalog');
-  assert.equal(actionTargets.version, 'family-action-catalog.v1');
+  assert.equal(actionTargets.version, 'family-action-catalog.v2');
   assert.equal(actionTargets.authority_boundary.opl_role, 'projection_consumer_only');
-  assert.equal(actionTargets.authority_boundary.default_generic_dispatch_owner, 'one-person-lab');
-  assert.equal(actionTargets.authority_boundary.temporal_stage_run_consumption_policy.rca_writes_opl_stage_attempts, false);
+  assert.equal(actionTargets.authority_boundary.opl_can_write_domain_truth, false);
+  assert.equal(actionTargets.authority_boundary.opl_can_mutate_domain_artifact_body, false);
+  assert.equal(actionTargets.authority_boundary.opl_can_authorize_quality_or_export, false);
   assert.equal(
     actionTargets.actions.some((action) => action.action_id === 'dispatch_domain_handler'),
-    true,
+    false,
   );
+  assert.equal(actionTargets.actions.every((action) => action.execution_binding?.kind === 'stage_binding'), true);
   assert.equal(packRefs.minimal_authority_surface_ids.includes('review_export_verdict'), true);
 
   assertNoLegacyAuthorityFunctionFields(packRefs, 'contracts/pack_compiler_input.json');
   assert.equal(JSON.stringify(actionTargets).includes('allowed_functions'), false);
+  assert.equal(JSON.stringify(actionTargets).includes('source_command'), false);
+  assert.equal(JSON.stringify(actionTargets).includes('dispatch_command'), false);
 });
 
 test('RCA OPL manifest registration stays refs-only and workspace generated output untracked', () => {

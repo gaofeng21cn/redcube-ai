@@ -177,10 +177,8 @@ test('domain-handler export is an exact refs-only authority target without gener
       'adapter_id',
       'artifact_locator_refs',
       'authority_boundary',
-      'command',
       'compatibility_alias_allowed',
       'declarative_stage_manifest_ref',
-      'dispatch_command',
       'domain_authority_refs',
       'domain_evidence_refs',
       'domain_id',
@@ -205,9 +203,13 @@ test('domain-handler export is an exact refs-only authority target without gener
       'source_manifest_refs',
       'runtime_residue_retirement',
       'summary',
+      'command',
+      'dispatch_command',
     ]) {
       assert.equal(Object.hasOwn(exportSurface, retiredSurface), false, retiredSurface);
     }
+    assert.equal(Object.hasOwn(exportSurface.action_handler_refs, 'export_command'), false);
+    assert.equal(Object.hasOwn(exportSurface.action_handler_refs, 'dispatch_command'), false);
     assert.equal(exportSurface.authority_boundary.projection_can_claim_domain_ready, false);
     const manifest = await readManifest();
     for (const [name, locator] of Object.entries(exportSurface.domain_authority_refs)) {

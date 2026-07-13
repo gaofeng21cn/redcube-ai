@@ -60,10 +60,10 @@ test('product-entry projects the RCA-owned standard agent interface for generic 
     default_project_id: 'deck-001',
     required_locator_fields: ['workspace_root'],
     optional_locator_fields: [],
-    entry_command_template: ['redcube', 'product', 'status', '--workspace-root', '{workspace_root}'],
-    manifest_command_template: ['redcube', 'product', 'manifest', '--workspace-root', '{workspace_root}'],
   });
-  assert.deepEqual(standardInterface.runtime.dispatch_command, ['redcube', 'domain-handler', 'dispatch']);
+  assert.equal(Object.hasOwn(standardInterface.workspace_binding, 'entry_command_template'), false);
+  assert.equal(Object.hasOwn(standardInterface.workspace_binding, 'manifest_command_template'), false);
+  assert.equal(Object.hasOwn(standardInterface.runtime, 'dispatch_command'), false);
   assert.equal(standardInterface.runtime.runtime_domain_id, 'redcube_ai');
   assert.deepEqual(standardInterface.progress.deliverable_delta_aliases, [
     'visual_deliverable_progress',
@@ -90,5 +90,5 @@ test('product-entry projects the RCA-owned standard agent interface for generic 
   }
   const placeholders = stringValues(standardInterface)
     .flatMap((value) => value.match(/\{[^}]+\}/g) ?? []);
-  assert.deepEqual([...new Set(placeholders)], ['{workspace_root}']);
+  assert.deepEqual([...new Set(placeholders)], []);
 });

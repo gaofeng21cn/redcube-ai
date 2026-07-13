@@ -72,13 +72,16 @@ test('RCA root contracts expose OPL-owned standard surfaces with RCA refs-only p
   assert.equal(domainDescriptor.domain_specific_profile.stage_pack_role, 'declarative_visual_pack');
 
   assert.equal(actionTargets.surface_kind, 'family_action_catalog');
-  assert.equal(actionTargets.version, 'family-action-catalog.v1');
+  assert.equal(actionTargets.version, 'family-action-catalog.v2');
   assert.equal(actionTargets.authority_boundary.opl_role, 'projection_consumer_only');
-  assert.equal(actionTargets.authority_boundary.generated_interface_owner, 'one-person-lab');
+  assert.equal(actionTargets.authority_boundary.opl_can_write_domain_truth, false);
+  assert.equal(actionTargets.authority_boundary.opl_can_mutate_domain_artifact_body, false);
+  assert.equal(actionTargets.authority_boundary.opl_can_authorize_quality_or_export, false);
   assert.equal(
     actionTargets.actions.some((action) => action.action_id === 'dispatch_domain_handler'),
-    true,
+    false,
   );
+  assert.equal(actionTargets.actions.every((action) => action.execution_binding?.kind === 'stage_binding'), true);
   assert.equal(packRefs.minimal_authority_surface_ids.includes('review_export_verdict'), true);
 
   assert.equal(stageManifest.surface_kind, 'opl_standard_agent_declarative_stage_manifest');
