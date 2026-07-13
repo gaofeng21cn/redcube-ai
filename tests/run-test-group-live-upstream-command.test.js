@@ -65,7 +65,7 @@ test('run-test-group routes Python cache outside the checkout', () => {
   const runner = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const pyproject = readFileSync('pyproject.toml', 'utf-8');
 
-  assert.match(runner, /packages[\s\S]*link-framework/);
+  assert.match(runner, /'packages',[\s\S]*'link-framework'/);
   assert.match(runner, /node_modules[\s\S]*opl-framework[\s\S]*bin[\s\S]*opl/);
   assert.match(runner, /OPL-managed framework link check failed before test execution/);
   assert.match(runner, /OPL_REPO_TEMP_ROOT/);
