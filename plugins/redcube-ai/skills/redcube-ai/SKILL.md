@@ -55,7 +55,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 - `author_image_pages` 是默认视觉实现路线，通过 Responses `image_generation` 生成完整 16:9 PPT 页面 PNG；HTML routes 与 native editable PPTX routes 只能作为显式选择路线，不能替代默认 `author_image_pages -> screenshot_review -> export_pptx`。
 - `author_image_pages` 可复用同 key 的 image artifact cache；真实 image generation 只在 cache miss、显式重绘或 blocked-slide repair target 时发生，artifact 不记录 token。
-- `screenshot_review` 必须消费可用 PNG 与 prompt/style/image manifest，并执行 16:9、非空、重复、低信息密度、裁切、碎片化、字段泄漏与可选 OCR 检查。普通视觉 QA、manifest/provenance 缺口只记录质量债务和 repair recommendation；没有任何可消费页面、文件损坏不可读或 authority/permission 边界才硬停止。
+- `screenshot_review` 优先消费可用 PNG 与 prompt/style/image manifest，并执行 16:9、非空、重复、低信息密度、裁切、碎片化、字段泄漏与可选 OCR 检查。普通视觉 QA、manifest/provenance 缺口只记录质量债务和 repair recommendation；没有可消费页面、文件损坏不可读或输入缺失时物化 no-output/failure diagnostic 并继续，只有 executor unavailable、authority/safety/permission、wrong-target identity/currentness、不可逆动作或显式 human decision 才硬停止。
 - 截图质控未通过时，在预算内从明确 stage rerun 或 `repair_image_pages` 回修；`repair_image_pages` 只重绘需要修复的 slide ids，未阻断页复用并记录 preserved hashes。预算耗尽后携带最佳 artifact 进入后续 stage，不得声明 `visual_ready` 或 `export_ready`。
 - 用户明确要求 HTML / CSS / 网页时走 `render_html / fix_html`；用户明确要求可编辑 / 原生 PPTX / DrawingML 时走 `author_pptx_native / repair_pptx_native`。
 - authoring lane 在同一 deliverable 内锁定；外层失败处理不得自动从 image/native/HTML 切换到另一 lane。只有新的显式 product-entry route 选择可以更新该 lock。
