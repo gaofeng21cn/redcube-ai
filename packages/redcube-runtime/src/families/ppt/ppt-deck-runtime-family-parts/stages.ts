@@ -18,6 +18,10 @@ import { createPptDeckScreenshotReviewMechanicsParts } from './stage-screenshot-
 import { createPptDeckScreenshotPreflightParts } from './stage-screenshot-preflight.js';
 import { createPptDeckScreenshotReviewRuntimeParts } from './stage-screenshot-review-runtime.js';
 import { createPptDeckStageReviewScopeParts } from './stage-review-scope.js';
+import {
+  buildPptStageReviewIsolation,
+  buildPptStageReviewReceipt,
+} from './stage-review-isolation.js';
 
 export function createPptDeckStageParts(deps) {
   const {
@@ -355,6 +359,14 @@ export function createPptDeckStageParts(deps) {
     const targetSlideIds = incrementalReview
       ? safeArray(reviewOptions?.targetSlideIds).map((slideId) => safeText(slideId)).filter(Boolean)
       : [];
+    const reviewIsolation = buildPptStageReviewIsolation({
+      deliverableId: deliverablePaths.deliverableId,
+      contract,
+      renderArtifact,
+      reviewRoute: 'screenshot_review',
+      lineageRefs: ['visual_director_review'],
+      priorFindingRefs: safeArray(reviewOptions?.priorReviewArtifact?.review_export_refs),
+    });
     const summaryBlueprintSlides = incrementalReview
       ? filterSlideScopedArray(blueprintSlides, targetSlideIds)
       : blueprintSlides.map((slide) => ({
@@ -446,6 +458,10 @@ export function createPptDeckStageParts(deps) {
           purpose: `Review rendered lecture slide screenshot for ${slide.slide_id}`,
         })),
         cwd: deliverablePaths.deliverableDir,
+        attemptRole: reviewIsolation.attemptRole,
+        producerSessionRefs: reviewIsolation.producerSessionRefs,
+        qualityRoundIndex: reviewIsolation.qualityRoundIndex,
+        contextManifestRef: reviewIsolation.reviewContextManifestRef,
       });
       return {
         aiSlideReviews: normalizePptScreenshotAiSlideReviews(batchData?.slide_reviews, slideBatch),
@@ -480,6 +496,10 @@ export function createPptDeckStageParts(deps) {
       },
       outputContract: screenshotReviewSummaryOutputContract(),
       cwd: deliverablePaths.deliverableDir,
+      attemptRole: reviewIsolation.attemptRole,
+      producerSessionRefs: reviewIsolation.producerSessionRefs,
+      qualityRoundIndex: reviewIsolation.qualityRoundIndex,
+      contextManifestRef: reviewIsolation.reviewContextManifestRef,
     });
     const summaryCall = normalizeStructuredRuntimeCall(generationRuntime, {
       callKind: 'summary',
@@ -493,6 +513,7 @@ export function createPptDeckStageParts(deps) {
         ...batchResults.map((result) => result.generationRuntime),
         summaryCall,
       ]),
+      reviewIsolation,
     };
   }
 
@@ -592,7 +613,17 @@ export function createPptDeckStageParts(deps) {
         }))
       : Promise.resolve(null);
     const [
-      { data, aiSlideReviews, generationRuntime },
+      {
+        data,
+        aiSlideReviews,
+        generationRuntime,
+        reviewIsolation = buildPptStageReviewIsolation({
+          deliverableId,
+          contract,
+          renderArtifact,
+          reviewRoute: 'screenshot_review',
+        }),
+      },
       baselineReview,
     ] = await Promise.all([aiReviewPromise, baselineReviewPromise]);
     const aiWeakPages = normalizeStringList(data?.weak_pages, 'screenshot_review.weak_pages', { min: 0, max: 4 });
@@ -654,6 +685,20 @@ export function createPptDeckStageParts(deps) {
       nextRequiredOwnerAction: rerunFromStage,
       artifactRefs,
     });
+    const reviewReceipt = buildPptStageReviewReceipt({
+      deliverableId,
+      renderArtifact,
+      generationRuntime,
+      reviewIsolation,
+      status,
+      artifactRefs,
+    });
+    if (status === 'pass' && !reviewReceipt) {
+      const error = new Error('screenshot_review requires producer/reviewer session lineage before a pass verdict');
+      error.failure_kind = 'stale_or_mismatched_stage_identity';
+      error.hard_stop_kind = 'stale_or_mismatched_stage_identity';
+      throw error;
+    }
     const visualMemoryProposal = normalizeVisualMemoryProposal({
       data,
       status,
@@ -681,6 +726,9 @@ export function createPptDeckStageParts(deps) {
           : [],
       },
       review_overlay: 'screenshot_review',
+      review_context_manifest: reviewIsolation.reviewContextManifest,
+      stage_review_receipt: reviewReceipt,
+      context_isolation_status: reviewReceipt ? 'verified' : 'mechanical_block_without_formal_pass_receipt',
       mode,
       status,
       mechanical_cache: mechanicalCacheMetadata(cacheStatus, reviewHash),

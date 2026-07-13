@@ -79,8 +79,15 @@ export function createImagePageGenerationParts({
   }): Promise<JsonRecord> {
     if (process.env.REDCUBE_IMAGE_GENERATION_MOCK === '1') {
       const mockBytes = solidPngFixture(1536, 864, `${route}:${slideId}:${prompt}`);
+      const mockRunId = `resp_mock_${sha256(`${route}:${slideId}:${prompt}`).slice(0, 16)}`;
       return {
-        id: `resp_mock_${sha256(`${route}:${slideId}:${prompt}`).slice(0, 16)}`,
+        id: mockRunId,
+        codex_native_imagegen_runtime: {
+          owner: 'mock_codex_native_imagegen_test_double',
+          run_id: mockRunId,
+          session_id: `mock-thread-${sha256(`${route}:${slideId}`).slice(0, 16)}`,
+          test_double: true,
+        },
         output: [{
           type: 'image_generation_call',
           id: `ig_mock_${sha256(`${slideId}:${prompt}`).slice(0, 16)}`,

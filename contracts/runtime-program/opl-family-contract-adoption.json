@@ -328,6 +328,7 @@
     "projection_id": "rca.opl.family.stage-control.projection.v1",
     "adapter_model": "descriptor_and_stage_execution_plan_provider",
     "maps_to_opl_contract": "opl_family_stage_control_plane.v1",
+    "stage_quality_cycle_profile_ref": "contracts/stage_quality_cycle_policy.json",
     "source_surfaces": [
       "hydrated overlay stage_sequence",
       "OPL generated product-entry session currentness refs",
@@ -376,10 +377,9 @@
     },
     "route_stage_projection": {
       "ppt_deck": {
-        "source_intake": [
-          "storyline"
-        ],
+        "source_intake": [],
         "communication_strategy": [
+          "storyline",
           "detailed_outline",
           "slide_blueprint"
         ],
@@ -389,15 +389,14 @@
         "artifact_creation": [
           "author_image_pages",
           "render_html",
-          "author_pptx_native"
-        ],
-        "review_and_revision": [
+          "author_pptx_native",
           "visual_director_review",
           "screenshot_review",
           "repair_image_pages",
           "fix_html",
           "repair_pptx_native"
         ],
+        "review_and_revision": [],
         "package_and_handoff": [
           "export_pptx"
         ]
@@ -415,40 +414,44 @@
         ],
         "artifact_creation": [
           "author_image_pages",
-          "render_html"
-        ],
-        "review_and_revision": [
+          "render_html",
           "visual_director_review",
           "screenshot_review",
           "repair_image_pages",
           "fix_html"
         ],
+        "review_and_revision": [],
         "package_and_handoff": [
           "publish_copy",
           "export_bundle"
         ]
       },
       "poster_onepager": {
-        "source_intake": [
-          "storyline"
-        ],
+        "source_intake": [],
         "communication_strategy": [
+          "storyline",
           "poster_blueprint"
         ],
         "visual_direction": [
           "visual_direction"
         ],
         "artifact_creation": [
-          "render_html"
-        ],
-        "review_and_revision": [
+          "render_html",
           "visual_director_review",
           "screenshot_review"
         ],
+        "review_and_revision": [],
         "package_and_handoff": [
           "export_bundle"
         ]
       }
+    },
+    "meta_review_stage_handler": {
+      "stage_id": "review_and_revision",
+      "stage_role": "cross_stage_meta_review",
+      "handler_ref": "redcube.meta_review_handler:review_and_revision",
+      "domain_routes_are_not_meta_review_stages": true,
+      "no_context_inheritance": true
     },
     "authority_boundary": {
       "rca_owns_visual_truth": true,

@@ -107,6 +107,12 @@ function makeFixture({ missingManifest = false, promptManifestPatch = {}, styleM
   const imageArtifact = {
     route: 'author_image_pages',
     status: 'completed',
+    image_generation_calls: [{
+      codex_native_imagegen_runtime: {
+        run_id: 'producer-image-run',
+        session_id: 'producer-image-thread',
+      },
+    }],
     image_pages_bundle: {
       source_visual_route: 'author_image_pages',
       page_count: 1,
@@ -171,13 +177,13 @@ function makeFixture({ missingManifest = false, promptManifestPatch = {}, styleM
     extraChecks: () => ({}),
     generateStructuredArtifact: async ({ context }) => {
       if (context?.route === 'visual_director_review' || context?.source_surface_kind === 'image_pages') {
-        return { data: { director_intent_landed: true, anti_template_ok: true, peak_pages_landed: true, memory_hook_present: true, weak_pages: [], homogeneous_layout_risk: 0.1, review_summary: 'image manifest reviewed', rewrite_action: 'none' }, generationRuntime: { provider: 'test' } };
+        return { data: { director_intent_landed: true, anti_template_ok: true, peak_pages_landed: true, memory_hook_present: true, weak_pages: [], homogeneous_layout_risk: 0.1, review_summary: 'image manifest reviewed', rewrite_action: 'none' }, generationRuntime: { provider: 'test', run_id: 'director-review-run', session_id: 'director-review-thread' } };
       }
       if (context?.review_scope === 'slide_batch') {
-        return { data: { slide_reviews: [{ slide_id: 'S01', judgement: 'pass', visual_findings: [], recommended_fix: '' }] }, generationRuntime: { provider: 'test' } };
+        return { data: { slide_reviews: [{ slide_id: 'S01', judgement: 'pass', visual_findings: [], recommended_fix: '' }] }, generationRuntime: { provider: 'test', run_id: 'screenshot-batch-run', session_id: 'screenshot-batch-thread' } };
       }
       if (context?.review_scope === 'summary') {
-        return { data: { director_intent_landed: true, anti_template_ok: true, weak_pages: [], review_summary: 'image screenshots ok' }, generationRuntime: { provider: 'test' } };
+        return { data: { director_intent_landed: true, anti_template_ok: true, weak_pages: [], review_summary: 'image screenshots ok' }, generationRuntime: { provider: 'test', run_id: 'screenshot-summary-run', session_id: 'screenshot-summary-thread' } };
       }
       return { data: {}, generationRuntime: { provider: 'test' } };
     },
@@ -236,6 +242,13 @@ test('ppt image-first route reviews PNG pages and exports non-editable full-page
       'rca-owner-receipt:review-export:ppt_deck:visual_director_review:deck-image',
     ]);
     assert.deepEqual(director.typed_blocker_refs, []);
+    assert.equal(director.review_context_manifest.surface_kind, 'opl_stage_review_context_manifest');
+    assert.equal(director.stage_review_receipt.surface_kind, 'opl_stage_review_receipt');
+    assert.equal(director.stage_review_receipt.no_context_inheritance, true);
+    assert.equal(
+      director.stage_review_receipt.producer_session_refs.includes(director.stage_review_receipt.reviewer_session_ref),
+      false,
+    );
     assert.equal(director.visual_director_review.deterministic_preflight.findings.length, 0);
     fixture.artifacts.set('visual_director_review', director);
 
@@ -251,6 +264,12 @@ test('ppt image-first route reviews PNG pages and exports non-editable full-page
       'rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-image',
     ]);
     assert.deepEqual(screenshot.typed_blocker_refs, []);
+    assert.equal(screenshot.stage_review_receipt.surface_kind, 'opl_stage_review_receipt');
+    assert.equal(screenshot.stage_review_receipt.no_context_inheritance, true);
+    assert.notEqual(
+      screenshot.stage_review_receipt.reviewer_session_ref,
+      director.stage_review_receipt.reviewer_session_ref,
+    );
     assert.equal(screenshot.review_capture.source_visual_route, 'author_image_pages');
     assert.equal(screenshot.mechanical_review.python_helper_invocation, null);
     assert.equal(screenshot.mechanical_review.metrics.source_surface_kind, 'image_pages');
@@ -280,6 +299,7 @@ test('ppt image-first route reviews PNG pages and exports non-editable full-page
     const gallery = readJson(exported.export_bundle.artifact_gallery.index_file);
     assert.equal(gallery.source_visual_route, 'author_image_pages');
     assert.equal(gallery.editable, false);
+    assert.equal(gallery.status, 'output_ready');
     assert.deepEqual(gallery.artifacts.source.png_files, [fixture.pngFile]);
     assert.deepEqual(gallery.artifacts.source.prompt_manifest_files, [fixture.promptManifestFile]);
     assert.deepEqual(gallery.artifacts.source.style_manifest_files, [fixture.styleManifestFile]);

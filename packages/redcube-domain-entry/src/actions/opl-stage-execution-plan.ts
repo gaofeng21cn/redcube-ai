@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { canonicalStageForRoute } from '@redcube/runtime-protocol';
 import { getDeliverable } from './get-deliverable.js';
 import { safeText } from './action-utils.js';
 
@@ -6,24 +7,41 @@ const OPL_STAGE_EXECUTION_OWNER = 'one-person-lab';
 const OPL_STAGE_ATTEMPT_OWNER = 'opl_family_runtime_provider';
 const OPL_ATTEMPT_LEDGER_OWNER = 'one-person-lab';
 const RCA_DOMAIN_OWNER = 'redcube_ai';
+const RCA_STAGE_QUALITY_PROFILE_REF = 'contracts/stage_quality_cycle_policy.json';
+const CANONICAL_STAGES = Object.freeze([
+  { stage_id: 'source_intake', title: 'Source intake', stage_kind: 'intake', output_artifact: 'source_truth_pack' },
+  { stage_id: 'communication_strategy', title: 'Communication strategy', stage_kind: 'planning', output_artifact: 'strategy_brief' },
+  { stage_id: 'visual_direction', title: 'Visual direction', stage_kind: 'planning', output_artifact: 'visual_direction' },
+  { stage_id: 'artifact_creation', title: 'Artifact creation', stage_kind: 'creation', output_artifact: 'render_manifest' },
+  { stage_id: 'review_and_revision', title: 'Cross-stage Meta Review', stage_kind: 'review', output_artifact: 'review_verdict' },
+  { stage_id: 'package_and_handoff', title: 'Package and handoff', stage_kind: 'packaging', output_artifact: 'export_bundle' },
+]);
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
 function stageSequenceFromContract(contract) {
-  return safeArray(contract?.stage_sequence?.stages)
+  const routeStages = safeArray(contract?.stage_sequence?.stages)
     .map((stage, index) => ({
-      stage_id: safeText(stage?.stage_id),
-      title: safeText(stage?.title || stage?.label || stage?.stage_id),
-      stage_kind: safeText(stage?.stage_kind || stage?.kind, 'visual_domain_stage'),
+      route_id: safeText(stage?.stage_id),
       output_artifact: safeText(stage?.output_artifact) || null,
-      requires_stages: safeArray(stage?.requires_stages).map((dependency) => safeText(dependency)).filter(Boolean),
-      route_handler_ref: `redcube.route_handler:${safeText(stage?.stage_id)}`,
-      stage_attempt_ref: `opl.stage_attempt:${safeText(stage?.stage_id)}`,
+      requires_routes: safeArray(stage?.requires_stages).map((dependency) => safeText(dependency)).filter(Boolean),
       sequence_index: index,
     }))
-    .filter((stage) => stage.stage_id);
+    .filter((stage) => stage.route_id);
+  return CANONICAL_STAGES.map((stage, index) => {
+    const routes = routeStages.filter((route) => canonicalStageForRoute(route.route_id) === stage.stage_id);
+    return {
+      ...stage,
+      requires_stages: index === 0 ? [] : [CANONICAL_STAGES[index - 1].stage_id],
+      route_handler_refs: routes.map((route) => `redcube.route_handler:${route.route_id}`),
+      route_ids: routes.map((route) => route.route_id),
+      stage_handler_ref: `redcube.stage_handler:${stage.stage_id}`,
+      stage_attempt_ref: `opl.stage_attempt:${stage.stage_id}`,
+      sequence_index: index,
+    };
+  });
 }
 
 function stagePlanRef({ overlay, topicId, deliverableId, stopAfterStage }) {
@@ -37,7 +55,10 @@ function stagePlanRef({ overlay, topicId, deliverableId, stopAfterStage }) {
 }
 
 function plannedStagesForStop({ stages, stopAfterStage }) {
-  const stopStage = safeText(stopAfterStage);
+  const requestedStop = safeText(stopAfterStage);
+  const stopStage = CANONICAL_STAGES.some((stage) => stage.stage_id === requestedStop)
+    ? requestedStop
+    : canonicalStageForRoute(requestedStop);
   if (!stopStage) return stages;
   const stopIndex = stages.findIndex((stage) => stage.stage_id === stopStage);
   if (stopIndex < 0) return stages;
@@ -100,6 +121,9 @@ export async function buildOplStageExecutionPlan({
       retry_liveness_queue_owner: OPL_STAGE_EXECUTION_OWNER,
       closeout_transport_owner: OPL_STAGE_EXECUTION_OWNER,
       rca_role: 'visual_domain_authority_functions_and_route_handler_refs',
+      canonical_stage_source: 'agent/stages/manifest.json',
+      domain_routes_are_stage_internal_handlers: true,
+      route_ids_are_not_opl_stage_ids: true,
     },
     control_policy: {
       mode: safeText(stopAfterStage) ? 'stop_after_stage' : 'auto_to_terminal',
@@ -121,6 +145,7 @@ export async function buildOplStageExecutionPlan({
           'stale_or_mismatched_stage_identity',
         ],
       },
+      stage_quality_cycle_profile_ref: RCA_STAGE_QUALITY_PROFILE_REF,
       user_intent: safeText(userIntent) || null,
       requested_mode: safeText(mode, 'draft_new'),
       baseline_deliverable_id: safeText(baselineDeliverableId) || null,
@@ -129,7 +154,9 @@ export async function buildOplStageExecutionPlan({
       stage_id: stage.stage_id,
       stage_kind: stage.stage_kind,
       title: stage.title,
-      route_handler_ref: stage.route_handler_ref,
+      stage_handler_ref: stage.stage_handler_ref,
+      route_handler_refs: stage.route_handler_refs,
+      route_ids: stage.route_ids,
       provider_attempt_ref: `${planRef}:${stage.stage_id}`,
       depends_on: stage.requires_stages,
       output_artifact_ref: stage.output_artifact,
@@ -137,6 +164,20 @@ export async function buildOplStageExecutionPlan({
         consumable_artifact_advances: true,
         quality_budget_not_transition_gate: true,
       },
+      stage_quality_cycle_policy_ref: `${RCA_STAGE_QUALITY_PROFILE_REF}#/stage_policies/${stage.stage_id}`,
+      attempt_roles: stage.stage_id === 'artifact_creation'
+        ? ['producer', 'reviewer', 'repairer', 're_reviewer']
+        : stage.stage_id === 'review_and_revision'
+          ? ['producer']
+          : stage.stage_id === 'package_and_handoff'
+            ? ['producer']
+            : ['producer', 'reviewer', 'repairer', 're_reviewer'],
+      context_isolation_required: stage.stage_id !== 'package_and_handoff',
+      ...(stage.stage_id === 'review_and_revision' ? {
+        stage_role: 'cross_stage_meta_review',
+        meta_review_handler_ref: 'redcube.meta_review_handler:review_and_revision',
+        no_context_inheritance: true,
+      } : {}),
       owner_split: {
         stage_attempt_owner: OPL_STAGE_ATTEMPT_OWNER,
         route_handler_owner: RCA_DOMAIN_OWNER,
@@ -146,6 +187,7 @@ export async function buildOplStageExecutionPlan({
       },
     })),
     full_stage_sequence_refs: stages.map((stage) => stage.stage_id),
+    full_route_sequence_refs: stages.flatMap((stage) => stage.route_ids),
     authority_refs: {
       domain_handler_ref: '/product_entry_shell/domain_handler',
       domain_action_adapter_ref: '/product_entry_shell/domain_handler',

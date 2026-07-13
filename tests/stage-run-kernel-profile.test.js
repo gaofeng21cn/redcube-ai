@@ -105,6 +105,17 @@ test('StageRun kernel profile preserves RCA authority and rejects runtime overcl
   ]);
   assert.equal(profile.legacy_runtime_residue_guard.repo_local_stage_run_runtime_owner_allowed, false);
   assert.equal(profile.legacy_runtime_residue_guard.repo_local_status_workbench_owner_allowed, false);
+  assert.deepEqual(profile.visual_stage_run_canary.ordered_domain_events, [
+    'visual_direction_candidates',
+    'grounded_reflection',
+    'comparative_selection',
+    'evolution_and_revision',
+    'strategy_retrospective',
+    'independent_quality_gate',
+    'progress_receipt_or_owner_answer_or_hard_stop_closeout',
+  ]);
+  assert.equal(profile.visual_stage_run_canary.required_role_artifacts.includes('strategy_retrospective_ref'), true);
+  assert.equal(profile.visual_stage_run_canary.required_role_artifacts.includes('meta_review_ref'), false);
 });
 
 test('controlled StageRun canary is followable refs-only evidence, not live progress', () => {
@@ -118,6 +129,16 @@ test('controlled StageRun canary is followable refs-only evidence, not live prog
     evidence.stage_manifest_ref,
     evidence.current_pointer_ref,
   ], 'stage_run_core_refs');
+  assert.deepEqual(Object.keys(evidence.strategy_trace), [
+    'candidate_generation',
+    'grounded_reflection',
+    'comparative_selection',
+    'evolution_and_revision',
+    'strategy_retrospective',
+    'independent_quality_gate',
+  ]);
+  assert.equal('strategy_retrospective_ref' in evidence.role_artifact_refs, true);
+  assert.equal('meta_review_ref' in evidence.role_artifact_refs, false);
   for (const key of Object.keys(evidence.strategy_trace)) {
     assertNonEmptyRefs(evidence.strategy_trace[key].refs, `strategy_trace.${key}.refs`);
   }

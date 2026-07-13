@@ -134,7 +134,7 @@ test('runDeliverableRoute rejects provider refs without OPL owner evidence', asy
     assert.equal(result.ok, false);
     assert.equal(result.surface_kind, 'typed_blocker');
     assert.equal(result.typed_blocker.blocker_kind, 'missing_opl_stage_attempt');
-    assert.deepEqual(result.typed_blocker.missing_refs, ['provider_attempt_owner']);
+    assert.deepEqual(result.typed_blocker.missing_refs, ['provider_attempt_owner', 'valid_attempt_role']);
     assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'runs')), false);
   });
 });

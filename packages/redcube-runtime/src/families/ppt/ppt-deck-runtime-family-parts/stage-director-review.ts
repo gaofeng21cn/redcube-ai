@@ -9,6 +9,10 @@ import {
 } from './review-export-closeout.js';
 import { createPptDeckDirectorReviewPreflightParts } from './stage-director-review-preflight.js';
 import { createPptDeckStageReviewScopeParts } from './stage-review-scope.js';
+import {
+  buildPptStageReviewIsolation,
+  buildPptStageReviewReceipt,
+} from './stage-review-isolation.js';
 
 export function createPptDeckDirectorReviewParts(deps) {
   const {
@@ -129,6 +133,14 @@ export function createPptDeckDirectorReviewParts(deps) {
     const reviewedSlideIds = incrementalReview
       ? incrementalTargetSlideIds
       : renderSummary.map((slide) => safeText(slide?.slide_id)).filter(Boolean);
+    const reviewIsolation = buildPptStageReviewIsolation({
+      deliverableId: deliverablePaths.deliverableId,
+      contract,
+      renderArtifact,
+      reviewRoute: 'visual_director_review',
+      lineageRefs: [currentVisualStage],
+      priorFindingRefs: safeArray(priorReviewArtifact?.review_export_refs),
+    });
     const { data, generationRuntime } = await generateStructuredArtifact({
       adapter,
       family: 'ppt_deck',
@@ -160,6 +172,10 @@ export function createPptDeckDirectorReviewParts(deps) {
           }))
         : undefined,
       outputContract: directorReviewOutputContract(),
+      attemptRole: reviewIsolation.attemptRole,
+      producerSessionRefs: reviewIsolation.producerSessionRefs,
+      qualityRoundIndex: reviewIsolation.qualityRoundIndex,
+      contextManifestRef: reviewIsolation.reviewContextManifestRef,
     });
     return {
       data,
@@ -172,6 +188,7 @@ export function createPptDeckDirectorReviewParts(deps) {
             .filter((slideId) => slideId && !targetSlideIdSet.has(slideId))
         : [],
       priorReviewArtifact: incrementalReview ? priorReviewArtifact : null,
+      reviewIsolation,
     };
   }
 
@@ -192,6 +209,7 @@ export function createPptDeckDirectorReviewParts(deps) {
       reviewedSlideIds,
       reusedSlideIds,
       priorReviewArtifact,
+      reviewIsolation,
     } = await generateDirectorReviewDraft(contract, deliverablePaths, preflight, adapter);
     const priorReview = priorReviewArtifact?.visual_director_review || null;
     const incrementalReview = reviewScope === 'incremental_page_review';
@@ -224,6 +242,21 @@ export function createPptDeckDirectorReviewParts(deps) {
       nextRequiredOwnerAction: status === 'pass' ? null : rerunFromStage,
       artifactRefs,
     });
+    const reviewReceipt = buildPptStageReviewReceipt({
+      deliverableId: deliverablePaths.deliverableId,
+      renderArtifact,
+      generationRuntime,
+      reviewIsolation,
+      currentVisualStage: currentVisualStageId(contract, deliverablePaths),
+      status,
+      artifactRefs,
+    });
+    if (!reviewReceipt) {
+      const error = new Error('visual_director_review requires producer session lineage before formal Review');
+      error.failure_kind = 'stale_or_mismatched_stage_identity';
+      error.hard_stop_kind = 'stale_or_mismatched_stage_identity';
+      throw error;
+    }
     return {
       ...attachCommon('visual_director_review', contract, generationRuntime, adapter),
       ...closeout,
@@ -235,6 +268,9 @@ export function createPptDeckDirectorReviewParts(deps) {
         reused_slide_ids: reusedSlideIds,
       },
       review_overlay: 'visual_director_review',
+      review_context_manifest: reviewIsolation.reviewContextManifest,
+      stage_review_receipt: reviewReceipt,
+      context_isolation_status: 'verified',
       status,
       visual_director_review: {
         review_model: 'director_first_visual_judgement',

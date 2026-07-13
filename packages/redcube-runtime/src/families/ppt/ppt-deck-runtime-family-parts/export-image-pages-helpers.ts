@@ -53,7 +53,7 @@ export function createPptDeckExportImagePageHelpers(deps: {
     const artifactGalleryIndexFile = path.join(artifactGalleryDir, 'index.json');
     const gallery = {
       surface_kind: 'image_pages_export_operator_artifact_gallery_v1',
-      status: 'output_ready',
+      status: safeText(finalDelivery?.current, 'output_available_with_quality_debt'),
       title: safeText(contract?.title),
       deliverable_id: deliverableId,
       source_visual_route: safeText(renderArtifact?.route),

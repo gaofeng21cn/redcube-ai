@@ -11,6 +11,7 @@ Requires:
 
 Ensures:
 - `artifact_candidate_rendered`
+- `independent_stage_review_receipt_recorded`
 
 Runtime event refs:
 - `runtime_event:rca.artifact_creation.candidate_rendered`
@@ -18,3 +19,4 @@ Runtime event refs:
 Owner boundary:
 - RCA owns artifact mutation authorization and canonical artifact authority.
 - OPL holds attempt/runtime refs only.
+- Producer, reviewer, repairer, and re-reviewer are separate StageAttempts with fresh executor sessions under the same StageRun.

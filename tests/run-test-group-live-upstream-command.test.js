@@ -148,7 +148,6 @@ test('run-test-group partitions route-heavy files away from the default parallel
       groupName: 'fast',
       files: [
         'tests/ppt-native-ppt-runtime.test.js',
-        'tests/runtime-deliverable-route-recovery.test.js',
         'tests/product-entry.test.js',
       ],
     }),
@@ -158,7 +157,6 @@ test('run-test-group partitions route-heavy files away from the default parallel
       ],
       serialized_files: [
         'tests/ppt-native-ppt-runtime.test.js',
-        'tests/runtime-deliverable-route-recovery.test.js',
       ],
     },
   );
@@ -274,7 +272,6 @@ test('native PPT fast runtime tests use the mock Python helper instead of launch
   for (const file of [
     'tests/ppt-native-ppt-runtime.test.js',
     'tests/ppt-generation.test.js',
-    'tests/runtime-deliverable-route-recovery.test.js',
     'tests/runtime-deliverable-route-cases/shared.js',
   ]) {
     const content = readTestFileWithStaticRelativeImports(file);

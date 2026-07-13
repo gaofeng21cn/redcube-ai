@@ -11,6 +11,12 @@ Canonical policy:
 - Keep image-first, HTML, and native PPTX differences route-local through detailed prompt locators, professional skills, and typed repair targets; do not split the top-level stage for route-specific failures.
 - Do not expose prompt metadata, route names, internal fields, source ids, or operator notes in visible artifacts.
 - Artifact mutation requires RCA authorization, owner receipt refs, or typed blockers.
+- Treat authoring, visual review, repair, and re-review as one `artifact_creation` quality cycle, not as additional top-level stages.
+- Use a new OPL StageAttempt and a fresh Codex thread for each formal role: `producer`, `reviewer`, `repairer`, and `re_reviewer`. Never resume the producer thread for Review.
+- A producer-thread write-after-check is only `in_thread_refinement`; it cannot issue a Review receipt or close a formal quality gate.
+- Preserve the professional evidence order: candidate -> render/mechanical evidence -> independent visual-director review -> independent screenshot review -> targeted repair -> rerender -> fresh re-review.
+- Formal reviewers receive only exact artifact/source refs, hashes, quality rubrics, necessary lineage, and prior findings for re-review. They do not receive producer conversation history.
+- A repair round is one repairer Attempt plus one fresh re-reviewer Attempt. Stop after three repair rounds, select the best consumable artifact, and record `completed_with_quality_debt` when defects remain.
 
 Professional skill routing:
 - Route page-level PPT authoring, visible text safety, text fit, and blocked-slide repair planning to `agent/professional_skills/rca-ppt-page-author/SKILL.md`.
@@ -26,3 +32,4 @@ Detailed prompt locators:
 Authority boundary:
 - OPL can schedule attempts and hold runtime refs.
 - RCA owns artifact mutation authorization and canonical artifact authority.
+- OPL owns quality-cycle Attempt scheduling and budget accounting; RCA owns the professional sequence, review verdict, repair target, and artifact lineage.

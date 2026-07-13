@@ -37,9 +37,9 @@
         "tool-affordance-ref:agent/tools/domain_affordances.md"
       ]
     },
-    "meta_review_learning": {
+    "strategy_retrospective": {
       "refs": [
-        "role-artifact-ref:controlled-canary:visual_direction:meta_review",
+        "role-artifact-ref:controlled-canary:visual_direction:strategy_retrospective",
         "knowledge-ref:agent/knowledge/review_export_memory.md",
         "quality-gate-ref:agent/quality_gates/review_export_memory.md"
       ]
@@ -57,7 +57,7 @@
     "reflection_review_ref": "role-artifact-ref:controlled-canary:visual_direction:reflection_review",
     "ranking_selection_ref": "role-artifact-ref:controlled-canary:visual_direction:ranking_selection",
     "revision_lineage_ref": "role-artifact-ref:controlled-canary:visual_direction:revision_lineage",
-    "meta_review_ref": "role-artifact-ref:controlled-canary:visual_direction:meta_review",
+    "strategy_retrospective_ref": "role-artifact-ref:controlled-canary:visual_direction:strategy_retrospective",
     "independent_gate_ref": "role-artifact-ref:controlled-canary:visual_direction:independent_gate"
   },
   "asset_follow_audit": {
@@ -72,7 +72,7 @@
       "reflection_review_ref",
       "ranking_selection_ref",
       "revision_lineage_ref",
-      "meta_review_ref",
+      "strategy_retrospective_ref",
       "independent_gate_ref",
       "owner_receipt_or_typed_blocker_ref"
     ],

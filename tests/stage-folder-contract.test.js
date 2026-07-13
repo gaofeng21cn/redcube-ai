@@ -237,8 +237,8 @@ test('RCA stage folder converts a readable quality block without typed blocker i
       topicId: 'topic-a',
       deliverableId: 'deck-a',
       routeStageId: 'screenshot_review',
-      canonicalStageId: 'review_and_revision',
-      stageOrder: 5,
+      canonicalStageId: 'artifact_creation',
+      stageOrder: 4,
       attemptId: 'attempt-missing-blocker-ref',
       outputName: 'screenshot_review.json',
       status: 'blocked',
@@ -267,8 +267,8 @@ test('RCA stage folder materializes a progress diagnostic when no readable artif
       topicId: 'topic-a',
       deliverableId: 'deck-a',
       routeStageId: 'screenshot_review',
-      canonicalStageId: 'review_and_revision',
-      stageOrder: 5,
+      canonicalStageId: 'artifact_creation',
+      stageOrder: 4,
       attemptId: 'attempt-zero-artifact',
       outputName: 'screenshot_review.json',
       status: 'blocked',
@@ -364,8 +364,8 @@ test('RCA readable blocked attempts expose typed blocker evidence as quality deb
       topicId: 'topic-a',
       deliverableId: 'deck-a',
       routeStageId: 'screenshot_review',
-      canonicalStageId: 'review_and_revision',
-      stageOrder: 5,
+      canonicalStageId: 'artifact_creation',
+      stageOrder: 4,
       attemptId: 'attempt-blocked',
       outputRole: 'review_verdict',
       typedBlockerRefs: ['rca-typed-blocker:screenshot-review'],
@@ -385,7 +385,7 @@ test('RCA readable blocked attempts expose typed blocker evidence as quality deb
     const loaded = readStageFolderArtifact({
       deliverablePaths: paths,
       routeStageId: 'screenshot_review',
-      canonicalStageId: 'review_and_revision',
+      canonicalStageId: 'artifact_creation',
     });
     assert.equal(loaded?.status, 'completed_with_quality_debt');
     assert.equal(loaded?.artifact.status, 'block');
@@ -397,8 +397,8 @@ test('RCA review, repair, and export routes map to receipt-backed stage output r
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-route-roles-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
     const cases = [
-      ['visual_director_review', 'review_and_revision', 'review_verdict'],
-      ['screenshot_review', 'review_and_revision', 'review_verdict'],
+      ['visual_director_review', 'artifact_creation', 'review_verdict'],
+      ['screenshot_review', 'artifact_creation', 'review_verdict'],
       ['repair_image_pages', 'artifact_creation', 'render_manifest'],
       ['export_pptx', 'package_and_handoff', 'export_bundle'],
     ];
@@ -709,8 +709,8 @@ test('RCA stage folder artifact read does not substitute another route in the sa
       topicId: 'topic-a',
       deliverableId: 'deck-a',
       routeStageId: 'visual_director_review',
-      canonicalStageId: 'review_and_revision',
-      stageOrder: 5,
+      canonicalStageId: 'artifact_creation',
+      stageOrder: 4,
       attemptId: 'attempt-director-block',
       outputName: 'visual_director_review.json',
       typedBlockerRefs: ['rca-typed-blocker:visual-director-review'],
@@ -723,7 +723,7 @@ test('RCA stage folder artifact read does not substitute another route in the sa
       readStageFolderArtifact({
         deliverablePaths: paths,
         routeStageId: 'screenshot_review',
-        canonicalStageId: 'review_and_revision',
+        canonicalStageId: 'artifact_creation',
       }),
       null,
     );
@@ -731,7 +731,7 @@ test('RCA stage folder artifact read does not substitute another route in the sa
       readStageFolderArtifact({
         deliverablePaths: paths,
         routeStageId: 'visual_director_review',
-        canonicalStageId: 'review_and_revision',
+        canonicalStageId: 'artifact_creation',
       })?.artifact.route,
       'visual_director_review',
     );

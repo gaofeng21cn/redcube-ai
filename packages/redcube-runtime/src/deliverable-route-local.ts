@@ -23,7 +23,6 @@ import {
   authoringLaneForRoute,
   isHardStopArtifact,
   lockedAuthoringLane,
-  markQualityBudgetExhausted,
 } from './progress-first.js';
 import { safeText } from './runtime-utils.js';
 import { runtimeCurrentnessReceipt } from './runtime-currentness.js';
@@ -51,7 +50,7 @@ function loadHydratedContract(deliverablePaths, storedDeliverable) {
   };
 }
 const overlayRegistry = getDefaultOverlayRegistry();
-const QUALITY_BUDGET_ROUTES = new Set([
+const ROUTE_REPEAT_BUDGET_ROUTES = new Set([
   'render_html',
   'fix_html',
   'author_image_pages',
@@ -59,7 +58,7 @@ const QUALITY_BUDGET_ROUTES = new Set([
   'visual_director_review',
   'screenshot_review',
 ]);
-const QUALITY_BUDGET_OVERLAYS = new Set(['ppt_deck', 'xiaohongshu']);
+const ROUTE_REPEAT_BUDGET_OVERLAYS = new Set(['ppt_deck', 'xiaohongshu']);
 function routeStageDefinitions(contract) {
   return [
     ...(Array.isArray(contract?.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
@@ -522,6 +521,13 @@ export function refreshStageFolderRouteArtifact({
     artifactRefs: safeArray(artifact?.artifact_refs),
     reviewExportRefs: reviewExportRefsForRoute(artifact),
     helperOutputRefs: helperOutputRefsForArtifact({ route, artifact }),
+    attemptRole: safeText(oplRouteAttemptIndex?.attempt_role || oplRouteAttemptIndex?.attemptRole),
+    qualityRoundIndex: Number(oplRouteAttemptIndex?.quality_round_index || oplRouteAttemptIndex?.qualityRoundIndex || 0),
+    parentAttemptRef: safeText(oplRouteAttemptIndex?.parent_attempt_ref || oplRouteAttemptIndex?.parentAttemptRef),
+    producerAttemptRef: safeText(oplRouteAttemptIndex?.producer_attempt_ref || oplRouteAttemptIndex?.producerAttemptRef),
+    producerSessionRef: safeText(oplRouteAttemptIndex?.producer_session_ref || oplRouteAttemptIndex?.producerSessionRef),
+    noContextInheritance: oplRouteAttemptIndex?.no_context_inheritance === true || oplRouteAttemptIndex?.noContextInheritance === true,
+    contextManifestRef: safeText(oplRouteAttemptIndex?.context_manifest_ref || oplRouteAttemptIndex?.contextManifestRef),
   });
 }
 
@@ -625,7 +631,7 @@ function buildRepeatedBlockFailFastArtifact({
     blocking_reasons: blockingReasons,
     blocked_checks: blockedChecks,
   };
-  return markQualityBudgetExhausted({
+  const admitted = admitStageArtifactForProgress({
     ...priorArtifact,
     status: 'completed_with_quality_debt',
     failure_kind: null,
@@ -638,7 +644,7 @@ function buildRepeatedBlockFailFastArtifact({
     deliverable_id: deliverableId,
     target_slide_ids: targetSlideIds,
     blocking_reasons: blockingReasons,
-    quality_budget_exhaustion: {
+    route_repeat_budget_exhaustion: {
       schema_version: 1,
       status: 'exhausted_continue_with_best_artifact',
       route,
@@ -654,20 +660,28 @@ function buildRepeatedBlockFailFastArtifact({
       stall_lineage: stallLineage,
       repeat_budget: repeatBudget,
       recommended_action: 'continue_with_best_available_artifact',
-      quality_gate_policy: 'retry_budget_improves_quality_and_never_blocks_transition',
+      stage_quality_budget_consumed: false,
+      policy: 'route_repeat_budget_is_separate_from_stage_quality_revision_budget',
     },
     stall_lineage: stallLineage,
     route_cache: {
       ...(priorArtifact.route_cache || {}),
-      cache_status: 'quality_budget_exhausted',
+      cache_status: 'route_repeat_budget_exhausted',
       cache_key: routeCacheKey,
       input_hash: routeCacheKey,
       reused_from_artifact_file: artifactFile,
     },
-  }, {
-    route,
-    attempts: repeatBudget.max_repeats,
-  });
+  }, { route });
+  return {
+    ...admitted,
+    route_repeat_budget_exhaustion: admitted.route_repeat_budget_exhaustion,
+    quality_debt: {
+      ...(admitted.quality_debt || {}),
+      route_repeat_budget_exhausted: true,
+      route_repeat_budget: repeatBudget,
+      stage_quality_budget_consumed: false,
+    },
+  };
 }
 
 function readRepeatedBlockFailFastArtifact({
@@ -680,7 +694,7 @@ function readRepeatedBlockFailFastArtifact({
   topicId,
   deliverableId,
 }) {
-  if (!qualityBudgetEnabledForRoute({ overlay, route })) return null;
+  if (!routeRepeatBudgetEnabled({ overlay, route })) return null;
   const loaded = readStageFolderArtifact({
     deliverablePaths,
     routeStageId: route,
@@ -914,7 +928,7 @@ export async function executeDeliverableRouteLocally({
         artifactFile,
         ...(Array.isArray(stageFolderRefs?.artifact_refs) ? stageFolderRefs.artifact_refs : []),
       ])),
-      cache_status: 'quality_budget_exhausted',
+      cache_status: 'route_repeat_budget_exhausted',
       executor: {
         adapter: executor.adapter,
         primary: executor.primary,

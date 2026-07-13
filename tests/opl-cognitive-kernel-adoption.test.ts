@@ -122,6 +122,8 @@ test('RCA declarative manifest binds stage refs while OPL owns generated cogniti
   const manifest = readJson('agent/stages/manifest.json');
   const pack = readJson('contracts/pack_compiler_input.json');
   const adoption = readJson('contracts/cognitive_kernel_adoption.json');
+  const stageRunProfile = readJson('contracts/stage_run_kernel_profile.json');
+  const canary = readJson('contracts/stage_run_canary_evidence.json');
   const adoptionBoundary = adoption.tool_affordance_boundary;
 
   assert.equal(manifest.surface_kind, 'opl_standard_agent_declarative_stage_manifest');
@@ -132,6 +134,10 @@ test('RCA declarative manifest binds stage refs while OPL owns generated cogniti
     'opl-generated:family_stage_control_plane#/stages/*/selected_executor',
   );
   assert.deepEqual(pack.stage_pack_required_sections, requiredStagePackSections);
+  assert.equal(stageRunProfile.visual_stage_run_canary.ordered_domain_events.includes('strategy_retrospective'), true);
+  assert.equal(stageRunProfile.visual_stage_run_canary.ordered_domain_events.includes('meta_review_learning'), false);
+  assert.equal('strategy_retrospective' in canary.strategy_trace, true);
+  assert.equal('meta_review_learning' in canary.strategy_trace, false);
 
   for (const stage of manifest.stages) {
     assert.equal(stage.policy_ref, `agent/stages/${stage.stage_id}.md`);

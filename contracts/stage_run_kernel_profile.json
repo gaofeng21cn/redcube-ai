@@ -220,7 +220,7 @@
       "grounded_reflection",
       "comparative_selection",
       "evolution_and_revision",
-      "meta_review_learning",
+      "strategy_retrospective",
       "independent_quality_gate",
       "progress_receipt_or_owner_answer_or_hard_stop_closeout"
     ],
@@ -229,7 +229,7 @@
       "reflection_review_ref",
       "ranking_selection_ref",
       "revision_lineage_ref",
-      "meta_review_ref",
+      "strategy_retrospective_ref",
       "independent_gate_ref"
     ],
     "closure_policy": {

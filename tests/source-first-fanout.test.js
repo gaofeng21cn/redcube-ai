@@ -95,30 +95,43 @@ test('source-first fanout prepares one shared source pack then returns OPL stage
     assert.deepEqual(
       deckPlan.stage_attempts.map((stageRun) => stageRun.stage_id),
       [
-        'storyline',
-        'detailed_outline',
-        'slide_blueprint',
+        'source_intake',
+        'communication_strategy',
         'visual_direction',
-        'author_image_pages',
-        'visual_director_review',
-        'screenshot_review',
-        'repair_image_pages',
-        'export_pptx',
+        'artifact_creation',
+        'review_and_revision',
+        'package_and_handoff',
       ],
     );
     assert.deepEqual(
       notePlan.stage_attempts.map((stageRun) => stageRun.stage_id),
       [
-        'research',
-        'storyline',
-        'single_note_plan',
+        'source_intake',
+        'communication_strategy',
         'visual_direction',
-        'author_image_pages',
-        'visual_director_review',
-        'screenshot_review',
-        'repair_image_pages',
-        'publish_copy',
-        'export_bundle',
+        'artifact_creation',
+        'review_and_revision',
+        'package_and_handoff',
       ],
+    );
+    assert.deepEqual(
+      deckPlan.stage_attempts.find((stageRun) => stageRun.stage_id === 'communication_strategy').route_ids,
+      ['storyline', 'detailed_outline', 'slide_blueprint'],
+    );
+    assert.deepEqual(
+      deckPlan.stage_attempts.find((stageRun) => stageRun.stage_id === 'artifact_creation').route_ids,
+      ['author_image_pages', 'visual_director_review', 'screenshot_review', 'repair_image_pages'],
+    );
+    assert.equal(
+      deckPlan.stage_attempts.find((stageRun) => stageRun.stage_id === 'review_and_revision').stage_role,
+      'cross_stage_meta_review',
+    );
+    assert.deepEqual(
+      deckPlan.stage_attempts.find((stageRun) => stageRun.stage_id === 'review_and_revision').attempt_roles,
+      ['producer'],
+    );
+    assert.deepEqual(
+      deckPlan.stage_attempts.find((stageRun) => stageRun.stage_id === 'package_and_handoff').attempt_roles,
+      ['producer'],
     );
 });

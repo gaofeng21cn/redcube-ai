@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
+import { buildQualityAttemptRuntime } from '@redcube/runtime-protocol';
 import {
   OPL_CODEX_EXECUTOR_SURFACE,
   REDCUBE_CODEX_RUNTIME_OWNER,
@@ -32,6 +33,14 @@ export {
   readCodexCliContract,
 } from './index-parts/command-process.js';
 
+function qualityAttemptRoleForRoute(route, requestedRole = '') {
+  const explicit = safeText(requestedRole);
+  if (explicit) return explicit;
+  if (['visual_director_review', 'screenshot_review'].includes(route)) return 'reviewer';
+  if (['repair_image_pages', 'repair_pptx_native', 'fix_html'].includes(route)) return 'repairer';
+  return 'producer';
+}
+
 export async function generateStructuredArtifactViaCodexCli({
   family = 'redcube',
   route,
@@ -43,6 +52,12 @@ export async function generateStructuredArtifactViaCodexCli({
   cwd = process.cwd(),
   contract = readCodexCliContract(),
   spawnSyncImpl = null,
+  attemptRole = '',
+  attemptRef = '',
+  parentAttemptRef = '',
+  producerSessionRefs = [],
+  qualityRoundIndex = 0,
+  contextManifestRef = '',
 } = {}) {
   const safeFamily = safeText(family, 'redcube');
   const safeRoute = safeText(route);
@@ -160,6 +175,15 @@ export async function generateStructuredArtifactViaCodexCli({
     }));
   }
   const usage = terminalUsage(execution.codexRun.events);
+  const qualityAttempt = buildQualityAttemptRuntime({
+    attemptRole: qualityAttemptRoleForRoute(safeRoute, attemptRole),
+    sessionId: execution.codexRun.session_id,
+    attemptRef: attemptRef || execution.codexRun.run_id,
+    parentAttemptRef,
+    producerSessionRefs,
+    qualityRoundIndex,
+    contextManifestRef,
+  });
 
   return {
     data,
@@ -180,6 +204,7 @@ export async function generateStructuredArtifactViaCodexCli({
         usage,
       }),
       ...structuredOutputTelemetry,
+      stage_quality_attempt: qualityAttempt,
       usage,
     },
   };

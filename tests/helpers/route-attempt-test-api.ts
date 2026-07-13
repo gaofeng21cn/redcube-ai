@@ -9,6 +9,10 @@ export function buildOplRouteAttemptIndexForTest(request) {
   const route = safeText(request?.route) || 'unknown_route';
   const runId = safeText(request?.runId)
     || `${safeText(request?.topicId) || 'topic'}/${safeText(request?.deliverableId) || 'deliverable'}/${route}`;
+  const reviewRoute = ['visual_director_review', 'screenshot_review'].includes(route);
+  const repairRoute = ['repair_image_pages', 'repair_pptx_native', 'fix_html'].includes(route);
+  const attemptRole = safeText(request?.attemptRole)
+    || (reviewRoute ? 'reviewer' : repairRoute ? 'repairer' : 'producer');
   return {
     surface_kind: 'cross_provider_attempt_index',
     version: 'cross-provider-attempt-index.v1',
@@ -25,6 +29,12 @@ export function buildOplRouteAttemptIndexForTest(request) {
     local_session_ref_is_not_provider_attempt_ref: true,
     rca_does_not_own_provider_attempt_ledger: true,
     can_claim_current_without_provider_ledger: false,
+    attempt_role: attemptRole,
+    quality_round_index: Number(request?.qualityRoundIndex || 0),
+    no_context_inheritance: reviewRoute,
+    ...(reviewRoute ? {
+      producer_session_ref: safeText(request?.producerSessionRef) || `codex://threads/test-producer/${safeText(request?.deliverableId) || 'deliverable'}`,
+    } : {}),
   };
 }
 

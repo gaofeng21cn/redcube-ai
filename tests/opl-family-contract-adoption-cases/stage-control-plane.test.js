@@ -36,6 +36,8 @@ test('RCA declarative manifest is the sole tracked stage source for OPL projecti
 
   assert.equal(manifest.surface_kind, 'opl_standard_agent_declarative_stage_manifest');
   assert.equal(manifest.version, 'opl-standard-agent-declarative-stage-manifest.v1');
+  assert.equal(manifest.stage_quality_cycle_profile_ref, 'contracts/stage_quality_cycle_policy.json');
+  assert.equal(manifest.meta_review_stage_ref, 'review_and_revision');
   assert.deepEqual(manifest.stages.map((stage) => stage.stage_id), [
     'source_intake',
     'communication_strategy',
@@ -46,6 +48,8 @@ test('RCA declarative manifest is the sole tracked stage source for OPL projecti
   ]);
   assert.equal(manifest.stages.every((stage) => stage.policy_ref.startsWith('agent/stages/')), true);
   assert.equal(manifest.stages.every((stage) => stage.prompt_ref.startsWith('agent/prompts/')), true);
+  assert.equal(manifest.stages.every((stage) => stage.stage_quality_cycle_policy_ref.startsWith('contracts/stage_quality_cycle_policy.json#/stage_policies/')), true);
+  assert.equal(manifest.stages.find((stage) => stage.stage_id === 'review_and_revision').stage_role, 'cross_stage_meta_review');
   assert.equal(manifest.authority_boundary.opl_role, 'projection_consumer_only');
   assert.equal(manifest.authority_boundary.opl_can_write_domain_truth, false);
   assert.equal(manifest.authority_boundary.provider_completion_is_domain_completion, false);

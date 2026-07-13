@@ -160,7 +160,7 @@ export const TEST_REGISTRY = Object.freeze([
   { file: 'tests/screenshot-cache.test.js', lane: 'integration' },
   { file: 'tests/runtime-performance-report.test.ts', lane: 'integration', fast: true },
   { file: 'tests/runtime-deliverable-route-integration.test.js', lane: 'integration', routeHeavy: true },
-  { file: 'tests/runtime-deliverable-route-recovery.test.js', lane: 'integration', fast: true, routeHeavy: true },
+  { file: 'tests/stage-review-isolation-contract.test.js', lane: 'integration', fast: true },
   { file: 'tests/rca-executor-backend-contract.test.ts', lane: 'integration' },
   { file: 'tests/runtime-deliverable-route.test.js', lane: 'integration', fast: true, routeHeavy: true },
   { file: 'tests/screenshot-review-ai-first.test.js', lane: 'integration' },

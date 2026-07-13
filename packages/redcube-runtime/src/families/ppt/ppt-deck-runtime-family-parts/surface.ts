@@ -189,7 +189,11 @@ export function createPptDeckSurfaceParts(deps) {
   }
 
   function invalidateDownstreamReviewPatch(route) {
-    if (!['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'author_pptx_native', 'fix_html', 'repair_pptx_native'].includes(route)) {
+    if (![
+      'storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction',
+      'author_image_pages', 'repair_image_pages', 'render_html', 'fix_html',
+      'author_pptx_native', 'repair_pptx_native',
+    ].includes(route)) {
       return null;
     }
     return {
@@ -211,6 +215,13 @@ export function createPptDeckSurfaceParts(deps) {
     if (!reviewStatePatch) return payload;
     return {
       ...payload,
+      stale_ref_invalidation: {
+        caused_by_route: route,
+        invalidated_route_refs: ['visual_director_review', 'screenshot_review', 'export_pptx'],
+        requires_fresh_review_attempts: true,
+        requires_fresh_meta_review_stage_run: true,
+        invalidation_reason: 'upstream_artifact_generation_changed',
+      },
       review_state_patch: {
         ...reviewStatePatch,
         ...(payload?.review_state_patch || {}),

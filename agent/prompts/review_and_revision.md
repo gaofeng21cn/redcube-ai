@@ -1,8 +1,8 @@
-# Review And Revision Prompt Policy
+# Cross-Stage Meta Review Prompt Policy
 
 Stage id: `review_and_revision`
 Owner: RedCube AI
-Purpose: perform visual director review, screenshot review, source-fidelity checks, repair targeting, and visual memory proposal review before export.
+Purpose: independently review the whole deck after the artifact-creation quality cycle and route defects to the earliest canonical Stage that can close their root cause.
 
 Canonical policy:
 - Review final rendered pages or screenshots directly; summaries and mechanical metrics are supporting evidence only.
@@ -17,11 +17,10 @@ Professional skill routing:
 - Route reusable, evidence-backed visual-pattern proposal judgment to `agent/professional_skills/rca-visual-memory-curator/SKILL.md` only in the screenshot-review summary call; slide-batch calls stay reviewer-only, unresolved defects remain repair targets, and memory absence never blocks review/export progression.
 - Keep `agent/skills/*.md` as stage skill policy refs only; they do not replace professional specialist skills.
 
-Detailed prompt locators:
-- `ppt_deck`: `prompts/ppt_deck/director_review.md`, `prompts/ppt_deck/screenshot_review.md`, `prompts/ppt_deck/repair_image_pages.md`, `prompts/ppt_deck/fix_html.md`, `prompts/ppt_deck/repair_pptx_native.md`
-- `xiaohongshu`: `prompts/xiaohongshu/director_review.md`, `prompts/xiaohongshu/screenshot_review.md`, `prompts/xiaohongshu/repair_image_pages.md`, `prompts/xiaohongshu/fix_html.md`
-- `poster_onepager`: `prompts/poster_onepager/director_review.md`, `prompts/poster_onepager/screenshot_review.md`
+Stage-internal review locators:
+- Visual director review, screenshot review, and route-local repairs belong to `artifact_creation`; their detailed prompt locators remain under each family prompt pack.
+- This Stage consumes their receipts and exact artifacts rather than replaying those route-local reviews.
 
 Authority boundary:
-- Review/export verdict and visual memory accept/reject are AI-first RCA authority surfaces, but accept/reject is a separate post-export memory-owner action rather than part of screenshot review.
-- OPL may transport review refs and repair hints only.
+- RCA owns the deck-level Meta Review verdict and defect-owner matrix.
+- OPL owns the independent StageRun/Attempt identities, context-isolation enforcement, route-back transport, and stale-ref invalidation transport.

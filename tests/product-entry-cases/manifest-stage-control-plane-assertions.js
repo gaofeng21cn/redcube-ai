@@ -57,6 +57,8 @@ export function assertManifestActionAndStageControlPlane({
   assert.deepEqual(artifactStage.allowed_action_refs, ['invoke_product_entry', 'run_image_ppt_proof', 'run_native_ppt_proof']);
   const reviewStage = stageManifest.stages.find((stage) => stage.stage_id === 'review_and_revision');
   assert.equal(reviewStage.trust_lane, 'ai_decision');
+  assert.equal(reviewStage.stage_role, 'cross_stage_meta_review');
+  assert.equal(stageManifest.stage_quality_cycle_profile_ref, 'contracts/stage_quality_cycle_policy.json');
   const handoffStage = stageManifest.stages.find((stage) => stage.stage_id === 'package_and_handoff');
   assert.equal(handoffStage.trust_lane, 'human_gate');
   assert.deepEqual(handoffStage.next_stage_refs, []);

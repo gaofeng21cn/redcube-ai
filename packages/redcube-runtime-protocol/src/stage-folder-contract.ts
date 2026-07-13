@@ -52,11 +52,14 @@ const RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY = Object.freeze({
 
 export function canonicalStageForRoute(stageId) {
   const route = safeText(stageId);
-  if (['source_readiness', 'research', 'storyline'].includes(route)) return 'source_intake';
-  if (['detailed_outline', 'single_note_plan', 'communication_strategy'].includes(route)) return 'communication_strategy';
-  if (['slide_blueprint', 'poster_blueprint', 'visual_direction'].includes(route)) return 'visual_direction';
-  if (['render_html', 'fix_html', 'author_image_pages', 'repair_image_pages', 'author_pptx_native', 'repair_pptx_native'].includes(route)) return 'artifact_creation';
-  if (['visual_director_review', 'screenshot_review'].includes(route)) return 'review_and_revision';
+  if (['source_readiness', 'research', 'source_intake'].includes(route)) return 'source_intake';
+  if (['storyline', 'detailed_outline', 'single_note_plan', 'slide_blueprint', 'poster_blueprint', 'communication_strategy'].includes(route)) return 'communication_strategy';
+  if (route === 'visual_direction') return 'visual_direction';
+  if ([
+    'render_html', 'fix_html', 'author_image_pages', 'repair_image_pages',
+    'author_pptx_native', 'repair_pptx_native', 'visual_director_review', 'screenshot_review',
+  ].includes(route)) return 'artifact_creation';
+  if (['review_and_revision', 'deck_meta_review'].includes(route)) return 'review_and_revision';
   if (['publish_copy', 'export_bundle', 'export_pptx'].includes(route)) return 'package_and_handoff';
   return route || 'domain_specific';
 }
@@ -119,6 +122,9 @@ function roles(input) {
     .filter((role) => RCA_STAGE_OUTPUT_CANONICAL_ROLES.includes(role));
   if (explicit.length) return explicit;
   const route = safeText(input.routeStageId || input.route_stage_id);
+  if (['visual_director_review', 'screenshot_review', 'review_and_revision', 'deck_meta_review'].includes(route)) {
+    return ['review_verdict'];
+  }
   const canonical = canonicalStageForRoute(route);
   return RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS[canonical] || [];
 }
@@ -235,6 +241,15 @@ export function writeStageFolderArtifact(input): any {
     helper_output_refs: helperOutputRefs(input, paths.attempt_dir),
     artifact_refs: unique(input.artifactRefs),
     review_export_refs: unique(input.reviewExportRefs),
+    stage_quality_attempt: {
+      attempt_role: safeText(input.attemptRole || input.attempt_role) || null,
+      quality_round_index: Number(input.qualityRoundIndex ?? input.quality_round_index ?? 0),
+      parent_attempt_ref: safeText(input.parentAttemptRef || input.parent_attempt_ref) || null,
+      producer_attempt_ref: safeText(input.producerAttemptRef || input.producer_attempt_ref) || null,
+      producer_session_ref: safeText(input.producerSessionRef || input.producer_session_ref) || null,
+      no_context_inheritance: input.noContextInheritance === true || input.no_context_inheritance === true,
+      context_manifest_ref: safeText(input.contextManifestRef || input.context_manifest_ref) || null,
+    },
     authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
   };
   writeDomainArtifact({ ...attemptLocator, role: 'receipt', relative_path: 'rca-stage-output-interface.json', body: `${JSON.stringify(interfacePayload, null, 2)}\n` });
@@ -320,6 +335,7 @@ export function writeStageFolderArtifact(input): any {
     },
     helper_output_refs: interfacePayload.helper_output_refs,
     stage_receipts: stageReceipts,
+    stage_quality_attempt: interfacePayload.stage_quality_attempt,
     artifact_refs: interfacePayload.artifact_refs,
     review_export_refs: interfacePayload.review_export_refs,
     authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,

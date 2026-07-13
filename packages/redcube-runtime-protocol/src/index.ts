@@ -24,6 +24,14 @@ export {
   writeStageFolderArtifact,
 } from './stage-folder-contract.js';
 export {
+  RCA_MAX_QUALITY_REPAIR_ROUNDS,
+  RCA_STAGE_QUALITY_ATTEMPT_ROLES,
+  buildQualityAttemptRuntime,
+  buildStageReviewContextManifest,
+  buildStageReviewReceipt,
+  collectExecutionSessionRefs,
+} from './stage-review-contract.js';
+export {
   buildSourcePackFanoutArtifact,
   buildSourceTruthConsumptionSummary,
   getSourceArtifactPaths,

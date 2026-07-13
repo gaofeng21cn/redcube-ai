@@ -173,12 +173,27 @@ function normalizeOplRouteAttemptIndex({ crossProviderAttemptIndex, safeRoute, o
   const attemptLeaseRef = safeIndexText(index, 'attempt_lease_ref', 'attemptLeaseRef', 'lease_ref', 'leaseRef', 'provider_attempt_lease_ref', 'providerAttemptLeaseRef');
   const attemptReceiptRef = safeIndexText(index, 'attempt_receipt_ref', 'attemptReceiptRef', 'closeout_receipt_ref', 'closeoutReceiptRef');
   const localSessionRef = safeIndexText(index, 'local_session_ref', 'localSessionRef');
+  const attemptRole = safeIndexText(index, 'attempt_role', 'attemptRole');
+  const noContextInheritance = index.no_context_inheritance ?? index.noContextInheritance;
+  const producerSessionRef = safeIndexText(index, 'producer_session_ref', 'producerSessionRef');
+  const qualityRoundIndex = Number(index.quality_round_index ?? index.qualityRoundIndex ?? 0);
+  const reviewRoute = ['visual_director_review', 'screenshot_review'].includes(safeRoute);
+  const repairRoute = ['repair_image_pages', 'repair_pptx_native', 'fix_html'].includes(safeRoute);
+  const allowedAttemptRoles = reviewRoute
+    ? new Set(['reviewer', 're_reviewer'])
+    : repairRoute ? new Set(['repairer']) : new Set(['producer']);
 
   if (providerAttemptOwner !== 'one-person-lab' && owner !== 'one-person-lab') missing.push('provider_attempt_owner');
   if (!providerAttemptRef) missing.push('provider_attempt_ref');
   if (!providerAttemptLedgerRef) missing.push('provider_attempt_ledger_ref');
   if (!stageAttemptRef && !attemptLeaseRef && !attemptReceiptRef) {
     missing.push('opl_stage_attempt_or_lease_or_receipt_ref');
+  }
+  if (!allowedAttemptRoles.has(attemptRole)) missing.push('valid_attempt_role');
+  if (reviewRoute && noContextInheritance !== true) missing.push('no_context_inheritance');
+  if (reviewRoute && !producerSessionRef) missing.push('producer_session_ref');
+  if (!Number.isInteger(qualityRoundIndex) || qualityRoundIndex < 0 || qualityRoundIndex > 3) {
+    missing.push('valid_quality_round_index');
   }
   if (providerAttemptRef && (
     providerAttemptRef === localSessionRef
@@ -224,6 +239,10 @@ function normalizeOplRouteAttemptIndex({ crossProviderAttemptIndex, safeRoute, o
       ...(stageAttemptRef ? { stage_attempt_ref: stageAttemptRef } : {}),
       ...(attemptLeaseRef ? { attempt_lease_ref: attemptLeaseRef } : {}),
       ...(attemptReceiptRef ? { attempt_receipt_ref: attemptReceiptRef } : {}),
+      attempt_role: attemptRole,
+      quality_round_index: qualityRoundIndex,
+      no_context_inheritance: reviewRoute,
+      ...(producerSessionRef ? { producer_session_ref: producerSessionRef } : {}),
       provider_attempt_ref_required: true,
       provider_attempt_ledger_ref_required: true,
       missing_provider_ledger_policy: 'fail_closed_typed_blocker_projection',
@@ -470,6 +489,16 @@ function materializeRouteResult({
   patchArtifactExecutionModel(routeResult.artifact_file, executor);
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const patchedArtifact = JSON.parse(readFileSync(routeResult.artifact_file, 'utf-8'));
+  patchedArtifact.stage_quality_attempt = {
+    attempt_role: safeIndexText(crossProviderAttemptIndex, 'attempt_role', 'attemptRole'),
+    quality_round_index: Number(crossProviderAttemptIndex?.quality_round_index ?? crossProviderAttemptIndex?.qualityRoundIndex ?? 0),
+    parent_attempt_ref: safeIndexText(crossProviderAttemptIndex, 'parent_attempt_ref', 'parentAttemptRef') || null,
+    producer_attempt_ref: safeIndexText(crossProviderAttemptIndex, 'producer_attempt_ref', 'producerAttemptRef') || null,
+    producer_session_ref: safeIndexText(crossProviderAttemptIndex, 'producer_session_ref', 'producerSessionRef') || null,
+    no_context_inheritance: crossProviderAttemptIndex?.no_context_inheritance === true || crossProviderAttemptIndex?.noContextInheritance === true,
+    context_manifest_ref: safeIndexText(crossProviderAttemptIndex, 'context_manifest_ref', 'contextManifestRef') || null,
+  };
+  writeFileSync(routeResult.artifact_file, JSON.stringify(patchedArtifact, null, 2), 'utf-8');
   const stageAttemptId = safeIndexText(
     crossProviderAttemptIndex,
     'stage_attempt_ref',

@@ -268,11 +268,13 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       '',
     ].join('\n'));
     return {
+      current: manifest.current,
       current_dir: finalDeliveryDir,
       pptx_file: finalPptxFile,
       pdf_file: finalPdfFile,
       manifest_file: manifestFile,
       readme_file: readmeFile,
+      quality_debt_reasons: qualityDebtReasons,
     };
   }
 
@@ -352,7 +354,11 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     if (!sourcePptx || !fileExists(sourcePptx)) {
       throw new Error(`Route export_pptx requires native PPTX source before export: ${sourcePptx}`);
     }
-    const qualityDebtReasons = [];
+    const qualityDebtReasons = [...new Set([
+      ...safeArray(renderArtifact?.quality_debt?.reasons),
+      ...safeArray(reviewArtifact?.quality_debt?.reasons),
+      ...safeArray(reviewArtifact?.quality_debt_reasons),
+    ].map((reason) => safeText(reason)).filter(Boolean))];
     if (!sourcePdf || !fileExists(sourcePdf)) qualityDebtReasons.push('native_preview_pdf_unavailable');
     const shapeManifest = readJsonIfPresent(shapeManifestFile);
     const rendererProof = shapeManifest.render_proof || bundle.render_proof || {};

@@ -336,6 +336,7 @@ export const RCA_REQUIRED_DOMAIN_PACK_PATHS = Object.freeze([
   'agent/prompts/artifact_creation.md',
   'agent/prompts/review_and_revision.md',
   'agent/prompts/package_and_handoff.md',
+  'agent/prompts/stage-quality-cycle-roles.md',
   'agent/stages/source_intake.md',
   'agent/stages/communication_strategy.md',
   'agent/stages/visual_direction.md',

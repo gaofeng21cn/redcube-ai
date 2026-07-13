@@ -26,6 +26,8 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 ## RCA Domain Authority 与标准 Agent 目标
 
 - Retry、candidate race、shape-plan preflight、review 与 repair loop 只能作为质量预算，不能作为 stage transition gate；有可消费 artifact 必须推进，并把未达标项记录为 `completed_with_quality_debt`。
+- 同一 executor thread 内的写后自检只能称为 `in_thread_refinement`。正式 Stage Review 必须是同一 StageRun 下新的 StageAttempt 和新的 Codex thread；Repair、Re-review 也分别使用新 Attempt，且 Review receipt 必须证明 `no_context_inheritance=true` 和 reviewer/producer session 不同。
+- `review_and_revision` 是独立的跨 Stage Meta Review StageRun，不承载页面级 visual-director/screenshot repair loop；Meta Review 不继承上游生成对话，也不直接修改上游 artifact。
 - 质量债务不得生成 execution typed blocker，不得阻断后续 stage，但必须阻止 `visual_ready`、`export_ready`、handoffable、domain-ready 或 production-ready 声明。
 - Hard stop 白名单仅包含 executor unavailable、权限/凭据/安全、显式人工门、不可逆动作、authority violation 与 stage identity/currentness mismatch。零/损坏/不可读 artifact 必须转成 failure/no-output diagnostic 与质量债继续推进。
 - 同一 deliverable 的 image/native/HTML authoring lane 必须显式锁定；不得以 fallback 或 recovery 为由自动跨 lane。

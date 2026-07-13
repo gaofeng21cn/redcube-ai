@@ -350,7 +350,8 @@ test('PPT and xiaohongshu HTML routes exhaust quality budget and continue with t
         assert.equal(blocked.artifact.progress_first.advance_allowed, true);
         assert.equal(blocked.artifact.quality_debt.blocks_stage_transition, false);
         assert.deepEqual(blocked.artifact.target_slide_ids, scenario.targetSlideIds);
-        assert.deepEqual(blocked.artifact.quality_budget_exhaustion.blocking_reasons, scenario.blockingReasons);
+        assert.deepEqual(blocked.artifact.route_repeat_budget_exhaustion.blocking_reasons, scenario.blockingReasons);
+        assert.equal(blocked.artifact.route_repeat_budget_exhaustion.stage_quality_budget_consumed, false);
         assert.equal(blocked.artifact.stall_lineage.lineage_id, `repeated-block:${scenario.overlay}:render_html:${scenario.deliverableId}`);
         assert.equal(blocked.artifact.stall_lineage.repeated_block_count, 2);
         assert.deepEqual(blocked.artifact.stall_lineage.repeat_budget, {
@@ -358,7 +359,8 @@ test('PPT and xiaohongshu HTML routes exhaust quality budget and continue with t
           remaining_repeats: 0,
           budget_exhausted: true,
         });
-        assert.equal(blocked.artifact.quality_budget_exhaustion.recommended_action, 'continue_with_best_available_artifact');
+        assert.equal(blocked.artifact.route_repeat_budget_exhaustion.recommended_action, 'continue_with_best_available_artifact');
+        assert.equal(blocked.artifact.quality_debt.stage_quality_budget_consumed, false);
         assert.equal(blocked.artifact.typed_blocker_refs.length, 0);
       }
 
