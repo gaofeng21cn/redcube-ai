@@ -105,7 +105,11 @@
   },
   "progress_first_policy": {
     "contract_id": "rca.progress_first_stage_admission.v1",
+    "route_selection_owner": "codex_cli",
+    "codex_may_advance_skip_repeat_reverse_or_route_back": true,
+    "any_declared_stage_may_start_from_any_prior_stage_result": true,
     "artifact_advances_stage": true,
+    "no_output_or_failure_diagnostic_advances_stage": true,
     "retries_are_quality_budget": true,
     "quality_debt_blocks_transition": false,
     "quality_debt_blocks_ready_claims": true,
