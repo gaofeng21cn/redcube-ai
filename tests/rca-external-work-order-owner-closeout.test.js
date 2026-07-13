@@ -54,11 +54,11 @@ function validCloseoutTask(workspaceRoot, overrides = {}) {
   };
 }
 
-test('RCA manifest and domain_action_adapter expose external work-order owner closeout as an owner-owned refs-only action', SERIAL_ENV_TEST, async () => {
+test('RCA manifest and domain handler keep external work-order owner closeout owner-internal and refs-only', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
     const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
-    const domain_action_adapter = await exportDomainHandler({ workspace_root: workspaceRoot });
+    const domainHandler = await exportDomainHandler({ workspace_root: workspaceRoot });
     const metadata = await getDomainActionAdapterGuardedActionMetadata();
 
     assert.equal(
@@ -79,12 +79,12 @@ test('RCA manifest and domain_action_adapter expose external work-order owner cl
     ]);
 
     const actionCatalog = JSON.parse(readFileSync(new URL('../contracts/action_catalog.json', import.meta.url), 'utf8'));
-    const domainHandlerAction = actionCatalog.actions.find(
-      (entry) => entry.action_id === 'dispatch_domain_handler',
-    );
+    assert.equal(actionCatalog.version, 'family-action-catalog.v2');
+    assert.equal(actionCatalog.actions.some((entry) => entry.action_id === 'dispatch_domain_handler'), false);
+    assert.equal(actionCatalog.actions.some((entry) => entry.action_id === 'emit_external_work_order_owner_closeout'), false);
     assert.equal(
-      domainHandlerAction.authority_boundary.allowed_actions.includes('emit_external_work_order_owner_closeout'),
-      true,
+      domainHandler.action_handler_refs.handler_target_ref,
+      'packages/redcube-domain-entry/src/actions/domain-handler.ts',
     );
     const ownerReceiptContract = manifest.domain_authority_refs.domain_owner_receipt_contract;
     assert.equal(ownerReceiptContract.external_work_order_owner_closeout.action, 'emit_external_work_order_owner_closeout');
@@ -104,11 +104,11 @@ test('RCA manifest and domain_action_adapter expose external work-order owner cl
     );
 
     assert.equal(
-      domain_action_adapter.domain_authority_refs.external_work_order_owner_closeout_ref,
+      domainHandler.domain_authority_refs.external_work_order_owner_closeout_ref,
       'opl_generated:product_entry_manifest#/domain_authority_refs/domain_owner_receipt_contract/external_work_order_owner_closeout',
     );
-    assert.equal(domain_action_adapter.authority_boundary.opl_can_write_visual_truth, false);
-    assert.equal(domain_action_adapter.authority_boundary.opl_can_authorize_review_or_export, false);
+    assert.equal(domainHandler.authority_boundary.opl_can_write_visual_truth, false);
+    assert.equal(domainHandler.authority_boundary.opl_can_authorize_review_or_export, false);
   });
 });
 

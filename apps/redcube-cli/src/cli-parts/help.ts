@@ -1,5 +1,4 @@
 import type { DomainActionMap, JsonMap } from './types.js';
-import { buildRedCubeActionMetadata } from '@redcube/domain-entry';
 
 function buildCommonFlows(overlayCatalog: { overlays: JsonMap[] }): JsonMap {
   return Object.fromEntries(
@@ -48,10 +47,6 @@ function buildOperatorQuickstart() {
 
 export function buildCommandHelp(commandKey: string): JsonMap | null {
   const operatorQuickstart = buildOperatorQuickstart();
-  const command = `redcube ${commandKey}`;
-  const actionCommand = buildRedCubeActionMetadata().cli_commands
-    .filter((entry): entry is JsonMap => Boolean(entry))
-    .find((entry) => entry.command === command);
   const directCommandCatalog = {
     'workspace doctor': {
       summary: '诊断 workspace 合同与 canonical 目录，并把 brand-new workspace 引向 Source Readiness bootstrap writers。',
@@ -89,6 +84,36 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       action_ref: 'invokeDomainEntry',
       boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId'],
     },
+    'product invoke': {
+      summary: '通过 RCA direct domain entry 创建或继续同一视觉交付任务。',
+      usage: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--route <stage>] [--stop-after-stage <stage>]',
+      action_ref: 'invokeProductEntry',
+      boundary_fields: ['workspaceRoot', 'entrySessionId', 'topicId', 'deliverableId'],
+    },
+    'domain-handler export': {
+      summary: '导出 RCA refs-only domain handler target，供 OPL hosted runtime 消费。',
+      usage: 'redcube domain-handler export --workspace-root <dir> [--workspace-receipt-scaleout-root <dir>[,<dir>...]] --format json',
+      action_ref: 'exportDomainHandler',
+      boundary_fields: ['workspaceRoot', 'workspaceReceiptScaleoutRoot'],
+    },
+    'domain-handler dispatch': {
+      summary: '执行 RCA-owned guarded domain handler action，不承担 OPL hosted action 路由。',
+      usage: 'redcube domain-handler dispatch --task <task.json> --format json',
+      action_ref: 'dispatchDomainHandler',
+      boundary_fields: ['task'],
+    },
+    'image-ppt proof': {
+      summary: '执行 RCA repo-owned image-first PPT proof runner。',
+      usage: 'redcube image-ppt proof --output-dir <dir> [--mock-image-generation|--live-image-generation] [--skip-system-deps] [--style-reference-dir <dir>]',
+      action_ref: 'runImagePptProof',
+      boundary_fields: ['outputDir', 'styleReferenceDir'],
+    },
+    'native-ppt proof': {
+      summary: '执行 RCA repo-owned native PPT proof route。',
+      usage: 'redcube native-ppt proof --workspace-root <dir> --entry-session-id <id> --topic-id <id> --deliverable-id <id> [--route <author_pptx_native|repair_pptx_native>] [--stop-after-stage <stage>]',
+      action_ref: 'runNativePptProductEntryProof',
+      boundary_fields: ['workspaceRoot', 'entrySessionId', 'topicId', 'deliverableId'],
+    },
     'report performance': {
       summary: '聚合 route/run/review/render/capture telemetry，输出 RedCube performance report surface。',
       usage: 'redcube report performance --workspace-root <dir> [--topic-id <id>] [--deliverable-id <id>]',
@@ -96,7 +121,7 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId'],
     },
   };
-  const entry = actionCommand || (directCommandCatalog as Record<string, JsonMap>)[commandKey];
+  const entry = (directCommandCatalog as Record<string, JsonMap>)[commandKey];
   if (!entry) {
     return null;
   }
@@ -110,7 +135,7 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
     api_surface: entry.api_surface,
     boundary_fields: entry.boundary_fields,
     action_id: entry.action_id,
-    source_metadata: actionCommand ? 'redcube_family_action_catalog' : 'cli_help_catalog',
+    source_metadata: 'redcube_direct_cli_catalog',
     canonical_operator_route: operatorQuickstart.canonicalRoute,
     operator_quickstart: operatorQuickstart,
   };

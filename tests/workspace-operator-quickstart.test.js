@@ -87,7 +87,8 @@ test('CLI help common tasks stay deduplicated and CLI actions stay aligned with 
   const cliActions = getCliDomainActions();
   const help = await buildHelp(cliActions);
   const commands = help.commonTasks.map((item) => item.command);
-  const metadata = buildRedCubeActionMetadata();
+  const workspaceRoot = path.resolve('.');
+  const metadata = buildRedCubeActionMetadata(workspaceRoot);
   const cliActionRefs = new Set(metadata.cli_commands.map((command) => command.action_ref));
 
   assert.equal(new Set(commands).size, commands.length);
@@ -109,13 +110,15 @@ test('CLI help common tasks stay deduplicated and CLI actions stay aligned with 
   }
   for (const actionRef of [
     'invoke_product_entry',
-    'export_domain_handler',
-    'dispatch_domain_handler',
     'run_image_ppt_proof',
     'run_native_ppt_proof',
   ]) {
     assert.equal(cliActionRefs.has(actionRef), true, `metadata:${actionRef}`);
   }
+  assert.equal(metadata.cli_commands.every((entry) => (
+    entry.command.startsWith('opl agents run --domain redcube_ai --action ')
+    && entry.command.endsWith(`--workspace ${workspaceRoot}`)
+  )), true);
   assert.equal(cliActions.runtimeWatch, undefined);
 });
 
@@ -126,41 +129,46 @@ test('CLI managed command is retired from public operator surface', async () => 
   );
 });
 
-test('CLI product-entry and proof command help is projected from family action metadata', () => {
-  const metadata = buildRedCubeActionMetadata();
+test('hosted action metadata binds the runtime workspace while direct RCA help stays local', () => {
+  const workspaceRoot = path.join(os.tmpdir(), 'redcube-hosted-runtime-workspace');
+  const metadata = buildRedCubeActionMetadata(workspaceRoot);
+  const hostedByAction = new Map(metadata.cli_commands.map((entry) => [entry.action_ref, entry]));
 
-  for (const entry of metadata.cli_commands.filter((command) => (
-    command.command.startsWith('redcube product ')
-    || command.command.startsWith('redcube image-ppt ')
-    || command.command.startsWith('redcube native-ppt ')
-  ))) {
-    const commandKey = entry.command.replace(/^redcube /, '');
+  for (const [commandKey, actionRef] of [
+    ['product invoke', 'invoke_product_entry'],
+    ['image-ppt proof', 'run_image_ppt_proof'],
+    ['native-ppt proof', 'run_native_ppt_proof'],
+  ]) {
+    const entry = hostedByAction.get(actionRef);
     const help = buildCommandHelp(commandKey);
 
+    assert.equal(entry.command, `opl agents run --domain redcube_ai --action ${actionRef} --workspace ${workspaceRoot}`);
     assert.equal(help.surface_kind, 'command_help');
     assert.equal(help.command, commandKey);
-    assert.equal(help.summary, entry.summary);
-    assert.equal(help.usage, entry.usage);
-    assert.equal(help.action_ref, entry.action_ref);
-    assert.equal(help.api_surface, entry.api_surface);
-    assert.deepEqual(help.boundary_fields, entry.boundary_fields);
+    assert.equal(help.usage.startsWith(`redcube ${commandKey} `), true);
+    assert.equal(help.source_metadata, 'redcube_direct_cli_catalog');
   }
+
+  assert.throws(
+    () => buildRedCubeActionMetadata('relative/workspace'),
+    /requires an absolute workspace path/,
+  );
 });
 
-test('CLI domain-handler subcommand help uses family action metadata at runtime', async () => {
-  for (const [argv, actionId] of [
-    [['domain-handler', 'export', '--help'], 'export_domain_handler'],
-    [['domain-handler', 'dispatch', '--help'], 'dispatch_domain_handler'],
+test('CLI domain-handler subcommand help stays on the RCA direct handler surface', async () => {
+  for (const [argv, actionRef] of [
+    [['domain-handler', 'export', '--help'], 'exportDomainHandler'],
+    [['domain-handler', 'dispatch', '--help'], 'dispatchDomainHandler'],
   ]) {
     const help = await executeCli(argv);
     const commandKey = argv.slice(0, 2).join(' ');
-    const catalogHelp = buildCommandHelp(commandKey);
+    const directHelp = buildCommandHelp(commandKey);
 
     assert.equal(help.surface_kind, 'command_help');
-    assert.equal(help.source_metadata, 'redcube_family_action_catalog');
-    assert.equal(help.action_id, actionId);
-    assert.equal(help.summary, catalogHelp.summary);
-    assert.equal(help.usage, catalogHelp.usage);
+    assert.equal(help.source_metadata, 'redcube_direct_cli_catalog');
+    assert.equal(help.action_ref, actionRef);
+    assert.equal(help.summary, directHelp.summary);
+    assert.equal(help.usage, directHelp.usage);
   }
 });
 

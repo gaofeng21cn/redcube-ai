@@ -6,9 +6,9 @@ import { fileURLToPath } from 'node:url';
 import {
   buildFamilyDomainMemoryDescriptor,
   buildPhysicalSourceMorphologyPolicy,
-  buildRedCubeActionMetadata,
   buildRedCubeDomainAuthorityRefs,
   buildVisualPackCompilerHandoffProjection,
+  getRedCubeFamilyActionCatalog,
 } from '../../packages/redcube-domain-entry/dist/index.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const repoRoot = path.resolve(__dirname, '..', '..');
@@ -139,7 +139,7 @@ export function assertCleanAgentRepoPathRef(refEntry, expectedPrefix, label) {
 }
 
 export function buildCanonicalPack() {
-  const actionCatalog = buildRedCubeActionMetadata().family_action_catalog;
+  const actionCatalog = getRedCubeFamilyActionCatalog();
   const declarativeStageManifest = readJson('agent/stages/manifest.json');
   const authorityRefs = buildRedCubeDomainAuthorityRefs({
     workspaceRoot: '<workspace_root>',
@@ -214,7 +214,7 @@ export function buildCanonicalPack() {
       package_distribution_gate: visualPackCompilerHandoff.declarative_visual_pack_input.package_distribution_gate,
       source_refs: {
         canonical_semantic_pack: 'agent/',
-        action_catalog: 'packages/redcube-domain-entry/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
+        action_catalog: 'packages/redcube-domain-entry/src/actions/family-action-catalog.ts::getRedCubeFamilyActionCatalog',
         declarative_stage_manifest: 'agent/stages/manifest.json',
         generated_stage_control_plane: 'opl-generated:family_stage_control_plane',
         memory_descriptor: 'packages/redcube-domain-entry/src/actions/domain-authority-refs.ts::buildFamilyDomainMemoryDescriptor',
