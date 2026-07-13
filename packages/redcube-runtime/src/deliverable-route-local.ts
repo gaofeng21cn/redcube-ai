@@ -596,9 +596,9 @@ function diagnosticProgressArtifactForError(error, route) {
   }, { route });
 }
 
-function qualityBudgetEnabledForRoute({ overlay, route }) {
-  return QUALITY_BUDGET_OVERLAYS.has(overlay)
-    && QUALITY_BUDGET_ROUTES.has(route);
+function routeRepeatBudgetEnabled({ overlay, route }) {
+  return ROUTE_REPEAT_BUDGET_OVERLAYS.has(overlay)
+    && ROUTE_REPEAT_BUDGET_ROUTES.has(route);
 }
 
 function buildRepeatedBlockFailFastArtifact({

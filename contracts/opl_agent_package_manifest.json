@@ -4,7 +4,7 @@
   "package_id": "rca",
   "display_name": "RedCube AI",
   "publisher": "one-person-lab",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "source": "first_party_repo_local",
   "carrier_source_role": "codex_plugin_default_carrier_not_package_truth",
   "source_repo": "https://github.com/gaofeng21cn/redcube-ai.git",
@@ -54,7 +54,7 @@
     {
       "id": "redcube-ai",
       "source": "repo_local_codex_plugin_carrier",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "install_mode": "bundled_required",
       "source_ref": "agent/primary_skill/SKILL.md",
       "carrier_mirror_ref": "plugins/redcube-ai/skills/redcube-ai/SKILL.md",
