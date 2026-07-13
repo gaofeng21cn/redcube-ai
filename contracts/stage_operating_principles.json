@@ -27,6 +27,13 @@
   },
   "speed_policy": {
     "route_selection_owner": "codex_cli",
+    "route_selection_owner_scope": "intra_stage_domain_route_only",
+    "cross_stage_decision_owner": "stage_run_decisive_codex_attempt",
+    "primary_only_decisive_attempt_role": "producer",
+    "formal_review_decisive_attempt_roles": ["reviewer", "re_reviewer"],
+    "non_decisive_attempt_output": "route_impact.stage_route_recommendation",
+    "decisive_attempt_output": "route_impact.stage_route_decision",
+    "framework_transition_role": "validate_terminal_role_and_passively_project_decision",
     "codex_may_advance_skip_repeat_reverse_or_route_back": true,
     "any_declared_stage_may_start_from_any_prior_stage_result": true,
     "declared_requires_are_quality_context_not_launch_gates": true,

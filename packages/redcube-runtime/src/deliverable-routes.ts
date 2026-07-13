@@ -74,14 +74,14 @@ function routeArtifactAttemptId(index) {
   );
 }
 
-function buildMissingOplRouteAttemptBlocker({ safeRoute, overlay, topicId, deliverableId, runId, reasons }) {
-  const blockerRef = `rca-typed-blocker:route-execution-owner:${overlay}:${safeRoute}:${deliverableId}:opl-stage-attempt-required`;
+function buildOplRouteAttemptIdentityBlocker({ safeRoute, overlay, topicId, deliverableId, runId, reasons }) {
+  const blockerRef = `rca-typed-blocker:route-execution-owner:${overlay}:${safeRoute}:${deliverableId}:identity-mismatch`;
   return {
     ok: false,
     surface_kind: 'typed_blocker',
     return_shape: 'typed_blocker',
     blocker_ref: blockerRef,
-    blocker_kind: 'missing_opl_stage_attempt',
+    blocker_kind: 'stale_or_mismatched_stage_identity',
     owner: 'redcube_ai',
     route: safeRoute,
     overlay,
@@ -97,38 +97,40 @@ function buildMissingOplRouteAttemptBlocker({ safeRoute, overlay, topicId, deliv
       current_stage: safeRoute,
       error_kind: 'typed_blocker',
       error: {
-        code: 'missing_opl_stage_attempt',
-        message: 'RCA route execution requires an OPL-owned stage attempt packet; repo-local route runner cannot be the default execution owner.',
-        failure_kind: 'typed_blocker',
+        code: 'stale_or_mismatched_stage_identity',
+        message: 'RCA route execution received explicit provider identity evidence that conflicts with the OPL-owned attempt boundary.',
+        failure_kind: 'stale_or_mismatched_stage_identity',
+        hard_stop_kind: 'stale_or_mismatched_stage_identity',
         blocking_reasons: reasons,
-        recommended_action: 'submit_route_to_opl_stage_attempt_or_record_domain_owned_typed_blocker',
+        recommended_action: 'resubmit_with_current_opl_attempt_identity',
       },
       cross_provider_attempt_index: null,
       route_execution_owner_boundary: {
         owner: 'opl',
         rca_role: 'visual_route_handler_and_artifact_authority',
-        default_execution_owner: 'opl_stage_attempt_or_typed_blocker',
+        default_execution_owner: 'opl_stage_attempt',
         repo_local_route_runner_default_allowed: false,
       },
     },
     events: [],
     error: {
-      code: 'missing_opl_stage_attempt',
-      message: 'RCA route execution requires an OPL-owned stage attempt packet; repo-local route runner cannot be the default execution owner.',
-      failure_kind: 'typed_blocker',
+      code: 'stale_or_mismatched_stage_identity',
+      message: 'RCA route execution received explicit provider identity evidence that conflicts with the OPL-owned attempt boundary.',
+      failure_kind: 'stale_or_mismatched_stage_identity',
+      hard_stop_kind: 'stale_or_mismatched_stage_identity',
       blocking_reasons: reasons,
-      recommended_action: 'submit_route_to_opl_stage_attempt_or_record_domain_owned_typed_blocker',
+      recommended_action: 'resubmit_with_current_opl_attempt_identity',
       blocker_ref: blockerRef,
-      blocker_kind: 'missing_opl_stage_attempt',
+      blocker_kind: 'stale_or_mismatched_stage_identity',
     },
     typed_blocker: {
       surface_kind: 'typed_blocker',
       return_shape: 'typed_blocker',
       blocker_ref: blockerRef,
-      blocker_kind: 'missing_opl_stage_attempt',
+      blocker_kind: 'stale_or_mismatched_stage_identity',
       owner: 'redcube_ai',
-      next_required_owner_action: 'opl_stage_attempt_or_domain_owned_typed_blocker',
-      missing_refs: reasons,
+      next_required_owner_action: 'resubmit_with_current_opl_attempt_identity',
+      identity_mismatch_reasons: reasons,
       forbidden_default_owner: 'redcube_ai_repo_local_route_runner',
     },
     artifact: null,
@@ -157,7 +159,11 @@ function normalizeOplRouteAttemptIndex({ crossProviderAttemptIndex, safeRoute, o
         blocks_runtime_currentness_claim: true,
         next_stage_may_start: true,
         route_selection_owner: 'codex_cli',
+        route_selection_owner_scope: 'intra_stage_domain_route_only',
+        cross_stage_decision_owner: 'stage_run_decisive_codex_attempt',
+        route_execution_grants_stage_transition_authority: false,
         rca_does_not_own_provider_attempt_ledger: true,
+        can_claim_current_without_provider_ledger: false,
         repo_local_route_runner_default_allowed: false,
         execution_owner: 'codex_cli_direct_domain_handler',
         rca_execution_role: 'visual_route_handler_and_artifact_authority',
@@ -176,31 +182,32 @@ function normalizeOplRouteAttemptIndex({ crossProviderAttemptIndex, safeRoute, o
   const attemptRole = safeIndexText(index, 'attempt_role', 'attemptRole');
   const noContextInheritance = index.no_context_inheritance ?? index.noContextInheritance;
   const producerSessionRef = safeIndexText(index, 'producer_session_ref', 'producerSessionRef');
-  const qualityRoundIndex = Number(index.quality_round_index ?? index.qualityRoundIndex ?? 0);
-  const reviewRoute = ['visual_director_review', 'screenshot_review'].includes(safeRoute);
-  const repairRoute = ['repair_image_pages', 'repair_pptx_native', 'fix_html'].includes(safeRoute);
-  const allowedAttemptRoles = reviewRoute
-    ? new Set(['reviewer', 're_reviewer'])
-    : repairRoute ? new Set(['repairer']) : new Set(['producer']);
+  const qualityRoundValue = index.quality_round_index ?? index.qualityRoundIndex;
+  const qualityRoundIndex = qualityRoundValue === undefined || qualityRoundValue === null || qualityRoundValue === ''
+    ? null
+    : Number(qualityRoundValue);
+  const declaredOwner = providerAttemptOwner || owner;
+  const identityMismatches = [];
 
-  if (providerAttemptOwner !== 'one-person-lab' && owner !== 'one-person-lab') missing.push('provider_attempt_owner');
+  if (!declaredOwner) missing.push('provider_attempt_owner');
+  if (declaredOwner && declaredOwner !== 'one-person-lab') {
+    identityMismatches.push('provider_attempt_owner_mismatch');
+  }
   if (!providerAttemptRef) missing.push('provider_attempt_ref');
   if (!providerAttemptLedgerRef) missing.push('provider_attempt_ledger_ref');
   if (!stageAttemptRef && !attemptLeaseRef && !attemptReceiptRef) {
     missing.push('opl_stage_attempt_or_lease_or_receipt_ref');
   }
-  if (!allowedAttemptRoles.has(attemptRole)) missing.push('valid_attempt_role');
-  if (reviewRoute && noContextInheritance !== true) missing.push('no_context_inheritance');
-  if (reviewRoute && !producerSessionRef) missing.push('producer_session_ref');
-  if (!Number.isInteger(qualityRoundIndex) || qualityRoundIndex < 0 || qualityRoundIndex > 3) {
-    missing.push('valid_quality_round_index');
-  }
+  if (!attemptRole) missing.push('attempt_role');
+  if (!Number.isInteger(qualityRoundIndex)) missing.push('quality_round_index');
+  if (noContextInheritance !== true) missing.push('no_context_inheritance');
+  if (['reviewer', 're_reviewer'].includes(attemptRole) && !producerSessionRef) missing.push('producer_session_ref');
   if (providerAttemptRef && (
     providerAttemptRef === localSessionRef
     || providerAttemptRef.startsWith('route-run:')
     || providerAttemptRef.startsWith('product-entry-session:')
   )) {
-    missing.push('valid_provider_attempt_ref');
+    identityMismatches.push('provider_attempt_ref_mismatch');
   }
   if (providerAttemptLedgerRef && (
     providerAttemptLedgerRef === localSessionRef
@@ -208,22 +215,25 @@ function normalizeOplRouteAttemptIndex({ crossProviderAttemptIndex, safeRoute, o
     || providerAttemptLedgerRef.startsWith('route-run:')
     || providerAttemptLedgerRef.startsWith('product-entry-session:')
   )) {
-    missing.push('valid_provider_attempt_ledger_ref');
+    identityMismatches.push('provider_attempt_ledger_ref_mismatch');
   }
 
-  if (missing.length > 0) {
+  if (identityMismatches.length > 0) {
     return {
       ok: false,
-      blocker: buildMissingOplRouteAttemptBlocker({
+      blocker: buildOplRouteAttemptIdentityBlocker({
         safeRoute,
         overlay,
         topicId,
         deliverableId,
         runId,
-        reasons: Array.from(new Set(missing)).sort(),
+        reasons: Array.from(new Set(identityMismatches)).sort(),
       }),
     };
   }
+
+  const missingRefs = Array.from(new Set(missing)).sort();
+  const transportMetadataCurrent = missingRefs.length === 0;
 
   return {
     ok: true,
@@ -231,26 +241,31 @@ function normalizeOplRouteAttemptIndex({ crossProviderAttemptIndex, safeRoute, o
       ...index,
       surface_kind: 'cross_provider_attempt_index',
       version: safeIndexText(index, 'version') || 'cross-provider-attempt-index.v1',
-      owner: 'one-person-lab',
-      provider_attempt_owner: 'one-person-lab',
+      status: transportMetadataCurrent ? 'current' : 'missing_quality_debt',
+      owner: declaredOwner || null,
+      provider_attempt_owner: declaredOwner || null,
       domain_adapter_owner: 'redcube_ai',
-      provider_attempt_ref: providerAttemptRef,
-      provider_attempt_ledger_ref: providerAttemptLedgerRef,
+      ...(providerAttemptRef ? { provider_attempt_ref: providerAttemptRef } : {}),
+      ...(providerAttemptLedgerRef ? { provider_attempt_ledger_ref: providerAttemptLedgerRef } : {}),
       ...(stageAttemptRef ? { stage_attempt_ref: stageAttemptRef } : {}),
       ...(attemptLeaseRef ? { attempt_lease_ref: attemptLeaseRef } : {}),
       ...(attemptReceiptRef ? { attempt_receipt_ref: attemptReceiptRef } : {}),
-      attempt_role: attemptRole,
-      quality_round_index: qualityRoundIndex,
-      no_context_inheritance: reviewRoute,
+      attempt_role: attemptRole || null,
+      quality_round_index: Number.isInteger(qualityRoundIndex) ? qualityRoundIndex : null,
+      no_context_inheritance: noContextInheritance === true,
       ...(producerSessionRef ? { producer_session_ref: producerSessionRef } : {}),
-      provider_attempt_ref_required: true,
-      provider_attempt_ledger_ref_required: true,
-      missing_provider_ledger_policy: 'fail_closed_typed_blocker_projection',
+      missing_refs: missingRefs,
+      blocks_stage_transition: false,
+      blocks_runtime_currentness_claim: !transportMetadataCurrent,
+      next_stage_may_start: true,
+      attempt_metadata_validation_owner: 'one-person-lab',
+      rca_role_round_or_context_gate_applied: false,
+      missing_attempt_metadata_policy: 'record_quality_debt_and_continue',
       local_session_ref_is_not_provider_attempt_ref: true,
       rca_does_not_own_provider_attempt_ledger: true,
       can_claim_current_without_provider_ledger: false,
       repo_local_route_runner_default_allowed: false,
-      execution_owner: 'opl_stage_attempt',
+      execution_owner: transportMetadataCurrent ? 'opl_stage_attempt' : 'codex_cli_direct_domain_handler',
       rca_execution_role: 'visual_route_handler_and_artifact_authority',
     },
   };
@@ -685,6 +700,7 @@ function buildFailedRouteResponse({
   deliverableId,
   error,
   executor,
+  crossProviderAttemptIndex = null,
   startedEvent = null,
 }) {
   const { failure, qualityBlocked } = normalizeRouteFailure(error);
@@ -756,6 +772,7 @@ function buildFailedRouteResponse({
         cache_status: progressArtifact?.route_cache?.cache_status || 'quality_debt_recovered',
       },
       executor,
+      crossProviderAttemptIndex,
       startedEvent,
     });
   }
@@ -881,6 +898,7 @@ export async function runDeliverableRoute(request) {
       deliverableId,
       error,
       executor,
+      crossProviderAttemptIndex: normalizedRouteAttempt.index,
       startedEvent,
     });
   }

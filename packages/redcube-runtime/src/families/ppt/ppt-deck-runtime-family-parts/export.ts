@@ -8,7 +8,11 @@ import {
 } from '@redcube/runtime-protocol';
 
 import { createPptDeckExportImagePageHelpers } from './export-image-pages-helpers.js';
-import { buildReviewExportCloseout } from './review-export-closeout.js';
+import {
+  FINAL_BYTE_HANDOFF_REVIEW,
+  OUTPUT_CANDIDATE_PENDING_REVIEW,
+  buildPackageCandidateCloseout,
+} from '../../../package-handoff-contract.js';
 
 type JsonRecord = Record<string, any>;
 
@@ -242,7 +246,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     }
     const manifest = {
       surface_kind: 'ppt_deck_final_delivery',
-      current: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : 'output_ready',
+      current: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : OUTPUT_CANDIDATE_PENDING_REVIEW,
       title: safeText(contract?.title),
       deliverable_id: deliverableId,
       pptx_file: fileExists(finalPptxFile) ? finalPptxFile : null,
@@ -257,13 +261,13 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       '# 交付成果',
       '',
       `- 讲题：${safeText(contract?.title)}`,
-      `- 当前状态：${qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : 'output_ready'}`,
+      `- 当前状态：${qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : OUTPUT_CANDIDATE_PENDING_REVIEW}`,
       `- PPTX：${fileExists(finalPptxFile) ? path.basename(finalPptxFile) : '未生成'}`,
       `- PDF：${fileExists(finalPdfFile) ? path.basename(finalPdfFile) : '未生成'}`,
       ...(qualityDebtReasons.length > 0 ? [`- 质量债务：${qualityDebtReasons.join('、')}`] : []),
       '',
       '规则：',
-      '- 这里是给用户直接取用的当前最终版入口。',
+      '- 这里是待 fresh handoff Review 的交付候选入口；通过 exact-byte Review 后才能标记为最终可交付。',
       '- `topics/`、`runtime/` 与各版本目录是 RCA 运行态，不作为人工查找最终文件的入口。',
       '',
     ].join('\n'));
@@ -298,7 +302,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         non_authority: true,
         non_blocking: true,
         proposal_candidate: null,
-        terminal_binding: null,
+        pending_handoff_review_binding: null,
         accept_reject_status: 'not_requested',
         accept_reject_receipt_refs: [],
       };
@@ -309,10 +313,10 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       non_authority: true,
       non_blocking: true,
       proposal_candidate: proposal.proposal_candidate,
-      terminal_binding: {
-        review_export_refs: [...new Set([
+      pending_handoff_review_binding: {
+        upstream_review_refs: [...new Set([
           ...safeArray(reviewArtifact?.review_export_refs),
-          ...safeArray(closeout?.review_export_refs),
+          ...safeArray(closeout?.upstream_review_refs),
         ].map((ref) => safeText(ref)).filter(Boolean))],
         export_artifact_refs: [...new Set(
           safeArray(artifactRefs).map((ref) => safeText(ref)).filter(Boolean),
@@ -391,6 +395,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       reviewed_page_count: safeArray(reviewArtifact?.slide_reviews).length,
       page_count_match: safeArray(reviewArtifact?.slide_reviews).length === pageCount,
     };
+    if (!previewMetrics.page_count_match) qualityDebtReasons.push('export_page_count_mismatch');
     const finalDelivery = syncWorkspaceFinalDelivery({
       workspaceRoot,
       contract,
@@ -437,7 +442,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     };
     const operatorProofSummary = {
       proof_surface: 'native_export_bundle_operator_proof_summary_v1',
-      status: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : 'output_ready',
+      status: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : OUTPUT_CANDIDATE_PENDING_REVIEW,
       source_visual_route: safeText(renderArtifact.route),
       renderer_pipeline: safeText(rendererProof?.renderer_pipeline),
       libreoffice_headless_pdf_png_v1: shapeManifestSummary.libreoffice_headless_pdf_png_v1,
@@ -451,7 +456,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     const artifactGalleryIndexFile = path.join(artifactGalleryDir, 'index.json');
     const artifactGalleryIndex = {
       surface_kind: 'native_export_operator_artifact_gallery_v1',
-      status: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : 'output_ready',
+      status: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : OUTPUT_CANDIDATE_PENDING_REVIEW,
       title: safeText(contract?.title),
       deliverable_id: safeText(contract?.deliverable_id),
       source_visual_route: safeText(renderArtifact.route),
@@ -506,12 +511,11 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       finalDelivery.readme_file,
       artifactGalleryIndexFile,
     ].filter(Boolean);
-    const closeout = buildReviewExportCloseout({
+    const closeout = buildPackageCandidateCloseout({
       family: 'ppt_deck',
       route: 'export_pptx',
       deliverableId: safeText(contract?.deliverable_id),
-      status: qualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'completed',
-      reviewExportRefs: [
+      upstreamReviewRefs: [
         ...safeArray(reviewArtifact?.review_export_refs),
         ...safeArray(reviewArtifact?.owner_receipt_refs),
       ],
@@ -520,6 +524,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     return {
       ...attachCommon('export_pptx', contract, null, adapter),
       ...closeout,
+      owner_receipt_refs: [],
       status: qualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'completed',
       quality_debt: qualityDebtReasons.length > 0 ? {
         status: 'recorded_non_blocking',
@@ -528,10 +533,10 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         blocks_ready_claims: true,
       } : null,
       review_state_patch: {
-        current_status: qualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'completed',
-        ready_for_export: qualityDebtReasons.length === 0,
+        current_status: qualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'package_review_pending',
+        ready_for_export: false,
         latest_review_stage: 'export_pptx',
-        pending_reviews: [],
+        pending_reviews: [FINAL_BYTE_HANDOFF_REVIEW],
         blocking_reasons: [],
         rerun_from_stage: null,
         rerun_policy: {
@@ -540,8 +545,8 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         },
       },
       export_bundle: {
-        export_ref: closeout.review_export_refs[0],
-        review_receipt_refs: safeArray(reviewArtifact?.owner_receipt_refs),
+        export_ref: closeout.export_candidate_ref,
+        upstream_review_receipt_refs: safeArray(reviewArtifact?.owner_receipt_refs),
         visual_memory_proposal: buildExportVisualMemoryProposal(reviewArtifact, closeout, artifactRefs),
         source_visual_route: safeText(renderArtifact.route),
         quality_debt: qualityDebtReasons.length > 0 ? {
@@ -580,8 +585,8 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         final_delivery: finalDelivery,
         review_capture: reviewArtifact.review_capture || null,
         delivery_state: {
-          current: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : 'output_ready',
-          next: null,
+          current: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : OUTPUT_CANDIDATE_PENDING_REVIEW,
+          next: FINAL_BYTE_HANDOFF_REVIEW,
         },
         page_count: pageCount,
         page_count_match: previewMetrics.page_count_match,
@@ -671,6 +676,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     const conversionCommand = cachedPreview
       ? []
       : python.argv;
+    if (!previewMetrics.page_count_match) upstreamQualityDebtReasons.push('export_page_count_mismatch');
     const normalizedUpstreamQualityDebtReasons = [...new Set(upstreamQualityDebtReasons)];
     const finalDelivery = syncWorkspaceFinalDelivery({
       workspaceRoot,
@@ -705,12 +711,11 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       finalDelivery.manifest_file,
       finalDelivery.readme_file,
     ].filter(Boolean);
-    const closeout = buildReviewExportCloseout({
+    const closeout = buildPackageCandidateCloseout({
       family: 'ppt_deck',
       route: 'export_pptx',
       deliverableId,
-      status: 'completed',
-      reviewExportRefs: [
+      upstreamReviewRefs: [
         ...safeArray(reviewArtifact?.review_export_refs),
         ...safeArray(reviewArtifact?.owner_receipt_refs),
       ],
@@ -719,6 +724,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     return {
       ...attachCommon('export_pptx', contract, null, adapter),
       ...closeout,
+      owner_receipt_refs: [],
       status: normalizedUpstreamQualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'completed',
       quality_debt: normalizedUpstreamQualityDebtReasons.length > 0 ? {
         status: 'recorded_non_blocking',
@@ -727,10 +733,10 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         blocks_ready_claims: true,
       } : null,
       review_state_patch: {
-        current_status: normalizedUpstreamQualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'completed',
-        ready_for_export: normalizedUpstreamQualityDebtReasons.length === 0,
+        current_status: normalizedUpstreamQualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'package_review_pending',
+        ready_for_export: false,
         latest_review_stage: 'export_pptx',
-        pending_reviews: [],
+        pending_reviews: [FINAL_BYTE_HANDOFF_REVIEW],
         blocking_reasons: [],
         rerun_from_stage: null,
         rerun_policy: {
@@ -739,8 +745,8 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         },
       },
       export_bundle: {
-        export_ref: closeout.review_export_refs[0],
-        review_receipt_refs: safeArray(reviewArtifact?.owner_receipt_refs),
+        export_ref: closeout.export_candidate_ref,
+        upstream_review_receipt_refs: safeArray(reviewArtifact?.owner_receipt_refs),
         visual_memory_proposal: buildExportVisualMemoryProposal(reviewArtifact, closeout, artifactRefs),
         source_visual_route: imagePagesExportInput ? safeText(renderArtifact?.route) : undefined,
         editable: imagePagesExportInput ? false : undefined,
@@ -763,8 +769,8 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
           export_capture_mode: exportCapture.manifest?.capture_mode || safeText(reviewArtifact?.review_capture?.capture_mode, 'full'),
         },
         delivery_state: {
-          current: 'output_ready',
-          next: null,
+          current: normalizedUpstreamQualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : OUTPUT_CANDIDATE_PENDING_REVIEW,
+          next: FINAL_BYTE_HANDOFF_REVIEW,
         },
         page_count: exportPayload.page_count,
         page_count_match: previewMetrics.page_count_match,

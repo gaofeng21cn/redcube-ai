@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 
 import {
@@ -38,6 +39,13 @@ function stageFolderAttemptOutputFile(input, outputName) {
     ...input,
     outputName,
   });
+}
+
+function refHashMetadata(files) {
+  return files.map((file) => ({
+    ref: file,
+    sha256: createHash('sha256').update(readFileSync(file)).digest('hex'),
+  }));
 }
 
 function withTempOplState(fn) {
@@ -427,7 +435,7 @@ test('RCA review, repair, and export routes map to receipt-backed stage output r
   });
 });
 
-test('RCA route closeout records native helper, export, gallery, and handoff refs in Stage Manifest', () => {
+test('RCA route helper cannot turn reviewer role or self-reported closeout into an owner receipt', () => {
   withTempOplState(() => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-route-helper-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
@@ -455,10 +463,40 @@ test('RCA route closeout records native helper, export, gallery, and handoff ref
       mkdirSync(path.dirname(file), { recursive: true });
       writeFileSync(file, key === 'pptx' || key === 'pdf' ? key : `${JSON.stringify({ key }, null, 2)}\n`, 'utf-8');
     }
+    const exactArtifactRefMetadata = refHashMetadata([
+      files.pptx,
+      files.pdf,
+      files.notes,
+      files.handoff,
+      files.gallery,
+      files.capture,
+      files.shapeManifest,
+    ]);
+    const artifactIdentityReceiptRef = 'rca-artifact-identity-receipt:package-handoff:ppt_deck:export_pptx:deck-a';
     const artifact = {
       route: 'export_pptx',
       status: 'completed',
-      owner_receipt_refs: ['rca-owner-receipt:export-pptx-ready'],
+      artifact_identity_receipt_refs: [artifactIdentityReceiptRef],
+      artifact_identity_receipt: {
+        surface_kind: 'artifact_identity_receipt',
+        receipt_ref: artifactIdentityReceiptRef,
+        hash_metadata_complete: true,
+        exact_artifact_ref_metadata: exactArtifactRefMetadata,
+      },
+      handoff_review_closeout: {
+        surface_kind: 'rca_handoff_review_closeout',
+        status: 'pass',
+        stage_quality_attempt: {
+          attempt_role: 'reviewer',
+          execution_session_ref: 'codex://threads/reviewer-1',
+          producer_session_refs: ['codex://threads/producer-1'],
+          no_context_inheritance: true,
+        },
+        artifact_identity_receipt_refs: [artifactIdentityReceiptRef],
+        reviewed_artifact_ref_metadata: exactArtifactRefMetadata,
+        review_receipt_refs: ['opl-stage-review-receipt:package-and-handoff:reviewer-1'],
+        owner_receipt_refs: ['rca-owner-receipt:export-pptx-ready'],
+      },
       native_ppt_bundle: {
         shape_manifest_file: files.shapeManifest,
       },
@@ -485,11 +523,32 @@ test('RCA route closeout records native helper, export, gallery, and handoff ref
       attemptId: 'attempt-export',
       artifactFile: files.artifact,
       artifact,
+      oplRouteAttemptIndex: {
+        attempt_role: 'reviewer',
+        no_context_inheritance: true,
+      },
     });
 
     const manifest = readJson(written.manifest_file);
     assert.deepEqual(manifest.present_output_roles, ['export_bundle', 'handoff_manifest']);
-    assert.equal(manifest.stage_receipts[0].receipt_ref, 'rca-owner-receipt:export-pptx-ready');
+    assert.deepEqual(manifest.owner_receipt_refs, []);
+    assert.equal(manifest.status, 'completed_with_quality_debt');
+    assert.equal(
+      manifest.stage_receipts.some((receipt) => receipt.receipt_kind === 'domain_owner_receipt'),
+      false,
+    );
+    assert.equal(
+      manifest.stage_receipts.some((receipt) => (
+        receipt.receipt_kind === 'artifact_identity_receipt'
+        && receipt.receipt_ref === artifactIdentityReceiptRef
+        && receipt.authorizes_ready_claim === false
+      )),
+      true,
+    );
+    assert.equal(
+      existsSync(path.join(path.dirname(written.manifest_file), 'receipts', 'domain-owner-receipt.json')),
+      false,
+    );
     const helperRoles = manifest.helper_output_refs.map((ref) => ref.role).sort();
     for (const role of [
       'artifact_gallery_ref_index',
@@ -515,10 +574,66 @@ test('RCA route closeout records native helper, export, gallery, and handoff ref
       assert.equal(Object.prototype.hasOwnProperty.call(helperRef, 'visual_truth'), false);
       assert.equal(Object.prototype.hasOwnProperty.call(helperRef, 'review_export_judgment'), false);
     }
+
+    const repairerSpoof = refreshStageFolderRouteArtifact({
+      deliverablePaths: paths,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'export_pptx',
+      attemptId: 'attempt-repairer-spoof',
+      artifactFile: files.artifact,
+      artifact,
+      oplRouteAttemptIndex: { attempt_role: 'repairer' },
+    });
+    assert.deepEqual(repairerSpoof.manifest.owner_receipt_refs, []);
+
+    const tamperedReview = {
+      ...artifact,
+      handoff_review_closeout: {
+        ...artifact.handoff_review_closeout,
+        reviewed_artifact_ref_metadata: exactArtifactRefMetadata.map((entry, index) => (
+          index === 0 ? { ...entry, sha256: '0'.repeat(64) } : entry
+        )),
+      },
+    };
+    const tampered = refreshStageFolderRouteArtifact({
+      deliverablePaths: paths,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'export_pptx',
+      attemptId: 'attempt-reviewer-tampered',
+      artifactFile: files.artifact,
+      artifact: tamperedReview,
+      oplRouteAttemptIndex: { attempt_role: 'reviewer' },
+    });
+    assert.deepEqual(tampered.manifest.owner_receipt_refs, []);
+
+    const qualityDebt = refreshStageFolderRouteArtifact({
+      deliverablePaths: paths,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'export_pptx',
+      attemptId: 'attempt-reviewer-quality-debt',
+      artifactFile: files.artifact,
+      artifact: {
+        ...artifact,
+        status: 'completed_with_quality_debt',
+        quality_debt: {
+          status: 'recorded_non_blocking',
+          reasons: ['export_page_count_mismatch'],
+          blocks_ready_claims: true,
+        },
+      },
+      oplRouteAttemptIndex: { attempt_role: 'reviewer' },
+    });
+    assert.deepEqual(qualityDebt.manifest.owner_receipt_refs, []);
   });
 });
 
-test('RCA route stage folder helper supplies deterministic owner receipt refs', () => {
+test('RCA package producer cannot synthesize an owner receipt before fresh Review', () => {
   withTempOplState((stateRoot) => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-route-helper-missing-ref-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
@@ -552,9 +667,8 @@ test('RCA route stage folder helper supplies deterministic owner receipt refs', 
       artifactFile,
       artifact,
     });
-    assert.deepEqual(result.manifest.owner_receipt_refs, [
-      'rca-owner-receipt:visual-stage:ppt_deck:export_pptx:deck-a',
-    ]);
+    assert.deepEqual(result.manifest.owner_receipt_refs, []);
+    assert.equal(result.manifest.status, 'completed_with_quality_debt');
     assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'current.json')), true);
     assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'latest.json')), false);
     assert.equal(existsSync(pointers.latest_pointer), true);
@@ -770,20 +884,16 @@ test('RCA route execution writes manifest-backed Stage Folder attempt and curren
         deliverablePaths: paths,
         routeStageId: 'research',
       });
-      assert.equal(loaded?.status, 'success');
+      assert.equal(loaded?.status, 'completed_with_quality_debt');
       assert.equal(loaded?.artifact?.route, 'research');
-      assert.deepEqual(loaded?.manifest?.owner_receipt_refs, [
-        'rca-owner-receipt:visual-stage:xiaohongshu:research:note-a',
-      ]);
-      assert.equal(
-        loaded?.manifest?.owner_receipt_refs.some((ref) => ref.startsWith('rca-owner-receipt:stage-artifact:')),
-        false,
-      );
+      assert.deepEqual(loaded?.manifest?.owner_receipt_refs, []);
+      assert.equal(loaded?.manifest?.stage_quality_attempt?.attempt_role, 'producer');
       assert.equal(loaded?.manifest?.stage_id, 'source_intake');
       assert.equal(loaded?.manifest?.attempt_id, 'opl-stage-attempt-test-redcube_ai-route-run-1');
       assert.equal(existsSync(loaded?.manifest_file), true);
-      assert.equal(readJson(path.join(path.dirname(loaded.manifest_file), 'receipts', 'domain-owner-receipt.json')).owner, 'redcube_ai');
-      assert.equal(readJson(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'note-a', 'current.json')).current_stage.status, 'success');
+      assert.equal(existsSync(path.join(path.dirname(loaded.manifest_file), 'receipts', 'domain-owner-receipt.json')), false);
+      assert.equal(existsSync(path.join(path.dirname(loaded.manifest_file), 'receipts', 'progress-delta-receipt.json')), true);
+      assert.equal(readJson(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'note-a', 'current.json')).current_stage.status, 'completed_with_quality_debt');
     });
   });
 });

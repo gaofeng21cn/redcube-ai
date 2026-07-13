@@ -434,6 +434,7 @@ test('generateStructuredArtifactViaCodexCli records deterministic prompt telemet
   assert.deepEqual(result.generationRuntime.prompt_files, ['prompts/ppt_deck/storyline.md']);
   assert.deepEqual(result.generationRuntime.slide_scope.target_slide_ids, ['S05', 'S07']);
   assert.deepEqual(result.generationRuntime.slide_scope.slide_ids, ['S01', 'S05', 'S07']);
+  assert.equal('stage_quality_attempt' in result.generationRuntime, false);
   assert.equal(Number.isInteger(result.generationRuntime.estimated_prompt_tokens), true);
   assert.equal(result.generationRuntime.estimated_prompt_tokens > 0, true);
 });

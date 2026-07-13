@@ -165,14 +165,10 @@ export async function buildOplStageExecutionPlan({
         quality_budget_not_transition_gate: true,
       },
       stage_quality_cycle_policy_ref: `${RCA_STAGE_QUALITY_PROFILE_REF}#/stage_policies/${stage.stage_id}`,
-      attempt_roles: stage.stage_id === 'artifact_creation'
-        ? ['producer', 'reviewer', 'repairer', 're_reviewer']
-        : stage.stage_id === 'review_and_revision'
-          ? ['producer']
-          : stage.stage_id === 'package_and_handoff'
-            ? ['producer']
-            : ['producer', 'reviewer', 'repairer', 're_reviewer'],
-      context_isolation_required: stage.stage_id !== 'package_and_handoff',
+      attempt_roles: stage.stage_id === 'review_and_revision'
+        ? ['producer']
+        : ['producer', 'reviewer', 'repairer', 're_reviewer'],
+      context_isolation_required: true,
       ...(stage.stage_id === 'review_and_revision' ? {
         stage_role: 'cross_stage_meta_review',
         meta_review_handler_ref: 'redcube.meta_review_handler:review_and_revision',

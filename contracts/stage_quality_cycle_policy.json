@@ -4,12 +4,24 @@
   "profile_id": "rca.official_high_value_visual_deliverable.v1",
   "target_domain_id": "redcube_ai",
   "shared_contract_ref": "opl-framework:contracts/opl-framework/stage-quality-cycle-contract.json",
+  "route_selection_contract_ref": "opl-framework:contracts/opl-framework/stage-quality-cycle-contract.json#/cross_stage_route_selection",
   "attempt_roles": [
     "producer",
     "reviewer",
     "repairer",
     "re_reviewer"
   ],
+  "handoff_authority_sequence": {
+    "steps": [
+      "terminal_reviewer_or_re_reviewer_outcome",
+      "opl_controller_formal_review_receipt",
+      "rca_domain_owner_receipt",
+      "ready_projection"
+    ],
+    "attempt_can_materialize_review_receipt": false,
+    "attempt_can_materialize_owner_receipt": false,
+    "route_helper_can_set_ready_claim": false
+  },
   "context_isolation": {
     "required_for_formal_review": true,
     "new_stage_attempt_required": true,
@@ -36,6 +48,19 @@
       "undeclared_transient_context"
     ]
   },
+  "attempt_route_execution_policy": {
+    "route_is_stage_internal_operation": true,
+    "attempt_role_round_and_context_validation_owner": "opl_stage_run_controller",
+    "attempt_role_is_never_inferred_or_validated_from_route_name": true,
+    "all_quality_attempts_require_fresh_context": true,
+    "rca_route_handler_consumes_attempt_metadata_passively": true,
+    "rca_route_handler_can_reject_role_round_or_review_context_shape": false,
+    "missing_attempt_metadata_result": "completed_with_quality_debt",
+    "explicit_owner_or_identity_mismatch_result": "hard_stop",
+    "missing_attempt_metadata_blocks_stage_transition": false,
+    "professional_route_sequence_remains_domain_owned": true,
+    "stage_transition_authority_is_not_granted_by_route_execution": true
+  },
   "quality_budget": {
     "max_repair_rounds": 3,
     "initial_production_counts_as_repair_round": false,
@@ -43,7 +68,10 @@
     "provider_retry_consumes_quality_budget": false,
     "protocol_closeout_resume_consumes_quality_budget": false,
     "on_exhaustion_with_consumable_artifact": "completed_with_quality_debt",
-    "on_exhaustion_without_consumable_artifact": "typed_blocker"
+    "on_exhaustion_without_consumable_artifact": "typed_blocker",
+    "repair_required_outcome_is_preserved_at_exhaustion": true,
+    "repair_required_at_exhaustion_with_consumable_artifact_is_terminal_decisive": true,
+    "zero_repair_round_budget_makes_initial_review_terminal": true
   },
   "budget_separation": {
     "stage_quality_revision_budget_owner": "opl_stage_run_controller",
@@ -54,39 +82,104 @@
   },
   "finding_and_repair_contract": {
     "review_findings_required": true,
-    "finding_fields": [
-      "finding_ref",
-      "rubric_axis",
-      "severity",
-      "exact_artifact_ref",
-      "evidence_ref",
-      "defect_owner_stage",
-      "acceptance_criteria"
+    "attempt_outcome_field": "route_impact.stage_quality_cycle.outcome",
+    "review_attempt_outcomes": [
+      "pass",
+      "repair_required",
+      "quality_debt",
+      "blocked",
+      "human_gate"
     ],
-    "repair_map_required_when_not_passed": true,
+    "attempt_outcome_authorized_roles": [
+      "reviewer",
+      "re_reviewer"
+    ],
+    "producer_may_emit_attempt_outcome": false,
+    "repairer_may_emit_attempt_outcome": false,
+    "review_receipt_materialization": {
+      "owner": "opl_stage_run_controller",
+      "receipt_field": "verdict",
+      "outcome_to_verdict": {
+        "pass": "pass",
+        "repair_required": "repair_required",
+        "quality_debt": "quality_debt",
+        "blocked": "hard_stop",
+        "human_gate": "hard_stop"
+      }
+    },
+    "quality_debt_stage_run_projection": "completed_with_quality_debt",
+    "blocked_or_human_gate_can_emit_stage_route_decision": false,
+    "route_output_policy": {
+      "pass": "terminal_stage_route_decision",
+      "quality_debt": "terminal_stage_route_decision",
+      "repair_required_with_budget_remaining": "stage_route_recommendation_only",
+      "repair_required_at_budget_exhaustion_with_consumable_artifact": "terminal_stage_route_decision_and_completed_with_quality_debt",
+      "repair_required_at_budget_exhaustion_without_consumable_artifact": "no_stage_route_decision_and_typed_blocker",
+      "blocked_or_human_gate": "no_stage_route_decision"
+    },
+    "reviewer_required_outputs": [
+      "finding_refs",
+      "outcome",
+      "evidence_refs",
+      "repair_expectation_refs"
+    ],
+    "finding_fields": [
+      "finding_id",
+      "severity",
+      "required",
+      "evidence_refs",
+      "repair_expectation"
+    ],
+    "repairer_required_outputs": [
+      "artifact_identity",
+      "repair_map"
+    ],
+    "repair_map_required_for_each_required_finding": true,
     "repair_map_fields": [
-      "finding_ref",
-      "repair_owner_attempt_ref",
-      "target_artifact_ref",
-      "allowed_write_scope",
-      "acceptance_criteria"
+      "finding_id",
+      "repair_status",
+      "changed_artifact_refs",
+      "repair_evidence_refs"
     ],
     "re_review_closure_required": true,
+    "re_reviewer_required_outputs": [
+      "finding_closures",
+      "outcome",
+      "evidence_refs",
+      "remaining_quality_debt_refs"
+    ],
     "re_review_closure_fields": [
-      "finding_ref",
-      "re_reviewer_attempt_ref",
-      "reviewed_artifact_ref",
-      "reviewed_artifact_hash",
-      "closure_verdict",
-      "residual_quality_debt_ref"
-    ]
+      "finding_id",
+      "status",
+      "evidence_refs"
+    ],
+    "closure_status_values": [
+      "closed",
+      "partially_closed",
+      "still_open"
+    ],
+    "next_repair_round_triggers": [
+      "required_finding_not_closed",
+      "repair_regression",
+      "critical_new_finding"
+    ],
+    "next_round_required_finding_sources": [
+      "required_finding_not_closed",
+      "repair_regression",
+      "critical_new_finding"
+    ],
+    "reopened_finding_id_must_be_unique_across_cycle": true,
+    "repair_regression_or_critical_new_finding_becomes_required": true,
+    "ordinary_new_suggestion_policy": "optional_observation_without_reopening_loop",
+    "pass_with_optional_observations_allowed": true,
+    "optional_observation_alone_forces_quality_debt": false
   },
   "professional_sequence": {
     "ppt_visual_quality_loop": [
       "candidate",
       "render_and_mechanical_evidence",
-      "independent_visual_director_review",
-      "independent_screenshot_review",
+      "visual_director_route_qa_evidence",
+      "screenshot_route_qa_evidence",
       "targeted_repair",
       "rerender",
       "fresh_re_review"
@@ -214,7 +307,7 @@
         "agent/quality_gates/review_export_memory.md"
       ],
       "in_thread_refinement": {"allowed": true, "authoritative": false},
-      "formal_review": {"required": false, "risk_tier": "medium", "review_depth": "focused", "context_isolation_required": true, "max_repair_rounds": 0},
+      "formal_review": {"required": true, "risk_tier": "high", "review_depth": "multi_axis", "context_isolation_required": true, "max_repair_rounds": 3},
       "budget_exhaustion": "complete_with_quality_debt_if_consumable",
       "attempt_boundary": {"inherits_stage_goal_scope_authority": true, "role_overlay_may_only_narrow": true, "controller_creates_next_attempt": true, "attempt_is_not_sub_stage": true}
     }
@@ -226,6 +319,8 @@
     "primary_attempt_role": "producer",
     "no_context_inheritance": true,
     "max_route_back_rounds": 3,
+    "terminal_route_output": "route_impact.stage_route_decision",
+    "terminal_route_owner": "producer",
     "allowed_verdicts": [
       "pass",
       "route_back",

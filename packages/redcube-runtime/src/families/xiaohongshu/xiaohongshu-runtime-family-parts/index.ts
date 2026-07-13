@@ -76,6 +76,16 @@ function isBlockedCloseoutStatus(status) {
 function routeCloseoutRefs({ route, deliverableId, payload }) {
   const safeRoute = refSegment(route, 'route');
   const safeDeliverableId = refSegment(deliverableId, 'deliverable');
+  if (['publish_copy', 'export_bundle'].includes(safeRoute)) {
+    return {
+      owner_receipt_refs: [],
+      artifact_identity_receipt_refs: uniqueStrings(shared.safeArray(payload?.artifact_identity_receipt_refs)),
+      typed_blocker_refs: [],
+      ...(payload?.status === 'completed_with_quality_debt' ? {
+        quality_debt_refs: [`rca-quality-debt:visual-stage:xiaohongshu:${safeRoute}:${safeDeliverableId}`],
+      } : {}),
+    };
+  }
   if (isBlockedCloseoutStatus(payload?.status)) {
     return {
       owner_receipt_refs: [],
@@ -83,14 +93,8 @@ function routeCloseoutRefs({ route, deliverableId, payload }) {
       quality_debt_refs: [`rca-quality-debt:visual-stage:xiaohongshu:${safeRoute}:${safeDeliverableId}`],
     };
   }
-  const explicitOwnerRefs = uniqueStrings([
-    ...shared.safeArray(payload?.owner_receipt_refs),
-    ...shared.safeArray(payload?.receipt_refs),
-  ]);
   return {
-    owner_receipt_refs: explicitOwnerRefs.length > 0
-      ? explicitOwnerRefs
-      : [`rca-owner-receipt:visual-stage:xiaohongshu:${safeRoute}:${safeDeliverableId}`],
+    owner_receipt_refs: [],
     typed_blocker_refs: [],
   };
 }

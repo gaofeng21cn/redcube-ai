@@ -238,17 +238,13 @@ test('ppt image-first route reviews PNG pages and exports non-editable full-page
   try {
     const director = await fixture.stageParts.buildDirectorReview(fixture.contract, fixture.deliverablePaths, 'test-adapter');
     assert.equal(director.status, 'pass');
-    assert.deepEqual(director.owner_receipt_refs, [
-      'rca-owner-receipt:review-export:ppt_deck:visual_director_review:deck-image',
-    ]);
+    assert.deepEqual(director.owner_receipt_refs, []);
     assert.deepEqual(director.typed_blocker_refs, []);
-    assert.equal(director.review_context_manifest.surface_kind, 'opl_stage_review_context_manifest');
-    assert.equal(director.stage_review_receipt.surface_kind, 'opl_stage_review_receipt');
-    assert.equal(director.stage_review_receipt.no_context_inheritance, true);
-    assert.equal(
-      director.stage_review_receipt.producer_session_refs.includes(director.stage_review_receipt.reviewer_session_ref),
-      false,
-    );
+    assert.equal(director.in_attempt_visual_qa_context.surface_kind, 'rca_in_attempt_visual_qa_context');
+    assert.equal(director.in_attempt_visual_qa.surface_kind, 'rca_in_attempt_visual_qa');
+    assert.equal(director.in_attempt_visual_qa.authoritative, false);
+    assert.equal(director.formal_stage_review_completed, false);
+    assert.equal('stage_review_receipt' in director, false);
     assert.equal(director.visual_director_review.deterministic_preflight.findings.length, 0);
     fixture.artifacts.set('visual_director_review', director);
 
@@ -260,15 +256,17 @@ test('ppt image-first route reviews PNG pages and exports non-editable full-page
       mode: 'draft_new',
     });
     assert.equal(screenshot.status, 'pass');
-    assert.deepEqual(screenshot.owner_receipt_refs, [
-      'rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-image',
-    ]);
+    assert.deepEqual(screenshot.owner_receipt_refs, []);
     assert.deepEqual(screenshot.typed_blocker_refs, []);
-    assert.equal(screenshot.stage_review_receipt.surface_kind, 'opl_stage_review_receipt');
-    assert.equal(screenshot.stage_review_receipt.no_context_inheritance, true);
+    assert.equal(screenshot.in_attempt_visual_qa.surface_kind, 'rca_in_attempt_visual_qa');
+    assert.equal(screenshot.in_attempt_visual_qa.review_receipt_materialized, false);
+    assert.equal(screenshot.formal_stage_review_completed, false);
+    assert.equal('stage_review_receipt' in screenshot, false);
+    assert.equal(screenshot.review_state_patch.current_status, 'screenshot_review_passed');
+    assert.equal(screenshot.review_state_patch.ready_for_export, false);
     assert.notEqual(
-      screenshot.stage_review_receipt.reviewer_session_ref,
-      director.stage_review_receipt.reviewer_session_ref,
+      screenshot.in_attempt_visual_qa.qa_execution_session_refs[0],
+      director.in_attempt_visual_qa.qa_execution_session_refs[0],
     );
     assert.equal(screenshot.review_capture.source_visual_route, 'author_image_pages');
     assert.equal(screenshot.mechanical_review.python_helper_invocation, null);
@@ -283,12 +281,14 @@ test('ppt image-first route reviews PNG pages and exports non-editable full-page
       deliverableId: 'deck-image',
       contract: fixture.contract,
     });
-    assert.deepEqual(exported.owner_receipt_refs, [
-      'rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-image',
-    ]);
-    assert.deepEqual(exported.typed_blocker_refs, []);
-    assert.equal(exported.export_bundle.review_receipt_refs.includes(screenshot.owner_receipt_refs[0]), true);
-    assert.equal(exported.review_export_refs.includes(exported.export_bundle.export_ref), true);
+    assert.deepEqual(exported.owner_receipt_refs, []);
+    assert.equal(exported.artifact_identity_receipt_refs.length, 1);
+    assert.equal(exported.artifact_identity_receipt.hash_metadata_complete, true);
+    assert.deepEqual(exported.typed_blocker_refs || [], []);
+    assert.deepEqual(exported.export_bundle.upstream_review_receipt_refs, []);
+    assert.equal(exported.review_state_patch.current_status, 'package_review_pending');
+    assert.equal(exported.review_state_patch.ready_for_export, false);
+    assert.equal(exported.upstream_review_refs.includes(screenshot.review_export_refs[0]), true);
     assert.equal(exported.export_bundle.source_visual_route, 'author_image_pages');
     assert.equal(exported.export_bundle.editable, false);
     assert.equal(exported.export_bundle.page_count_match, true);
@@ -299,7 +299,7 @@ test('ppt image-first route reviews PNG pages and exports non-editable full-page
     const gallery = readJson(exported.export_bundle.artifact_gallery.index_file);
     assert.equal(gallery.source_visual_route, 'author_image_pages');
     assert.equal(gallery.editable, false);
-    assert.equal(gallery.status, 'output_ready');
+    assert.equal(gallery.status, 'output_candidate_pending_review');
     assert.deepEqual(gallery.artifacts.source.png_files, [fixture.pngFile]);
     assert.deepEqual(gallery.artifacts.source.prompt_manifest_files, [fixture.promptManifestFile]);
     assert.deepEqual(gallery.artifacts.source.style_manifest_files, [fixture.styleManifestFile]);
@@ -325,9 +325,7 @@ test('ppt image-first screenshot review records missing PNG manifest refs as non
     mode: 'draft_new',
   });
   assert.equal(screenshot.status, 'block');
-  assert.deepEqual(screenshot.owner_receipt_refs, [
-    'rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-image',
-  ]);
+  assert.deepEqual(screenshot.owner_receipt_refs, []);
   assert.deepEqual(screenshot.typed_blocker_refs, []);
   assert.equal(screenshot.typed_blocker, null);
   assert.equal(screenshot.quality_debt.blocks_stage_transition, false);

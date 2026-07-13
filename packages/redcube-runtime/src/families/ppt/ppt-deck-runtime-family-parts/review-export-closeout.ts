@@ -33,13 +33,9 @@ function reviewExportRef(family: string, route: string, deliverableId: string): 
   return `rca-review-export:${family}:${route}:${deliverableId}`;
 }
 
-function ownerReceiptRef(family: string, route: string, deliverableId: string): string {
-  return `rca-owner-receipt:review-export:${family}:${route}:${deliverableId}`;
-}
-
 function commonRefs(family: string, route: string, deliverableId: string): JsonRecord {
   return {
-    attempt_ref: `workspace-runtime-ref:review-export:${family}:${route}:${deliverableId}`,
+    route_execution_ref: `workspace-runtime-ref:review-export:${family}:${route}:${deliverableId}`,
     artifact_locator_ref: `artifact-locator:redcube_ai:${family}:${route}:${deliverableId}`,
     memory_receipt_ref: `rca-memory-receipt:not-applicable:review-export:${family}:${route}:${deliverableId}`,
     lifecycle_receipt_ref: `rca-lifecycle-receipt:review-export:${family}:${route}:${deliverableId}`,
@@ -55,30 +51,28 @@ export function buildReviewExportCloseout(input: ReviewExportCloseoutInput): Jso
   const refs = commonRefs(family, route, deliverableId);
   const explicitReviewExportRefs = uniqueStrings([gateRef, ...safeArray(input.reviewExportRefs)]);
   const artifactRefs = uniqueStrings(safeArray(input.artifactRefs));
-  const receiptRef = ownerReceiptRef(family, route, deliverableId);
   const qualityDebt = isBlockedStatus(input.status);
   const qualityDebtReasons = uniqueStrings(input.blockingReasons || ['review_export_quality_gate_not_passed']);
   return {
-    owner_receipt_refs: [receiptRef],
+    owner_receipt_refs: [],
     typed_blocker_refs: [],
     review_export_refs: explicitReviewExportRefs,
-    owner_receipt: {
-      surface_kind: 'domain_owner_receipt',
-      return_shape: 'domain_receipt',
+    review_verdict_candidate: {
+      surface_kind: 'rca_review_export_verdict_candidate',
+      return_shape: 'review_export_verdict_candidate',
       owner: 'redcube_ai',
-      source_contract: 'rca.domain_owner_receipt.v1',
-      receipt_ref: receiptRef,
+      source_contract: 'rca.review_export_verdict_candidate.v1',
       route_stage_id: route,
       deliverable_id: deliverableId,
       review_export_ref: gateRef,
       artifact_refs: artifactRefs,
+      verdict: safeText(input.status),
       ...refs,
       authority_boundary: {
-        rca_owns_owner_receipt: true,
-        opl_can_store_receipt_refs: true,
-        opl_can_write_visual_truth: false,
-        opl_can_write_review_export_verdict: false,
-        opl_can_write_domain_artifact_body: false,
+        authoritative: false,
+        formal_stage_review_completed: false,
+        owner_receipt_materialized: false,
+        decisive_reviewer_attempt_required: true,
       },
     },
     typed_blocker: null,

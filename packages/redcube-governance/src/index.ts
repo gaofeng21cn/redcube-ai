@@ -18,6 +18,7 @@ export {
 export {
   buildGateSummary,
   buildSourceReadinessReport,
+  evaluateDecisiveHandoffReview,
 } from './review-state-parts/freshness-gates.js';
 export type {
   AuditDeliverableRequest,

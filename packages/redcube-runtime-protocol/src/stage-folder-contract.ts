@@ -181,6 +181,9 @@ export function writeStageFolderArtifact(input): any {
   const paths = publicPaths(input);
   const output = outputName(input);
   const ownerReceiptRefs = unique(input.ownerReceiptRefs || input.owner_receipt_refs);
+  const artifactIdentityReceiptRefs = unique(
+    input.artifactIdentityReceiptRefs || input.artifact_identity_receipt_refs,
+  );
   const qualityDebtRefs = unique(input.qualityDebtRefs || input.quality_debt_refs);
   const typedBlockerRefs = unique(input.typedBlockerRefs || input.typed_blocker_refs);
   const artifactFile = safeText(input.artifactFile || input.artifact_file)
@@ -241,6 +244,7 @@ export function writeStageFolderArtifact(input): any {
     helper_output_refs: helperOutputRefs(input, paths.attempt_dir),
     artifact_refs: unique(input.artifactRefs),
     review_export_refs: unique(input.reviewExportRefs),
+    artifact_identity_receipt_refs: artifactIdentityReceiptRefs,
     stage_quality_attempt: {
       attempt_role: safeText(input.attemptRole || input.attempt_role) || null,
       quality_round_index: Number(input.qualityRoundIndex ?? input.quality_round_index ?? 0),
@@ -255,6 +259,23 @@ export function writeStageFolderArtifact(input): any {
   writeDomainArtifact({ ...attemptLocator, role: 'receipt', relative_path: 'rca-stage-output-interface.json', body: `${JSON.stringify(interfacePayload, null, 2)}\n` });
   if (ownerReceiptRefs.length) {
     writeDomainArtifact({ ...attemptLocator, role: 'receipt', relative_path: 'domain-owner-receipt.json', body: `${JSON.stringify({ surface_kind: 'domain_owner_receipt_ref', owner: 'redcube_ai', receipt_refs: ownerReceiptRefs }, null, 2)}\n` });
+  }
+  if (artifactIdentityReceiptRefs.length) {
+    writeDomainArtifact({
+      ...attemptLocator,
+      role: 'receipt',
+      relative_path: 'artifact-identity-receipt.json',
+      body: `${JSON.stringify({
+        surface_kind: 'artifact_identity_receipt_ref',
+        owner: 'redcube_ai',
+        receipt_refs: artifactIdentityReceiptRefs,
+        authority_boundary: {
+          receipt_is_artifact_identity_only: true,
+          receipt_is_domain_owner_acceptance: false,
+          receipt_can_authorize_ready_claim: false,
+        },
+      }, null, 2)}\n`,
+    });
   }
   if (typedBlockerRefs.length) {
     writeDomainArtifact({ ...attemptLocator, role: 'evidence', relative_path: 'typed-blocker-ref.json', body: `${JSON.stringify({ surface_kind: 'domain_typed_blocker_ref', typed_blocker_refs: typedBlockerRefs, blocking_reasons: unique(input.blockingReasons || input.blocking_reasons) }, null, 2)}\n` });
@@ -299,6 +320,7 @@ export function writeStageFolderArtifact(input): any {
   const outputHash = committed.manifest.output_hashes.find((entry) => entry.path === output) || null;
   const stageReceipts = [
     ...ownerReceiptRefs.map((receiptRef) => ({ receipt_kind: 'domain_owner_receipt', receipt_ref: receiptRef, receipt_file: 'receipts/domain-owner-receipt.json', output_roles: outputRoles, route_stage_id: interfacePayload.route_stage_id, owner: 'redcube_ai' })),
+    ...artifactIdentityReceiptRefs.map((receiptRef) => ({ receipt_kind: 'artifact_identity_receipt', receipt_ref: receiptRef, receipt_file: 'receipts/artifact-identity-receipt.json', output_roles: outputRoles, route_stage_id: interfacePayload.route_stage_id, owner: 'redcube_ai', authorizes_ready_claim: false })),
     ...(progressDeltaReceiptRef ? [{ receipt_kind: 'progress_delta_receipt', receipt_ref: progressDeltaReceiptRef, receipt_file: 'receipts/progress-delta-receipt.json', output_roles: outputRoles, route_stage_id: interfacePayload.route_stage_id, owner: 'redcube_ai' }] : []),
     ...typedBlockerRefs.map((typedBlockerRef) => ({ receipt_kind: 'domain_typed_blocker', typed_blocker_ref: typedBlockerRef, evidence_file: 'evidence/typed-blocker-ref.json', output_roles: outputRoles, route_stage_id: interfacePayload.route_stage_id, owner: 'redcube_ai' })),
   ];
@@ -308,6 +330,7 @@ export function writeStageFolderArtifact(input): any {
     output_file: path.join(paths.outputs_dir, output),
     manifest_ref: 'manifest.json',
     receipt_ref: ownerReceiptRefs.length ? 'receipts/domain-owner-receipt.json' : null,
+    artifact_identity_receipt_ref: artifactIdentityReceiptRefs.length ? 'receipts/artifact-identity-receipt.json' : null,
     progress_delta_receipt_ref: progressDeltaReceiptRef ? 'receipts/progress-delta-receipt.json' : null,
     quality_debt_ref: effectiveQualityDebtRefs.length ? 'evidence/quality-debt-ref.json' : null,
     typed_blocker_ref: typedBlockerRefs.length ? 'evidence/typed-blocker-ref.json' : null,
@@ -338,6 +361,7 @@ export function writeStageFolderArtifact(input): any {
     stage_quality_attempt: interfacePayload.stage_quality_attempt,
     artifact_refs: interfacePayload.artifact_refs,
     review_export_refs: interfacePayload.review_export_refs,
+    artifact_identity_receipt_refs: artifactIdentityReceiptRefs,
     authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
   };
   fs.writeFileSync(paths.manifest_file, `${JSON.stringify(domainManifest, null, 2)}\n`, 'utf8');
@@ -351,6 +375,7 @@ export function writeStageFolderArtifact(input): any {
     output_file: path.join(paths.outputs_dir, output),
     manifest: domainManifest,
     receipt_file: path.join(paths.receipts_dir, 'domain-owner-receipt.json'),
+    artifact_identity_receipt_file: path.join(paths.receipts_dir, 'artifact-identity-receipt.json'),
     progress_receipt_file: path.join(paths.receipts_dir, 'progress-delta-receipt.json'),
     quality_debt_evidence_file: path.join(paths.evidence_dir, 'quality-debt-ref.json'),
     blocker_evidence_file: path.join(paths.evidence_dir, 'typed-blocker-ref.json'),

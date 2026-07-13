@@ -16,6 +16,7 @@ import {
   runDeliverableRoute,
 } from './product-domain-action-test-api.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
+import { applyFormalPackageReviewCloseoutForTest } from './helpers/route-attempt-test-api.ts';
 import { withMockCodexRuntime } from './mock-codex-cli.js';
 import { assertWorkspaceGitBoundary } from './helpers/workspace-git-boundary.js';
 
@@ -236,6 +237,12 @@ test('auditDeliverable passes when hydrated ppt deck surface exists and baseline
       });
       assert.equal(result.ok, true, route);
     }
+    await applyFormalPackageReviewCloseoutForTest({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-approved-v1',
+    });
 
     await createDeliverable({
       workspaceRoot,

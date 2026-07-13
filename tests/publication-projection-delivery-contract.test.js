@@ -10,6 +10,7 @@ import {
   runDeliverableRoute,
 } from './product-domain-action-test-api.js';
 import { withMockCodexRuntime } from './mock-codex-cli.js';
+import { applyFormalPackageReviewCloseoutForTest } from './helpers/route-attempt-test-api.ts';
 
 async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes) {
   for (const route of routes) {
@@ -22,6 +23,7 @@ async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes)
     });
     assert.equal(result.ok, true, `${overlay}:${route}`);
   }
+  await applyFormalPackageReviewCloseoutForTest({ workspaceRoot, overlay, topicId, deliverableId });
 }
 
 test('topic publication projection converges direct-delivery and human-publication families through hydrated delivery contracts', async () => {

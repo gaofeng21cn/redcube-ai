@@ -20,6 +20,9 @@ export type RouteRunDomainEntryResponse = Omit<RouteRunResponse, 'run' | 'summar
     requested_route: string;
     executed_route: string;
     route_selection_owner: 'codex_cli';
+    route_selection_owner_scope: 'intra_stage_domain_route_only';
+    cross_stage_decision_owner: 'stage_run_decisive_codex_attempt';
+    route_execution_grants_stage_transition_authority: false;
     programmatic_route_continuation: false;
     next_stage_may_start: boolean;
   };

@@ -35,6 +35,11 @@ export function buildRouteRunDomainEntryResponse({
     || safeText((result as { return_shape?: unknown }).return_shape) === 'typed_blocker'
     || safeText(run?.status) === 'typed_blocker'
   );
+  const typedBlockerRecommendedAction = safeText(
+    (result as { error?: { recommended_action?: unknown } }).error?.recommended_action
+      || (result as { typed_blocker?: { next_required_owner_action?: unknown } }).typed_blocker?.next_required_owner_action
+      || (run as { error?: { recommended_action?: unknown } } | undefined)?.error?.recommended_action,
+  );
 
   return {
     ...result,
@@ -42,7 +47,7 @@ export function buildRouteRunDomainEntryResponse({
     ...(typedBlocker ? { return_shape: 'typed_blocker' } : {}),
     recommended_action: result.ok
       ? 'continue'
-      : (typedBlocker ? 'submit_route_to_opl_stage_attempt_or_record_domain_owned_typed_blocker' : 'inspect_run_failure'),
+      : (typedBlocker ? (typedBlockerRecommendedAction || 'resolve_typed_blocker_at_owner_boundary') : 'inspect_run_failure'),
     error_kind: result.ok ? null : (typedBlocker ? 'typed_blocker' : 'route_failure'),
     summary: {
       route: request.route,
@@ -52,6 +57,9 @@ export function buildRouteRunDomainEntryResponse({
       requested_route: request.route,
       executed_route: safeText(run?.current_stage) || request.route,
       route_selection_owner: 'codex_cli',
+      route_selection_owner_scope: 'intra_stage_domain_route_only',
+      cross_stage_decision_owner: 'stage_run_decisive_codex_attempt',
+      route_execution_grants_stage_transition_authority: false,
       programmatic_route_continuation: false,
       next_stage_may_start: result.ok === true,
     },

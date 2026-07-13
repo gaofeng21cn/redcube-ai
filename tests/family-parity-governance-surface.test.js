@@ -14,6 +14,7 @@ import {
 } from './product-domain-action-test-api.js';
 import { getDeliverablePaths } from './package-surfaces.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
+import { applyFormalPackageReviewCloseoutForTest } from './helpers/route-attempt-test-api.ts';
 import { withMockCodexRuntime } from './mock-codex-cli.js';
 
 const SHARED_GOVERNANCE_SURFACES = [
@@ -66,6 +67,12 @@ async function buildReviewReadyWorkspace({ workspaceRoot, overlay, profileId, de
     });
     assert.equal(result.ok, true, route);
   }
+  await applyFormalPackageReviewCloseoutForTest({
+    workspaceRoot,
+    overlay,
+    topicId: 'topic-a',
+    deliverableId,
+  });
 
   return created;
 }

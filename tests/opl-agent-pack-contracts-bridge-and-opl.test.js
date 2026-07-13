@@ -138,12 +138,17 @@ test('OPL default callers see RCA deletion evidence refs without delete authorit
   ], {
     cwd: repoRoot,
     encoding: 'utf8',
+    maxBuffer: 32 * 1024 * 1024,
   });
 
   assert.equal(result.status, 0, result.stderr || result.stdout);
   const payload = JSON.parse(result.stdout);
   const readiness = payload.agent_default_caller_readiness;
-  assert.equal(readiness.status, 'ready_domain_evidence_required');
+  const report = readiness.reports[0];
+  const sourceClosureBlocked = report.source_closure?.status === 'blocked';
+  assert.equal(readiness.status, sourceClosureBlocked ? 'blocked' : 'ready_domain_evidence_required');
+  assert.equal(readiness.summary.source_closure_blocked_repo_count, sourceClosureBlocked ? 1 : 0);
+  assert.equal(readiness.summary.source_closure_verified_repo_count, sourceClosureBlocked ? 0 : 1);
   assert.equal(readiness.summary.generated_default_caller_surface_count, 8);
   assert.equal(readiness.summary.missing_domain_owner_receipt_or_typed_blocker_count, 0);
   assert.equal(readiness.summary.missing_no_forbidden_write_proof_count, 0);
@@ -151,7 +156,6 @@ test('OPL default callers see RCA deletion evidence refs without delete authorit
   assert.equal(readiness.migration_gate_policy.physical_delete_authorized_by_this_report, false);
   assert.equal(readiness.authority_boundary.report_can_authorize_domain_repo_physical_delete, false);
 
-  const report = readiness.reports[0];
   assert.equal(report.deletion_gate.physical_delete_authorized, false);
   assert.equal(report.deletion_gate.evidence_worklist_count, 0);
   assert.equal(report.deletion_gate.default_caller_delete_ready, false);

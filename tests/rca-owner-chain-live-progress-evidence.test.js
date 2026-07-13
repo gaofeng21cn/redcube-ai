@@ -433,25 +433,19 @@ test('RCA mock-safe visual owner-chain canary reaches review/export refs and own
       assert.equal(author.image_pages_bundle.source_visual_route, 'author_image_pages');
       assert.equal(author.image_page_manifest.slides.every((slide) => fs.existsSync(slide.image_file)), true);
 
-      assert.deepEqual(director.owner_receipt_refs, [
-        'rca-owner-receipt:review-export:ppt_deck:visual_director_review:deck-owner-chain',
-      ]);
+      assert.deepEqual(director.owner_receipt_refs, []);
       assert.deepEqual(director.typed_blocker_refs, []);
-      assert.deepEqual(screenshot.owner_receipt_refs, [
-        'rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-owner-chain',
-      ]);
+      assert.deepEqual(screenshot.owner_receipt_refs, []);
       assert.deepEqual(screenshot.typed_blocker_refs, []);
       assert.equal(screenshot.status, 'pass');
       assert.equal(screenshot.review_capture.source_visual_route, 'author_image_pages');
+      assert.equal(screenshot.review_state_patch.ready_for_export, false);
 
-      assert.deepEqual(exported.owner_receipt_refs, [
-        'rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-owner-chain',
-      ]);
+      assert.deepEqual(exported.owner_receipt_refs, []);
+      assert.equal(exported.artifact_identity_receipt_refs.length, 1);
+      assert.equal(exported.artifact_identity_receipt.hash_metadata_complete, true);
       assert.deepEqual(exported.typed_blocker_refs, []);
-      assert.equal(
-        exported.export_bundle.review_receipt_refs.includes(screenshot.owner_receipt_refs[0]),
-        true,
-      );
+      assert.deepEqual(exported.export_bundle.upstream_review_receipt_refs, []);
       assert.equal(exported.export_bundle.source_visual_route, 'author_image_pages');
       assert.equal(fs.existsSync(exported.export_bundle.pptx_file), true);
       assert.equal(fs.existsSync(exported.export_bundle.pdf_file), true);

@@ -124,6 +124,8 @@ test('poster_onepager mainline runs through review and export on shared runtime'
 
     assert.equal(screenshotArtifact.status, 'pass');
     assert.equal(screenshotArtifact.review_state_patch.rerun_from_stage, null);
+    assert.equal(screenshotArtifact.review_state_patch.current_status, 'screenshot_review_passed');
+    assert.equal(screenshotArtifact.review_state_patch.ready_for_export, false);
     assert.equal(exportArtifact.status, 'completed');
     assert.equal(exportArtifact.export_bundle.png_files.length, 1);
     assert.equal(typeof exportArtifact.export_bundle.source_html, 'string');

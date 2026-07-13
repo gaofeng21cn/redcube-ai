@@ -54,28 +54,45 @@ function buildProjectionState({ reviewState, contract, deliveryArtifact, deliver
   const projectionModel = safeText(deliveryContract?.projection_model);
   const artifactDeliveryState = deliveryArtifact?.export_bundle?.delivery_state || null;
   const exportFreshness = derivePreExportReviewFreshness({ contract, deliverablePaths, reviewState });
+  const reviewedArtifactIsCurrent = reviewState?.ready_for_export === true
+    && reviewState?.handoff_review_validation?.passed === true
+    && exportFreshness.stale === false
+    && exportFreshness.handoff_review?.passed === true;
+  const reviewedDeliveryState = reviewedArtifactIsCurrent && artifactDeliveryState?.current
+    ? {
+        ...artifactDeliveryState,
+        current: safeText(deliveryContract?.operator_handoff?.handoff_ready_state, 'output_ready'),
+        next: null,
+      }
+    : null;
   if (projectionModel === 'human_publication') {
     const current = safeText(reviewState?.publish_state?.current, 'draft');
     return {
       current,
       next: derivePublishNext(current),
-      delivery_state: exportFreshness.stale ? null : artifactDeliveryState,
+      delivery_state: reviewedDeliveryState,
+      ready_for_export: reviewedArtifactIsCurrent,
+      export_freshness: exportFreshness,
     };
   }
 
-  if (!exportFreshness.stale && artifactDeliveryState?.current) {
+  if (reviewedDeliveryState) {
     return {
-      current: safeText(artifactDeliveryState.current),
-      next: safeText(artifactDeliveryState.next) || null,
-      delivery_state: artifactDeliveryState,
+      current: safeText(reviewedDeliveryState.current),
+      next: safeText(reviewedDeliveryState.next) || null,
+      delivery_state: reviewedDeliveryState,
+      ready_for_export: true,
+      export_freshness: exportFreshness,
     };
   }
 
-  if (reviewState?.ready_for_export) {
+  if (reviewedArtifactIsCurrent) {
     return {
       current: safeText(deliveryContract?.projection_states?.ready_for_export, 'export_ready'),
       next: safeText(deliveryContract?.projection_states?.output_ready) || null,
       delivery_state: null,
+      ready_for_export: true,
+      export_freshness: exportFreshness,
     };
   }
 
@@ -83,6 +100,8 @@ function buildProjectionState({ reviewState, contract, deliveryArtifact, deliver
     current: 'draft',
     next: safeText(deliveryContract?.projection_states?.ready_for_export, toDirectDeliveryNext('draft')) || null,
     delivery_state: null,
+    ready_for_export: false,
+    export_freshness: exportFreshness,
   };
 }
 
@@ -118,7 +137,7 @@ function buildOperatorHandoffSummary({
     blockingReasons.push(...reviewBlocks);
   }
 
-  if (!reviewState?.ready_for_export) {
+  if (!publicationProjectionEntry?.ready_for_export) {
     blockingReasons.push('export_not_ready');
   }
 
@@ -199,7 +218,7 @@ export function toPublicationProjectionEntry({
     current: projectionState.current,
     next: projectionState.next,
     current_status: safeText(reviewState?.current_status, 'idle'),
-    ready_for_export: Boolean(reviewState?.ready_for_export),
+    ready_for_export: projectionState.ready_for_export,
     approval_status: safeText(reviewState?.approval_state?.status, 'not_required'),
     approval_required: Boolean(deliveryContract?.human_gate?.required),
     latest_review_stage: safeText(reviewState?.latest_review_stage) || null,
@@ -209,6 +228,7 @@ export function toPublicationProjectionEntry({
       ? stageArtifactPath(contract, deliverablePaths, deliveryContract.required_export_route)
       : null,
     delivery_state: projectionState.delivery_state,
+    export_freshness: projectionState.export_freshness,
     governance_surface: governanceSurface,
     source_readiness_summary: sourceReadinessSummary,
     lifecycle_stage_summary: lifecycleStageSummary,

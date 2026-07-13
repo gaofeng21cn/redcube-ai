@@ -1,6 +1,11 @@
 // @ts-nocheck
 import path from 'node:path';
 import { existsSync } from 'node:fs';
+import {
+  FINAL_BYTE_HANDOFF_REVIEW,
+  OUTPUT_CANDIDATE_PENDING_REVIEW,
+  buildPackageCandidateCloseout,
+} from '../../../package-handoff-contract.js';
 
 export function createPosterOnepagerCoreAssemblyHelpers(deps) {
   const {
@@ -403,13 +408,25 @@ export function createPosterOnepagerCoreAssemblyHelpers(deps) {
       review_markdown: safeText(reviewArtifact.report_markdown),
       publish_manifest_file: manifestFile,
       delivery_state: {
-        current: hasQualityDebt ? 'output_with_quality_debt' : 'output_ready',
-        next: hasQualityDebt ? 'review_quality_debt_before_ready_claim' : null,
+        current: hasQualityDebt ? 'output_with_quality_debt' : OUTPUT_CANDIDATE_PENDING_REVIEW,
+        next: FINAL_BYTE_HANDOFF_REVIEW,
       },
     };
     writeJson(manifestFile, exportBundle);
+    const artifactRefs = [manifestFile, stableViewHtmlFile, exportBundle.review_markdown, ...exportBundle.png_files].filter(Boolean);
+    const closeout = buildPackageCandidateCloseout({
+      family: 'poster_onepager',
+      route: 'export_bundle',
+      deliverableId: deliverablePaths.deliverableId,
+      artifactRefs,
+      upstreamReviewRefs: [
+        ...safeArray(reviewArtifact?.review_export_refs),
+        ...safeArray(reviewArtifact?.owner_receipt_refs),
+      ],
+    });
     return {
       ...attachCommon('export_bundle', contract, null, adapter),
+      ...closeout,
       status: hasQualityDebt ? 'completed_with_quality_debt' : 'completed',
       quality_debt: hasQualityDebt ? {
         status: 'recorded_non_blocking',
@@ -419,10 +436,10 @@ export function createPosterOnepagerCoreAssemblyHelpers(deps) {
         blocks_export_ready_claim: true,
       } : null,
       export_bundle: exportBundle,
-      artifact_refs: [manifestFile, stableViewHtmlFile, exportBundle.review_markdown, ...exportBundle.png_files].filter(Boolean),
+      artifact_refs: artifactRefs,
       review_state_patch: {
-        current_status: hasQualityDebt ? 'completed_with_quality_debt' : 'completed',
-        ready_for_export: !hasQualityDebt,
+        current_status: hasQualityDebt ? 'completed_with_quality_debt' : 'package_review_pending',
+        ready_for_export: false,
         latest_review_stage: 'export_bundle',
         latest_checks: {
           director_intent_landed: true,
@@ -432,11 +449,11 @@ export function createPosterOnepagerCoreAssemblyHelpers(deps) {
           occlusion_free: true,
           visual_density_ok: true,
         },
-        pending_reviews: qualityDebtReasons,
+        pending_reviews: [FINAL_BYTE_HANDOFF_REVIEW],
         blocking_reasons: [],
         rerun_from_stage: null,
         rerun_policy: {
-          status: hasQualityDebt ? 'quality_debt_recorded' : 'idle',
+          status: hasQualityDebt ? 'quality_debt_recorded' : 'awaiting_fresh_review',
           rerun_from_stage: null,
         },
       },

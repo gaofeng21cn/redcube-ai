@@ -10,3 +10,5 @@ Gate rules:
 - Visual memory accept/reject requires RCA owner judgment and receipt refs.
 - OPL may transport review, repair, memory proposal, and receipt refs only.
 - Agent Lab efficiency refs, including source pack reuse, prompt/static-prefix cache, blocked-page-only repair, page-local batch telemetry, and export preview cache, remain refs-only observability and cannot replace screenshot review, review/export verdicts, or RCA owner receipts.
+- `package_and_handoff` produces new or transformed reviewable bytes after Meta Review. Its producer/repairer output remains a candidate until a fresh reviewer/re-reviewer inspects exact final artifact hashes, rendered equivalence, caption/source fidelity, notes/content consistency, and manifest/file/hash closure.
+- Artifact-identity receipts prove which candidate bytes exist; they never authorize quality, export, publication, handoff-ready, or owner-accepted claims. Those claims require a decisive reviewer/re-reviewer exact-byte outcome, the controller-materialized formal Review receipt bound to the current hashes, and the RCA-signed owner receipt. Attempt role or route name alone grants none of these authorities.

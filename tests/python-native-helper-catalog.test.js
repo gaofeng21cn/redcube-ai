@@ -337,7 +337,7 @@ test('Python native helper doctor runs as a package module and emits fixed JSON 
   assert.equal(report.status, 'ok');
   assert.deepEqual(report.package, {
     name: 'redcube-ai',
-    version: '0.2.1',
+    version: '0.2.2',
     import_root: 'redcube_ai',
     source_root: 'python',
   });

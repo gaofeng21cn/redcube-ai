@@ -7,10 +7,13 @@ import {
   isHardStopArtifact,
 } from '../packages/redcube-runtime/dist/progress-first.js';
 
-test('stage manifest gives Codex unrestricted declared-stage routing', () => {
+test('stage manifest separates Stage-internal route selection from decisive cross-Stage routing', () => {
   const manifest = JSON.parse(fs.readFileSync(new URL('../agent/stages/manifest.json', import.meta.url), 'utf8'));
   const policy = manifest.progress_first_policy;
   assert.equal(policy.route_selection_owner, 'codex_cli');
+  assert.equal(policy.route_selection_owner_scope, 'intra_stage_domain_route_only');
+  assert.equal(policy.cross_stage_decision_owner, 'stage_run_decisive_codex_attempt');
+  assert.equal(policy.route_execution_grants_stage_transition_authority, false);
   assert.equal(policy.codex_may_advance_skip_repeat_reverse_or_route_back, true);
   assert.equal(policy.any_declared_stage_may_start_from_any_prior_stage_result, true);
   assert.equal(policy.declared_requires_are_quality_context_not_launch_gates, true);
@@ -25,6 +28,12 @@ test('stage operating principles mirror the OPL route-authority ABI', () => {
   const policy = principles.speed_policy;
 
   assert.equal(policy.route_selection_owner, 'codex_cli');
+  assert.equal(policy.route_selection_owner_scope, 'intra_stage_domain_route_only');
+  assert.equal(policy.cross_stage_decision_owner, 'stage_run_decisive_codex_attempt');
+  assert.equal(policy.primary_only_decisive_attempt_role, 'producer');
+  assert.deepEqual(policy.formal_review_decisive_attempt_roles, ['reviewer', 're_reviewer']);
+  assert.equal(policy.non_decisive_attempt_output, 'route_impact.stage_route_recommendation');
+  assert.equal(policy.decisive_attempt_output, 'route_impact.stage_route_decision');
   assert.equal(policy.codex_may_advance_skip_repeat_reverse_or_route_back, true);
   assert.equal(policy.any_declared_stage_may_start_from_any_prior_stage_result, true);
   assert.equal(policy.declared_requires_are_quality_context_not_launch_gates, true);

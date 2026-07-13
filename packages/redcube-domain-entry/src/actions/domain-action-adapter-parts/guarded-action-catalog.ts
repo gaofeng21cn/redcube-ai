@@ -30,7 +30,7 @@ const DOMAIN_ACTION_ADAPTER_GUARDED_ACTIONS = Object.freeze([
   {
     action: 'emit_domain_owner_receipt',
     effect: 'guarded_domain_owner_receipt_write',
-    summary: 'Emit an RCA-owned domain receipt instance into workspace runtime receipts when required refs are present; otherwise return a typed blocker.',
+    summary: 'Emit an RCA-owned domain receipt only after required refs and any supplied formal Review exact-byte binding validate; ordinary evidence gaps return non-blocking quality debt.',
     required_fields: [
       'workspace_root',
       'receipt_id',

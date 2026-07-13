@@ -489,7 +489,10 @@ function artifactFor(results, route) {
 
 function assertCommonExport({ exported, expectedRoute }) {
   assert.equal(exported.status, 'completed');
-  assert.equal(exported.export_bundle.delivery_state.current, 'output_ready');
+  assert.equal(exported.export_bundle.delivery_state.current, 'output_candidate_pending_review');
+  assert.deepEqual(exported.owner_receipt_refs, []);
+  assert.equal(exported.artifact_identity_receipt_refs.length, 1);
+  assert.equal(exported.artifact_identity_receipt.hash_metadata_complete, true);
   assert.equal(fs.existsSync(exported.export_bundle.pptx_file), true);
   assert.equal(fs.existsSync(exported.export_bundle.pdf_file), true);
   assert.equal(fs.existsSync(exported.export_bundle.presenter_notes_file), true);
@@ -637,8 +640,8 @@ test('screenshot summary creates one non-authority memory candidate that export 
         true,
       );
       assert.deepEqual(forwarded.proposal_candidate, proposal.proposal_candidate);
-      assert.equal(forwarded.terminal_binding.review_export_refs.includes(screenshot.review_export_refs[0]), true);
-      assert.equal(forwarded.terminal_binding.review_export_refs.includes(exported.review_export_refs[0]), true);
+      assert.equal(forwarded.pending_handoff_review_binding.upstream_review_refs.includes(screenshot.review_export_refs[0]), true);
+      assert.equal(forwarded.pending_handoff_review_binding.export_artifact_refs.includes(exported.export_bundle.pptx_file), true);
       assert.equal(exported.owner_receipt_refs.includes(proposal.proposal_candidate.proposal_ref), false);
       assert.deepEqual(forwarded.accept_reject_receipt_refs, []);
     });

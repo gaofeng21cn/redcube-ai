@@ -13,6 +13,7 @@ import {
   runtimeWatch,
 } from './product-domain-action-test-api.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
+import { applyFormalPackageReviewCloseoutForTest } from './helpers/route-attempt-test-api.ts';
 import { withMockCodexRuntime } from './mock-codex-cli.js';
 
 async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes) {
@@ -20,6 +21,7 @@ async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes)
     const result = await runDeliverableRoute({ workspaceRoot, overlay, topicId, deliverableId, route });
     assert.equal(result.ok, true, `${overlay}:${route}`);
   }
+  await applyFormalPackageReviewCloseoutForTest({ workspaceRoot, overlay, topicId, deliverableId });
 }
 
 test('direct-delivery families keep operator handoff on audit/review/projection while runtimeWatch stays refs-only', async () => {

@@ -334,14 +334,6 @@ export function createPptDeckRuntimeCore() {
     return contract?.lifecycle_model?.review_overlay_routes?.[route] || null;
   }
 
-  function refSegment(value, fallback) {
-    return safeText(value, fallback).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || fallback;
-  }
-
-  function routeOwnerReceiptRef(route, contract) {
-    return `rca-owner-receipt:visual-stage:ppt_deck:${refSegment(route, 'route')}:${refSegment(contract?.deliverable_id, 'deliverable')}`;
-  }
-
   function attachCommon(route, contract, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
     return {
       route,
@@ -352,7 +344,7 @@ export function createPptDeckRuntimeCore() {
       lifecycle_stage: lifecycleStageForRoute(contract, route),
       review_overlay: reviewOverlayForRoute(contract, route),
       execution_model: generationRuntime?.execution_model || executionModelForAdapter(adapter),
-      owner_receipt_refs: [routeOwnerReceiptRef(route, contract)],
+      owner_receipt_refs: [],
       typed_blocker_refs: [],
     };
   }

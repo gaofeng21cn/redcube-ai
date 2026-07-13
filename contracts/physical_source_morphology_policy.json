@@ -699,13 +699,15 @@
       ],
       "legacy_name_allowance": {
         "legacy_terms": [
-          "runtime"
+          "runtime",
+          "session"
         ],
         "allowed_as": [
           "visual_route_runtime_family_implementation",
-          "package_protocol_boundary"
+          "package_protocol_boundary",
+          "provider_thread_identity_context_isolation_evidence"
         ],
-        "rationale": "runtime-local family source roots implement RCA visual route families and the direct registry for those route handlers; they cannot own generic runtime, session, workbench, attempt ledger, scheduler, review/repair transport, or generated wrapper surfaces.",
+        "rationale": "runtime-local family source roots implement RCA visual route families and may record provider thread/session identity only as non-authoritative context-isolation evidence. They cannot own generic runtime, session storage or lifecycle, workbench, attempt ledger, scheduler, review/repair transport, or generated wrapper surfaces.",
         "compatibility_alias_allowed": false,
         "callable_alias_allowed": false,
         "public_identity_allowed": false,

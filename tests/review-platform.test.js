@@ -7,12 +7,18 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import {
   applyReviewMutation,
   createDeliverable,
+  dispatchDomainHandler,
   getPublicationProjection,
   getReviewState,
   runDeliverableRoute,
   runtimeWatch,
 } from './product-domain-action-test-api.js';
+import { persistReviewStatePatch } from '@redcube/governance';
 import { withMockCodexRuntime } from './mock-codex-cli.js';
+import {
+  applyFormalPackageReviewCloseoutForTest,
+  prepareFormalPackageReviewEvidenceForTest,
+} from './helpers/route-attempt-test-api.ts';
 
 const TOPIC_ID = 'topic-a';
 const XHS_SHARED_STATE_TOPIC_ID = 'topic-shared-state';
@@ -20,7 +26,6 @@ const ROUTES_BY_OVERLAY = {
   ppt_deck: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review'],
   xiaohongshu: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review', 'publish_copy'],
 };
-
 function createWorkspaceRoot(prefix = 'redcube-review-platform-') {
   return mkdtempSync(path.join(os.tmpdir(), prefix));
 }
@@ -68,6 +73,7 @@ async function createReviewReadyDeliverable({
     goal,
   });
   await runAllReviewRoutes({ workspaceRoot, overlay, topicId, deliverableId, mode, baselineDeliverableId });
+  await applyFormalPackageReviewCloseoutForTest({ workspaceRoot, overlay, topicId, deliverableId });
 }
 
 async function buildXhsBaselineCandidateFixture(workspaceRoot) {
@@ -137,6 +143,153 @@ async function createPreparedWorkspace(name, buildFixture) {
   return workspaceRoot;
 }
 
+test('package handoff keeps review debt non-blocking and reserves hard stops for exact-byte identity conflicts', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = createWorkspaceRoot('redcube-review-platform-handoff-authority-');
+    const deliverableId = 'deck-authority';
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: TOPIC_ID,
+      deliverableId,
+      title: 'Handoff authority deck',
+      goal: '验证 Review 质量债与 exact-byte identity authority 边界',
+    });
+    await runAllReviewRoutes({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: TOPIC_ID,
+      deliverableId,
+    });
+    const evidence = await prepareFormalPackageReviewEvidenceForTest({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: TOPIC_ID,
+      deliverableId,
+    });
+
+    const reviewDebt = await dispatchDomainHandler({
+      task: {
+        ...evidence.ownerReceiptTask,
+        receipt_id: 'review-quality-debt',
+        formal_review_receipt: {
+          ...evidence.formalReviewReceipt,
+          verdict: 'quality_debt',
+        },
+      },
+    });
+    assert.equal(reviewDebt.ok, true);
+    assert.equal(reviewDebt.result_surface.ok, false);
+    assert.equal(reviewDebt.result_surface.return_shape, 'quality_debt');
+    assert.equal(reviewDebt.result_surface.receipt_issued, false);
+    assert.equal(reviewDebt.result_surface.quality_debt.blocks_stage_transition, false);
+    assert.equal(reviewDebt.result_surface.quality_debt.next_stage_may_start, true);
+    assert.equal(reviewDebt.result_surface.quality_debt.blocks_quality_export_publication_or_ready_claims, true);
+
+    const mismatchedReviewHash = await dispatchDomainHandler({
+      task: {
+        ...evidence.ownerReceiptTask,
+        receipt_id: 'review-hash-mismatch',
+        formal_review_receipt: {
+          ...evidence.formalReviewReceipt,
+          reviewed_artifact_hashes: evidence.formalReviewReceipt.reviewed_artifact_hashes
+            .map((hash, index) => index === 0 ? '0'.repeat(64) : hash),
+        },
+      },
+    });
+    assert.equal(mismatchedReviewHash.result_surface.return_shape, 'typed_blocker');
+    assert.equal(mismatchedReviewHash.result_surface.blocker_kind, 'stale_or_mismatched_stage_identity');
+    assert.equal(
+      mismatchedReviewHash.result_surface.identity_mismatch_reasons.includes('formal_review_hashes_do_not_match_candidate'),
+      true,
+    );
+
+    const mismatchedSizeIdentity = {
+      ...evidence.identityReceipt,
+      exact_artifact_ref_metadata: evidence.exactArtifactMetadata.map((entry, index) => (
+        index === 0 ? { ...entry, size_bytes: entry.size_bytes + 1 } : entry
+      )),
+    };
+    const mismatchedCurrentSize = await dispatchDomainHandler({
+      task: {
+        ...evidence.ownerReceiptTask,
+        receipt_id: 'current-size-mismatch',
+        artifact_identity_receipt: mismatchedSizeIdentity,
+      },
+    });
+    assert.equal(mismatchedCurrentSize.result_surface.return_shape, 'typed_blocker');
+    assert.equal(mismatchedCurrentSize.result_surface.blocker_kind, 'stale_or_mismatched_stage_identity');
+    assert.equal(
+      mismatchedCurrentSize.result_surface.identity_mismatch_reasons
+        .some((reason) => reason.startsWith('artifact_size_changed:')),
+      true,
+    );
+
+    const closeoutBase = {
+      surface_kind: 'rca_handoff_review_closeout',
+      attempt_role: 'reviewer',
+      reviewer_session_ref: evidence.reviewerSessionRef,
+      producer_session_refs: [evidence.producerSessionRef],
+      no_context_inheritance: true,
+      artifact_identity_receipt_refs: evidence.identityReceiptRefs,
+      reviewed_artifact_ref_metadata: evidence.exactArtifactMetadata,
+      review_receipt_refs: [evidence.reviewReceiptRef],
+    };
+    const fakeOwnerReceiptCloseout = {
+      ...closeoutBase,
+      status: 'pass',
+      owner_receipt_refs: ['rca-owner-receipt:fake-without-body'],
+    };
+    const fakeOwnerResult = persistReviewStatePatch({
+      workspaceRoot,
+      topicId: TOPIC_ID,
+      deliverableId,
+      patch: {
+        current_status: 'export_ready',
+        ready_for_export: true,
+        latest_review_stage: 'export_pptx',
+        pending_reviews: [],
+        handoff_review_closeout: fakeOwnerReceiptCloseout,
+      },
+    });
+    assert.equal(fakeOwnerResult.state.ready_for_export, false);
+    assert.equal(fakeOwnerResult.state.pending_reviews.includes('final_byte_handoff_review'), true);
+    assert.equal(fakeOwnerResult.state.handoff_review_validation.reasons.includes('domain_owner_receipt_body_missing'), true);
+    assert.deepEqual(fakeOwnerResult.state.handoff_review_closeout, fakeOwnerReceiptCloseout);
+
+    const failedReviewCloseout = {
+      ...closeoutBase,
+      status: 'quality_debt',
+      owner_receipt_refs: [],
+    };
+    const failedReviewResult = persistReviewStatePatch({
+      workspaceRoot,
+      topicId: TOPIC_ID,
+      deliverableId,
+      patch: {
+        current_status: 'completed_with_quality_debt',
+        ready_for_export: false,
+        latest_review_stage: 'export_pptx',
+        pending_reviews: [],
+        handoff_review_closeout: failedReviewCloseout,
+      },
+    });
+    assert.equal(failedReviewResult.state.ready_for_export, false);
+    assert.equal(
+      failedReviewResult.state.handoff_review_validation.reasons.includes('decisive_handoff_review_not_passed'),
+      true,
+    );
+    assert.deepEqual(failedReviewResult.state.handoff_review_closeout, failedReviewCloseout);
+    const failedHistory = readFileSync(failedReviewResult.history_file, 'utf-8')
+      .trim()
+      .split('\n')
+      .filter(Boolean)
+      .map((line) => JSON.parse(line));
+    assert.deepEqual(failedHistory.at(-1)?.patch?.handoff_review_closeout, failedReviewCloseout);
+  });
+});
+
 test('platform review state tracks pending revisions and rerun loop for ppt_deck', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = await createPreparedWorkspace('ppt-baseline-candidate', buildPptBaselineCandidateFixture);
@@ -183,6 +336,14 @@ test('platform review state tracks pending revisions and rerun loop for ppt_deck
     assert.equal(authorImagePages.ok, true, JSON.stringify(authorImagePages));
     assert.equal((await runDeliverableRoute({ workspaceRoot, overlay: 'ppt_deck', topicId: TOPIC_ID, deliverableId: 'deck-candidate', route: 'visual_director_review' })).ok, true);
     assert.equal((await runDeliverableRoute({ workspaceRoot, overlay: 'ppt_deck', topicId: TOPIC_ID, deliverableId: 'deck-candidate', route: 'screenshot_review' })).ok, true);
+    await applyFormalPackageReviewCloseoutForTest({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: TOPIC_ID,
+      deliverableId: 'deck-candidate',
+      attemptRole: 're_reviewer',
+      qualityRoundIndex: 1,
+    });
 
     const rerunState = await getReviewState({ workspaceRoot, topicId: TOPIC_ID, deliverableId: 'deck-candidate' });
     assert.equal(rerunState.state.current_status, 'export_ready');

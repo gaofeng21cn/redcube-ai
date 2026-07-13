@@ -150,34 +150,6 @@ function fileMtimeMs(file) {
   return Number(statSync(file).mtimeMs || 0);
 }
 
-function assertOplRouteAttemptBoundary(oplRouteAttemptIndex) {
-  const index = oplRouteAttemptIndex && typeof oplRouteAttemptIndex === 'object' && !Array.isArray(oplRouteAttemptIndex)
-    ? oplRouteAttemptIndex
-    : null;
-  const providerAttemptRef = safeText(index?.provider_attempt_ref || index?.providerAttemptRef);
-  const providerAttemptLedgerRef = safeText(index?.provider_attempt_ledger_ref || index?.providerAttemptLedgerRef);
-  const stageAttemptRef = safeText(index?.stage_attempt_ref || index?.stageAttemptRef || index?.opl_stage_attempt_ref || index?.oplStageAttemptRef);
-  const attemptLeaseRef = safeText(index?.attempt_lease_ref || index?.attemptLeaseRef || index?.lease_ref || index?.leaseRef);
-  const attemptReceiptRef = safeText(index?.attempt_receipt_ref || index?.attemptReceiptRef || index?.closeout_receipt_ref || index?.closeoutReceiptRef);
-  if (
-    safeText(index?.provider_attempt_owner || index?.providerAttemptOwner || index?.owner) === 'one-person-lab'
-    && providerAttemptRef
-    && providerAttemptLedgerRef
-    && (stageAttemptRef || attemptLeaseRef || attemptReceiptRef)
-  ) {
-    return;
-  }
-  if (safeText(index?.status) === 'missing_quality_debt') {
-    return;
-  }
-  const error = new Error('RCA local deliverable route helper requires OPL-owned stage attempt, lease, or receipt evidence');
-  error.code = 'missing_opl_stage_attempt';
-  error.failure_kind = 'typed_blocker';
-  error.blocking_reasons = ['opl_stage_attempt_or_lease_or_receipt_ref'];
-  error.recommended_action = 'submit_route_to_opl_stage_attempt_or_record_domain_owned_typed_blocker';
-  throw error;
-}
-
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
@@ -429,14 +401,11 @@ function refSegment(value, fallback) {
   return safeText(value, fallback).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || fallback;
 }
 
-function ownerReceiptRefsForRoute({ artifact, overlay, route, deliverableId }) {
-  if (['block', 'failed', 'completed_with_quality_debt'].includes(artifact?.status)) return [];
-  const explicitRefs = uniqueStrings([
-    ...safeArray(artifact?.owner_receipt_refs),
-    ...safeArray(artifact?.receipt_refs),
+function artifactIdentityReceiptRefsForRoute(artifact) {
+  return uniqueStrings([
+    ...safeArray(artifact?.artifact_identity_receipt_refs),
+    safeText(artifact?.artifact_identity_receipt?.receipt_ref),
   ]);
-  if (explicitRefs.length > 0) return explicitRefs;
-  return [`rca-owner-receipt:visual-stage:${refSegment(overlay, 'overlay')}:${refSegment(route, 'route')}:${refSegment(deliverableId, 'deliverable')}`];
 }
 
 function qualityDebtRefsForRoute({ artifact, overlay, route, deliverableId }) {
@@ -474,6 +443,7 @@ function attachRouteArtifactCloseoutRefs({ artifact, overlay, route, deliverable
     return {
       ...artifact,
       owner_receipt_refs: [],
+      artifact_identity_receipt_refs: artifactIdentityReceiptRefsForRoute(artifact),
       typed_blocker_refs: uniqueStrings([
         ...safeArray(artifact?.typed_blocker_refs),
         ...safeArray(artifact?.blocker_refs),
@@ -483,7 +453,8 @@ function attachRouteArtifactCloseoutRefs({ artifact, overlay, route, deliverable
   }
   return {
     ...artifact,
-    owner_receipt_refs: ownerReceiptRefsForRoute({ artifact, overlay, route, deliverableId }),
+    owner_receipt_refs: [],
+    artifact_identity_receipt_refs: artifactIdentityReceiptRefsForRoute(artifact),
     quality_debt_refs: qualityDebtRefsForRoute({ artifact, overlay, route, deliverableId }),
     typed_blocker_refs: [],
   };
@@ -514,7 +485,8 @@ export function refreshStageFolderRouteArtifact({
     artifactFile,
     outputName: path.basename(artifactFile),
     requiredOutputs: [path.basename(artifactFile)],
-    ownerReceiptRefs: ownerReceiptRefsForRoute({ artifact, overlay, route, deliverableId }),
+    ownerReceiptRefs: [],
+    artifactIdentityReceiptRefs: artifactIdentityReceiptRefsForRoute(artifact),
     qualityDebtRefs: qualityDebtRefsForRoute({ artifact, overlay, route, deliverableId }),
     typedBlockerRefs: typedBlockerRefsForRoute({ artifact }),
     blockingReasons: safeArray(artifact?.blocking_reasons),
@@ -784,7 +756,6 @@ export async function executeDeliverableRouteLocally({
   oplRouteAttemptIndex = null,
   runId = null,
 }) {
-  assertOplRouteAttemptBoundary(oplRouteAttemptIndex);
   const { safeRoute } = validateDeliverableRouteInput({
     workspaceRoot,
     overlay,
@@ -902,6 +873,7 @@ export async function executeDeliverableRouteLocally({
       route: safeRoute,
       deliverableId,
       artifact: repeatedBlockArtifact,
+      attemptRole: safeText(oplRouteAttemptIndex?.attempt_role || oplRouteAttemptIndex?.attemptRole),
     });
     mkdirSync(path.dirname(artifactFile), { recursive: true });
     writeFileSync(artifactFile, JSON.stringify(closeoutArtifact, null, 2), 'utf-8');
@@ -966,6 +938,7 @@ export async function executeDeliverableRouteLocally({
     route: safeRoute,
     deliverableId,
     artifact: routeArtifact,
+    attemptRole: safeText(oplRouteAttemptIndex?.attempt_role || oplRouteAttemptIndex?.attemptRole),
   });
 
   mkdirSync(path.dirname(artifactFile), { recursive: true });

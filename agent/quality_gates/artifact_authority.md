@@ -9,3 +9,4 @@ Gate rules:
 - Native helpers may materialize artifacts, manifests, screenshots, PPTX/PDF, PNG sequences, and package directories.
 - Generated OPL surfaces may consume artifact refs; they cannot store artifact bodies or authorize artifact mutation.
 - Export preview cache refs and preserved slide hashes are evidence refs only; final export artifacts still require RCA export gate refs and artifact locator refs.
+- Final handoff candidates must preserve exact file hashes and render/package readback evidence across repair. Producer/repairer artifact-identity receipts do not authorize ready claims. A fresh reviewer/re-reviewer supplies the decisive exact-byte outcome; the OPL controller must bind it into a formal Review receipt before RCA owner authority may sign accepted final bytes or any ready claim.

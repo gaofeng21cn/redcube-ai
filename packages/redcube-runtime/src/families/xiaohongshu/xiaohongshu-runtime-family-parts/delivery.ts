@@ -3,6 +3,11 @@ import path from 'node:path';
 import { existsSync } from 'node:fs';
 
 import { createXiaohongshuDeliveryExportHelpers } from './delivery-export-helpers.js';
+import {
+  FINAL_BYTE_HANDOFF_REVIEW,
+  OUTPUT_CANDIDATE_PENDING_REVIEW,
+  buildPackageCandidateCloseout,
+} from '../../../package-handoff-contract.js';
 
 export function createXiaohongshuDeliveryParts(deps) {
   const {
@@ -143,10 +148,25 @@ export function createXiaohongshuDeliveryParts(deps) {
       '',
       hashtags.join(' '),
     ].join('\n'));
+    const qualityDebtReasons = qualityGate.gate_pass ? [] : ['platform_copy_complete'];
+    const artifactRefs = [...candidateSurfaceRefs, captionFile];
+    const closeout = buildPackageCandidateCloseout({
+      family: 'xiaohongshu',
+      route: 'publish_copy',
+      deliverableId: deliverablePaths.deliverableId,
+      artifactRefs,
+    });
     return {
       ...attachCommon('publish_copy', contract, generationRuntime, adapter),
+      ...closeout,
       creative_execution: creativeExecution('publish_copy', generationRuntime, adapter),
-      status: qualityGate.gate_pass ? 'pass' : 'block',
+      status: qualityGate.gate_pass ? 'completed' : 'completed_with_quality_debt',
+      quality_debt: qualityDebtReasons.length > 0 ? {
+        status: 'recorded_non_blocking',
+        reasons: qualityDebtReasons,
+        blocks_stage_transition: false,
+        blocks_ready_claims: true,
+      } : null,
       publish_copy: {
         titles: hydratedTitles,
         body,
@@ -219,20 +239,20 @@ export function createXiaohongshuDeliveryParts(deps) {
           }),
         },
       },
-      artifact_refs: [...candidateSurfaceRefs, captionFile],
+      artifact_refs: artifactRefs,
       review_state_patch: {
-        current_status: qualityGate.gate_pass ? 'publish_ready' : 'blocked_for_revision',
-        ready_for_export: qualityGate.gate_pass,
+        current_status: qualityGate.gate_pass ? 'package_review_pending' : 'completed_with_quality_debt',
+        ready_for_export: false,
         latest_review_stage: 'publish_copy',
         latest_checks: {
           platform_copy_complete: qualityGate.gate_pass,
           cta_clear: qualityGate.interaction_question_count >= 1,
         },
-        pending_reviews: qualityGate.gate_pass ? [] : ['platform_copy_complete'],
-        blocking_reasons: qualityGate.gate_pass ? [] : ['platform_copy_complete'],
+        pending_reviews: [FINAL_BYTE_HANDOFF_REVIEW],
+        blocking_reasons: [],
         rerun_from_stage: qualityGate.gate_pass ? null : 'publish_copy',
         rerun_policy: {
-          status: qualityGate.gate_pass ? 'idle' : 'rerun_required',
+          status: qualityGate.gate_pass ? 'awaiting_fresh_review' : 'quality_debt_recorded',
           rerun_from_stage: qualityGate.gate_pass ? null : 'publish_copy',
         },
       },
@@ -273,6 +293,7 @@ export function createXiaohongshuDeliveryParts(deps) {
       ...safeArray(review?.quality_debt_reasons),
       ...safeArray(copy?.quality_debt?.reasons),
       ...safeArray(copy?.quality_debt_reasons),
+      ...(copy?.publish_copy?.quality_gate?.gate_pass === false ? ['publish_copy_quality_gate_not_passed'] : []),
     ].map((reason) => safeText(reason)).filter(Boolean))];
     const stableHtmlFile = imagePagesInput ? '' : getDeliverableViewSurfacePaths(deliverablePaths).stableHtmlFile;
     if (!imagePagesInput && !existsSync(stableHtmlFile)) {
@@ -318,8 +339,8 @@ export function createXiaohongshuDeliveryParts(deps) {
       preview_cache: exportPreviewCacheMetadata(previewCacheStatus, previewHash),
       preview_metrics: previewMetrics,
       delivery_state: {
-        current: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : 'output_ready',
-        next: 'published_pending_human',
+        current: qualityDebtReasons.length > 0 ? 'output_available_with_quality_debt' : OUTPUT_CANDIDATE_PENDING_REVIEW,
+        next: FINAL_BYTE_HANDOFF_REVIEW,
       },
       quality_debt_reasons: qualityDebtReasons,
     };
@@ -336,8 +357,34 @@ export function createXiaohongshuDeliveryParts(deps) {
       authorSignature: copy.publish_copy.author_signature || null,
       deliveryState: exportBundle.delivery_state,
     }));
+    const seriesSurfaces = computeSeriesSurfaces(contract, deliverablePaths, exportBundle);
+    const artifactRefs = [
+      manifestFile,
+      publishManifestFile,
+      publishReadmeFile,
+      ...Object.values(seriesSurfaces || {}),
+      ...(stableHtmlFile ? [stableHtmlFile] : []),
+      ...(imagePagesInput ? safeArray(sourceArtifacts?.png_files) : [publishHtmlFile]),
+      ...safeArray(sourceArtifacts?.prompt_manifest_files),
+      ...safeArray(sourceArtifacts?.style_manifest_files),
+      copy.publish_copy.caption_file,
+      publishCaptionFile,
+      ...pngFiles,
+      ...publishPngFiles,
+    ].filter(Boolean);
+    const closeout = buildPackageCandidateCloseout({
+      family: 'xiaohongshu',
+      route: 'export_bundle',
+      deliverableId: deliverablePaths.deliverableId,
+      artifactRefs,
+      upstreamReviewRefs: [
+        ...safeArray(review?.review_export_refs),
+        ...safeArray(review?.owner_receipt_refs),
+      ],
+    });
     return {
       ...attachCommon('export_bundle', contract, null, adapter),
+      ...closeout,
       status: qualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'completed',
       quality_debt: qualityDebtReasons.length > 0 ? {
         status: 'recorded_non_blocking',
@@ -346,33 +393,21 @@ export function createXiaohongshuDeliveryParts(deps) {
         blocks_ready_claims: true,
       } : null,
       export_bundle: exportBundle,
-      series_surfaces: computeSeriesSurfaces(contract, deliverablePaths, exportBundle),
-      artifact_refs: [
-        manifestFile,
-        publishManifestFile,
-        publishReadmeFile,
-        ...(stableHtmlFile ? [stableHtmlFile] : []),
-        ...(imagePagesInput ? safeArray(sourceArtifacts?.png_files) : [publishHtmlFile]),
-        ...safeArray(sourceArtifacts?.prompt_manifest_files),
-        ...safeArray(sourceArtifacts?.style_manifest_files),
-        copy.publish_copy.caption_file,
-        publishCaptionFile,
-        ...pngFiles,
-        ...publishPngFiles,
-      ].filter(Boolean),
+      series_surfaces: seriesSurfaces,
+      artifact_refs: artifactRefs,
       review_state_patch: {
-        current_status: qualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'publish_ready',
-        ready_for_export: qualityDebtReasons.length === 0,
+        current_status: qualityDebtReasons.length > 0 ? 'completed_with_quality_debt' : 'package_review_pending',
+        ready_for_export: false,
         latest_review_stage: 'export_bundle',
         latest_checks: {
           platform_copy_complete: true,
           cta_clear: true,
         },
-        pending_reviews: [],
+        pending_reviews: [FINAL_BYTE_HANDOFF_REVIEW],
         blocking_reasons: [],
         rerun_from_stage: null,
         rerun_policy: {
-          status: 'idle',
+          status: qualityDebtReasons.length > 0 ? 'quality_debt_recorded' : 'awaiting_fresh_review',
           rerun_from_stage: null,
         },
       },

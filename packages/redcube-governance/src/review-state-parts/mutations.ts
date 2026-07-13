@@ -13,7 +13,51 @@ import {
   safeReadJson,
   writeState,
 } from './state-io.js';
-import { buildQualitySummary, stageArtifactPath } from './freshness-gates.js';
+import {
+  buildQualitySummary,
+  evaluateDecisiveHandoffReview,
+  stageArtifactPath,
+} from './freshness-gates.js';
+
+const FINAL_BYTE_HANDOFF_REVIEW = 'final_byte_handoff_review';
+
+function enforcePackageHandoffReviewAuthority({ previous, patch, contract, deliverablePaths }) {
+  const requiredExportRoute = String(contract?.delivery_contract?.required_export_route || '').trim();
+  if (!requiredExportRoute || String(patch?.latest_review_stage || '').trim() !== requiredExportRoute) {
+    return patch;
+  }
+  const deliveryArtifact = safeReadJson(stageArtifactPath(contract, deliverablePaths, requiredExportRoute));
+  const candidateReceiptRefs = normalizeList(deliveryArtifact?.artifact_identity_receipt_refs);
+  const candidateState = {
+    ...previous,
+    ...patch,
+    handoff_review_closeout: patch?.handoff_review_closeout || null,
+  };
+  const decision = evaluateDecisiveHandoffReview({
+    deliveryArtifact,
+    reviewState: candidateState,
+  });
+  if (patch?.ready_for_export === true && decision.passed) {
+    return {
+      ...patch,
+      artifact_identity_receipt_refs: candidateReceiptRefs,
+      handoff_review_validation: decision,
+      pending_reviews: normalizeList(patch?.pending_reviews)
+        .filter((review) => review !== FINAL_BYTE_HANDOFF_REVIEW),
+    };
+  }
+  return {
+    ...patch,
+    ready_for_export: false,
+    artifact_identity_receipt_refs: candidateReceiptRefs,
+    handoff_review_closeout: patch?.handoff_review_closeout || null,
+    handoff_review_validation: decision,
+    pending_reviews: [...new Set([
+      ...normalizeList(patch?.pending_reviews),
+      FINAL_BYTE_HANDOFF_REVIEW,
+    ])],
+  };
+}
 
 function deriveArtifactGovernanceState({ previous, patch, contract }) {
   const approvalRequired = Boolean(contract?.delivery_contract?.human_gate?.required);
@@ -106,24 +150,27 @@ export function persistReviewStatePatch({
     ? JSON.parse(readFileSync(file, 'utf-8'))
     : defaultState({ contract, topicId, deliverableId });
 
+  const effectivePatch = source === 'artifact'
+    ? enforcePackageHandoffReviewAuthority({ previous, patch, contract, deliverablePaths })
+    : patch;
   const artifactGovernanceState = source === 'artifact'
-    ? deriveArtifactGovernanceState({ previous, patch, contract })
+    ? deriveArtifactGovernanceState({ previous, patch: effectivePatch, contract })
     : null;
 
   const next = {
     ...previous,
-    ...patch,
-    pending_reviews: patch.pending_reviews !== undefined ? normalizeList(patch.pending_reviews) : previous.pending_reviews,
-    blocking_reasons: patch.blocking_reasons !== undefined ? normalizeList(patch.blocking_reasons) : previous.blocking_reasons,
-    rerun_from_stage: Object.hasOwn(patch, 'rerun_from_stage') ? patch.rerun_from_stage : previous.rerun_from_stage,
-    latest_checks: patch.latest_checks ? { ...patch.latest_checks } : previous.latest_checks,
-    baseline: patch.baseline ? { ...(previous.baseline || {}), ...patch.baseline } : previous.baseline,
-    rerun_policy: patch.rerun_policy ? { ...(previous.rerun_policy || {}), ...patch.rerun_policy } : previous.rerun_policy,
-    approval_state: patch.approval_state
-      ? { ...(previous.approval_state || {}), ...patch.approval_state }
+    ...effectivePatch,
+    pending_reviews: effectivePatch.pending_reviews !== undefined ? normalizeList(effectivePatch.pending_reviews) : previous.pending_reviews,
+    blocking_reasons: effectivePatch.blocking_reasons !== undefined ? normalizeList(effectivePatch.blocking_reasons) : previous.blocking_reasons,
+    rerun_from_stage: Object.hasOwn(effectivePatch, 'rerun_from_stage') ? effectivePatch.rerun_from_stage : previous.rerun_from_stage,
+    latest_checks: effectivePatch.latest_checks ? { ...effectivePatch.latest_checks } : previous.latest_checks,
+    baseline: effectivePatch.baseline ? { ...(previous.baseline || {}), ...effectivePatch.baseline } : previous.baseline,
+    rerun_policy: effectivePatch.rerun_policy ? { ...(previous.rerun_policy || {}), ...effectivePatch.rerun_policy } : previous.rerun_policy,
+    approval_state: effectivePatch.approval_state
+      ? { ...(previous.approval_state || {}), ...effectivePatch.approval_state }
       : (artifactGovernanceState?.approval_state || previous.approval_state),
-    publish_state: patch.publish_state
-      ? { ...(previous.publish_state || {}), ...patch.publish_state }
+    publish_state: effectivePatch.publish_state
+      ? { ...(previous.publish_state || {}), ...effectivePatch.publish_state }
       : (artifactGovernanceState?.publish_state || previous.publish_state),
     last_updated_at: nowIso(),
   };
@@ -138,7 +185,7 @@ export function persistReviewStatePatch({
   appendHistory(historyFile, {
     timestamp: next.last_updated_at,
     source,
-    patch,
+    patch: effectivePatch,
   });
   const publicationStateFile = rebuildPublicationProjection({ workspaceRoot, topicId });
   return {

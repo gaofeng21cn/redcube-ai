@@ -14,7 +14,7 @@ Canonical policy:
 - Treat authoring, visual review, repair, and re-review as one `artifact_creation` quality cycle, not as additional top-level stages.
 - Use a new OPL StageAttempt and a fresh Codex thread for each formal role: `producer`, `reviewer`, `repairer`, and `re_reviewer`. Never resume the producer thread for Review.
 - A producer-thread write-after-check is only `in_thread_refinement`; it cannot issue a Review receipt or close a formal quality gate.
-- Preserve the professional evidence order: candidate -> render/mechanical evidence -> independent visual-director review -> independent screenshot review -> targeted repair -> rerender -> fresh re-review.
+- Preserve the professional evidence order across the bounded quality cycle: candidate -> render/mechanical evidence -> visual-director QA -> screenshot QA -> targeted repair -> rerender -> fresh re-review. Visual-director and screenshot helper calls inside one reviewer/re-reviewer Attempt are `in_attempt_visual_qa`, not additional Attempts or formal Reviews; they return evidence and findings but never materialize a Review receipt.
 - Formal reviewers receive only exact artifact/source refs, hashes, quality rubrics, necessary lineage, and prior findings for re-review. They do not receive producer conversation history.
 - A repair round is one repairer Attempt plus one fresh re-reviewer Attempt. Stop after three repair rounds, select the best consumable artifact, and record `completed_with_quality_debt` when defects remain.
 

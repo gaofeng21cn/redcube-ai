@@ -499,7 +499,7 @@ export interface XhsRuntimePromptMeta {
 }
 
 export interface XhsRuntimeReviewPolicy {
-  status: 'idle' | 'rerun_required';
+  status: 'idle' | 'rerun_required' | 'awaiting_fresh_review' | 'quality_debt_recorded';
   rerun_from_stage: XhsRuntimeRoute | null;
 }
 
@@ -643,7 +643,7 @@ export interface XhsScreenshotReviewArtifact extends XhsRuntimeArtifactBase {
 
 export interface XhsPublishCopyArtifact extends XhsRuntimeArtifactBase {
   route: 'publish_copy';
-  status: 'pass' | 'block';
+  status: 'completed' | 'completed_with_quality_debt';
   publish_copy: {
     titles: string[];
     body: string;
@@ -756,7 +756,7 @@ export interface XhsSeriesSurfaces {
 
 export interface XhsExportBundleArtifact extends XhsRuntimeArtifactBase {
   route: 'export_bundle';
-  status: 'completed';
+  status: 'completed' | 'completed_with_quality_debt';
   export_bundle: {
     source_surface_kind?: 'image_pages' | 'html';
     source_visual_route?: 'author_image_pages' | 'repair_image_pages' | 'render_html' | 'fix_html';
@@ -773,8 +773,8 @@ export interface XhsExportBundleArtifact extends XhsRuntimeArtifactBase {
     publish_png_files?: string[];
     publish_image_files?: string[];
     delivery_state: {
-      current: 'output_ready';
-      next: 'published_pending_human';
+      current: 'output_candidate_pending_review' | 'output_available_with_quality_debt';
+      next: 'final_byte_handoff_review';
     };
   };
   series_surfaces: XhsSeriesSurfaces | null;

@@ -500,7 +500,7 @@ export function buildPublishBundleReadme({
   const lines = [
     '# publish 交付包',
     '',
-    `- 当前 publish 包状态：${safeText(deliveryState?.current, 'output_ready')}`,
+    `- 当前 publish 包状态：${safeText(deliveryState?.current, 'output_candidate_pending_review')}`,
     `- Source surface：${safeText(sourceSurfaceKind, 'html')}`,
     `- Source visual route：${safeText(sourceVisualRoute)}`,
     ...(safeText(publishHtmlFile) ? [`- HTML：${path.basename(publishHtmlFile)}`] : []),

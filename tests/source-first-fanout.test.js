@@ -132,6 +132,6 @@ test('source-first fanout prepares one shared source pack then returns OPL stage
     );
     assert.deepEqual(
       deckPlan.stage_attempts.find((stageRun) => stageRun.stage_id === 'package_and_handoff').attempt_roles,
-      ['producer'],
+      ['producer', 'reviewer', 'repairer', 're_reviewer'],
     );
 });

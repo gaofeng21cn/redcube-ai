@@ -316,11 +316,31 @@ test('xiaohongshu image-first workflow publishes and exports real files', async 
     });
     assert.equal(exportResult.ok, true);
     const bundle = readJson(exportResult.artifactFile);
-    assert.equal(bundle.export_bundle.delivery_state.current, 'output_ready');
+    assert.equal(bundle.export_bundle.delivery_state.current, 'output_candidate_pending_review');
     assert.equal(bundle.export_bundle.publish_image_files.every((file) => existsSync(file)), true);
     assert.equal(existsSync(bundle.export_bundle.caption_file), true);
     assert.equal(Object.hasOwn(bundle, 'publication_state_file'), false);
     assert.equal(existsSync(bundle.series_surfaces.delivery_overview_file), true);
+
+    const repairedExportResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId,
+      route: 'export_bundle',
+      runId: `${deliverableId}/export_bundle/repair-1`,
+      attemptRole: 'repairer',
+      qualityRoundIndex: 1,
+      userIntent: 'Rebuild package bytes and manifest refs for the required package repair round.',
+    });
+    assert.equal(repairedExportResult.ok, true);
+    assert.equal(repairedExportResult.run.cross_provider_attempt_index.attempt_role, 'repairer');
+    assert.equal(repairedExportResult.run.cross_provider_attempt_index.quality_round_index, 1);
+    assert.equal(repairedExportResult.run.cross_provider_attempt_index.no_context_inheritance, true);
+    const repairedBundle = readJson(repairedExportResult.artifactFile);
+    assert.equal(repairedBundle.stage_quality_attempt.attempt_role, 'repairer');
+    assert.equal(repairedBundle.stage_quality_attempt.quality_round_index, 1);
+    assert.equal(repairedBundle.stage_quality_attempt.no_context_inheritance, true);
   });
 });
 

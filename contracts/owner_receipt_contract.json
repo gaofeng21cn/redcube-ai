@@ -5,6 +5,7 @@
   "contract_model": "domain_receipt_typed_blocker_no_regression_refs_only",
   "allowed_return_shapes": [
     "domain_receipt",
+    "quality_debt",
     "typed_blocker",
     "no_regression_evidence"
   ],
@@ -16,6 +17,29 @@
     "review_export_ref",
     "forbidden_write_proof_ref"
   ],
+  "formal_stage_review_handoff_policy": {
+    "package_ready_claim_sequence": [
+      "terminal_reviewer_or_re_reviewer_outcome",
+      "opl_stage_run_controller_materializes_formal_review_receipt",
+      "rca_owner_receipt_authority_validates_domain_refs_and_signs",
+      "ready_projection_consumes_review_and_owner_receipts"
+    ],
+    "terminal_attempt_output_field": "route_impact.stage_quality_cycle.outcome",
+    "review_receipt_verdict_materialization_owner": "opl_stage_run_controller",
+    "attempt_role_alone_can_authorize_ready_claim": false,
+    "route_helper_can_issue_owner_receipt": false,
+    "stage_folder_writer_can_issue_owner_receipt": false,
+    "formal_review_receipt_owner": "one-person-lab",
+    "domain_owner_receipt_signer": "domain-handler:dispatch#emit_domain_owner_receipt",
+    "exact_artifact_identity_binding_required": true,
+    "required_owner_authority_inputs": [
+      "formal_review_receipt",
+      "artifact_identity_receipt"
+    ],
+    "ordinary_review_failure_result": "quality_debt_without_owner_receipt",
+    "ordinary_review_failure_blocks_stage_transition": false,
+    "artifact_identity_mismatch_result": "stale_or_mismatched_stage_identity"
+  },
   "efficiency_handoff_owner_projection": {
     "work_order_ref": "oma_developer_patch_work_order_5a1b68cacbd4",
     "projection_ref": "opl_generated:product_entry_manifest#/rca_efficiency_handoff_projection/target_agent_owner_surface_refs/owner_receipt_contract_ref",

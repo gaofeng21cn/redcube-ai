@@ -97,6 +97,12 @@
       "knowledge_refs": ["agent/knowledge/artifact_and_export_authority.md", "agent/knowledge/owner_receipt_policy.md"],
       "quality_gate_refs": ["agent/quality_gates/visual_authority_boundaries.md", "agent/quality_gates/artifact_authority.md", "agent/quality_gates/review_export_memory.md"],
       "stage_quality_cycle_policy_ref": "contracts/stage_quality_cycle_policy.json#/stage_policies/package_and_handoff",
+      "handoff_review_boundary": {
+        "artifact_effect": "new_or_transformed_reviewable_bytes",
+        "freezes_canonical_artifact_bytes": true,
+        "issues_quality_export_publication_or_ready_claim": true,
+        "downstream_owner_retains_acceptance": true
+      },
       "allowed_action_refs": ["invoke_product_entry", "dispatch_domain_handler", "get_product_entry_session", "get_product_entry_manifest", "export_domain_handler"],
       "requires": ["visual_review_artifact_recorded"],
       "ensures": ["export_handoff_artifact_recorded"],
@@ -115,6 +121,9 @@
   "progress_first_policy": {
     "contract_id": "rca.progress_first_stage_admission.v1",
     "route_selection_owner": "codex_cli",
+    "route_selection_owner_scope": "intra_stage_domain_route_only",
+    "cross_stage_decision_owner": "stage_run_decisive_codex_attempt",
+    "route_execution_grants_stage_transition_authority": false,
     "codex_may_advance_skip_repeat_reverse_or_route_back": true,
     "any_declared_stage_may_start_from_any_prior_stage_result": true,
     "declared_requires_are_quality_context_not_launch_gates": true,

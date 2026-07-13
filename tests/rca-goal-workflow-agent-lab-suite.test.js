@@ -262,7 +262,9 @@ test('artifact-producing xiaohongshu goal workflow reaches export bundle without
       assert.equal(exportArtifact.status, 'completed');
       assert.equal(exportArtifact.export_bundle.source_surface_kind, 'image_pages');
       assert.equal(exportArtifact.export_bundle.source_visual_route, 'author_image_pages');
-      assert.equal(exportArtifact.export_bundle.delivery_state.current, 'output_ready');
+      assert.equal(exportArtifact.export_bundle.delivery_state.current, 'output_candidate_pending_review');
+      assert.deepEqual(exportArtifact.owner_receipt_refs, []);
+      assert.equal(exportArtifact.artifact_identity_receipt_refs.length, 1);
       assert.equal(exportArtifact.export_bundle.png_files.length, authorArtifact.image_page_manifest.slides.length);
       assert.equal(exportArtifact.export_bundle.publish_image_files.length, exportArtifact.export_bundle.png_files.length);
       assert.equal(

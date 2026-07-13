@@ -19,9 +19,9 @@ import { createPptDeckScreenshotPreflightParts } from './stage-screenshot-prefli
 import { createPptDeckScreenshotReviewRuntimeParts } from './stage-screenshot-review-runtime.js';
 import { createPptDeckStageReviewScopeParts } from './stage-review-scope.js';
 import {
-  buildPptStageReviewIsolation,
-  buildPptStageReviewReceipt,
-} from './stage-review-isolation.js';
+  buildPptInAttemptVisualQaContext,
+  buildPptInAttemptVisualQaEvidence,
+} from './in-attempt-visual-qa.js';
 
 export function createPptDeckStageParts(deps) {
   const {
@@ -359,11 +359,11 @@ export function createPptDeckStageParts(deps) {
     const targetSlideIds = incrementalReview
       ? safeArray(reviewOptions?.targetSlideIds).map((slideId) => safeText(slideId)).filter(Boolean)
       : [];
-    const reviewIsolation = buildPptStageReviewIsolation({
+    const visualQaContext = buildPptInAttemptVisualQaContext({
       deliverableId: deliverablePaths.deliverableId,
       contract,
       renderArtifact,
-      reviewRoute: 'screenshot_review',
+      qaRoute: 'screenshot_review',
       lineageRefs: ['visual_director_review'],
       priorFindingRefs: safeArray(reviewOptions?.priorReviewArtifact?.review_export_refs),
     });
@@ -458,10 +458,6 @@ export function createPptDeckStageParts(deps) {
           purpose: `Review rendered lecture slide screenshot for ${slide.slide_id}`,
         })),
         cwd: deliverablePaths.deliverableDir,
-        attemptRole: reviewIsolation.attemptRole,
-        producerSessionRefs: reviewIsolation.producerSessionRefs,
-        qualityRoundIndex: reviewIsolation.qualityRoundIndex,
-        contextManifestRef: reviewIsolation.reviewContextManifestRef,
       });
       return {
         aiSlideReviews: normalizePptScreenshotAiSlideReviews(batchData?.slide_reviews, slideBatch),
@@ -496,10 +492,6 @@ export function createPptDeckStageParts(deps) {
       },
       outputContract: screenshotReviewSummaryOutputContract(),
       cwd: deliverablePaths.deliverableDir,
-      attemptRole: reviewIsolation.attemptRole,
-      producerSessionRefs: reviewIsolation.producerSessionRefs,
-      qualityRoundIndex: reviewIsolation.qualityRoundIndex,
-      contextManifestRef: reviewIsolation.reviewContextManifestRef,
     });
     const summaryCall = normalizeStructuredRuntimeCall(generationRuntime, {
       callKind: 'summary',
@@ -513,7 +505,7 @@ export function createPptDeckStageParts(deps) {
         ...batchResults.map((result) => result.generationRuntime),
         summaryCall,
       ]),
-      reviewIsolation,
+      visualQaContext,
     };
   }
 
@@ -617,11 +609,11 @@ export function createPptDeckStageParts(deps) {
         data,
         aiSlideReviews,
         generationRuntime,
-        reviewIsolation = buildPptStageReviewIsolation({
+        visualQaContext = buildPptInAttemptVisualQaContext({
           deliverableId,
           contract,
           renderArtifact,
-          reviewRoute: 'screenshot_review',
+          qaRoute: 'screenshot_review',
         }),
       },
       baselineReview,
@@ -685,20 +677,13 @@ export function createPptDeckStageParts(deps) {
       nextRequiredOwnerAction: rerunFromStage,
       artifactRefs,
     });
-    const reviewReceipt = buildPptStageReviewReceipt({
-      deliverableId,
-      renderArtifact,
+    const inAttemptVisualQa = buildPptInAttemptVisualQaEvidence({
       generationRuntime,
-      reviewIsolation,
+      qaContext: visualQaContext,
       status,
       artifactRefs,
+      repairRoute: rerunFromStage,
     });
-    if (status === 'pass' && !reviewReceipt) {
-      const error = new Error('screenshot_review requires producer/reviewer session lineage before a pass verdict');
-      error.failure_kind = 'stale_or_mismatched_stage_identity';
-      error.hard_stop_kind = 'stale_or_mismatched_stage_identity';
-      throw error;
-    }
     const visualMemoryProposal = normalizeVisualMemoryProposal({
       data,
       status,
@@ -726,9 +711,9 @@ export function createPptDeckStageParts(deps) {
           : [],
       },
       review_overlay: 'screenshot_review',
-      review_context_manifest: reviewIsolation.reviewContextManifest,
-      stage_review_receipt: reviewReceipt,
-      context_isolation_status: reviewReceipt ? 'verified' : 'mechanical_block_without_formal_pass_receipt',
+      in_attempt_visual_qa_context: visualQaContext.context,
+      in_attempt_visual_qa: inAttemptVisualQa,
+      formal_stage_review_completed: false,
       mode,
       status,
       mechanical_cache: mechanicalCacheMetadata(cacheStatus, reviewHash),
@@ -816,8 +801,8 @@ export function createPptDeckStageParts(deps) {
       metrics: reviewPayload.metrics,
       artifact_refs: artifactRefs,
       review_state_patch: {
-        current_status: status === 'pass' ? 'export_ready' : 'blocked_for_revision',
-        ready_for_export: status === 'pass',
+        current_status: status === 'pass' ? 'screenshot_review_passed' : 'blocked_for_revision',
+        ready_for_export: false,
         latest_review_stage: 'screenshot_review',
         latest_checks: latestChecks,
         pending_reviews: failedChecks,

@@ -8,7 +8,10 @@ export const PROGRESS_FIRST_STAGE_POLICY = Object.freeze({
   transition_rule: 'domain_artifact_or_stage_diagnostic_advances',
   next_stage_may_start: true,
   route_selection_owner: 'codex_cli',
-  route_may_skip_repeat_reverse_or_target_any_declared_stage: true,
+  route_selection_owner_scope: 'intra_stage_domain_route_only',
+  cross_stage_decision_owner: 'stage_run_decisive_codex_attempt',
+  decisive_attempt_may_advance_skip_repeat_reverse_or_target_any_declared_stage: true,
+  route_execution_grants_stage_transition_authority: false,
   quality_claim_rule: 'quality_debt_never_implies_visual_or_export_ready',
   hard_stop_kinds: [
     'executor_unavailable',
@@ -47,11 +50,13 @@ function uniqueStrings(values: unknown[]): string[] {
 }
 
 function failedChecks(artifact: JsonRecord): string[] {
+  const pendingReviews = safeArray(artifact?.review_state_patch?.pending_reviews)
+    .filter((review) => safeText(review) !== 'final_byte_handoff_review');
   return uniqueStrings([
     ...safeArray(artifact?.blocking_reasons),
     ...safeArray(artifact?.issues),
     ...safeArray(artifact?.review_state_patch?.blocking_reasons),
-    ...safeArray(artifact?.review_state_patch?.pending_reviews),
+    ...pendingReviews,
     ...safeArray(artifact?.quality_debt?.reasons),
     ...Object.entries(artifact?.checks || {})
       .filter(([, value]) => value === false)

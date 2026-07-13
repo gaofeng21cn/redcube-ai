@@ -42,8 +42,8 @@ test('runDeliverableRoute reuses a fresh gated stage artifact when the route cac
     assert.equal(first.summary.cache_status, 'miss');
     assert.equal(first.artifact.runtime_currentness_receipt.surface_kind, 'rca_runtime_currentness_receipt');
     assert.equal(Boolean(first.artifact.runtime_currentness_receipt.source_revision), true);
-    assert.equal(first.artifact.runtime_currentness_receipt.rca_version, '0.2.1');
-    assert.equal(first.artifact.runtime_currentness_receipt.plugin_version, '0.2.1');
+    assert.equal(first.artifact.runtime_currentness_receipt.rca_version, '0.2.2');
+    assert.equal(first.artifact.runtime_currentness_receipt.plugin_version, '0.2.2');
     assert.equal(first.artifact.runtime_currentness_receipt.blocks_stage_transition, false);
 
     const second = await runDeliverableRoute({

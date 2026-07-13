@@ -13,6 +13,7 @@ import {
   runtimeWatch,
 } from './product-domain-action-test-api.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
+import { applyFormalPackageReviewCloseoutForTest } from './helpers/route-attempt-test-api.ts';
 import {
   startMockCodexCli,
   withEnv,
@@ -160,6 +161,12 @@ test('auditDeliverable gates optimize_existing baseline approval and promoted ba
     await completeTopicSource(promotedRoot);
     await createXhs(promotedRoot, { deliverableId: 'baseline-a', title: '甲状腺门诊小红书 baseline', goal: '旧版认可稿' });
     await runRoutes({ workspaceRoot: promotedRoot, overlay: 'xiaohongshu', deliverableId: 'baseline-a', routes: XHS_FULL_ROUTES });
+    await applyFormalPackageReviewCloseoutForTest({
+      workspaceRoot: promotedRoot,
+      overlay: 'xiaohongshu',
+      topicId: TOPIC_ID,
+      deliverableId: 'baseline-a',
+    });
     await applyReviewMutation({
       workspaceRoot: promotedRoot,
       topicId: TOPIC_ID,
@@ -173,6 +180,12 @@ test('auditDeliverable gates optimize_existing baseline approval and promoted ba
       deliverableId: 'candidate-a',
       routes: XHS_FULL_ROUTES,
       extra: { mode: 'optimize_existing', baselineDeliverableId: 'baseline-a' },
+    });
+    await applyFormalPackageReviewCloseoutForTest({
+      workspaceRoot: promotedRoot,
+      overlay: 'xiaohongshu',
+      topicId: TOPIC_ID,
+      deliverableId: 'candidate-a',
     });
     await applyReviewMutation({
       workspaceRoot: promotedRoot,

@@ -157,7 +157,7 @@ test('ppt export_pptx reuses deterministic preview metrics when reviewed stable 
       non_authority: true,
       non_blocking: true,
       proposal_candidate: null,
-      terminal_binding: null,
+      pending_handoff_review_binding: null,
       accept_reject_status: 'not_requested',
       accept_reject_receipt_refs: [],
     });
@@ -214,13 +214,10 @@ test('ppt export_pptx preserves an existing visual-memory proposal candidate and
     assert.equal(exported.status, 'completed');
     assert.equal(forwarded.status, 'proposal_candidate');
     assert.deepEqual(forwarded.proposal_candidate, proposalCandidate);
-    assert.equal(forwarded.terminal_binding.review_export_refs.includes(
+    assert.equal(forwarded.pending_handoff_review_binding.upstream_review_refs.includes(
       'rca-review-export:ppt_deck:screenshot_review:deck-a',
     ), true);
-    assert.equal(forwarded.terminal_binding.review_export_refs.includes(
-      'rca-review-export:ppt_deck:export_pptx:deck-a',
-    ), true);
-    assert.equal(forwarded.terminal_binding.export_artifact_refs.includes(exported.export_bundle.pptx_file), true);
+    assert.equal(forwarded.pending_handoff_review_binding.export_artifact_refs.includes(exported.export_bundle.pptx_file), true);
     assert.deepEqual(forwarded.accept_reject_receipt_refs, []);
     assert.equal(exported.owner_receipt_refs.includes(proposalCandidate.proposal_ref), false);
   } finally {
@@ -323,7 +320,7 @@ test('xiaohongshu export_bundle reuses deterministic preview metrics while prese
   assert.equal(second.export_bundle.preview_cache.cache_status, 'hit');
   assert.equal(second.export_bundle.preview_cache.hash, first.export_bundle.preview_cache.hash);
   assert.deepEqual(second.export_bundle.preview_metrics, first.export_bundle.preview_metrics);
-  assert.equal(readJson(second.export_bundle.publish_manifest_file).delivery_state.current, 'output_ready');
+  assert.equal(readJson(second.export_bundle.publish_manifest_file).delivery_state.current, 'output_candidate_pending_review');
   assert.equal(second.review_state_patch.latest_review_stage, 'export_bundle');
   assert.ok(second.export_bundle.publish_html_file.endsWith('publish/index.html'));
 });

@@ -27,7 +27,10 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 
 - Retry、candidate race、shape-plan preflight、review 与 repair loop 只能作为质量预算，不能作为 stage transition gate；有可消费 artifact 必须推进，并把未达标项记录为 `completed_with_quality_debt`。
 - 同一 executor thread 内的写后自检只能称为 `in_thread_refinement`。正式 Stage Review 必须是同一 StageRun 下新的 StageAttempt 和新的 Codex thread；Repair、Re-review 也分别使用新 Attempt，且 Review receipt 必须证明 `no_context_inheritance=true` 和 reviewer/producer session 不同。
+- reviewer/re-reviewer Attempt 内调用的 visual-director、screenshot 或机械检查 helper 只能物化非权威 `in_attempt_visual_qa` 证据；这些 helper 调用不是新的 StageAttempt，不得写 `stage_quality_attempt`、Review receipt、owner receipt 或 Stage transition decision。正式 Review receipt 只由 OPL StageRunController 根据外层 Attempt closeout 物化。
+- 每个质量循环 Attempt 都必须声明 `no_context_inheritance=true`；producer/reviewer 固定为第 0 轮，repairer/re-reviewer 只能是第 1 至 3 轮。RCA route 是 Stage 内专业操作，不是 Attempt 类型或 Stage transition authority：review-only route 只供 reviewer/re-reviewer，专用 repair route 只供 repairer，其他生产或打包 route 可由 producer/repairer 执行。
 - `review_and_revision` 是独立的跨 Stage Meta Review StageRun，不承载页面级 visual-director/screenshot repair loop；Meta Review 不继承上游生成对话，也不直接修改上游 artifact。
+- `package_and_handoff` 会生成或转换最终可审 bytes，因此必须启用独立 formal Review。Producer/repairer 只能物化候选与 artifact-identity receipt；terminal reviewer/re-reviewer 只返回绑定 exact refs/hash 与独立 session 的 `route_impact.stage_quality_cycle.outcome` 和 Stage route decision，不能自行创建 receipt verdict、签 receipt 或写 ready flag。OPL StageRunController 将 outcome 映射为正式 Review receipt verdict 后，RCA owner-receipt authority function 才能签 domain owner receipt 并授权 visual/export/publication/handoff-ready 或 owner-accepted projection。Attempt 创建、轮次预算、Review receipt materialization 与 Stage transition 归 OPL StageRunController。
 - 质量债务不得生成 execution typed blocker，不得阻断后续 stage，但必须阻止 `visual_ready`、`export_ready`、handoffable、domain-ready 或 production-ready 声明。
 - Hard stop 白名单仅包含 executor unavailable、权限/凭据/安全、显式人工门、不可逆动作、authority violation 与 stage identity/currentness mismatch。零/损坏/不可读 artifact 必须转成 failure/no-output diagnostic 与质量债继续推进。
 - 同一 deliverable 的 image/native/HTML authoring lane 必须显式锁定；不得以 fallback 或 recovery 为由自动跨 lane。

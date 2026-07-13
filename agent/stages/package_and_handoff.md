@@ -11,6 +11,7 @@ Requires:
 
 Ensures:
 - `export_handoff_receipt_recorded`
+- `final_byte_handoff_review_receipt_recorded`
 
 Runtime event refs:
 - `runtime_event:rca.package_and_handoff.export_handoff_recorded`
@@ -18,3 +19,4 @@ Runtime event refs:
 Owner boundary:
 - RCA owns export readiness and owner receipt signing.
 - OPL consumes handoff refs for generated session/workbench/projection surfaces.
+- Producer and repairer own package materialization only and cannot return a Review outcome. Reviewer and re-reviewer provide the decisive exact-byte quality outcome and terminal Stage route judgment, including final-budget `repair_required` over consumable bytes, which closes as quality debt rather than reopening or blocking. The OPL controller materializes the formal Review receipt; RCA owner authority consumes that receipt and the exact artifact identity before signing any final quality/export/publication/ready owner claim.

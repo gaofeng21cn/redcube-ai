@@ -477,15 +477,15 @@ export interface PosterScreenshotReviewArtifact extends PosterRuntimeArtifactBas
 
 export interface PosterExportBundleArtifact extends PosterRuntimeArtifactBase {
   route: 'export_bundle';
-  status: 'completed';
+  status: 'completed' | 'completed_with_quality_debt';
   export_bundle: {
     source_html: string;
     png_files: string[];
     review_markdown: string;
     publish_manifest_file: string;
     delivery_state: {
-      current: 'output_ready';
-      next: null;
+      current: 'output_candidate_pending_review' | 'output_with_quality_debt';
+      next: 'final_byte_handoff_review';
     };
   };
   artifact_refs: string[];
