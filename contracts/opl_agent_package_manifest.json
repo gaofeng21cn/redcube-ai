@@ -4,7 +4,7 @@
   "package_id": "rca",
   "display_name": "RedCube AI",
   "publisher": "one-person-lab",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "source": "first_party_repo_local",
   "carrier_source_role": "codex_plugin_default_carrier_not_package_truth",
   "source_repo": "https://github.com/gaofeng21cn/redcube-ai.git",
@@ -37,21 +37,6 @@
     "lifecycle_receipt_owner": "opl_connect_agent_package_registry",
     "exposure_owner": "opl_connect_agent_package_registry"
   },
-  "distribution_payload": {
-    "payload_kind": "ghcr_oci_agent_package",
-    "payload_ref": "ghcr.io/gaofeng21cn/one-person-lab-packages/rca:latest",
-    "payload_digest_ref": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
-    "required_skill_pack_lock_refs": [],
-    "proof_status": "non_live_contract_fixture",
-    "live_download_proof": false,
-    "installed_reload_proof": false,
-    "oci_ref": "ghcr.io/gaofeng21cn/one-person-lab-packages/rca:latest",
-    "oci_media_type": "application/vnd.oci.image.manifest.v1+json",
-    "immutable_tag": "0.1.0",
-    "rolling_tag": "latest",
-    "promotion_policy": "daily_candidate_gates_then_promote_latest",
-    "install_truth": "resolved_digest_lock"
-  },
   "codex_surface": {
     "plugin_id": "redcube-ai",
     "codex_visible_entry": "redcube-ai",
@@ -69,7 +54,7 @@
     {
       "id": "redcube-ai",
       "source": "repo_local_codex_plugin_carrier",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "install_mode": "bundled_required",
       "source_ref": "agent/primary_skill/SKILL.md",
       "carrier_mirror_ref": "plugins/redcube-ai/skills/redcube-ai/SKILL.md",
