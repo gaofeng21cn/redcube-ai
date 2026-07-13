@@ -17,11 +17,13 @@ import {
   bounds,
   createNativeObjectWorkspace,
   packageBindingResult,
+  packageBindingResults,
   pythonAnimationFailures,
   relocateRelationshipBackedParts,
   runPackageReadback,
   runNativeObjectMaterializer,
   runNativeObjectMaterializerFailure,
+  runNativeObjectMaterializerFailureCases,
   shape,
   validatePptx,
 } from './helpers/ppt-native-object-package-fixtures.js';
@@ -259,226 +261,60 @@ test('native PPT materializer accepts command-valid OfficeCLI JSON envelopes', (
   }
 });
 
-test('native PPT package binding rejects chart category drift', () => {
-  const result = packageBindingResult({
-    shape_id: 'S01-chart',
-    kind: 'chart',
-    semantic_kind: 'chart',
-    materialization_intent: 'native_data_object',
-    chart_type: 'column',
-    categories: ['A', 'B'],
-    series: [{ name: 'Actual', values: [1, 2] }],
-  }, {
-    name: 'S01-chart',
-    kind: 'chart',
-    chart_type: 'column',
-    categories: ['A', 'C'],
+test('native PPT package binding rejects the typed chart/table/picture drift matrix in one Python probe', () => {
+  const chartPlanned = {
+    shape_id: 'S01-chart', kind: 'chart', semantic_kind: 'chart',
+    materialization_intent: 'native_data_object', chart_type: 'column',
+    categories: ['A', 'B'], series: [{ name: 'Actual', values: [1, 2] }],
+  };
+  const chartReadback = {
+    name: 'S01-chart', kind: 'chart', chart_type: 'column', categories: ['A', 'B'],
     series: [{ name: 'Actual', values: [1, 2] }],
     relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart',
     relationship_resolved: true,
     content_type: 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml',
-  });
-  assert.notEqual(result.status, 0, 'chart category drift was accepted');
-  assert.match(`${result.stdout}\n${result.stderr}`, /chart categories/);
-});
-
-test('native PPT package binding rejects chart series drift', () => {
-  const result = packageBindingResult({
-    shape_id: 'S01-chart',
-    kind: 'chart',
-    semantic_kind: 'chart',
-    materialization_intent: 'native_data_object',
-    chart_type: 'column',
-    categories: ['A', 'B'],
-    series: [{ name: 'Actual', values: [1, 2] }],
-  }, {
-    name: 'S01-chart',
-    kind: 'chart',
-    chart_type: 'column',
-    categories: ['A', 'B'],
-    series: [{ name: 'Actual', values: [1, 3] }],
-    relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart',
-    relationship_resolved: true,
-    content_type: 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml',
-  });
-  assert.notEqual(result.status, 0, 'chart series drift was accepted');
-  assert.match(`${result.stdout}\n${result.stderr}`, /chart series/);
-});
-
-test('native PPT package binding rejects chart type drift', () => {
-  const result = packageBindingResult({
-    shape_id: 'S01-chart',
-    kind: 'chart',
-    semantic_kind: 'chart',
-    materialization_intent: 'native_data_object',
-    chart_type: 'column',
-    categories: ['A', 'B'],
-    series: [{ name: 'Actual', values: [1, 2] }],
-  }, {
-    name: 'S01-chart',
-    kind: 'chart',
-    chart_type: 'line',
-    categories: ['A', 'B'],
-    series: [{ name: 'Actual', values: [1, 2] }],
-    relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart',
-    relationship_resolved: true,
-    content_type: 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml',
-  });
-  assert.notEqual(result.status, 0, 'chart type drift was accepted');
-  assert.match(`${result.stdout}\n${result.stderr}`, /chart type/);
-});
-
-test('native PPT package binding rejects missing chart type evidence', () => {
-  const result = packageBindingResult({
-    shape_id: 'S01-chart',
-    kind: 'chart',
-    semantic_kind: 'chart',
-    materialization_intent: 'native_data_object',
-    categories: ['A'],
-    series: [{ name: 'Actual', values: [1] }],
-  }, {
-    name: 'S01-chart',
-    kind: 'chart',
-    chart_type: 'column',
-    categories: ['A'],
-    series: [{ name: 'Actual', values: [1] }],
-    relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart',
-    relationship_resolved: true,
-    content_type: 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml',
-  });
-  assert.notEqual(result.status, 0, 'missing chart type evidence was accepted');
-  assert.match(`${result.stdout}\n${result.stderr}`, /chart type evidence missing/);
-});
-
-test('native PPT package binding rejects table data drift', () => {
-  const result = packageBindingResult({
-    shape_id: 'S01-table',
-    kind: 'table',
-    semantic_kind: 'table',
-    data: [['Metric', 'Value'], ['Quality', 'Pass']],
-    first_row: true,
-  }, {
-    name: 'S01-table',
-    kind: 'table',
-    data: [['Metric', 'Value'], ['Quality', 'Fail']],
-    cells: [],
-  });
-  assert.notEqual(result.status, 0, 'table data drift was accepted');
-  assert.match(`${result.stdout}\n${result.stderr}`, /table data/);
-});
-
-test('native PPT package binding rejects table style drift', () => {
-  const result = packageBindingResult({
-    shape_id: 'S01-table',
-    kind: 'table',
-    semantic_kind: 'table',
-    data: [['Metric', 'Value'], ['Quality', 'Pass']],
-    first_row: true,
-    header_fill: '#17324D',
-    header_color: '#FFFFFF',
-    header_font: 'Aptos Display',
-    header_font_size: 15,
-    body_font_size: 13,
-  }, {
-    name: 'S01-table',
-    kind: 'table',
-    data: [['Metric', 'Value'], ['Quality', 'Pass']],
-    cells: [
+  };
+  const picturePlanned = {
+    shape_id: 'S01-picture', kind: 'picture', semantic_kind: 'picture',
+    alt: 'Expected description', crop: { left: 0, top: 0, right: 0, bottom: 0 },
+    source_payload_sha256: 'a'.repeat(64),
+  };
+  const pictureReadback = {
+    name: 'S01-picture', kind: 'picture', alt: 'Expected description',
+    crop: { left: 0, top: 0, right: 0, bottom: 0 }, embedded_sha256: 'a'.repeat(64),
+    relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
+    relationship_resolved: true, content_type: 'image/png',
+  };
+  const tablePlanned = {
+    shape_id: 'S01-table', kind: 'table', semantic_kind: 'table',
+    data: [['Metric', 'Value'], ['Quality', 'Pass']], first_row: true,
+  };
+  const cases = [
+    { case_id: 'chart-category-drift', planned: chartPlanned, materialized: { ...chartReadback, categories: ['A', 'C'] }, expected: /chart categories/ },
+    { case_id: 'chart-series-drift', planned: chartPlanned, materialized: { ...chartReadback, series: [{ name: 'Actual', values: [1, 3] }] }, expected: /chart series/ },
+    { case_id: 'chart-type-drift', planned: chartPlanned, materialized: { ...chartReadback, chart_type: 'line' }, expected: /chart type/ },
+    { case_id: 'chart-type-evidence-missing', planned: { ...chartPlanned, chart_type: undefined, categories: ['A'], series: [{ name: 'Actual', values: [1] }] }, materialized: { ...chartReadback, categories: ['A'], series: [{ name: 'Actual', values: [1] }] }, expected: /chart type evidence missing/ },
+    { case_id: 'table-data-drift', planned: tablePlanned, materialized: { name: 'S01-table', kind: 'table', data: [['Metric', 'Value'], ['Quality', 'Fail']], cells: [] }, expected: /table data/ },
+    { case_id: 'table-style-drift', planned: { ...tablePlanned, header_fill: '#17324D', header_color: '#FFFFFF', header_font: 'Aptos Display', header_font_size: 15, body_font_size: 13 }, materialized: { name: 'S01-table', kind: 'table', data: tablePlanned.data, cells: [
       { row: 1, column: 1, text: 'Metric', font: 'Aptos Display', font_size_pt: 15, bold: true, color: '#FFFFFF', fill: '#FF0000' },
       { row: 1, column: 2, text: 'Value', font: 'Aptos Display', font_size_pt: 15, bold: true, color: '#FFFFFF', fill: '#FF0000' },
       { row: 2, column: 1, text: 'Quality', font: 'Aptos', font_size_pt: 13, bold: false, color: '', fill: '' },
       { row: 2, column: 2, text: 'Pass', font: 'Aptos', font_size_pt: 13, bold: false, color: '', fill: '' },
-    ],
-  });
-  assert.notEqual(result.status, 0, 'table style drift was accepted');
-  assert.match(`${result.stdout}\n${result.stderr}`, /table header fill/);
-});
+    ] }, expected: /table header fill/ },
+    { case_id: 'picture-alt-drift', planned: picturePlanned, materialized: { ...pictureReadback, alt: 'Wrong description' }, expected: /picture alt/ },
+    { case_id: 'picture-crop-drift', planned: picturePlanned, materialized: { ...pictureReadback, crop: { left: 5, top: 0, right: 0, bottom: 0 } }, expected: /picture crop/ },
+    { case_id: 'picture-payload-substitution', planned: picturePlanned, materialized: { ...pictureReadback, embedded_sha256: 'b'.repeat(64) }, expected: /picture source payload SHA/ },
+    { case_id: 'picture-payload-evidence-missing', planned: { ...picturePlanned, source_payload_sha256: undefined }, materialized: pictureReadback, expected: /picture source payload SHA evidence missing/ },
+  ];
 
-test('native PPT package binding rejects picture alt drift', () => {
-  const result = packageBindingResult({
-    shape_id: 'S01-picture',
-    kind: 'picture',
-    semantic_kind: 'picture',
-    alt: 'Expected description',
-    crop: { left: 0, top: 0, right: 0, bottom: 0 },
-    source_payload_sha256: 'a'.repeat(64),
-  }, {
-    name: 'S01-picture',
-    kind: 'picture',
-    alt: 'Wrong description',
-    crop: { left: 0, top: 0, right: 0, bottom: 0 },
-    embedded_sha256: 'a'.repeat(64),
-    relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
-    relationship_resolved: true,
-    content_type: 'image/png',
-  });
-  assert.notEqual(result.status, 0, 'picture alt drift was accepted');
-  assert.match(`${result.stdout}\n${result.stderr}`, /picture alt/);
-});
-
-test('native PPT package binding rejects picture crop drift', () => {
-  const result = packageBindingResult({
-    shape_id: 'S01-picture',
-    kind: 'picture',
-    semantic_kind: 'picture',
-    alt: 'Expected description',
-    crop: { left: 0, top: 0, right: 0, bottom: 0 },
-    source_payload_sha256: 'a'.repeat(64),
-  }, {
-    name: 'S01-picture',
-    kind: 'picture',
-    alt: 'Expected description',
-    crop: { left: 5, top: 0, right: 0, bottom: 0 },
-    embedded_sha256: 'a'.repeat(64),
-    relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
-    relationship_resolved: true,
-    content_type: 'image/png',
-  });
-  assert.notEqual(result.status, 0, 'picture crop drift was accepted');
-  assert.match(`${result.stdout}\n${result.stderr}`, /picture crop/);
-});
-
-test('native PPT package binding rejects picture source payload substitution', () => {
-  const result = packageBindingResult({
-    shape_id: 'S01-picture',
-    kind: 'picture',
-    semantic_kind: 'picture',
-    alt: 'Expected description',
-    crop: { left: 0, top: 0, right: 0, bottom: 0 },
-    source_payload_sha256: 'a'.repeat(64),
-  }, {
-    name: 'S01-picture',
-    kind: 'picture',
-    alt: 'Expected description',
-    crop: { left: 0, top: 0, right: 0, bottom: 0 },
-    embedded_sha256: 'b'.repeat(64),
-    relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
-    relationship_resolved: true,
-    content_type: 'image/png',
-  });
-  assert.notEqual(result.status, 0, 'picture source payload substitution was accepted');
-  assert.match(`${result.stdout}\n${result.stderr}`, /picture source payload SHA/);
-});
-
-test('native PPT package binding rejects missing picture source payload SHA evidence', () => {
-  const result = packageBindingResult({
-    shape_id: 'S01-picture',
-    kind: 'picture',
-    semantic_kind: 'picture',
-    alt: 'Expected description',
-    crop: { left: 0, top: 0, right: 0, bottom: 0 },
-  }, {
-    name: 'S01-picture',
-    kind: 'picture',
-    alt: 'Expected description',
-    crop: { left: 0, top: 0, right: 0, bottom: 0 },
-    embedded_sha256: 'a'.repeat(64),
-    relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
-    relationship_resolved: true,
-    content_type: 'image/png',
-  });
-  assert.notEqual(result.status, 0, 'missing picture source payload SHA evidence was accepted');
-  assert.match(`${result.stdout}\n${result.stderr}`, /picture source payload SHA evidence missing/);
+  const results = packageBindingResults(cases);
+  assert.equal(results.length, cases.length);
+  for (const [index, result] of results.entries()) {
+    const fixture = cases[index];
+    assert.equal(result.case_id, fixture.case_id);
+    assert.equal(result.rejected, true, `${fixture.case_id} was accepted`);
+    assert.match(result.reason, fixture.expected, fixture.case_id);
+  }
 });
 
 test('native PPT picture source payload hashing canonicalizes files and data URIs', () => {
@@ -578,31 +414,6 @@ print(json.dumps({
   assert.deepEqual(JSON.parse(stdout), { picture: true, image: true });
 });
 
-test('real build_deck preserves native table metrics and body font size in the manifest', () => {
-  const slide = createAiSlide({ slideId: 'S01', layoutFamily: 'multi_zone_compare', slotCount: 2 });
-  slide.native_shapes = slide.native_shapes.filter((item) => (
-    item.shape_id !== 'S01-slot-1-panel'
-    && item.from_shape_id !== 'S01-slot-1-panel'
-    && item.to_shape_id !== 'S01-slot-1-panel'
-  ));
-  slide.native_shapes.push(shape('S01-table-proof', 'table', bounds(1.15, 3.2, 6.15, 2.68), {
-    role: 'compare_panel',
-    quality_role: 'content',
-    layout_zone_id: 'matrix_zone',
-    materialization_intent: 'native_data_object',
-    data: [['Metric', 'Value'], ['Quality', 'Pass']],
-    body_font_size: 16,
-    metrics: { max_cell_blank_ratio: 0.12 },
-  }));
-
-  const result = runNativeMaterializer(materializerPayload([slide]), 'redcube-native-object-build-deck-');
-  const table = result.slides[0].native_shapes.find((item) => item.shape_id === 'S01-table-proof');
-  assert.equal(table.body_font_size, 16);
-  assert.equal(table.metrics.min_font_pt, 16);
-  assert.equal(table.metrics.max_cell_blank_ratio, 0.12);
-  assert.deepEqual(table.data, [['Metric', 'Value'], ['Quality', 'Pass']]);
-});
-
 test('native PPT materializer writes distinct editable objects and semantic package readback', () => {
   const { workspaceRoot } = createNativeObjectWorkspace();
   const pictureFile = path.resolve('assets/branding/redcube-ai-logo.png');
@@ -667,7 +478,8 @@ test('native PPT materializer writes distinct editable objects and semantic pack
             header_color: '#FFFFFF',
             header_font: 'Aptos Display',
             header_font_size: 15,
-            body_font_size: 13,
+            body_font_size: 16,
+            metrics: { max_cell_blank_ratio: 0.12 },
           }),
           shape('S01-group', 'group', bounds(6.0, 1.65, 3.3, 1.1), {
             children: [
@@ -733,6 +545,7 @@ test('native PPT materializer writes distinct editable objects and semantic pack
   assert.equal(byName['S01-table'].row_count, 3);
   assert.equal(byName['S01-table'].column_count, 2);
   assert.deepEqual(byName['S01-table'].data, [['Metric', 'Value'], ['Quality', 'Pass'], ['Objects', '8']]);
+  assert.equal(Math.min(...byName['S01-table'].cells.map((cell) => cell.font_size_pt)), 15);
   assert.deepEqual(byName['S01-table'].cells[0], {
     row: 1,
     column: 1,
@@ -743,7 +556,7 @@ test('native PPT materializer writes distinct editable objects and semantic pack
     color: '#FFFFFF',
     fill: '#17324D',
   });
-  assert.equal(byName['S01-table'].cells[2].font_size_pt, 13);
+  assert.equal(byName['S01-table'].cells[2].font_size_pt, 16);
   assert.ok(byName['S01-picture'].embedded_size_bytes > 0);
   assert.equal(
     byName['S01-picture'].embedded_sha256,
@@ -857,7 +670,7 @@ build_deck(slides, Path(sys.argv[2]), Path(sys.argv[3]), set(), evaluate_native_
   assert.equal(existsSync(svgIrDir), false);
 });
 
-for (const fixture of [
+const animationMaterializationFailureCases = [
   {
     label: 'missing',
     targetId: 'S01-missing',
@@ -925,27 +738,30 @@ for (const fixture of [
     })],
     expectedReason: 'animation_target_kind_unsupported',
   },
-]) {
-  test(`native PPT ${fixture.label} animation target fails before creating an output`, () => {
-    const { workspaceRoot, pictureFile } = createNativeObjectWorkspace(`redcube-native-animation-${fixture.label.replaceAll(' ', '-')}-`);
-    const outputPptx = path.join(workspaceRoot, 'animation-target.pptx');
-    const failure = runNativeObjectMaterializerFailure({
-      workspaceRoot,
-      outputPptx,
-      payload: {
-        slides: [{
-          slide_id: 'S01',
-          animation_timeline: [{ target_shape_id: fixture.targetId, effect: 'fade' }],
-          _editable_native_shapes: fixture.buildShapes(pictureFile),
-        }],
-      },
-    });
-    assert.notEqual(failure.status, 0);
-    assert.match(`${failure.stdout}\n${failure.stderr}`, /animation target preflight failed/);
-    assert.match(`${failure.stdout}\n${failure.stderr}`, new RegExp(fixture.expectedReason));
-    assert.equal(existsSync(outputPptx), false);
-  });
-}
+];
+
+test('native PPT animation target failure matrix preserves typed reasons and zero-write behavior', () => {
+  const { workspaceRoot, pictureFile } = createNativeObjectWorkspace('redcube-native-animation-matrix-');
+  const cases = animationMaterializationFailureCases.map((fixture) => ({
+    case_id: fixture.label.replaceAll(' ', '-'),
+    slides: [{
+      slide_id: 'S01',
+      animation_timeline: [{ target_shape_id: fixture.targetId, effect: 'fade' }],
+      _editable_native_shapes: fixture.buildShapes(pictureFile),
+    }],
+  }));
+  const results = runNativeObjectMaterializerFailureCases({ workspaceRoot, cases });
+
+  assert.equal(results.length, animationMaterializationFailureCases.length);
+  for (const [index, result] of results.entries()) {
+    const fixture = animationMaterializationFailureCases[index];
+    assert.equal(result.case_id, fixture.label.replaceAll(' ', '-'));
+    assert.equal(result.rejected, true, fixture.label);
+    assert.match(result.reason, /animation target preflight failed/, fixture.label);
+    assert.match(result.reason, new RegExp(fixture.expectedReason), fixture.label);
+    assert.equal(result.output_exists, false, fixture.label);
+  }
+});
 
 test('native PPT charts reject series whose value count does not match categories', () => {
   const { workspaceRoot } = createNativeObjectWorkspace('redcube-native-chart-length-');

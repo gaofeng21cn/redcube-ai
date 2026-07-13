@@ -7,18 +7,6 @@ if [ "$#" -eq 0 ]; then
 fi
 
 repo_root="$(cd "$(dirname "$0")/.." && pwd -P)"
-opl_bin="${OPL_BIN:-${repo_root}/node_modules/opl-framework/bin/opl}"
-framework_link_check_status=0
-framework_link_check_output="$(
-  "${opl_bin}" packages link-framework \
-    --agent-root "${repo_root}" \
-    --check \
-    --json 2>&1
-)" || framework_link_check_status=$?
-if [ "${framework_link_check_status}" -ne 0 ]; then
-  printf '%s\n' "${framework_link_check_output}" >&2
-  exit "${framework_link_check_status}"
-fi
 
 cleanup_temp_root=0
 if [ -n "${OPL_REPO_TEMP_ROOT:-}" ]; then

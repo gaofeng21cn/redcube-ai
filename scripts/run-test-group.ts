@@ -29,32 +29,6 @@ const repoRoot = path.resolve(scriptDir, '..');
 
 process.chdir(repoRoot);
 
-function assertManagedFrameworkLink() {
-  const managedOplBin = path.join(repoRoot, 'node_modules', 'opl-framework', 'bin', 'opl');
-  const oplBin = process.env.OPL_BIN || managedOplBin;
-  const result = spawnSync(oplBin, [
-    'packages',
-    'link-framework',
-    '--agent-root',
-    repoRoot,
-    '--check',
-    '--json',
-  ], {
-    cwd: repoRoot,
-    encoding: 'utf8',
-  });
-  if (result.error) {
-    throw result.error;
-  }
-  if ((result.status ?? 1) !== 0) {
-    process.stderr.write(result.stdout || '');
-    process.stderr.write(result.stderr || '');
-    throw new Error('OPL-managed framework link check failed before test execution.');
-  }
-}
-
-assertManagedFrameworkLink();
-
 function pathIsInsideRepo(value) {
   if (!value) {
     return false;

@@ -132,6 +132,10 @@ RCA 当前 file authority、artifact index 和 Git source control 足以承载 c
 
 RCA Developer Mode 的 canonical Codex plugin scaffold/source locator 统一在 `plugins/redcube-ai/` 下维护，plugin manifest name 与 skill frontmatter name 都使用 repo slug `redcube-ai`。这个名称只标识 Codex carrier；canonical OPL agent/package id 都是 `rca`，且不接受 `redcube-ai` package alias。根层 `.codex-plugin/plugin.json`、repo-local installer、`plugins/rca/` legacy alias path 和第二套 skill/icon/marketplace truth 均不得恢复。
 
+### 验证执行只保留一个 owner
+
+OPL Framework link 由 OPL canonical `packages link-framework` 与 CI/bootstrap owner 管理；RCA repo-temp wrapper 和 grouped test runner 不重复执行 link command。真实 import/package resolution 与 build 失败仍 fail closed。本地 TypeScript build 使用增量 project graph，CI 使用 `build:ci --force`。同构 Python negative case 允许 batch 到单进程，但每个 case 必须保留稳定 `case_id`、typed reason、authority assertion 与 zero-write readback。
+
 ## 历史压缩
 
 2026-04 到 2026-06 的 dated decision entries 已压缩为上方 durable decisions。旧 OPL hosted integration、Hermes、Phase 2、pack/compiler、managed runtime、domain_action_adapter、Stage Folder、production acceptance、external work order、native helper 和 product-entry source channel 的实现过程只作为 provenance 读取。

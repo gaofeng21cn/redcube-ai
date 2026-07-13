@@ -29,5 +29,6 @@ test('CI constructs and links the OPL Framework before running consumers', () =>
   assert.match(workflow, /npm ci --prefix \..\/one-person-lab --ignore-scripts/);
   assert.match(workflow, /npm run --prefix \..\/one-person-lab build/);
   assert.match(workflow, /packages link-framework --agent-root "\$GITHUB_WORKSPACE" --json/);
+  assert.match(workflow, /npm run typecheck:ci/);
   assert.doesNotMatch(workflow, /scripts\/run-test-group\.ts family/);
 });

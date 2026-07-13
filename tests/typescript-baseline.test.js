@@ -121,14 +121,16 @@ test('root package exposes formal typecheck entrypoint', () => {
   assert.equal(pkg.scripts['test:line-budget'], undefined);
   assert.equal(pkg.scripts['test:line-budget:strict'], undefined);
   assert.equal(pkg.scripts.typecheck, 'npm run --silent build && tsc --noEmit --project tsconfig.typecheck.json --pretty false');
+  assert.equal(pkg.scripts['typecheck:ci'], 'npm run --silent build:ci && tsc --noEmit --project tsconfig.typecheck.json --pretty false');
   assert.equal(
     pkg.scripts['audit:typescript-closeout'],
     'node scripts/run-typescript-closeout-audit.ts',
   );
   assert.equal(
     pkg.scripts.build,
-    'tsc --build tsconfig.json --pretty false --force',
+    'tsc --build tsconfig.json --pretty false',
   );
+  assert.equal(pkg.scripts['build:ci'], 'tsc --build tsconfig.json --pretty false --force');
 });
 
 test('registry and verify dispatcher own non-package test lanes', () => {
@@ -347,7 +349,7 @@ test('test registry is the single source of truth for lane membership and keeps 
 
   assert.equal(registryFiles.length, new Set(registryFiles).size);
   assert.equal(groups.historical.length, 1);
-  assert.equal(groups.fast.length, 45);
+  assert.equal(groups.fast.length, 44);
   assert.equal(groups.smoke.length > 0, true);
   assert.equal(groups.smoke.length < groups.fast.length, true);
   assert.equal(groups['meta:ci'].some((file) => groups.fast.includes(file)), false);

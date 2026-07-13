@@ -35,6 +35,27 @@ _bind_manifest_to_package(manifest_slides, package_readback, [1])
   });
 }
 
+export function packageBindingResults(cases) {
+  return JSON.parse(runPython(`
+import json
+import sys
+from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import _bind_manifest_to_package
+
+results = []
+for fixture in json.loads(sys.argv[1]):
+    try:
+        _bind_manifest_to_package(
+            [{'native_shapes': [fixture['planned']]}],
+            {'slides': [{'slide_index': 1, 'objects': [fixture['materialized']]}]},
+            [1],
+        )
+        results.append({'case_id': fixture['case_id'], 'rejected': False, 'reason': None})
+    except Exception as exc:
+        results.append({'case_id': fixture['case_id'], 'rejected': True, 'reason': str(exc)})
+print(json.dumps(results))
+`, [JSON.stringify(cases)]));
+}
+
 export function pythonAnimationFailures(shapes) {
   return JSON.parse(runPython(`
 import json
@@ -108,6 +129,36 @@ materialize_native_pptx(
     env: pythonTestEnv(),
     encoding: 'utf-8',
   });
+}
+
+export function runNativeObjectMaterializerFailureCases({ workspaceRoot, cases }) {
+  const inputFile = writeObjectPayload(workspaceRoot, { cases });
+  return JSON.parse(runPython(`
+import json
+import sys
+from pathlib import Path
+from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import materialize_native_pptx
+
+payload = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+workspace_root = Path(sys.argv[2])
+results = []
+for fixture in payload['cases']:
+    output_path = workspace_root / f"{fixture['case_id']}.pptx"
+    try:
+        materialize_native_pptx(fixture['slides'], output_path)
+        reason = None
+        rejected = False
+    except Exception as exc:
+        reason = str(exc)
+        rejected = True
+    results.append({
+        'case_id': fixture['case_id'],
+        'rejected': rejected,
+        'reason': reason,
+        'output_exists': output_path.exists(),
+    })
+print(json.dumps(results))
+`, [inputFile, workspaceRoot]));
 }
 
 export function relocateRelationshipBackedParts(pptxFile) {

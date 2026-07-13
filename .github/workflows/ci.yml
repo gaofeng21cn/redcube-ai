@@ -63,7 +63,7 @@ jobs:
           "$OPL_BIN" packages link-framework --agent-root "$GITHUB_WORKSPACE" --json
 
       - name: Run build and typecheck
-        run: npm run typecheck
+        run: npm run typecheck:ci
 
       - name: Run fast tests
         run: node scripts/run-test-group.ts fast

@@ -129,6 +129,15 @@ function runPythonModule(module, args = []) {
   return runPython(['-m', module, ...args]);
 }
 
+let cachedDoctorReport;
+function readDoctorReport() {
+  if (cachedDoctorReport) return cachedDoctorReport;
+  const result = runPythonModule('redcube_ai.native_helpers.doctor');
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  cachedDoctorReport = JSON.parse(result.stdout);
+  return cachedDoctorReport;
+}
+
 function runPythonImportabilityCheck(module) {
   return runPython(['-c', [
     'import importlib',
@@ -322,10 +331,8 @@ test('Native PPT helper catalog check never invokes the real native renderer ent
 
 test('Python native helper doctor runs as a package module and emits fixed JSON diagnostics', () => {
   const catalog = readJson(CATALOG_FILE);
-  const result = runPythonModule(catalog.package.diagnostics.package_module);
-
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  const report = JSON.parse(result.stdout);
+  assert.equal(catalog.package.diagnostics.package_module, 'redcube_ai.native_helpers.doctor');
+  const report = readDoctorReport();
   assert.equal(report.surface_kind, 'python_native_helper_doctor');
   assert.equal(report.status, 'ok');
   assert.deepEqual(report.package, {
@@ -397,9 +404,7 @@ test('Python native helper doctor runs as a package module and emits fixed JSON 
 });
 
 test('Python native helper doctor does not create a bypass around review/export gates', () => {
-  const result = runPythonModule('redcube_ai.native_helpers.doctor');
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  const report = JSON.parse(result.stdout);
+  const report = readDoctorReport();
   const nativeHelper = report.helpers.find((helper) => helper.helper_id === 'ppt_deck_native');
 
   assert.deepEqual(report.required_gates, ['visual_director_review', 'screenshot_review', 'export_pptx']);

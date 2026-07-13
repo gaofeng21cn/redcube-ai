@@ -54,7 +54,6 @@ export const TEST_REGISTRY = Object.freeze([
   { file: 'tests/image-ppt-proof-runner.test.js', lane: 'meta' },
   { file: 'tests/kernel-split-extraction.test.js', lane: 'meta' },
   { file: 'tests/line-budget.test.js', lane: 'meta' },
-  { file: 'tests/managed-framework-link.test.js', lane: 'meta', fast: true },
   { file: 'tests/native-ppt-proof-fixture-contract.test.js', lane: 'meta' },
   { file: 'tests/overlay-registry.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/opl-agent-pack-contracts-bridge-and-opl.test.js', lane: 'meta' },
