@@ -240,7 +240,7 @@ test('xiaohongshu render_html starts without planning artifacts and records qual
   });
 });
 
-test('xiaohongshu render_html fails closed when the hydrated shell asset is missing', async () => {
+test('xiaohongshu render_html advances with quality debt when the hydrated shell asset is missing', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-missing-shell-'));
     const deliverableId = 'note-missing-shell';
@@ -272,8 +272,16 @@ test('xiaohongshu render_html fails closed when the hydrated shell asset is miss
       deliverableId,
       route: 'render_html',
     });
-    assert.equal(result.ok, false, JSON.stringify(result, null, 2));
-    assert.match(result.run.error.message, /Missing prompt pack asset/i);
+    assert.equal(result.ok, true, JSON.stringify(result, null, 2));
+    assert.equal(result.run.status, 'completed_with_quality_debt');
+    assert.equal(result.run.error, null);
+    assert.equal(result.artifact.status, 'completed_with_quality_debt');
+    assert.match(result.artifact.stage_attempt_diagnostic.error_message, /Missing prompt pack asset/i);
+    assert.equal(result.artifact.progress_first.next_stage_may_start, true);
+    assert.equal(result.artifact.quality_debt.blocks_stage_transition, false);
+    assert.equal(result.artifact.quality_debt.blocks_visual_ready_claim, true);
+    assert.equal(result.artifact.quality_debt.blocks_export_ready_claim, true);
+    assert.deepEqual(result.artifact.typed_blocker_refs, []);
   });
 });
 

@@ -3,7 +3,6 @@ import {
   assert,
   os,
   path,
-  existsSync,
   mkdtempSync,
   readFileSync,
   utimesSync,
@@ -18,7 +17,6 @@ import {
   MODULE_DIR,
   withMockCodexRuntime,
 } from './shared.js';
-import { runDeliverableRoute as runRawRuntimeDeliverableRoute } from '@redcube/runtime';
 
 test('runDeliverableRoute reuses a fresh gated stage artifact when the route cache key is unchanged', async () => {
   await withMockCodexRuntime(async () => {
@@ -245,32 +243,6 @@ test('image authoring cache survives downstream review and export artifacts', as
   });
 });
 
-test('runDeliverableRoute rejects missing OPL attempt evidence without local diagnostic bypass', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-stale-run-'));
-
-  await createDeliverable({
-    workspaceRoot,
-    overlay: 'ppt_deck',
-    profileId: 'lecture_student',
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    title: 'stale running deck',
-    goal: '验证旧 running run 不会继续被当作活跃事实',
-  });
-
-  const blocked = await runRawRuntimeDeliverableRoute({
-    workspaceRoot,
-    route: 'render_html',
-    overlay: 'ppt_deck',
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-  });
-  assert.equal(blocked.ok, false);
-  assert.equal(blocked.blocker_kind, 'missing_opl_stage_attempt');
-  assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'runs')), false);
-  assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'events')), false);
-});
-
 test('PPT and xiaohongshu HTML routes exhaust quality budget and continue with the prior artifact', async () => {
   await withMockCodexRuntime(async () => {
     const pptWorkspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-ppt-fastfail-'));
@@ -403,9 +375,18 @@ test('PPT and xiaohongshu HTML routes exhaust quality budget and continue with t
         deliverableId: 'deck-a',
         route: 'render_html',
       });
-      assert.equal(rerunAfterInputChange.ok, false);
-      assert.match(rerunAfterInputChange.run.error.message, /mock forced route failure/);
-      assert.notEqual(rerunAfterInputChange.run.error.failure_kind, 'repeated_block_without_input_change');
+      assert.equal(rerunAfterInputChange.ok, true);
+      assert.equal(rerunAfterInputChange.run.status, 'completed_with_quality_debt');
+      assert.equal(rerunAfterInputChange.run.error, null);
+      assert.equal(rerunAfterInputChange.artifact.status, 'completed_with_quality_debt');
+      assert.equal(rerunAfterInputChange.artifact.quality_budget_exhaustion, undefined);
+      assert.equal(rerunAfterInputChange.artifact.progress_first.artifact_available, false);
+      assert.equal(rerunAfterInputChange.artifact.progress_first.diagnostic_available, true);
+      assert.equal(rerunAfterInputChange.artifact.progress_first.next_stage_may_start, true);
+      assert.equal(rerunAfterInputChange.artifact.quality_debt.blocks_stage_transition, false);
+      assert.equal(rerunAfterInputChange.artifact.quality_debt.blocks_visual_ready_claim, true);
+      assert.equal(rerunAfterInputChange.artifact.quality_debt.blocks_export_ready_claim, true);
+      assert.deepEqual(rerunAfterInputChange.artifact.typed_blocker_refs, []);
     } finally {
       restoreEnv();
     }
