@@ -98,13 +98,13 @@ RCA 的 live / production evidence tail 包括真实 Temporal controlled visual-
 
 ### Progress/currentness 按 deliverable delta 与 platform repair 分账
 
-RCA product-entry session projection 必须区分 `deliverable_progress_delta`、`platform_repair_delta`、operator typed blocker resolution 和 OPL provider ledger closeout binding。Continuation 生成新 session plan 前必须消费 latest closeout；缺 closeout binding 时返回 RCA typed blocker。
+RCA product-entry session projection 必须区分 `deliverable_progress_delta`、`platform_repair_delta`、quality-debt diagnostic 和 OPL provider ledger currentness binding。Continuation 可以消费 latest typed/raw closeout、partial artifact 或 failure/no-output diagnostic；缺 typed closeout 只形成质量债。只有提供了相互冲突、伪装或 stale 的 provider/stage identity 时才返回 currentness typed blocker。
 
 Route-local repeated block 进入 OPL stall lineage；连续无 deliverable delta 时升级到 mechanism repair、human gate 或 stop-loss candidate。Platform/cache/interface repair 不得算作视觉交付推进。
 
 ### Default visual route 是 image-first，HTML/native PPTX 是显式可选路线
 
-Retry 是质量预算，不是 stage blocker。RCA 只要获得可消费 artifact 就推进；candidate、native shape-plan、视觉 review 与 repair 的轮数只决定可用于提高质量的预算。预算耗尽选择最佳 artifact 并记录 `completed_with_quality_debt`。质量债务阻止 ready claim，但不阻止下一 stage。只有零 artifact、损坏、权限/凭据、显式人工门、authority 或 identity/currentness 边界可以硬停止。
+Retry 是质量预算，不是 stage blocker。RCA 把可消费 artifact、raw/partial/failed output 或 no-output/failure diagnostic 都作为进度输入；candidate、native shape-plan、视觉 review 与 repair 的轮数只决定可用于提高质量的预算。预算耗尽选择最佳 artifact 或 diagnostic 并记录 `completed_with_quality_debt`。质量债务阻止 ready claim，但不阻止下一 stage。只有 executor unavailable、权限/凭据/安全、显式人工门、不可逆动作、authority 或 identity/currentness 边界可以硬停止。
 
 Authoring route 在 deliverable 内有显式 lane lock。image/native/HTML 之间不能由自动 recovery 切换；新的显式 product-entry route 是唯一合法的换 lane 入口。
 

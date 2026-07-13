@@ -27,7 +27,7 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 
 - Retry、candidate race、shape-plan preflight、review 与 repair loop 只能作为质量预算，不能作为 stage transition gate；有可消费 artifact 必须推进，并把未达标项记录为 `completed_with_quality_debt`。
 - 质量债务不得生成 execution typed blocker，不得阻断后续 stage，但必须阻止 `visual_ready`、`export_ready`、handoffable、domain-ready 或 production-ready 声明。
-- Hard stop 白名单仅包含零可消费 artifact、artifact 损坏不可读、权限/凭据、显式人工门、authority violation 与 stage identity/currentness mismatch。
+- Hard stop 白名单仅包含 executor unavailable、权限/凭据/安全、显式人工门、不可逆动作、authority violation 与 stage identity/currentness mismatch。零/损坏/不可读 artifact 必须转成 failure/no-output diagnostic 与质量债继续推进。
 - 同一 deliverable 的 image/native/HTML authoring lane 必须显式锁定；不得以 fallback 或 recovery 为由自动跨 lane。
 
 - 当前 OPL stage-led 对齐 surface 只供 OPL discovery、queue、wakeup、handoff、receipt、retry/dead-letter 和 operator projection 使用；不得授权 OPL 生成 visual route、review verdict、publication projection truth 或 canonical artifact。

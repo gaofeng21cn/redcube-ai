@@ -1,10 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 
 import {
   admitStageArtifactForProgress,
   isHardStopArtifact,
 } from '../packages/redcube-runtime/dist/progress-first.js';
+
+test('stage manifest gives Codex unrestricted declared-stage routing', () => {
+  const manifest = JSON.parse(fs.readFileSync(new URL('../agent/stages/manifest.json', import.meta.url), 'utf8'));
+  const policy = manifest.progress_first_policy;
+  assert.equal(policy.route_selection_owner, 'codex_cli');
+  assert.equal(policy.codex_may_advance_skip_repeat_reverse_or_route_back, true);
+  assert.equal(policy.any_declared_stage_may_start_from_any_prior_stage_result, true);
+  assert.equal(policy.declared_requires_are_quality_context_not_launch_gates, true);
+  assert.equal(policy.next_stage_refs_are_recommendations_not_constraints, true);
+  assert.equal(policy.no_output_or_failure_diagnostic_advances_stage, true);
+});
 
 test('zero domain output becomes a non-blocking progress diagnostic', () => {
   const admitted = admitStageArtifactForProgress(null, { route: 'author_image_pages' });
