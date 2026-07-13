@@ -12,7 +12,7 @@ type PptDeckCanonicalStageSequence = PptProfileModule['FAMILY_STAGE_SEQUENCE'];
 type PptDeckCanonicalStageDefinition =
   | PptDeckCanonicalStageSequence['stages'][number]
   | PptDeckCanonicalStageSequence['alternate_stages'][number];
-type PptDeckCanonicalHardStop = PptDeckCanonicalStageSequence['hard_stops'][number];
+type PptDeckCanonicalQualityRoute = PptDeckCanonicalStageSequence['quality_route_recommendations'][number];
 type PptDeckCanonicalStageRequirements = PptProfileModule['FAMILY_STAGE_REQUIREMENTS'];
 
 export type PptDeckOverlayProfiles = PptProfileModule['PPT_DECK_PROFILES'];
@@ -29,31 +29,31 @@ export interface PptDeckStageDefinition {
   stage_id: PptDeckStageId;
   prompt_file: PptDeckPromptFile;
   output_artifact: PptDeckOutputArtifactFile;
-  requires_stages: PptDeckStageId[];
-  requires_review_from_any?: PptDeckStageId[];
+  input_stage_refs: PptDeckStageId[];
+  preferred_review_stage_refs?: PptDeckStageId[];
   lane_id?: string;
   replaces_stage?: PptDeckStageId;
 }
 
-export interface PptDeckHardStop {
+export interface PptDeckQualityRouteRecommendation {
   stage_id: PptDeckStageId;
-  requires_stage_outputs?: PptDeckStageId[];
-  requires_review?: PptDeckStageId[];
-  requires_review_from_any?: PptDeckStageId[];
-  rerun_from_stage: PptDeckCanonicalHardStop['rerun_from_stage'];
+  preferred_input_stage_refs?: PptDeckStageId[];
+  preferred_review_stage_refs?: PptDeckStageId[];
+  rerun_from_stage: PptDeckCanonicalQualityRoute['rerun_from_stage'];
 }
 
 export interface PptDeckStageSequence {
   flow_id: PptDeckCanonicalStageSequence['flow_id'];
   stages: PptDeckStageDefinition[];
   alternate_stages?: PptDeckStageDefinition[];
-  hard_stops: PptDeckHardStop[];
+  quality_route_recommendations: PptDeckQualityRouteRecommendation[];
 }
 
 export interface PptDeckStageRequirement {
-  requires_artifacts: PptDeckStageId[];
-  requires_review_pass?: true;
-  requires_review_from_any?: PptDeckStageId[];
+  input_stage_refs: PptDeckStageId[];
+  ready_claim_requires_review_pass?: true;
+  preferred_review_stage_refs?: PptDeckStageId[];
+  can_block_stage_launch: false;
 }
 
 export type PptDeckStageRequirements = Record<

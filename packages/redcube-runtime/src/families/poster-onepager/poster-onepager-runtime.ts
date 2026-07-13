@@ -24,8 +24,8 @@ import { admitStageArtifactForProgress } from '../../progress-first.js';
 
 function isZeroArtifactHardFailure(error: any): boolean {
   if (error?.requiresHumanConfirmation === true || error?.requiresExternalSecret === true) return true;
-  if (['EACCES', 'EPERM', 'ENOENT'].includes(String(error?.code || ''))) return true;
-  return ['missing_consumable_artifact', 'unreadable_or_corrupt_artifact', 'permission_or_credential_boundary']
+  if (['EACCES', 'EPERM'].includes(String(error?.code || ''))) return true;
+  return ['executor_unavailable', 'codex_cli_unavailable', 'codex_cli_execution_blocked', 'permission_or_credential_boundary', 'authority_boundary_violation', 'stale_or_mismatched_stage_identity']
     .includes(String(error?.hard_stop_kind || ''));
 }
 

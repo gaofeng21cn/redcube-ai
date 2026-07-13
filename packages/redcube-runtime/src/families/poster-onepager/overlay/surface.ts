@@ -33,9 +33,10 @@ const SURFACE_VALIDATORS = {
     && content.stages.some((stage: SurfaceContract) => stage?.stage_id === 'poster_blueprint')
     && content.stages.some((stage: SurfaceContract) => stage?.stage_id === 'visual_director_review'),
   'contracts/stage-requirements.json': (content: SurfaceContract) => validateSurfaceRequirements(content, [
-    { path: 'render_html.requires_artifacts', includes: 'poster_blueprint' },
-    { path: 'render_html.requires_artifacts', includes: 'visual_direction' },
-    { path: 'export_bundle.requires_review_pass', equals: true },
+    { path: 'render_html.input_stage_refs', includes: 'poster_blueprint' },
+    { path: 'render_html.input_stage_refs', includes: 'visual_direction' },
+    { path: 'export_bundle.ready_claim_requires_review_pass', equals: true },
+    { path: 'export_bundle.can_block_stage_launch', equals: false },
   ]),
   'contracts/lifecycle-stage-contract.json': (content: SurfaceContract) => validateSurfaceRequirements(content, [
     { path: 'stage_model', equals: 'direct_delivery_human_workline' },

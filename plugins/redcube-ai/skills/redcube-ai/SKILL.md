@@ -5,7 +5,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 # RedCube AI App Skill
 
-当 Codex 需要把 `RedCube AI` 作为正式 domain app 来操作，而不是把仓库当成临时脚本集合时，使用这个 plugin。canonical 机器名是 `redcube-ai`。
+当 Codex 需要把 `RedCube AI` 作为正式 domain app 来操作，而不是把仓库当成临时脚本集合时，使用这个 plugin。canonical OPL agent/package id 是 `rca`；`redcube-ai` 只是 repo、Codex plugin 与 skill carrier 名，不是第二个 package identity 或 alias。
 
 ## 这个 plugin 是什么
 
@@ -92,7 +92,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 - 只要当前 stage 产生可读取、可被下一 stage 消费的 artifact，就以 `completed` 或 `completed_with_quality_debt` 推进。
 - 质量债务可以触发 repair recommendation，但不能生成 execution blocker，也不能让同一 stage 无限循环。
 - 质量债务必须阻止 `visual_ready`、`export_ready`、production-ready 等声明。
-- 只有零可消费 artifact、artifact 损坏不可读、权限/凭据、显式人工门、authority violation 或 stage identity/currentness mismatch 可以硬停止。
+- 零产出、artifact 损坏不可读或缺少上游输入时，必须物化 `no_output_diagnostic` / failure diagnostic 并以质量债推进；只有 executor 不可用、权限/凭据或安全边界、显式人工门、不可逆动作授权、authority violation 或 stage identity/currentness mismatch 可以硬停止。
 - Codex CLI 是唯一 stage 语义控制面；output schema、normalizer、validator、review helper 与静态 transition table 只能产生 findings，不能拒绝已有 raw/partial artifact。
 - Codex 可携带 review findings、失败尝试或负结果 route-back 到任一已声明 stage，重复进入 storyline/blueprint/visual/author/review stage 属于正常进度。
 

@@ -34,6 +34,7 @@
     "preflight_or_quality_review_can_loop_without_deliverable_delta": false,
     "quality_gaps_block_ordinary_progress_by_default": false,
     "consumable_artifact_advances_stage": true,
+    "no_output_or_failure_diagnostic_advances_stage": true,
     "retry_review_and_repair_limits_are_quality_budgets": true,
     "quality_budget_exhaustion_status": "completed_with_quality_debt",
     "quality_debt_blocks_stage_transition": false,
@@ -50,7 +51,7 @@
     "ai_route_back_may_target_any_declared_stage": true,
     "framework_static_transition_table_can_reject_ai_route_back": false,
     "safe_action_before_diagnostic_reconcile": true,
-    "next_delta_must_be_deliverable_receipt_blocker_or_handoff": true
+    "next_delta_may_be_deliverable_receipt_diagnostic_hard_blocker_or_handoff": true
   },
   "default_read_surface": {
     "root": "current_owner_delta",
@@ -69,8 +70,7 @@
     "cleanup_delete_gate"
   ],
   "hard_stop_gates": [
-    "zero_consumable_artifact",
-    "artifact_corrupt_or_unreadable",
+    "executor_unavailable",
     "safety_or_compliance",
     "permission_or_credential_boundary",
     "human_decision_required",
@@ -89,7 +89,8 @@
     "quality_gate_receipt_ref",
     "no_regression_ref",
     "route_back_ref",
-    "handoff_packet_ref"
+    "handoff_packet_ref",
+    "no_output_or_failure_diagnostic_ref"
   ],
   "authority_boundary": {
     "policy_can_claim_domain_ready": false,

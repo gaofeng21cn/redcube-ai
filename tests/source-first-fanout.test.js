@@ -66,11 +66,12 @@ test('source-first fanout prepares one shared source pack then returns OPL stage
     );
 
     assert.equal(result.planner.planner_kind, 'source_first_opl_stage_plan_fanout');
-    assert.equal(result.planner.barrier.authoritative_surface, 'shared_source_truth');
-    assert.equal(result.planner.barrier.planned_reuse, true);
-    assert.equal(result.planner.barrier.actual_reuse.frozen_source_pack_reused, false);
-    assert.equal(result.planner.barrier.reuse_truth_source, 'source_pack_manifest.reuse');
-    assert.equal(result.planner.family_execution.parallel_after_barrier, true);
+    assert.equal(result.planner.source_context.authoritative_surface, 'shared_source_truth');
+    assert.equal(result.planner.source_context.planned_reuse, true);
+    assert.equal(result.planner.source_context.actual_reuse.frozen_source_pack_reused, false);
+    assert.equal(result.planner.source_context.reuse_truth_source, 'source_pack_manifest.reuse');
+    assert.equal(result.planner.source_context.can_block_stage_launch, false);
+    assert.equal(result.planner.family_execution.parallel_with_source_context, true);
     assert.equal(result.planner.family_execution.quality_gate_policy, 'preserve_each_family_review_and_export_gates');
     assert.equal(result.planner.family_execution.stage_attempt_runtime_owner, 'configured_family_runtime_provider');
     assert.equal(result.planner.family_execution.stage_scheduler_owner, 'one-person-lab');
@@ -78,6 +79,7 @@ test('source-first fanout prepares one shared source pack then returns OPL stage
     assert.deepEqual(result.planner.opl_stage_execution_plan_dag.layers[0].task_ids, [
       'source_pack:topic-fanout/source-pack/planning_ready',
     ]);
+    assert.equal(result.planner.opl_stage_execution_plan_dag.layers[0].can_block_stage_launch, false);
     assert.deepEqual(result.planner.opl_stage_execution_plan_dag.layers[1].task_ids, [
       'opl-stage-execution-plan:ppt_deck:topic-fanout:deck-fanout:auto-to-terminal',
       'opl-stage-execution-plan:xiaohongshu:topic-fanout:note-fanout:auto-to-terminal',

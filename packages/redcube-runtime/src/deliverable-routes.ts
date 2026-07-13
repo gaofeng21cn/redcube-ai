@@ -145,15 +145,23 @@ function normalizeOplRouteAttemptIndex({ crossProviderAttemptIndex, safeRoute, o
   if (!index) {
     missing.push('cross_provider_attempt_index');
     return {
-      ok: false,
-      blocker: buildMissingOplRouteAttemptBlocker({
-        safeRoute,
-        overlay,
-        topicId,
-        deliverableId,
-        runId,
-        reasons: missing,
-      }),
+      ok: true,
+      index: {
+        surface_kind: 'route_execution_transport_context',
+        version: 'route-execution-transport-context.v1',
+        status: 'missing_quality_debt',
+        owner: 'one-person-lab',
+        domain_adapter_owner: 'redcube_ai',
+        missing_refs: missing,
+        blocks_stage_transition: false,
+        blocks_runtime_currentness_claim: true,
+        next_stage_may_start: true,
+        route_selection_owner: 'codex_cli',
+        rca_does_not_own_provider_attempt_ledger: true,
+        repo_local_route_runner_default_allowed: false,
+        execution_owner: 'codex_cli_direct_domain_handler',
+        rca_execution_role: 'visual_route_handler_and_artifact_authority',
+      },
     };
   }
 
@@ -550,7 +558,8 @@ function buildCompletedRouteResponse({
   crossProviderAttemptIndex = null,
   startedEvent = null,
 }) {
-  const routeRunStatus = isQualityDebtArtifact(routeResult.artifact)
+  const transportQualityDebt = crossProviderAttemptIndex?.status === 'missing_quality_debt';
+  const routeRunStatus = isQualityDebtArtifact(routeResult.artifact) || transportQualityDebt
     ? 'completed_with_quality_debt'
     : 'completed';
   const completedRun = completeRouteExecutionRef({
@@ -588,6 +597,15 @@ function buildCompletedRouteResponse({
     artifactFile: routeResult.artifact_file,
     artifact: routeResult.artifact,
     cache_status: routeResult.cache_status || 'miss',
+    ...(transportQualityDebt ? {
+      quality_debt: {
+        code: 'opl_stage_attempt_transport_context_missing',
+        missing_refs: crossProviderAttemptIndex.missing_refs,
+        blocks_stage_transition: false,
+        blocks_runtime_currentness_claim: true,
+        next_stage_may_start: true,
+      },
+    } : {}),
   };
 }
 
@@ -642,16 +660,28 @@ function buildFailedRouteResponse({
 }) {
   const { failure, qualityBlocked } = normalizeRouteFailure(error);
   const failedArtifact = failedArtifactForError(error, failure);
-  const admittedArtifact = failedArtifact
-    ? admitStageArtifactForProgress(failedArtifact, { route: safeRoute })
-    : null;
+  const failureIsHardStop = isHardStopArtifact({
+    ...failure,
+    hard_stop_kind: failure.hard_stop_kind,
+  })
+    || Boolean(failure.hard_stop_kind)
+    || failure.requiresHumanConfirmation
+    || failure.requiresExternalSecret
+    || ['EACCES', 'EPERM'].includes(String(failure.code || ''));
+  const admittedArtifact = failureIsHardStop
+    ? null
+    : admitStageArtifactForProgress(
+        failedArtifact || {
+          status: 'failed',
+          error: failure.message,
+          error_kind: failure.code,
+          route: safeRoute,
+          diagnostic_refs: failure.artifact_refs,
+        },
+        { route: safeRoute },
+      );
   const recoverableArtifactObserved = Boolean(
-    failedArtifact
-    && !isHardStopArtifact(failedArtifact)
-    && !failure.hard_stop_kind
-    && !failure.requiresHumanConfirmation
-    && !failure.requiresExternalSecret
-    && !['EACCES', 'EPERM'].includes(String(failure.code || '')),
+    admittedArtifact && !failureIsHardStop,
   );
   if (recoverableArtifactObserved && admittedArtifact) {
     const progressArtifact = {
@@ -660,7 +690,8 @@ function buildFailedRouteResponse({
       progress_first: {
         ...(admittedArtifact.progress_first || {}),
         transition_rule: 'any_diagnostic_or_partial_artifact_advances',
-        artifact_available: true,
+        artifact_available: Boolean(failedArtifact),
+        diagnostic_available: !failedArtifact,
         advance_allowed: true,
         next_stage_may_start: true,
         route_back_selection_owner: 'codex_cli',

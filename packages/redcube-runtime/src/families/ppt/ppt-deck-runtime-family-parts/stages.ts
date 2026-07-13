@@ -12,7 +12,6 @@ import {
 import { createPptRenderReviewMachineGateBuilder } from './render-review-machine-gate.js';
 import {
   buildReviewExportCloseout,
-  reviewExportBlockerKind,
 } from './review-export-closeout.js';
 import { materializePptScreenshotReviewCapture } from './screenshot-capture.js';
 import { createPptDeckScreenshotReviewMechanicsParts } from './stage-screenshot-review-mechanics.js';
@@ -651,11 +650,6 @@ export function createPptDeckStageParts(deps) {
       route: 'screenshot_review',
       deliverableId,
       status,
-      blockerKind: reviewExportBlockerKind({
-        route: 'screenshot_review',
-        failedChecks,
-        slideReviews,
-      }),
       blockingReasons: failedChecks,
       nextRequiredOwnerAction: rerunFromStage,
       artifactRefs,
@@ -823,7 +817,7 @@ export function createPptDeckStageParts(deps) {
     const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
     const contract = readJson(path.join(deliverablePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
     const findings = [];
-    const missing = safeArray(deps.STAGE_REQUIREMENTS?.[route]?.requires_artifacts)
+    const missing = safeArray(deps.STAGE_REQUIREMENTS?.[route]?.input_stage_refs)
       .filter((stageId) => !readStageArtifact(contract, deliverablePaths, stageId));
     if (missing.length > 0) {
       findings.push(`missing_upstream_artifacts:${missing.join(',')}`);

@@ -55,7 +55,7 @@ function assertUniqueDeliverables(deliverables) {
   }
 }
 
-function sourcePackBarrierId({ topicId, fanout }) {
+function sourcePackContextId({ topicId, fanout }) {
   return `${topicId}/source-pack/${safeText(fanout?.source_pack?.readiness?.sufficiency_status, 'unknown')}`;
 }
 
@@ -93,14 +93,15 @@ function hydrateSourcePackFanout({ sourcePackFanout, deliverables }) {
 
 function buildOplStagePlanDag({ sourcePackId, stageExecutionPlans }) {
   return {
-    dag_kind: 'opl_stage_execution_plan_dag',
-    scheduler_owner: 'one-person-lab',
+    dag_kind: 'opl_stage_execution_plan_context_projection',
+    scheduler_owner: 'codex_cli',
     domain_role: 'visual_route_stage_refs_only',
     layers: [
       {
-        layer_id: 'shared_source_pack_barrier',
+        layer_id: 'shared_source_pack_context',
         task_ids: [`source_pack:${sourcePackId}`],
         owner: 'redcube_ai',
+        can_block_stage_launch: false,
       },
       {
         layer_id: 'opl_family_stage_plan_submission',
@@ -114,23 +115,24 @@ function buildOplStagePlanDag({ sourcePackId, stageExecutionPlans }) {
 }
 
 function buildFanoutPlanner({ topicId, sourcePackFanout, createdDeliverables, stageExecutionPlans }) {
-  const sourcePackId = sourcePackBarrierId({ topicId, fanout: sourcePackFanout });
+  const sourcePackId = sourcePackContextId({ topicId, fanout: sourcePackFanout });
   const stagePlanDag = buildOplStagePlanDag({ sourcePackId, stageExecutionPlans });
   return {
     planner_kind: 'source_first_opl_stage_plan_fanout',
     schema_version: 2,
     topic_id: topicId,
-    barrier: {
-      task_kind: 'shared_source_pack_barrier',
+    source_context: {
+      task_kind: 'shared_source_pack_context',
       source_pack_id: sourcePackId,
       authoritative_surface: sourcePackFanout?.authoritative_surface || 'shared_source_truth',
       readiness: sourcePackFanout?.source_pack?.readiness || null,
       planned_reuse: true,
       actual_reuse: null,
       reuse_truth_source: 'source_pack_manifest.reuse',
+      can_block_stage_launch: false,
     },
     family_execution: {
-      parallel_after_barrier: sourcePackFanout.parallel_family_ready === true,
+      parallel_with_source_context: sourcePackFanout.parallel_family_ready === true,
       quality_gate_policy: 'preserve_each_family_review_and_export_gates',
       stage_attempt_runtime_owner: 'configured_family_runtime_provider',
       stage_scheduler_owner: 'one-person-lab',
@@ -198,21 +200,18 @@ export async function runSourceFirstFanout({
     sourceFiles,
     operatorFiles,
   });
-  if (sourceBarrier.planningReady !== true) {
-    return {
-      ok: false,
-      surface_kind: 'source_first_fanout',
-      recommended_action: sourceBarrier.recommended_action || 'complete_source_readiness',
-      source_barrier: sourceBarrier,
-      summary: {
-        topic_id: topicId,
-        source_barrier_status: 'blocked',
-        deliverable_count: normalizedDeliverables.length,
-        stage_execution_plan_count: 0,
-        stage_runtime_projection_count: 0,
-      },
-    };
-  }
+  const sourceQualityDebt = sourceBarrier.planningReady === true
+    ? null
+    : {
+        status: 'recorded_non_blocking',
+        reasons: ['source_pack_not_planning_ready'],
+        source_recommended_action: sourceBarrier.recommended_action || 'complete_source_readiness',
+        blocks_stage_transition: false,
+        blocks_visual_ready_claim: true,
+        blocks_export_ready_claim: true,
+        next_stage_may_start: true,
+        semantic_route_owner: 'codex_cli',
+      };
 
   const createdDeliverables = [];
   for (const deliverable of normalizedDeliverables) {
@@ -247,7 +246,7 @@ export async function runSourceFirstFanout({
     createdDeliverables,
     stageExecutionPlans,
   });
-  planner.barrier.actual_reuse = sourcePackManifest?.reuse || null;
+  planner.source_context.actual_reuse = sourcePackManifest?.reuse || null;
 
   return {
     ok: stageExecutionPlans.every((result) => result.ok === true),
@@ -256,6 +255,7 @@ export async function runSourceFirstFanout({
       ? 'submit_fanout_to_opl_stage_attempt_runtime'
       : 'inspect_opl_stage_plan_failures',
     source_barrier: sourceBarrier,
+    source_quality_debt: sourceQualityDebt,
     source_pack_fanout: sourcePackFanout,
     source_pack_manifest: sourcePackManifest,
     planner,
@@ -264,7 +264,9 @@ export async function runSourceFirstFanout({
     stage_runtime_projections: [],
     summary: {
       topic_id: topicId,
-      source_barrier_status: 'planning_ready',
+      source_barrier_status: sourceBarrier.planningReady === true
+        ? 'planning_ready'
+        : 'completed_with_quality_debt',
       deliverable_count: normalizedDeliverables.length,
       stage_execution_plan_count: stageExecutionPlans.length,
       stage_runtime_projection_count: 0,

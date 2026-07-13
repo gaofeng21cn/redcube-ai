@@ -7,7 +7,7 @@ type XiaohongshuCanonicalStageSequence = XiaohongshuContractModule['XIAOHONGSHU_
 type XiaohongshuCanonicalStageDefinition =
   | XiaohongshuCanonicalStageSequence['stages'][number]
   | XiaohongshuCanonicalStageSequence['alternate_stages'][number];
-type XiaohongshuCanonicalStageHardStop = XiaohongshuCanonicalStageSequence['hard_stops'][number];
+type XiaohongshuCanonicalQualityRoute = XiaohongshuCanonicalStageSequence['quality_route_recommendations'][number];
 type XiaohongshuCanonicalStageRequirements = XiaohongshuContractModule['XIAOHONGSHU_STAGE_REQUIREMENTS'];
 
 export type XiaohongshuOverlayId = XiaohongshuCatalog['overlay_id'];
@@ -21,28 +21,29 @@ export interface XiaohongshuStageDefinition {
   stage_id: XiaohongshuStageId;
   prompt_file: XiaohongshuPromptFile;
   output_artifact: XiaohongshuOutputArtifactFile;
-  requires_stages: XiaohongshuStageId[];
+  input_stage_refs: XiaohongshuStageId[];
   lane_id?: string;
   replaces_stage?: XiaohongshuStageId;
 }
 
-export interface XiaohongshuStageHardStop {
+export interface XiaohongshuQualityRouteRecommendation {
   stage_id: XiaohongshuStageId;
-  rerun_from_stage: XiaohongshuCanonicalStageHardStop['rerun_from_stage'];
-  requires_stage_outputs?: XiaohongshuStageId[];
-  requires_review?: XiaohongshuStageId[];
+  rerun_from_stage: XiaohongshuCanonicalQualityRoute['rerun_from_stage'];
+  preferred_input_stage_refs?: XiaohongshuStageId[];
+  preferred_review_stage_refs?: XiaohongshuStageId[];
 }
 
 export interface XiaohongshuStageSequence {
   flow_id: XiaohongshuCanonicalStageSequence['flow_id'];
   stages: XiaohongshuStageDefinition[];
   alternate_stages?: XiaohongshuStageDefinition[];
-  hard_stops: XiaohongshuStageHardStop[];
+  quality_route_recommendations: XiaohongshuQualityRouteRecommendation[];
 }
 
 export interface XiaohongshuStageRequirement {
-  requires_artifacts: XiaohongshuStageId[];
-  requires_review_pass?: true;
+  input_stage_refs: XiaohongshuStageId[];
+  ready_claim_requires_review_pass?: true;
+  can_block_stage_launch: false;
 }
 
 export type XiaohongshuStageRequirements = Record<

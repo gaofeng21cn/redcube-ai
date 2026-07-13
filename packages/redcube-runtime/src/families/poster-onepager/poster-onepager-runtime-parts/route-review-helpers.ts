@@ -71,7 +71,7 @@ export function createPosterOnepagerRouteReviewHelpers({ promptMeta, safeText })
     route,
     lifecycleStage,
     authoredSurface,
-    materializedFrom = 'prompt_pack_seed',
+    materializedFrom = 'codex_cli_json_output',
     generationRuntime = null,
     adapter = CODEX_DEFAULT_ADAPTER,
   }) {
@@ -90,7 +90,7 @@ export function createPosterOnepagerRouteReviewHelpers({ promptMeta, safeText })
     return {
       overlay,
       primary_surface: primarySurface(generationRuntime),
-      contract_asset: 'prompt_pack_seed',
+      contract_asset: 'stage_prompt_and_attached_output_contract',
     };
   }
 

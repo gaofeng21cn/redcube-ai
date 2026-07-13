@@ -5,17 +5,18 @@ type JsonRecord = Record<string, any>;
 export const PROGRESS_FIRST_STAGE_POLICY = Object.freeze({
   contract_id: 'rca.progress_first_stage_admission.v1',
   retry_semantics: 'quality_budget_not_transition_gate',
-  transition_rule: 'consumable_stage_artifact_advances',
+  transition_rule: 'domain_artifact_or_stage_diagnostic_advances',
   next_stage_may_start: true,
   route_selection_owner: 'codex_cli',
   route_may_skip_repeat_reverse_or_target_any_declared_stage: true,
   quality_claim_rule: 'quality_debt_never_implies_visual_or_export_ready',
   hard_stop_kinds: [
-    'missing_consumable_artifact',
-    'unreadable_or_corrupt_artifact',
+    'executor_unavailable',
+    'codex_cli_unavailable',
     'permission_or_credential_boundary',
     'explicit_human_gate',
     'authority_boundary_violation',
+    'irreversible_action_requires_authorization',
     'stale_or_mismatched_stage_identity',
   ],
 });
@@ -58,7 +59,7 @@ function failedChecks(artifact: JsonRecord): string[] {
   ]);
 }
 
-export function hasConsumableStageArtifact(artifact: unknown): artifact is JsonRecord {
+export function hasConsumableStageArtifact(artifact: unknown): boolean {
   if (!artifact || typeof artifact !== 'object' || Array.isArray(artifact)) return false;
   const record = artifact as JsonRecord;
   return Object.keys(record).some((key) => ![
@@ -80,14 +81,13 @@ function qualityDebtRequired(artifact: JsonRecord): boolean {
 }
 
 const HARD_STOP_KINDS = new Set([
-  'missing_consumable_artifact',
-  'missing_required_artifact',
-  'unreadable_or_corrupt_artifact',
+  'executor_unavailable',
+  'codex_cli_unavailable',
   'permission_or_credential_boundary',
   'explicit_human_gate',
   'authority_boundary_violation',
+  'irreversible_action_requires_authorization',
   'stale_or_mismatched_stage_identity',
-  'missing_opl_stage_attempt',
 ]);
 
 export function isHardStopArtifact(artifact: unknown): boolean {
@@ -100,19 +100,44 @@ export function isHardStopArtifact(artifact: unknown): boolean {
     record?.blocker_kind,
     record?.typed_blocker?.blocker_kind,
   ].map((value) => safeText(value)).filter(Boolean);
-  return record?.hard_stop === true || candidates.some((kind) => HARD_STOP_KINDS.has(kind));
+  return candidates.some((kind) => HARD_STOP_KINDS.has(kind));
 }
 
 export function admitStageArtifactForProgress(
-  artifact: JsonRecord,
+  artifact: JsonRecord | null | undefined,
   { route = '', qualityBudget = null }: { route?: string; qualityBudget?: JsonRecord | null } = {},
 ): JsonRecord {
-  if (!hasConsumableStageArtifact(artifact) || isHardStopArtifact(artifact)) return artifact;
-  const requiresQualityDebt = qualityDebtRequired(artifact);
-  const originalStatus = safeText(artifact?.status, 'completed');
-  const debtReasons = failedChecks(artifact);
-  const reviewStatePatch = artifact?.review_state_patch && typeof artifact.review_state_patch === 'object'
-    ? artifact.review_state_patch
+  const sourceArtifact = artifact && typeof artifact === 'object' && !Array.isArray(artifact)
+    ? artifact
+    : {};
+  if (isHardStopArtifact(sourceArtifact)) return sourceArtifact;
+  const domainArtifactAvailable = hasConsumableStageArtifact(sourceArtifact);
+  const noOutputDiagnostic = domainArtifactAvailable ? null : {
+    surface_kind: 'rca_stage_no_output_diagnostic',
+    failure_kind: 'no_output_diagnostic',
+    message: safeText(
+      sourceArtifact?.error || sourceArtifact?.message,
+      'Stage produced no consumable domain artifact; the diagnostic is the progress artifact.',
+    ),
+  };
+  const normalizedArtifact = noOutputDiagnostic
+    ? {
+        ...sourceArtifact,
+        stage_attempt_diagnostic: noOutputDiagnostic,
+        normalization_findings: uniqueStrings([
+          ...safeArray(sourceArtifact?.normalization_findings),
+          noOutputDiagnostic.message,
+        ]),
+      }
+    : sourceArtifact;
+  const requiresQualityDebt = !domainArtifactAvailable || qualityDebtRequired(normalizedArtifact);
+  const originalStatus = safeText(normalizedArtifact?.status, domainArtifactAvailable ? 'completed' : 'no_output');
+  const debtReasons = uniqueStrings([
+    ...failedChecks(normalizedArtifact),
+    ...(!domainArtifactAvailable ? ['stage_produced_no_consumable_domain_artifact'] : []),
+  ]);
+  const reviewStatePatch = normalizedArtifact?.review_state_patch && typeof normalizedArtifact.review_state_patch === 'object'
+    ? normalizedArtifact.review_state_patch
     : {};
   const rerunPolicy = reviewStatePatch?.rerun_policy && typeof reviewStatePatch.rerun_policy === 'object'
     ? reviewStatePatch.rerun_policy
@@ -122,18 +147,20 @@ export function admitStageArtifactForProgress(
   ) || null;
 
   return {
-    ...artifact,
+    ...normalizedArtifact,
     status: requiresQualityDebt ? 'completed_with_quality_debt' : originalStatus,
-    blocking_reasons: requiresQualityDebt ? [] : safeArray(artifact?.blocking_reasons),
-    typed_blocker_refs: requiresQualityDebt ? [] : safeArray(artifact?.typed_blocker_refs),
-    typed_blocker: requiresQualityDebt ? null : artifact?.typed_blocker,
-    blocker_ref: requiresQualityDebt ? null : artifact?.blocker_ref,
-    blocker_kind: requiresQualityDebt ? null : artifact?.blocker_kind,
-    failure_kind: requiresQualityDebt ? null : artifact?.failure_kind,
+    blocking_reasons: requiresQualityDebt ? [] : safeArray(normalizedArtifact?.blocking_reasons),
+    typed_blocker_refs: requiresQualityDebt ? [] : safeArray(normalizedArtifact?.typed_blocker_refs),
+    typed_blocker: requiresQualityDebt ? null : normalizedArtifact?.typed_blocker,
+    blocker_ref: requiresQualityDebt ? null : normalizedArtifact?.blocker_ref,
+    blocker_kind: requiresQualityDebt ? null : normalizedArtifact?.blocker_kind,
+    failure_kind: requiresQualityDebt ? null : normalizedArtifact?.failure_kind,
     progress_first: {
       ...PROGRESS_FIRST_STAGE_POLICY,
-      route: safeText(route || artifact?.route) || null,
-      artifact_available: true,
+      route: safeText(route || normalizedArtifact?.route) || null,
+      artifact_available: domainArtifactAvailable,
+      diagnostic_available: !domainArtifactAvailable,
+      progress_artifact_available: true,
       advance_allowed: true,
       quality_debt_recorded: requiresQualityDebt,
       quality_budget: qualityBudget,
@@ -141,8 +168,8 @@ export function admitStageArtifactForProgress(
     },
     quality_debt: requiresQualityDebt
       ? {
-          ...(artifact?.quality_debt && typeof artifact.quality_debt === 'object'
-            ? artifact.quality_debt
+          ...(normalizedArtifact?.quality_debt && typeof normalizedArtifact.quality_debt === 'object'
+            ? normalizedArtifact.quality_debt
             : {}),
           status: 'recorded_non_blocking',
           original_status: originalStatus,
@@ -153,7 +180,7 @@ export function admitStageArtifactForProgress(
           blocks_visual_ready_claim: true,
           blocks_export_ready_claim: true,
         }
-      : artifact?.quality_debt || null,
+      : normalizedArtifact?.quality_debt || null,
     review_state_patch: requiresQualityDebt
       ? {
           ...reviewStatePatch,

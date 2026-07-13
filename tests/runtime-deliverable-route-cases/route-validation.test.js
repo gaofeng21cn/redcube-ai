@@ -70,7 +70,7 @@ test('runDeliverableRoute rejects overlay mismatch against stored deliverable', 
   );
 });
 
-test('runDeliverableRoute returns typed blocker when OPL stage attempt packet is missing', async () => {
+test('runDeliverableRoute advances with transport quality debt when OPL stage attempt packet is missing', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-opl-owner-boundary-'));
 
@@ -92,12 +92,13 @@ test('runDeliverableRoute returns typed blocker when OPL stage attempt packet is
       route: 'storyline',
     });
 
-    assert.equal(result.ok, false);
-    assert.equal(result.surface_kind, 'typed_blocker');
-    assert.equal(result.return_shape, 'typed_blocker');
-    assert.equal(result.typed_blocker.blocker_kind, 'missing_opl_stage_attempt');
-    assert.equal(result.run.status, 'typed_blocker');
-    assert.equal(result.run.route_execution_owner_boundary.default_execution_owner, 'opl_stage_attempt_or_typed_blocker');
+    assert.equal(result.ok, true);
+    assert.notEqual(result.surface_kind, 'typed_blocker');
+    assert.equal(result.run.status, 'completed_with_quality_debt');
+    assert.equal(result.run.cross_provider_attempt_index.status, 'missing_quality_debt');
+    assert.equal(result.run.cross_provider_attempt_index.blocks_stage_transition, false);
+    assert.equal(result.run.cross_provider_attempt_index.next_stage_may_start, true);
+    assert.equal(result.run.cross_provider_attempt_index.route_selection_owner, 'codex_cli');
     assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'runs')), false);
     assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'events')), false);
   });

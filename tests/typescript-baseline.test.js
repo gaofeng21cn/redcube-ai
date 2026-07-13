@@ -347,7 +347,7 @@ test('test registry is the single source of truth for lane membership and keeps 
 
   assert.equal(registryFiles.length, new Set(registryFiles).size);
   assert.equal(groups.historical.length, 1);
-  assert.equal(groups.fast.length, 44);
+  assert.equal(groups.fast.length, 45);
   assert.equal(groups.smoke.length > 0, true);
   assert.equal(groups.smoke.length < groups.fast.length, true);
   assert.equal(groups['meta:ci'].some((file) => groups.fast.includes(file)), false);

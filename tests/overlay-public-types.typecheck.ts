@@ -42,46 +42,47 @@ type _PptProfileRerun = Expect<Equal<
 const pptSequence: PptDeckStageSequence = {
   flow_id: 'ppt_deck_standard_flow',
   stages: [],
-  hard_stops: [],
+  quality_route_recommendations: [],
 };
 pptSequence.stages.push({
   stage_id: 'storyline',
   prompt_file: 'storyline.md',
   output_artifact: 'storyline.json',
-  requires_stages: [],
+  input_stage_refs: [],
 });
-const pptRequirement: PptDeckStageRequirements['storyline'] = { requires_artifacts: [] };
-pptRequirement.requires_review_pass = true;
+const pptRequirement: PptDeckStageRequirements['storyline'] = { input_stage_refs: [], can_block_stage_launch: false };
+pptRequirement.ready_claim_requires_review_pass = true;
 
 const xiaohongshuSequence: XiaohongshuStageSequence = {
   flow_id: 'xiaohongshu_official_flow',
   stages: [],
-  hard_stops: [],
+  quality_route_recommendations: [],
 };
 xiaohongshuSequence.stages.push({
   stage_id: 'research',
   prompt_file: 'research.md',
   output_artifact: 'research.json',
-  requires_stages: [],
+  input_stage_refs: [],
 });
 const xiaohongshuRequirement: XiaohongshuHydratedContract['stage_requirements']['research'] = {
-  requires_artifacts: [],
+  input_stage_refs: [],
+  can_block_stage_launch: false,
 };
-xiaohongshuRequirement.requires_review_pass = true;
+xiaohongshuRequirement.ready_claim_requires_review_pass = true;
 
 const posterSequence: PosterOnepagerStageSequence = {
   flow_id: 'poster_onepager_mainline_flow',
   stages: [],
-  hard_stops: [],
+  quality_route_recommendations: [],
 };
 posterSequence.stages.push({
   stage_id: 'storyline',
   prompt_file: 'storyline.md',
   output_artifact: 'storyline.json',
-  requires_stages: [],
+  input_stage_refs: [],
 });
-const posterRequirement: PosterOnepagerStageRequirements['storyline'] = { requires_artifacts: [] };
-posterRequirement.requires_review_pass = true;
+const posterRequirement: PosterOnepagerStageRequirements['storyline'] = { input_stage_refs: [], can_block_stage_launch: false };
+posterRequirement.ready_claim_requires_review_pass = true;
 
 type NativeLane = PptDeckPromptPack['render_contract']['native_ppt_proof_lane'];
 type NativeRoute = NativeLane['runnable_routes'][number];

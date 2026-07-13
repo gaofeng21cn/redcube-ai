@@ -3,7 +3,7 @@
   "version": "opl-stage-artifact-kernel-adoption.v1",
   "owner": "redcube_ai",
   "domain_id": "redcube_ai",
-  "package_id": "redcube-ai",
+  "package_id": "rca",
   "conformance_entrypoint": "contracts/stage_artifact_kernel_adoption.json",
   "kernel_contract_ref": "contracts/opl-framework/stage-artifact-runtime-contract.json",
   "stage_control_plane_ref": "opl-generated:family_stage_control_plane",

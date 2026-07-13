@@ -155,6 +155,8 @@ test('OPL default callers see RCA deletion evidence refs without delete authorit
   assert.equal(report.deletion_gate.physical_delete_authorized, false);
   assert.equal(report.deletion_gate.evidence_worklist_count, 0);
   assert.equal(report.deletion_gate.default_caller_delete_ready, false);
+  assert.equal(report.deletion_gate.owner_decision_result_shape, 'keep_as_authority_adapter_ref');
+  assert.equal(report.deletion_gate.no_further_opl_default_caller_delete_work, true);
   assert.equal(report.private_platform_residue_deletion_gate.status, 'empty');
   assert.equal(report.private_platform_residue_deletion_gate.residue_gate_count, 0);
   assert.equal(report.private_platform_residue_deletion_gate.owner_decision_work_order.open_count_semantics, 'zero_residue_gate_count_means_no_cleanup_lane_items_not_physical_delete_authorized');

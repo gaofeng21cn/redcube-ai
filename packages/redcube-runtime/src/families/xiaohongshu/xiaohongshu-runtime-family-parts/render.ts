@@ -287,8 +287,7 @@ export function createXiaohongshuRenderParts(deps) {
     });
     if (slides.length === 0) {
       const error = new Error('render_html produced no consumable HTML pages');
-      error.failure_kind = 'missing_consumable_artifact';
-      error.hard_stop_kind = 'missing_consumable_artifact';
+      error.failure_kind = 'no_output_diagnostic';
       throw error;
     }
     const planSlides = safeArray(plan?.single_note_plan?.slides);
@@ -443,8 +442,7 @@ export function createXiaohongshuRenderParts(deps) {
     });
     if (slides.length === 0) {
       const error = new Error('fix_html produced no consumable HTML pages');
-      error.failure_kind = 'missing_consumable_artifact';
-      error.hard_stop_kind = 'missing_consumable_artifact';
+      error.failure_kind = 'no_output_diagnostic';
       throw error;
     }
     const allPlanSlides = safeArray(plan?.single_note_plan?.slides);

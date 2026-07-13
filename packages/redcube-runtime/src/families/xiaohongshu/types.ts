@@ -37,7 +37,15 @@ export type XhsRecipeId =
   | 'xhs.evidence_bands'
   | 'xhs.checklist_close';
 
-export type XhsPackProvenanceSource = 'prompt_pack_seed' | 'runtime_artifact_provenance';
+export interface XhsPackProvenanceStamp {
+  owner: string;
+  primary_surface: string;
+  stage_owner?: string;
+  route: string;
+  lifecycle_stage: string;
+  authored_surface: string;
+  materialized_from: 'codex_cli_json_output' | string;
+}
 
 interface PackDeliverablePaths {
   deliverableId: string;
@@ -108,28 +116,6 @@ export interface XhsStorylineArtifact {
   };
 }
 
-interface XhsPlanningSeedSlide {
-  slide_id: string;
-  title: string;
-  layout_family: XhsLayoutFamily;
-  render_recipe_id: XhsRecipeId;
-  page_goal: string;
-  progression_role?: XhsProgressionRole;
-  page_core_content?: string[];
-  visual_presentation?: XhsSourceVisualPresentation;
-  source_language?: string;
-  speaker_notes?: string;
-  transition?: string;
-  core_sentence?: string;
-}
-
-interface XhsPlanningSeed {
-  plan?: {
-    title_options?: string[];
-    slides?: XhsPlanningSeedSlide[];
-  };
-}
-
 export interface XhsPageRhythmPoint {
   slide_id: string;
   role: XhsProgressionRole;
@@ -139,20 +125,6 @@ export interface XhsMaterialRules {
   paper_base: string;
   main_accent: string;
   warning_accent: string;
-}
-
-interface XhsVisualDirectionSeed {
-  visual_direction?: {
-    director_statement?: string;
-    visual_motif?: string;
-    material_rules?: Partial<XhsMaterialRules>;
-    rhythm_curve?: XhsPageRhythmPoint[];
-    peak_pages?: string[];
-    page_family_ceiling?: Partial<Record<XhsLayoutFamily, number>>;
-    anti_template_constraints?: string[];
-    source_language_discipline?: string;
-    forbidden_regressions?: string[];
-  };
 }
 
 export interface XhsSourceReference {
@@ -185,8 +157,9 @@ export interface XhsPlanSlide {
   transition: string;
   transition_sentence: string;
   creative_sources: {
-    page_core_content: 'prompt_pack_seed';
-    visual_presentation: 'prompt_pack_seed';
+    page_core_content: XhsPackProvenanceStamp;
+    visual_presentation: XhsPackProvenanceStamp;
+    render_recipe_id?: XhsPackProvenanceStamp;
   };
 }
 
@@ -227,10 +200,10 @@ export interface XhsVisualDirection {
   baseline_deliverable_id: string | null;
   memory_hook: string;
   creative_sources?: {
-    director_statement: 'prompt_pack_seed';
-    visual_motif: 'prompt_pack_seed';
-    rhythm_curve: 'prompt_pack_seed';
-    page_family_ceiling: 'prompt_pack_seed';
+    director_statement: XhsPackProvenanceStamp;
+    visual_motif: XhsPackProvenanceStamp;
+    rhythm_curve: XhsPackProvenanceStamp;
+    page_family_ceiling: XhsPackProvenanceStamp;
   };
 }
 
@@ -273,8 +246,8 @@ export interface XhsRenderSlide {
   speaker_seconds: number;
   total_slides: number;
   creative_sources: {
-    recipe_selection: XhsPackProvenanceSource;
-    final_markup: XhsPackProvenanceSource;
+    recipe_selection: XhsPackProvenanceStamp;
+    final_markup: XhsPackProvenanceStamp;
   };
   content: string;
 }
@@ -338,8 +311,6 @@ interface CompileXhsRenderSlidesInput {
 interface XhsPlanningDependencies {
   safeText(value: unknown, fallback?: string): string;
   safeArray<T>(value: T[] | null | undefined): T[];
-  promptSeed(contract: XhsHydratedContract, route: XhsPromptRoute, vars?: { title?: string }): XhsPlanningSeed | XhsVisualDirectionSeed | null;
-  promptArtifact(contract: XhsHydratedContract, route: string, vars?: Record<string, string>): Record<string, unknown> | null;
   sourceLabels(contract: XhsHydratedContract): string[];
   sourceMaterials(contract: XhsHydratedContract): XhsSourceMaterial[];
   inferMemoryHook(contract: XhsHydratedContract): string;
@@ -359,7 +330,6 @@ interface XhsVisualDirectionDependencies {
   attachCommon(route: XhsStageRoute, contract: XhsHydratedContract): XhsArtifactBase;
   safeText(value: unknown, fallback?: string): string;
   safeArray<T>(value: T[] | null | undefined): T[];
-  promptSeed(contract: XhsHydratedContract, route: XhsPromptRoute, vars?: { title?: string }): XhsPlanningSeed | XhsVisualDirectionSeed | null;
   readStageArtifact<T>(contract: XhsHydratedContract, deliverablePaths: PackDeliverablePaths, stageId: XhsStageRoute): T | null;
   sourceConfidence(contract: XhsHydratedContract): string;
   inferMemoryHook(contract: XhsHydratedContract): string;
@@ -411,8 +381,9 @@ export interface XhsRuntimeStageSequence {
 }
 
 export interface XhsRuntimeStageRequirement {
-  requires_artifacts?: XhsRuntimeRoute[];
-  requires_review_pass?: boolean;
+  input_stage_refs?: XhsRuntimeRoute[];
+  ready_claim_requires_review_pass?: boolean;
+  can_block_stage_launch?: false;
 }
 
 export interface XhsRuntimeStageRequirements {

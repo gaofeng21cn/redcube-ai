@@ -57,38 +57,10 @@ export function readPromptPackText(relativePath) {
       hard_stop_kind?: string;
     };
     error.code = 'ENOENT';
-    error.hard_stop_kind = 'missing_consumable_artifact';
+    error.failure_kind = 'missing_prompt_asset_quality_debt';
     throw error;
   }
   return readFileSync(absolutePath, 'utf-8');
-}
-
-function renderSeedValue(value, vars) {
-  if (Array.isArray(value)) return value.map((item) => renderSeedValue(item, vars));
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, renderSeedValue(item, vars)]));
-  }
-  if (typeof value === 'string') {
-    return value.replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, (_match, key) => safeText(vars[key]));
-  }
-  return value;
-}
-
-function promptPackJsonSection(contract, route, section, vars = {}) {
-  const absolutePath = path.join(REPO_ROOT, promptRoute(contract, route));
-  if (!existsSync(absolutePath)) return null;
-  const raw = readFileSync(absolutePath, 'utf-8');
-  const match = raw.match(new RegExp(`## ${section}\\s*\\\`\\\`\\\`json\\s*([\\s\\S]*?)\\s*\\\`\\\`\\\``));
-  if (!match) return null;
-  return renderSeedValue(JSON.parse(match[1]), vars);
-}
-
-export function promptArtifact(contract, route, vars = {}) {
-  return promptPackJsonSection(contract, route, 'runtime_artifact', vars);
-}
-
-export function promptSeed(contract, route, vars = {}) {
-  return promptPackJsonSection(contract, route, 'runtime_seed', vars);
 }
 
 function isOperatorContextMaterial(material) {

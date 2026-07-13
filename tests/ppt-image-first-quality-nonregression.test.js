@@ -46,10 +46,11 @@ function injectImagePageRoutes(contract) {
     label: 'Repair image pages',
     output_artifact: 'repair_image_pages.json',
   });
-  contract.stage_requirements.author_image_pages = { requires_artifacts: ['slide_blueprint', 'visual_direction'] };
+  contract.stage_requirements.author_image_pages = { input_stage_refs: ['slide_blueprint', 'visual_direction'], can_block_stage_launch: false };
   contract.stage_requirements.repair_image_pages = {
-    requires_artifacts: ['author_image_pages'],
-    requires_review_from_any: ['visual_director_review', 'screenshot_review'],
+    input_stage_refs: ['author_image_pages'],
+    preferred_review_stage_refs: ['visual_director_review', 'screenshot_review'],
+    can_block_stage_launch: false,
   };
   contract.lifecycle_model.route_to_stage.author_image_pages = 'visual_authorship';
   contract.lifecycle_model.route_to_stage.repair_image_pages = 'visual_authorship';
@@ -273,7 +274,7 @@ test('ppt image-first quality non-regression contract exposes Agent Lab refs wit
   assert.equal(contract.blocked_page_only_repair_policy.scope, 'blocked_slide_ids_only');
   assert.equal(contract.blocked_page_only_repair_policy.unblocked_slide_policy, 'reuse_prior_png_and_record_preserved_hashes');
   assert.equal(contract.blocked_page_only_repair_policy.missing_prior_png_quality_debt_when_other_pages_are_consumable, true);
-  assert.equal(contract.blocked_page_only_repair_policy.zero_consumable_png_hard_stop, true);
+  assert.equal(contract.blocked_page_only_repair_policy.zero_consumable_png_policy, 'no_output_diagnostic_and_quality_debt');
   assert.equal(contract.blocked_page_only_repair_policy.repair_may_touch_unblocked_pages, false);
 
   assert.equal(contract.forbidden_authority_flags.no_forbidden_write, true);

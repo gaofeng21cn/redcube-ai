@@ -266,7 +266,7 @@
       "scope": "blocked_slide_ids_only",
       "preserve_unblocked_pages": true,
       "missing_prior_png_quality_debt_when_other_pages_are_consumable": true,
-      "zero_consumable_png_hard_stop": true
+      "zero_consumable_png_policy": "no_output_diagnostic_and_quality_debt"
     },
     "operator_ux": {
       "status": "landed",

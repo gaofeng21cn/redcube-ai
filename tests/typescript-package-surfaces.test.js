@@ -61,6 +61,7 @@ const PACKAGE_SURFACES = Object.freeze([
       /\bReviewRenderOutputResponse\b/,
       /\bRunSourceFirstFanoutRequest\b/,
       /\bSourceFirstFanoutResponse\b/,
+      /\bRuntimeWatchResponse\b/,
     ],
     typeFiles: ['src/types.ts', 'src/types-parts/foundation.ts', 'src/types-parts/product-entry.ts'],
     typeMatches: [/export interface WorkspaceDoctorResponse/, /export interface RouteRunResponse/],
@@ -70,7 +71,7 @@ const PACKAGE_SURFACES = Object.freeze([
     expectedTypesEntry: './dist/index.d.ts',
     requiredFiles: ['src/index.ts', 'src/types.ts'],
     entryMatches: [/getReviewState/, /getPublicationProjection/, /applyReviewMutation/, /buildGovernanceSurface/],
-    typeMatches: [/interface ReviewStateResponse/, /interface PublicationProjectionResponse/, /interface GovernanceSurfaceContract/],
+    typeMatches: [/interface ReviewStateResponse/, /interface PublicationProjectionResponse/, /interface VisualReviewRefProjectionResponse/, /interface GovernanceSurfaceContract/],
   },
   {
     directory: 'packages/redcube-overlay-core',

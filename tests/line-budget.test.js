@@ -126,7 +126,6 @@ test('RedCube AI skill prefers repo-local launcher over PATH global CLI', () => 
 
   assert.match(skill, /npm run --prefix <redcube-ai-repo> redcube --/);
   assert.match(skill, /用户 PATH 上的裸 `redcube`/);
-  assert.match(skill, /不得把 repo-local launcher 升级成 generic wrapper\/session\/workbench owner/);
 });
 
 function makeLines(lineCount) {

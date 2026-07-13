@@ -7,13 +7,17 @@ description: "Use when RedCube AI needs a PPT review specialist to inspect rende
 
 Operate as the RCA visual review specialist. Judge rendered pages and screenshots directly, then return pass/block verdict refs, weak pages, repair targets, or typed blockers. File presence and mechanical metrics are supporting evidence only.
 
+## Runtime Summary
+
+Independently review the exact rendered pixels and route-specific package/readback evidence against source, story, visual direction, readability, and export intent. Mechanical findings support but never replace visual judgment. Prioritize defects, choose the smallest coherent repair owner/scope, and require repaired bytes to be rerendered and freshly reviewed before pass/export claims.
+
 ## AI-First / Contract-Light Boundary
 
 - Use AI judgment here for visual verdicts, source-fidelity review, story-arc-in-pixels assessment, weak-vs-blocking classification, and repair target selection.
 - Use AI judgment here for repeated visual failure diagnosis and route arbitration: decide whether persistent defects belong to story, direction, page payload, native shape plan, template capacity, helper materialization, or the selected image-first / native route.
 - Treat contracts, screenshot gates, artifact inventories, and `contracts/capability_map.json` as evidence routing and false-authority guards; they can prove what was reviewed, not whether the deck is visually good.
 - Treat `visual_pack_compiler_handoff` and stage-control route decisions as refs-only handoff inputs. They may name route policy, stage ids, screenshot refs, review refs, receipt refs, and forbidden-authority flags; they must not encode the visual pass/block decision, repair route selection, or export/handoff judgment.
-- Do not let provider completion, schema completeness, token routing, or file existence substitute for pixel review. If evidence is insufficient, return a typed blocker.
+- Do not let provider completion, schema completeness, token routing, or file existence substitute for pixel review. If evidence is insufficient, return review quality debt or a no-output diagnostic and continue; use a typed blocker only for the explicit hard-stop whitelist.
 
 ## Inputs
 
@@ -48,7 +52,7 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 1. Review the pixels first. Screenshots and rendered pages are the primary evidence; summaries, manifests, and geometry checks explain, but do not replace, visual judgment.
 2. Compare across the deck. Check rhythm, layout variety, typography consistency, density, title hierarchy, and repeated template risk through the contact sheet.
 3. Check source fidelity. Visible claims, numbers, labels, and conclusions must match approved source truth and blueprint.
-4. Fail closed on visible leaks. Internal route names, prompt names, operator wording, local paths, source ids, RCA system terms, or hidden production instructions in visible slide text are blockers.
+4. Fail closed the visual-ready/export-ready claim on visible leaks. Internal route names, prompt names, operator wording, local paths, source ids, RCA system terms, or hidden production instructions in visible slide text become quality debt and targeted repair input; they do not block the next stage.
 5. Separate weak observation from blocking defect. Use only allowed verdict enums from the stage prompt, and put non-blocking concerns in findings.
 6. Repair targets must be actionable: name page id, visible problem, required change, owner stage, and whether to rerun page authoring, native repair, HTML repair, or image repair.
 7. Preserve passed pages. Do not request full-deck redraw when blocked-slide repair is sufficient.
@@ -102,18 +106,17 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 ## Stage Prompt Boundary
 
 - `review_and_revision` owns visual director review, screenshot review, repair targeting, and memory proposals.
-- `package_and_handoff` may export only after review gates pass or after review returns a typed blocker/human gate.
+- `package_and_handoff` may still run after review quality debt to produce a clearly non-ready candidate or export diagnostic; only `visual_ready`, `export_ready`, publication, production, or owner-accepted claims require review gates to pass or a legal owner closeout.
 - This skill does not materialize pages, mutate artifacts, write memory bodies, or sign export receipts outside the stage contract.
 
 ## Blockers And Repair Targets
 
 Return `typed_blocker` only when:
 
-- There are zero readable screenshots or the only visual artifact is corrupt/unreadable.
 - Screenshots belong to a different deck/page identity and therefore violate stage identity/currentness.
 - Permission, credential, explicit human approval, source authority, or artifact authority prevents review.
 
-Partial screenshots, missing contact sheet/shape manifest/source refs/render proof/inventory, uncertain source fidelity, visual defects, and incomplete page coverage are quality debt when any current readable visual artifact exists. They trigger bounded repair recommendations and block ready claims, not the next stage.
+Zero, corrupt, partial, or unreadable screenshots materialize a no-output/failure diagnostic and quality debt that the next declared stage can consume. Missing contact sheet/shape manifest/source refs/render proof/inventory, uncertain source fidelity, visual defects, and incomplete page coverage likewise trigger bounded repair recommendations and block ready claims, not the next stage.
 
 Return `repair_target` when:
 

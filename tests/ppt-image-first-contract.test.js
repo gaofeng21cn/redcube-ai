@@ -55,6 +55,6 @@ test('ppt image-first production contract keeps regressions as ready-claim block
     activeLane.visual_qa_hardening.ready_claim_block_checks.slice(-4),
     ['external_audience_language_ok', 'title_safe_zone_clear', 'table_legibility_ok', 'layout_density_ok'],
   );
-  assert.equal(activeLane.visual_qa_hardening.zero_consumable_png_hard_stop, true);
+  assert.equal(activeLane.visual_qa_hardening.zero_consumable_png_policy, 'no_output_diagnostic_and_quality_debt');
   assert.equal(activeLane.visual_qa_hardening.missing_or_partial_manifest_quality_debt, true);
 });

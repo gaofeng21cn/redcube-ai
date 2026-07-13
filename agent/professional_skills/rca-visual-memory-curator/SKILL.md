@@ -7,6 +7,10 @@ description: "Use when RedCube AI needs an optional visual-pattern proposal duri
 
 Operate as the RCA visual memory curator in one of two explicit modes. During screenshot-review summary, turn rendered review evidence into either one small non-authority proposal candidate or `skip`. After terminal export, the RCA memory owner may separately accept or reject an existing candidate using review and export closeout refs. Memory helps future authoring and review attention; it never becomes route truth, hidden layout code, an export gate, or visual authority.
 
+## Runtime Summary
+
+During review summary, derive at most one small evidence-backed reusable-pattern proposal or `skip`; unresolved defects route back instead of becoming memory. Owner accept/reject is a separate post-export action that requires the existing candidate, rendered review evidence, terminal export closeout, and provenance. Never collapse proposal and acceptance or use memory as route/export authority.
+
 ## AI-First / Contract-Light Boundary
 
 - Use AI judgment here for whether a lesson is reusable, stage-scoped, evidence-backed, stale, too broad, a duplicate, a live defect that should route back, or an authority bypass.

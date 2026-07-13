@@ -118,10 +118,6 @@ export function createPptDeckRuntimeCore() {
     promptMeta,
     resolvePromptPackAsset,
     readPromptPackText,
-    renderSeedValue,
-    promptSeed,
-    promptPackJsonSection,
-    promptArtifact,
     isOperatorContextMaterial,
     sharedSourceTruth,
     sharedSourceReadinessPack,
@@ -228,7 +224,7 @@ export function createPptDeckRuntimeCore() {
     route,
     lifecycleStage,
     authoredSurface,
-    materializedFrom = 'prompt_pack_seed',
+    materializedFrom = 'codex_cli_json_output',
     generationRuntime = null,
   }) {
     return {
@@ -346,10 +342,6 @@ export function createPptDeckRuntimeCore() {
     return `rca-owner-receipt:visual-stage:ppt_deck:${refSegment(route, 'route')}:${refSegment(contract?.deliverable_id, 'deliverable')}`;
   }
 
-  function routeTypedBlockerRef(route, contract) {
-    return `rca-typed-blocker:visual-stage:ppt_deck:${refSegment(route, 'route')}:${refSegment(contract?.deliverable_id, 'deliverable')}`;
-  }
-  
   function attachCommon(route, contract, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
     return {
       route,
@@ -361,7 +353,7 @@ export function createPptDeckRuntimeCore() {
       review_overlay: reviewOverlayForRoute(contract, route),
       execution_model: generationRuntime?.execution_model || executionModelForAdapter(adapter),
       owner_receipt_refs: [routeOwnerReceiptRef(route, contract)],
-      typed_blocker_refs: [routeTypedBlockerRef(route, contract)],
+      typed_blocker_refs: [],
     };
   }
   

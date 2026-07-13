@@ -1,6 +1,7 @@
 // @ts-nocheck
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 import { safeArray, safeText } from './surface-helpers.js';
 
@@ -32,11 +33,16 @@ function resolvePromptPackAsset(contract, relativePath) {
 function promptMeta(repoRoot, contract, route) {
   const relativePath = promptRoute(contract, route);
   const absolutePath = path.join(repoRoot, relativePath);
+  if (!existsSync(absolutePath)) {
+    throw new Error(`Missing poster_onepager prompt pack asset: ${relativePath}`);
+  }
+  const body = readFileSync(absolutePath);
   return {
     root: promptPackRoot(contract),
     file: path.basename(relativePath),
     relative_path: relativePath,
-    source: existsSync(absolutePath) ? 'repo' : 'embedded',
+    source: 'repo',
+    body_sha256: createHash('sha256').update(body).digest('hex'),
   };
 }
 
@@ -47,38 +53,10 @@ function readPromptPackText(repoRoot, relativePath) {
   if (!existsSync(absolutePath)) {
     const error = new Error(`Missing prompt pack asset: ${relativePath}`);
     error.code = 'ENOENT';
-    error.hard_stop_kind = 'missing_consumable_artifact';
+    error.failure_kind = 'missing_prompt_asset_quality_debt';
     throw error;
   }
   return readFileSync(absolutePath, 'utf-8');
-}
-
-function renderSeedValue(value, vars) {
-  if (Array.isArray(value)) return value.map((item) => renderSeedValue(item, vars));
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, renderSeedValue(item, vars)]));
-  }
-  if (typeof value === 'string') {
-    return value.replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, (_match, key) => safeText(vars[key]));
-  }
-  return value;
-}
-
-function promptPackJsonSection(repoRoot, contract, route, section, vars = {}) {
-  const absolutePath = path.join(repoRoot, promptRoute(contract, route));
-  if (!existsSync(absolutePath)) return null;
-  const raw = readFileSync(absolutePath, 'utf-8');
-  const match = raw.match(new RegExp(`## ${section}\\s*\\\`\\\`\\\`json\\s*([\\s\\S]*?)\\s*\\\`\\\`\\\``));
-  if (!match) return null;
-  return renderSeedValue(JSON.parse(match[1]), vars);
-}
-
-function promptArtifact(repoRoot, contract, route, vars = {}) {
-  return promptPackJsonSection(repoRoot, contract, route, 'runtime_artifact', vars);
-}
-
-function promptSeed(repoRoot, contract, route, vars = {}) {
-  return promptPackJsonSection(repoRoot, contract, route, 'runtime_seed', vars);
 }
 
 function isOperatorContextMaterial(material) {
@@ -123,10 +101,8 @@ function sourceLabels(contract) {
 
 export function createPosterOnepagerPromptSourceTruthHelpers({ repoRoot }) {
   return {
-    promptArtifact: (contract, route, vars = {}) => promptArtifact(repoRoot, contract, route, vars),
     promptMeta: (contract, route) => promptMeta(repoRoot, contract, route),
     promptRoute,
-    promptSeed: (contract, route, vars = {}) => promptSeed(repoRoot, contract, route, vars),
     publicSources,
     readPromptPackText: (relativePath) => readPromptPackText(repoRoot, relativePath),
     resolvePromptPackAsset,

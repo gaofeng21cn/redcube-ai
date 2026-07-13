@@ -188,7 +188,7 @@
         "table_legibility_ok",
         "layout_density_ok"
       ],
-      "zero_consumable_png_hard_stop": true,
+      "zero_consumable_png_policy": "no_output_diagnostic_and_quality_debt",
       "missing_or_partial_manifest_quality_debt": true,
       "rerun_route": "repair_image_pages"
     },
@@ -206,7 +206,7 @@
       "repair_scope": "blocked_slide_ids_only",
       "unblocked_slide_policy": "reuse_prior_png_and_record_preserved_hashes",
       "missing_prior_png_quality_debt_when_other_pages_are_consumable": true,
-      "zero_consumable_png_hard_stop": true,
+      "zero_consumable_png_policy": "no_output_diagnostic_and_quality_debt",
       "token_persistence_allowed": false
     },
     "operator_ux": {

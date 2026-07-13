@@ -77,16 +77,10 @@ function routeCloseoutRefs({ route, deliverableId, payload }) {
   const safeRoute = refSegment(route, 'route');
   const safeDeliverableId = refSegment(deliverableId, 'deliverable');
   if (isBlockedCloseoutStatus(payload?.status)) {
-    const explicitBlockerRefs = uniqueStrings([
-      ...shared.safeArray(payload?.typed_blocker_refs),
-      ...shared.safeArray(payload?.blocker_refs),
-      shared.safeText(payload?.blocker_ref),
-    ]);
     return {
       owner_receipt_refs: [],
-      typed_blocker_refs: explicitBlockerRefs.length > 0
-        ? explicitBlockerRefs
-        : [`rca-typed-blocker:visual-stage:xiaohongshu:${safeRoute}:${safeDeliverableId}`],
+      typed_blocker_refs: [],
+      quality_debt_refs: [`rca-quality-debt:visual-stage:xiaohongshu:${safeRoute}:${safeDeliverableId}`],
     };
   }
   const explicitOwnerRefs = uniqueStrings([
@@ -149,7 +143,7 @@ function runtimeCreativeSource(contractAsset, generationRuntime = null, adapter 
     primary_surface: primarySurface(generationRuntime),
     stage_owner: primarySurface(generationRuntime),
     adapter,
-    supporting_contract: shared.safeText(contractAsset, 'prompt_pack_seed'),
+    supporting_contract: shared.safeText(contractAsset, 'stage_prompt_and_attached_output_contract'),
   };
 }
 
@@ -171,7 +165,7 @@ function creativeSourceStamp({
   route,
   lifecycleStage,
   authoredSurface,
-  materializedFrom = 'prompt_pack_seed',
+  materializedFrom = 'codex_cli_json_output',
   generationRuntime = null,
   adapter = CODEX_DEFAULT_ADAPTER,
 }) {
@@ -188,7 +182,7 @@ function reviewAuthorship(overlay, generationRuntime = null, adapter = CODEX_DEF
   return {
     overlay,
     primary_surface: primarySurface(generationRuntime),
-    contract_asset: 'prompt_pack_seed',
+    contract_asset: 'stage_prompt_and_attached_output_contract',
   };
 }
 
@@ -207,7 +201,7 @@ function attachCommon(route, contract, generationRuntime = null, adapter = CODEX
 function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId }) {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const contract = shared.readJson(path.join(deliverablePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
-  const required = shared.safeArray(contract?.stage_requirements?.[route]?.requires_artifacts)
+  const required = shared.safeArray(contract?.stage_requirements?.[route]?.input_stage_refs)
     .filter((stageId) => !(route === 'visual_director_review' && stageId === 'author_image_pages'));
   const findings = [];
   const missing = required.filter((stageId) => !shared.readStageArtifact(contract, deliverablePaths, stageId));
@@ -281,8 +275,8 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
 
 function isZeroArtifactHardFailure(error) {
   if (error?.requiresHumanConfirmation === true || error?.requiresExternalSecret === true) return true;
-  if (['EACCES', 'EPERM', 'ENOENT'].includes(shared.safeText(error?.code))) return true;
-  return ['missing_consumable_artifact', 'unreadable_or_corrupt_artifact', 'permission_or_credential_boundary']
+  if (['EACCES', 'EPERM'].includes(shared.safeText(error?.code))) return true;
+  return ['executor_unavailable', 'codex_cli_unavailable', 'codex_cli_execution_blocked', 'permission_or_credential_boundary', 'authority_boundary_violation', 'stale_or_mismatched_stage_identity']
     .includes(shared.safeText(error?.hard_stop_kind));
 }
 

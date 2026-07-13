@@ -468,7 +468,7 @@ function buildNativePayload(args) {
       quality_model: 'shape_manifest_layout_metrics_v1',
       source_surface_kind: 'native_pptx',
       required_per_slide_metrics: NATIVE_QUALITY_REQUIRED_PER_SLIDE_METRICS,
-      fail_closed_when_missing: true,
+      quality_debt_when_missing: true,
     },
     render_proof: renderProof,
     package_readback: packageReadback,

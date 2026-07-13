@@ -5,7 +5,7 @@ type PosterCatalog = ReturnType<PosterContractModule['describePosterOnepagerOver
 
 type PosterCanonicalStageSequence = PosterContractModule['POSTER_STAGE_SEQUENCE'];
 type PosterCanonicalStageDefinition = PosterCanonicalStageSequence['stages'][number];
-type PosterCanonicalStageHardStop = PosterCanonicalStageSequence['hard_stops'][number];
+type PosterCanonicalQualityRoute = PosterCanonicalStageSequence['quality_route_recommendations'][number];
 type PosterCanonicalStageRequirements = PosterContractModule['POSTER_STAGE_REQUIREMENTS'];
 
 export type PosterOnepagerOverlayId = PosterCatalog['overlay_id'];
@@ -19,25 +19,26 @@ export interface PosterOnepagerStageDefinition {
   stage_id: PosterOnepagerStageId;
   prompt_file: PosterOnepagerPromptFile;
   output_artifact: PosterOnepagerOutputArtifactFile;
-  requires_stages: PosterOnepagerStageId[];
+  input_stage_refs: PosterOnepagerStageId[];
 }
 
-export interface PosterOnepagerStageHardStop {
+export interface PosterOnepagerQualityRouteRecommendation {
   stage_id: PosterOnepagerStageId;
-  rerun_from_stage: PosterCanonicalStageHardStop['rerun_from_stage'];
-  requires_stage_outputs?: PosterOnepagerStageId[];
-  requires_review?: PosterOnepagerStageId[];
+  rerun_from_stage: PosterCanonicalQualityRoute['rerun_from_stage'];
+  preferred_input_stage_refs?: PosterOnepagerStageId[];
+  preferred_review_stage_refs?: PosterOnepagerStageId[];
 }
 
 export interface PosterOnepagerStageSequence {
   flow_id: PosterCanonicalStageSequence['flow_id'];
   stages: PosterOnepagerStageDefinition[];
-  hard_stops: PosterOnepagerStageHardStop[];
+  quality_route_recommendations: PosterOnepagerQualityRouteRecommendation[];
 }
 
 export interface PosterOnepagerStageRequirement {
-  requires_artifacts: PosterOnepagerStageId[];
-  requires_review_pass?: true;
+  input_stage_refs: PosterOnepagerStageId[];
+  ready_claim_requires_review_pass?: true;
+  can_block_stage_launch: false;
 }
 
 export type PosterOnepagerStageRequirements = Record<

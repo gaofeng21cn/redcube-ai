@@ -15,7 +15,7 @@ test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint',
   assert.equal(adoption.version, 'opl-stage-artifact-kernel-adoption.v1');
   assert.equal(adoption.owner, 'redcube_ai');
   assert.equal(adoption.domain_id, 'redcube_ai');
-  assert.equal(adoption.package_id, 'redcube-ai');
+  assert.equal(adoption.package_id, 'rca');
   assert.equal(adoption.conformance_entrypoint, STAGE_ARTIFACT_KERNEL_ADOPTION_PATH);
   assert.equal(adoption.stage_control_plane_ref, GENERATED_STAGE_CONTROL_PLANE_REF);
   assert.equal(adoption.artifact_locator_contract_ref, 'contracts/artifact_locator_contract.json#/primary_artifact_truth');

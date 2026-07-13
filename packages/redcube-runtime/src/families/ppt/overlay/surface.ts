@@ -25,15 +25,16 @@ function deriveStageRequirements(contract: SurfaceContract) {
   const stages = Array.isArray(contract?.stage_sequence?.stages)
     ? contract.stage_sequence.stages
     : [];
-  const hardStops = Array.isArray(contract?.stage_sequence?.hard_stops)
-    ? contract.stage_sequence.hard_stops
+  const qualityRoutes = Array.isArray(contract?.stage_sequence?.quality_route_recommendations)
+    ? contract.stage_sequence.quality_route_recommendations
     : [];
-  const derived: Record<string, { requires_artifacts: unknown[]; requires_review_pass: boolean }> = {};
+  const derived: Record<string, { input_stage_refs: unknown[]; ready_claim_requires_review_pass: boolean; can_block_stage_launch: false }> = {};
   for (const stage of stages as SurfaceContract[]) {
-    const hardStop = (hardStops as SurfaceContract[]).find((item) => item?.stage_id === stage?.stage_id) || null;
+    const qualityRoute = (qualityRoutes as SurfaceContract[]).find((item) => item?.stage_id === stage?.stage_id) || null;
     derived[stage.stage_id] = {
-      requires_artifacts: Array.isArray(stage?.requires_stages) ? stage.requires_stages : [],
-      requires_review_pass: Boolean(hardStop?.requires_review?.length),
+      input_stage_refs: Array.isArray(stage?.input_stage_refs) ? stage.input_stage_refs : [],
+      ready_claim_requires_review_pass: Boolean(qualityRoute?.preferred_review_stage_refs?.length),
+      can_block_stage_launch: false,
     };
   }
   return derived;
@@ -60,11 +61,12 @@ const SURFACE_VALIDATORS = {
     && content.stages.some((stage: SurfaceContract) => stage?.stage_id === 'visual_director_review'),
   'contracts/stage-requirements.json': (content: SurfaceContract) =>
     validateSurfaceRequirements(content, [
-      { path: 'author_image_pages.requires_artifacts', includes: 'slide_blueprint' },
-      { path: 'author_image_pages.requires_artifacts', includes: 'visual_direction' },
-      { path: 'repair_image_pages.requires_artifacts', includes: 'author_image_pages' },
-      { path: 'screenshot_review.requires_artifacts', includes: 'visual_director_review' },
-      { path: 'export_pptx.requires_review_pass', equals: true },
+      { path: 'author_image_pages.input_stage_refs', includes: 'slide_blueprint' },
+      { path: 'author_image_pages.input_stage_refs', includes: 'visual_direction' },
+      { path: 'repair_image_pages.input_stage_refs', includes: 'author_image_pages' },
+      { path: 'screenshot_review.input_stage_refs', includes: 'visual_director_review' },
+      { path: 'export_pptx.ready_claim_requires_review_pass', equals: true },
+      { path: 'export_pptx.can_block_stage_launch', equals: false },
     ]),
   'contracts/lifecycle-stage-contract.json': (content: SurfaceContract) =>
     content?.stage_model === 'direct_delivery_human_workline'
@@ -152,7 +154,7 @@ const SURFACE_VALIDATORS = {
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.bootstrap_policy?.repo_owned_installer === 'tools/native-ppt-proof/install-deps.sh'
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.required_for_ready_claim === true
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.missing_policy === 'completed_with_quality_debt_when_pptx_is_consumable'
-    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.hard_stop_when_missing === 'no_consumable_pptx_artifact'
+    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.no_output_policy === 'diagnostic_and_quality_debt'
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.html_render_substitute_allowed === false
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.officecli_validate_substitute_allowed === false
     && Array.isArray(content.render_contract.selectable_explicit_routes)

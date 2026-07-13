@@ -6,7 +6,6 @@ import {
 } from './incremental-review-scope.js';
 import {
   buildReviewExportCloseout,
-  reviewExportBlockerKind,
 } from './review-export-closeout.js';
 import { createPptDeckDirectorReviewPreflightParts } from './stage-director-review-preflight.js';
 import { createPptDeckStageReviewScopeParts } from './stage-review-scope.js';
@@ -216,11 +215,6 @@ export function createPptDeckDirectorReviewParts(deps) {
       route: 'visual_director_review',
       deliverableId: deliverablePaths.deliverableId || contract?.deliverable_id,
       status,
-      hardStop: !renderArtifact,
-      blockerKind: reviewExportBlockerKind({
-        route: 'visual_director_review',
-        failedChecks: status === 'pass' ? [] : ['visual_director_review_blocked'],
-      }),
       blockingReasons: status === 'pass'
         ? []
         : [

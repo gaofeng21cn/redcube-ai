@@ -43,55 +43,55 @@ export const XIAOHONGSHU_DELIVERY_CONTRACT = Object.freeze({
 export const XIAOHONGSHU_STAGE_SEQUENCE = {
   flow_id: 'xiaohongshu_official_flow',
   stages: [
-    { stage_id: 'research', prompt_file: 'research.md', output_artifact: 'research.json', requires_stages: [] },
-    { stage_id: 'storyline', prompt_file: 'storyline.md', output_artifact: 'storyline.json', requires_stages: ['research'] },
-    { stage_id: 'single_note_plan', prompt_file: 'single_note_plan.md', output_artifact: 'single_note_plan.json', requires_stages: ['storyline'] },
-    { stage_id: 'visual_direction', prompt_file: 'visual_direction.md', output_artifact: 'visual_direction.json', requires_stages: ['single_note_plan'] },
-    { stage_id: 'author_image_pages', prompt_file: 'author_image_pages.md', output_artifact: 'image_pages_bundle.json', requires_stages: ['single_note_plan', 'visual_direction'] },
-    { stage_id: 'visual_director_review', prompt_file: 'director_review.md', output_artifact: 'director_review.json', requires_stages: ['author_image_pages'] },
-    { stage_id: 'screenshot_review', prompt_file: 'screenshot_review.md', output_artifact: 'quality_gate.json', requires_stages: ['visual_director_review'] },
-    { stage_id: 'repair_image_pages', prompt_file: 'repair_image_pages.md', output_artifact: 'image_pages_repair_bundle.json', requires_stages: ['author_image_pages', 'screenshot_review'] },
-    { stage_id: 'publish_copy', prompt_file: 'publish_copy.md', output_artifact: 'publish_copy.json', requires_stages: ['screenshot_review'] },
-    { stage_id: 'export_bundle', prompt_file: 'export_bundle.md', output_artifact: 'publish_bundle.json', requires_stages: ['publish_copy'] },
+    { stage_id: 'research', prompt_file: 'research.md', output_artifact: 'research.json', input_stage_refs: [] },
+    { stage_id: 'storyline', prompt_file: 'storyline.md', output_artifact: 'storyline.json', input_stage_refs: ['research'] },
+    { stage_id: 'single_note_plan', prompt_file: 'single_note_plan.md', output_artifact: 'single_note_plan.json', input_stage_refs: ['storyline'] },
+    { stage_id: 'visual_direction', prompt_file: 'visual_direction.md', output_artifact: 'visual_direction.json', input_stage_refs: ['single_note_plan'] },
+    { stage_id: 'author_image_pages', prompt_file: 'author_image_pages.md', output_artifact: 'image_pages_bundle.json', input_stage_refs: ['single_note_plan', 'visual_direction'] },
+    { stage_id: 'visual_director_review', prompt_file: 'director_review.md', output_artifact: 'director_review.json', input_stage_refs: ['author_image_pages'] },
+    { stage_id: 'screenshot_review', prompt_file: 'screenshot_review.md', output_artifact: 'quality_gate.json', input_stage_refs: ['visual_director_review'] },
+    { stage_id: 'repair_image_pages', prompt_file: 'repair_image_pages.md', output_artifact: 'image_pages_repair_bundle.json', input_stage_refs: ['author_image_pages', 'screenshot_review'] },
+    { stage_id: 'publish_copy', prompt_file: 'publish_copy.md', output_artifact: 'publish_copy.json', input_stage_refs: ['screenshot_review'] },
+    { stage_id: 'export_bundle', prompt_file: 'export_bundle.md', output_artifact: 'publish_bundle.json', input_stage_refs: ['publish_copy'] },
   ],
   alternate_stages: [
-    { stage_id: 'render_html', prompt_file: 'render_html.md', output_artifact: 'render_bundle.json', requires_stages: ['single_note_plan', 'visual_direction'], lane_id: 'html_authoring', replaces_stage: 'author_image_pages' },
-    { stage_id: 'fix_html', prompt_file: 'fix_html.md', output_artifact: 'fix_bundle.json', requires_stages: ['render_html', 'screenshot_review'], lane_id: 'html_authoring', replaces_stage: 'repair_image_pages' },
+    { stage_id: 'render_html', prompt_file: 'render_html.md', output_artifact: 'render_bundle.json', input_stage_refs: ['single_note_plan', 'visual_direction'], lane_id: 'html_authoring', replaces_stage: 'author_image_pages' },
+    { stage_id: 'fix_html', prompt_file: 'fix_html.md', output_artifact: 'fix_bundle.json', input_stage_refs: ['render_html', 'screenshot_review'], lane_id: 'html_authoring', replaces_stage: 'repair_image_pages' },
   ],
-  hard_stops: [
+  quality_route_recommendations: [
     {
       stage_id: 'author_image_pages',
-      requires_stage_outputs: ['single_note_plan', 'visual_direction'],
+      preferred_input_stage_refs: ['single_note_plan', 'visual_direction'],
       rerun_from_stage: 'single_note_plan',
     },
     {
       stage_id: 'screenshot_review',
-      requires_review: ['visual_director_review'],
+      preferred_review_stage_refs: ['visual_director_review'],
       rerun_from_stage: 'visual_director_review',
     },
     {
       stage_id: 'repair_image_pages',
-      requires_stage_outputs: ['author_image_pages', 'screenshot_review'],
+      preferred_input_stage_refs: ['author_image_pages', 'screenshot_review'],
       rerun_from_stage: 'screenshot_review',
     },
     {
       stage_id: 'publish_copy',
-      requires_review: ['screenshot_review'],
+      preferred_review_stage_refs: ['screenshot_review'],
       rerun_from_stage: 'screenshot_review',
     },
     {
       stage_id: 'export_bundle',
-      requires_review: ['publish_copy'],
+      preferred_review_stage_refs: ['publish_copy'],
       rerun_from_stage: 'publish_copy',
     },
     {
       stage_id: 'render_html',
-      requires_stage_outputs: ['single_note_plan', 'visual_direction'],
+      preferred_input_stage_refs: ['single_note_plan', 'visual_direction'],
       rerun_from_stage: 'single_note_plan',
     },
     {
       stage_id: 'fix_html',
-      requires_stage_outputs: ['render_html', 'screenshot_review'],
+      preferred_input_stage_refs: ['render_html', 'screenshot_review'],
       rerun_from_stage: 'screenshot_review',
     },
   ],
@@ -99,25 +99,26 @@ export const XIAOHONGSHU_STAGE_SEQUENCE = {
   flow_id: string;
   stages: readonly Record<string, unknown>[];
   alternate_stages: readonly Record<string, unknown>[];
-  hard_stops: readonly Record<string, unknown>[];
+  quality_route_recommendations: readonly Record<string, unknown>[];
 };
 
 export const XIAOHONGSHU_STAGE_REQUIREMENTS = {
-  research: { requires_artifacts: [] },
-  storyline: { requires_artifacts: ['research'] },
-  single_note_plan: { requires_artifacts: ['storyline'] },
-  visual_direction: { requires_artifacts: ['single_note_plan'] },
-  author_image_pages: { requires_artifacts: ['single_note_plan', 'visual_direction'] },
-  repair_image_pages: { requires_artifacts: ['author_image_pages', 'screenshot_review'] },
-  render_html: { requires_artifacts: ['single_note_plan', 'visual_direction'] },
-  fix_html: { requires_artifacts: ['render_html', 'screenshot_review'] },
-  visual_director_review: { requires_artifacts: ['author_image_pages'] },
-  screenshot_review: { requires_artifacts: ['visual_director_review'] },
-  publish_copy: { requires_artifacts: ['screenshot_review'], requires_review_pass: true },
-  export_bundle: { requires_artifacts: ['publish_copy'], requires_review_pass: true },
+  research: { input_stage_refs: [], can_block_stage_launch: false },
+  storyline: { input_stage_refs: ['research'], can_block_stage_launch: false },
+  single_note_plan: { input_stage_refs: ['storyline'], can_block_stage_launch: false },
+  visual_direction: { input_stage_refs: ['single_note_plan'], can_block_stage_launch: false },
+  author_image_pages: { input_stage_refs: ['single_note_plan', 'visual_direction'], can_block_stage_launch: false },
+  repair_image_pages: { input_stage_refs: ['author_image_pages', 'screenshot_review'], can_block_stage_launch: false },
+  render_html: { input_stage_refs: ['single_note_plan', 'visual_direction'], can_block_stage_launch: false },
+  fix_html: { input_stage_refs: ['render_html', 'screenshot_review'], can_block_stage_launch: false },
+  visual_director_review: { input_stage_refs: ['author_image_pages'], can_block_stage_launch: false },
+  screenshot_review: { input_stage_refs: ['visual_director_review'], can_block_stage_launch: false },
+  publish_copy: { input_stage_refs: ['screenshot_review'], ready_claim_requires_review_pass: true, can_block_stage_launch: false },
+  export_bundle: { input_stage_refs: ['publish_copy'], ready_claim_requires_review_pass: true, can_block_stage_launch: false },
 } as const satisfies Record<string, {
-  requires_artifacts: readonly string[];
-  requires_review_pass?: true;
+  input_stage_refs: readonly string[];
+  ready_claim_requires_review_pass?: true;
+  can_block_stage_launch: false;
 }>;
 
 export const XIAOHONGSHU_REVIEW_SURFACE = {

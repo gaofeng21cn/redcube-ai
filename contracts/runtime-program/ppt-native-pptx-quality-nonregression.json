@@ -175,7 +175,7 @@
     "helper_can_replace_ai_creative_owner": false,
     "required_for_ready_claim": true,
     "missing_policy": "completed_with_quality_debt_when_pptx_is_consumable",
-    "hard_stop_when_missing": "no_consumable_pptx_artifact",
+    "no_output_policy": "diagnostic_and_quality_debt",
     "template_layout_grammar_required": true,
     "per_slide_layout_binding_required": true,
     "materializer_executes_selected_archetype_zones_only": true,
@@ -199,7 +199,7 @@
     "creative_owner": "llm_agent",
     "materializer_can_select_layout": false,
     "helper_template_layout_allowed": false,
-    "fail_closed_when_missing": true,
+    "quality_debt_when_missing": true,
     "layout_archetype_taxonomy": [
       {
         "archetype_id": "flow_hub_to_cards_proof_band",
@@ -340,7 +340,7 @@
     "runtime": "libreoffice_headless",
     "cross_platform_render_required": true,
     "synthetic_preview_allowed": false,
-    "fail_closed_when_missing": true,
+    "quality_debt_when_missing": true,
     "render_proof_ref": "workspace-runtime-ref:native_pptx:<run-id>#/render_proof",
     "preview_screenshot_refs": [
       "workspace-runtime-ref:native_pptx:<run-id>#/preview_screenshots"

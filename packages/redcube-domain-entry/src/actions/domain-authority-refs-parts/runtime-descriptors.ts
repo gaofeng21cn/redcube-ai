@@ -37,7 +37,7 @@ export function buildArtifactLocatorContract({ workspaceRoot, productSessionSurf
         'stages/<nn-stage>/latest',
       ],
       completion_rule: 'required output roles plus a valid role manifest advance with a progress receipt; owner receipt is additionally required for quality/export/ready claims',
-      blocked_rule: 'only zero readable artifact or another legal hard stop uses typed blocker refs and evidence file',
+      blocked_rule: 'zero or unreadable output materializes a progress diagnostic; only execution, authority, safety, human-decision, irreversible-action, or identity/currentness boundaries use typed blocker refs',
       orphan_rule: 'outputs without a valid role manifest remain non-canonical but readable bytes are still Codex progress input and may route to any declared stage',
       program_identity_rule: 'RCA derives program_id from workspace root so same topic_id/deliverable_id in different workspaces cannot collide in shared OPL runtime-state',
     },

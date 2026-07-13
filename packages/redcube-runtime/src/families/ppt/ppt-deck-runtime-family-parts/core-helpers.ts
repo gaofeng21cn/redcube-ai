@@ -219,41 +219,10 @@ export function createPptDeckCoreHelpers({
     if (!existsSync(absolutePath)) {
       const error = new Error(`Missing prompt pack asset: ${relativePath}`);
       error.code = 'ENOENT';
-      error.hard_stop_kind = 'missing_consumable_artifact';
+      error.failure_kind = 'missing_prompt_asset_quality_debt';
       throw error;
     }
     return readFileSync(absolutePath, 'utf-8');
-  }
-
-  function renderSeedValue(value, vars) {
-    if (Array.isArray(value)) {
-      return value.map((item) => renderSeedValue(item, vars));
-    }
-    if (value && typeof value === 'object') {
-      return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, renderSeedValue(item, vars)]));
-    }
-    if (typeof value === 'string') {
-      return value.replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, (_match, key) => safeText(vars[key]));
-    }
-    return value;
-  }
-
-  function promptSeed(route, vars = {}) {
-    return promptPackJsonSection(route, 'runtime_seed', vars);
-  }
-
-  function promptPackJsonSection(route, section, vars = {}) {
-    const relativePath = PROMPT_PACK[route];
-    const absolutePath = path.join(REPO_ROOT, relativePath);
-    if (!existsSync(absolutePath)) return null;
-    const raw = readFileSync(absolutePath, 'utf-8');
-    const match = raw.match(new RegExp(`## ${section}\\s*\\\`\\\`\\\`json\\s*([\\s\\S]*?)\\s*\\\`\\\`\\\``));
-    if (!match) return null;
-    return renderSeedValue(JSON.parse(match[1]), vars);
-  }
-
-  function promptArtifact(route, vars = {}) {
-    return promptPackJsonSection(route, 'runtime_artifact', vars);
   }
 
   function isOperatorContextMaterial(material) {
@@ -414,10 +383,6 @@ export function createPptDeckCoreHelpers({
     promptMeta,
     resolvePromptPackAsset,
     readPromptPackText,
-    renderSeedValue,
-    promptSeed,
-    promptPackJsonSection,
-    promptArtifact,
     isOperatorContextMaterial,
     sharedSourceTruth,
     sharedSourceReadinessPack,

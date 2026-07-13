@@ -37,10 +37,11 @@ function injectImagePageRoutes(contract) {
     label: 'Repair image pages',
     output_artifact: 'repair_image_pages.json',
   });
-  contract.stage_requirements.author_image_pages = { requires_artifacts: ['slide_blueprint', 'visual_direction'] };
+  contract.stage_requirements.author_image_pages = { input_stage_refs: ['slide_blueprint', 'visual_direction'], can_block_stage_launch: false };
   contract.stage_requirements.repair_image_pages = {
-    requires_artifacts: ['author_image_pages'],
-    requires_review_from_any: ['visual_director_review', 'screenshot_review'],
+    input_stage_refs: ['author_image_pages'],
+    preferred_review_stage_refs: ['visual_director_review', 'screenshot_review'],
+    can_block_stage_launch: false,
   };
   contract.lifecycle_model.route_to_stage.author_image_pages = 'visual_authorship';
   contract.lifecycle_model.route_to_stage.repair_image_pages = 'visual_authorship';

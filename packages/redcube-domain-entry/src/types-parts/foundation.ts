@@ -399,6 +399,7 @@ interface RunSourceFirstFanoutRequest extends TopicRequest {
 
 interface SourceFirstFanoutResponse extends SurfaceBase<'source_first_fanout'> {
   source_barrier: SourceResearchResponse;
+  source_quality_debt?: Record<string, unknown> | null;
   source_pack_fanout?: Record<string, unknown>;
   source_pack_manifest?: Record<string, unknown>;
   planner?: Record<string, unknown>;

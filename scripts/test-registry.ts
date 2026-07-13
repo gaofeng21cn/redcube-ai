@@ -80,6 +80,7 @@ export const TEST_REGISTRY = Object.freeze([
   { file: 'tests/ppt-overlay.test.js', lane: 'meta' },
   { file: 'tests/ppt-native-pptx-quality-nonregression.test.js', lane: 'meta' },
   { file: 'tests/profile-contract-hydration.test.js', lane: 'meta', fast: true },
+  { file: 'tests/progress-first.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/python-native-helper-catalog.test.js', lane: 'meta', fast: true },
   { file: 'tests/rca-production-acceptance.test.js', lane: 'meta' },
   { file: 'tests/rca-workspace-receipt-scaleout-evidence.test.js', lane: 'meta' },

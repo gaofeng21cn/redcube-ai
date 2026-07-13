@@ -163,7 +163,7 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
   assert.deepEqual(
     JSON.parse(
       readFileSync(path.join(deliverableDir, 'contracts/stage-requirements.json'), 'utf-8'),
-    ).author_image_pages.requires_artifacts,
+    ).author_image_pages.input_stage_refs,
     ['slide_blueprint', 'visual_direction'],
   );
   assert.equal(

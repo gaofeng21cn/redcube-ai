@@ -7,6 +7,10 @@ description: "Use when RedCube AI needs a native editable PowerPoint specialist 
 
 Operate as the native editable PPTX design specialist. The AI-authored `editable_shape_plan` is the design authority; Office/Python helpers materialize, validate, render, and export refs. Their quality findings consume a bounded repair budget and do not block stage transition when a readable PPTX or shape plan already exists.
 
+## Runtime Summary
+
+Use the accepted blueprint, visual direction, and template profile to author an explicit editable shape plan before helper materialization. Native means real editable objects, semantic zones, stable ids, and deliberate notes/motion, not a full-page image label. After materialization inspect package/readback and rendered pixels; repair the plan, rerender, and obtain fresh review before native/export claims.
+
 ## AI-First / Contract-Light Boundary
 
 - Use AI judgment here for editable design spec locks, shape grammar, zone binding, coordinate tradeoffs, native repair strategy, and when native editability is genuinely worth the route cost.
@@ -59,7 +63,7 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 14. When converting from image-first, consume approved director notes, contact-sheet findings, source refs, and explicit editable targets. Do not trace pixels blindly or claim native readiness without native QA evidence.
 15. For repeated native repair failure, preserve passing slides and classify the failing boundary before rerender: shape grammar, zone capacity, text fit, helper materialization, review expectation, or route mismatch.
 16. Declare object kind and materialization intent explicitly. Use `stable_drawingml` for shape-built visuals where viewer consistency dominates and `native_data_object` for charts/tables where editable data semantics dominate.
-17. Use real connectors, pictures, groups, paths, charts, and tables when declared. Never permit the helper to convert an unknown or unsupported kind into a rectangle; return a typed blocker or repair target instead.
+17. Use real connectors, pictures, groups, paths, charts, and tables when declared. Never permit the helper to convert an unknown or unsupported kind into a rectangle; preserve the best plan plus a repair target or no-output diagnostic and continue without ready claims.
 18. Keep notes and motion authored, not inferred. Bind notes to slide ids, choose transitions deliberately, keep timing optional, and use animation only when it strengthens the spoken sequence without making the static page incomplete.
 19. Make targeted repair stable-id based. Preserve passing slide/object hashes and rerender only blocked objects or slides unless an upstream design lock changed.
 
@@ -73,7 +77,7 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 ## Design Registry Consumption
 
 - Read `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/visualization_pattern_registry`, `#/professional_style_registry`, and `#/connector_semantics`. Preserve each selected `visualization_pattern_id`, declare its observable semantics, and choose the supported typed materialization mode explicitly.
-- Use `contracts/runtime-program/ppt-master-learning-landing.json` only as provenance. Fail closed when typed objects cannot express the selected semantics; never substitute an unknown kind with a generic rectangle or copy an upstream SVG body.
+- Use `contracts/runtime-program/ppt-master-learning-landing.json` only as provenance. Reject an unexpressible typed shape from the native-ready claim, emit a shape-plan diagnostic or route-back, and continue to another declared stage; never substitute an unknown kind with a generic rectangle or copy an upstream SVG body.
 
 ## Minimal Template Resource
 
@@ -81,7 +85,7 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 - `native_pptx_editability`: the deck must remain editable through Office shapes, text, tables, charts, and connectors; full-page images can only be explicit visual assets, not the slide body.
 - `editable_pptx_grammar`: `template_layout_grammar`, `template_layout_binding`, and `native_shapes[]` must use editable Office objects, declared zones, inch bounds, role ids, quality roles, font sizes, fills/lines, and z-order.
 - `shape_row`: `id`, `slide_id`, `role`, `zone_id`, `left_in`, `top_in`, `width_in`, `height_in`, `text`, `font_size_pt`, `fill`, `line`, `z_order`, `quality_role`.
-- `native_repair_loop`: repair the plan, rerender, compare screenshots, update shape manifest refs, then return review/export refs or typed blocker.
+- `native_repair_loop`: repair the plan, rerender, compare screenshots, update shape manifest refs, then return review/export refs, quality debt, or a no-output diagnostic; typed blocker remains reserved for the explicit hard-stop whitelist.
 - `image_to_native_followup`: consume approved director notes, source refs, contact-sheet findings, and selected editable targets before writing native shapes.
 - `native_ppt_qa_plan`: shape manifest refs, screenshot refs, editable-object checks, hyperlink/text checks, expected reviewer checks, and blocked-slide-only repair scope.
 - `native_vs_image_first_arbitration`: editability reason, selected slides, rejected image-first/native alternatives, contact-sheet evidence, required native QA refs, and route-back owner.
@@ -105,7 +109,7 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 Return `typed_blocker` only when:
 
 - Native PPTX was not explicitly selected, which is an authoring-lane authority violation.
-- No consumable blueprint, visual direction, editable shape plan, or PPTX artifact exists for the next stage.
+- If no consumable blueprint, visual direction, editable shape plan, or PPTX artifact exists, return a no-output diagnostic and quality debt as the next stage input.
 - A template/reference requirement is impossible to read or legally use.
 - Permission, credential, explicit human approval, authority, or stage identity/currentness prevents legal continuation.
 

@@ -1,41 +1,16 @@
 # poster_onepager / poster_blueprint
 
-单页海报 blueprint 是正式 Story Architecture stage。
+## Goal
 
-## AI-first 蓝图合同
+Turn the accepted storyline and full source into a single-page content architecture for the actual poster objective.
 
-- 明确 `headline` / `subheadline` / `render_recipe_id` / `panels` / `anchor_tracks`。
-- 每个 panel 必须给出 `region` / `label` / `text` / `support_points`。
-- 不允许只留模糊区块名，不允许把 visual_direction 混进同一段描述。
-- 必须根据 storyline、`source_materials_full_text` 和海报目标自行组织 panel；不得复制本 prompt 的占位语言或固定 hero/proof/pathway/cta 文案。
+## Good Work
 
-## runtime_seed
+- Author the headline, subheadline, panels, evidence/support points, action boundary, visual anchors, and render recipe from the real source and audience task.
+- Give every panel a clear audience-facing role and enough content to be useful; do not copy fixed hero/evidence/pathway/CTA slots.
+- Preserve evidence and public naming while separating authoring/provenance metadata from visible copy.
+- Let 4:5 capacity and visual hierarchy trigger a focused panel revision before materialization rather than forcing unreadable density.
 
-下列 JSON 只说明字段形状，不提供固定四段故事、固定行动清单或默认运营话术。
+## Handoff
 
-```json
-{
-  "poster_blueprint": {
-    "render_recipe_id": "poster.<allowed_recipe_id>",
-    "headline": "<AI-authored headline from storyline>",
-    "subheadline": "<AI-authored subheadline from storyline>",
-    "panels": [
-      {
-        "panel_id": "<stable panel id>",
-        "region": "<hero_band | evidence_columns | pathway_strip | action_footer | AI-authored region>",
-        "label": "<audience-facing panel label>",
-        "text": "<audience-facing panel text grounded in source_materials_full_text>",
-        "support_points": [
-          "<source-backed support point>",
-          "<source-backed support point>"
-        ]
-      }
-    ],
-    "anchor_tracks": [
-      "<visual anchor track>",
-      "<visual anchor track>",
-      "<visual anchor track>"
-    ]
-  }
-}
-```
+Return the poster-blueprint object required by the attached output contract. The blueprint and visual direction jointly form the materialization basis.

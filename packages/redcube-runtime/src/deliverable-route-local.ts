@@ -21,7 +21,6 @@ import { fileContentHash, helperOutputRefsForArtifact } from './stage-folder-hel
 import {
   admitStageArtifactForProgress,
   authoringLaneForRoute,
-  hasConsumableStageArtifact,
   isHardStopArtifact,
   lockedAuthoringLane,
   markQualityBudgetExhausted,
@@ -169,6 +168,9 @@ function assertOplRouteAttemptBoundary(oplRouteAttemptIndex) {
   ) {
     return;
   }
+  if (safeText(index?.status) === 'missing_quality_debt') {
+    return;
+  }
   const error = new Error('RCA local deliverable route helper requires OPL-owned stage attempt, lease, or receipt evidence');
   error.code = 'missing_opl_stage_attempt';
   error.failure_kind = 'typed_blocker';
@@ -192,8 +194,8 @@ function routeInputFingerprints(files) {
   }));
 }
 
-function routeRequiresArtifacts(contract, route) {
-  return (contract?.stage_requirements?.[route]?.requires_artifacts || [])
+function routeInputStageRefs(contract, route) {
+  return (contract?.stage_requirements?.[route]?.input_stage_refs || [])
     .map((stageId) => String(stageId || '').trim())
     .filter(Boolean);
 }
@@ -206,7 +208,7 @@ function stageArtifactFile(deliverablePaths, contract, stageId) {
     routeStageId: stageId,
     canonicalStageId,
   });
-  if (loaded?.output_file && ['success', 'blocked'].includes(loaded.status)) {
+  if (loaded?.output_file && ['success', 'completed_with_quality_debt', 'blocked'].includes(loaded.status)) {
     return loaded.output_file;
   }
   return stageFolderArtifactPath({
@@ -236,7 +238,7 @@ function pptOperatorRevisionFile(deliverablePaths) {
 }
 
 function routeCacheDependencyFiles({ overlay, route, deliverablePaths, contract, deliverableId }) {
-  const files = routeRequiresArtifacts(contract, route)
+  const files = routeInputStageRefs(contract, route)
     .map((stageId) => stageArtifactFile(deliverablePaths, contract, stageId));
   const promptFile = safeText(contract?.prompt_pack?.routes?.[route]);
   if (promptFile) {
@@ -310,7 +312,7 @@ function buildRouteCacheKey({
     delivery_contract: contract?.delivery_contract || null,
     delivery_request_constraints: contract?.delivery_request?.constraints || null,
     route_user_intent: safeText(userIntent),
-    required_artifacts: routeRequiresArtifacts(contract, route),
+    input_stage_refs: routeInputStageRefs(contract, route),
     mode,
     baselineDeliverableId,
     adapter,
@@ -542,7 +544,7 @@ function routeErrorMustHardStop(error) {
   if (error?.requiresHumanConfirmation === true || error?.requiresExternalSecret === true) return true;
   if (['EACCES', 'EPERM'].includes(String(error?.code || ''))) return true;
   if (error?.artifact && isHardStopArtifact(error.artifact)) return true;
-  if (error?.hard_stop === true || error?.hard_stop_kind) return true;
+  if (isHardStopArtifact(error)) return true;
   const rawOutput = safeText(error?.raw_stage_output || error?.artifact?.raw_stage_output);
   const artifactRefs = Array.isArray(error?.artifact_refs) ? error.artifact_refs.filter(Boolean) : [];
   return error?.failure_kind === 'codex_cli_execution_blocked'
@@ -979,13 +981,12 @@ export async function executeDeliverableRouteLocally({
   }
 
   if (artifact?.status === 'block' || artifact?.status === 'failed') {
-    const missingConsumableArtifact = !hasConsumableStageArtifact(artifact);
     const hardStopKind = safeText(
       artifact?.hard_stop_kind
         || artifact?.error_kind
         || artifact?.failure_kind
         || artifact?.blocker_kind,
-      missingConsumableArtifact ? 'missing_consumable_artifact' : 'route_failure',
+      'route_quality_debt',
     );
     const blockingReasons = uniqueStrings([
       ...safeArray(artifact?.blocking_reasons),
@@ -1002,7 +1003,7 @@ export async function executeDeliverableRouteLocally({
     );
     error.code = hardStopKind;
     error.failure_kind = hardStopKind;
-    error.hard_stop_kind = hardStopKind;
+    if (isHardStopArtifact(artifact)) error.hard_stop_kind = hardStopKind;
     error.target_slide_ids = uniqueStrings([
       ...safeArray(artifact?.target_slide_ids),
       ...safeArray(artifact?.preflight_gate?.target_slide_ids),

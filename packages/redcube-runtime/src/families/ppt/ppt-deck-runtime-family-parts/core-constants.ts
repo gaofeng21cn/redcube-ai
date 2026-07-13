@@ -16,19 +16,19 @@ export const PROMPT_PACK = Object.freeze({
 });
 
 export const STAGE_REQUIREMENTS = Object.freeze({
-  storyline: { requires_artifacts: [] },
-  detailed_outline: { requires_artifacts: ['storyline'] },
-  slide_blueprint: { requires_artifacts: ['detailed_outline'] },
-  visual_direction: { requires_artifacts: ['slide_blueprint'] },
-  render_html: { requires_artifacts: ['slide_blueprint', 'visual_direction'] },
-  author_pptx_native: { requires_artifacts: ['slide_blueprint', 'visual_direction'] },
-  author_image_pages: { requires_artifacts: ['slide_blueprint', 'visual_direction'] },
-  fix_html: { requires_artifacts: ['render_html', 'screenshot_review'] },
-  repair_pptx_native: { requires_artifacts: ['author_pptx_native'] },
-  repair_image_pages: { requires_artifacts: ['author_image_pages'] },
-  visual_director_review: { requires_artifacts: [] },
-  screenshot_review: { requires_artifacts: ['visual_director_review'] },
-  export_pptx: { requires_artifacts: ['screenshot_review'], requires_review_pass: true },
+  storyline: { input_stage_refs: [] },
+  detailed_outline: { input_stage_refs: ['storyline'] },
+  slide_blueprint: { input_stage_refs: ['detailed_outline'] },
+  visual_direction: { input_stage_refs: ['slide_blueprint'] },
+  render_html: { input_stage_refs: ['slide_blueprint', 'visual_direction'] },
+  author_pptx_native: { input_stage_refs: ['slide_blueprint', 'visual_direction'] },
+  author_image_pages: { input_stage_refs: ['slide_blueprint', 'visual_direction'] },
+  fix_html: { input_stage_refs: ['render_html', 'screenshot_review'] },
+  repair_pptx_native: { input_stage_refs: ['author_pptx_native'] },
+  repair_image_pages: { input_stage_refs: ['author_image_pages'] },
+  visual_director_review: { input_stage_refs: [] },
+  screenshot_review: { input_stage_refs: ['visual_director_review'] },
+  export_pptx: { input_stage_refs: ['screenshot_review'], ready_claim_requires_review_pass: true },
 });
 
 export const CANVAS = Object.freeze({ width: 1152, height: 648, ratio: '16:9' });

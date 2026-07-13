@@ -177,9 +177,33 @@ export function writeStageFolderArtifact(input): any {
   const ownerReceiptRefs = unique(input.ownerReceiptRefs || input.owner_receipt_refs);
   const qualityDebtRefs = unique(input.qualityDebtRefs || input.quality_debt_refs);
   const typedBlockerRefs = unique(input.typedBlockerRefs || input.typed_blocker_refs);
-  const artifactReadable = fs.existsSync(input.artifactFile) && fs.statSync(input.artifactFile).isFile();
+  const artifactFile = safeText(input.artifactFile || input.artifact_file)
+    || path.join(paths.outputs_dir, output);
+  let artifactReadable = fs.existsSync(artifactFile) && fs.statSync(artifactFile).isFile();
   if (!artifactReadable && typedBlockerRefs.length === 0) {
-    throw new Error('RCA Stage Folder closeout requires a readable artifact or explicit typedBlockerRefs');
+    fs.mkdirSync(path.dirname(artifactFile), { recursive: true });
+    fs.writeFileSync(artifactFile, `${JSON.stringify({
+      surface_kind: 'rca_stage_no_output_diagnostic',
+      status: 'completed_with_quality_debt',
+      route_stage_id: safeText(input.routeStageId || input.route_stage_id),
+      canonical_stage_id: safeText(input.canonicalStageId || input.canonical_stage_id),
+      stage_attempt_diagnostic: {
+        failure_kind: 'no_output_diagnostic',
+        message: 'Stage produced no readable domain artifact; this diagnostic preserves progress.',
+      },
+      progress_first: {
+        diagnostic_available: true,
+        advance_allowed: true,
+        next_stage_may_start: true,
+      },
+      quality_debt: {
+        status: 'recorded_non_blocking',
+        reasons: ['stage_produced_no_readable_domain_artifact'],
+        blocks_stage_transition: false,
+        blocks_quality_export_or_ready_claims: true,
+      },
+    }, null, 2)}\n`, 'utf8');
+    artifactReadable = true;
   }
   const terminalStatus = typedBlockerRefs.length > 0
     ? 'blocked'
@@ -195,8 +219,8 @@ export function writeStageFolderArtifact(input): any {
     ? `rca-progress-delta:${safeText(input.canonicalStageId || input.canonical_stage_id)}:${safeText(input.routeStageId || input.route_stage_id)}:${path.basename(paths.attempt_dir)}`
     : null;
 
-  if (fs.existsSync(input.artifactFile)) {
-    writeDomainArtifact({ ...attemptLocator, role: 'output', relative_path: output, body: fs.readFileSync(input.artifactFile) });
+  if (artifactReadable) {
+    writeDomainArtifact({ ...attemptLocator, role: 'output', relative_path: output, body: fs.readFileSync(artifactFile) });
   }
   const outputRoles = roles(input);
   const interfacePayload = {

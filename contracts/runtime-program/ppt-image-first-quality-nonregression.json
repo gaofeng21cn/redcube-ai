@@ -117,7 +117,7 @@
     "scope": "blocked_slide_ids_only",
     "unblocked_slide_policy": "reuse_prior_png_and_record_preserved_hashes",
     "missing_prior_png_quality_debt_when_other_pages_are_consumable": true,
-    "zero_consumable_png_hard_stop": true,
+    "zero_consumable_png_policy": "no_output_diagnostic_and_quality_debt",
     "repair_may_touch_unblocked_pages": false
   },
   "export_pptx_policy": {

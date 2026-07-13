@@ -208,7 +208,7 @@ test('probeCodexCli proves the local exec surface with a mock spawn implementati
   assert.equal(result.steps.exec_surface.terminal_event, 'run.completed');
 });
 
-test('buildGenerationInput includes declared RCA professional specialist guidance for mapped ppt routes', () => {
+test('buildGenerationInput consumes the skill-owned Runtime Summary for mapped ppt routes', () => {
   withTemporaryProfessionalSkillFile(
     'agent/professional_skills/rca-ppt-story-architect/SKILL.md',
     '# Story Architect\n\nKeep storyline, outline, and slide blueprint decisions professionally structured.',
@@ -221,10 +221,13 @@ test('buildGenerationInput includes declared RCA professional specialist guidanc
         outputContract: { type: 'object' },
       });
 
-      assert.match(input, /## RCA Professional Specialist Skill Guidance/);
+      assert.match(input, /## RCA Professional Specialist Roles/);
       assert.match(input, /### Story Architect/);
       assert.match(input, /agent\/professional_skills\/rca-ppt-story-architect\/SKILL\.md/);
-      assert.match(input, /Build a claim spine before slide count|Keep storyline, outline, and slide blueprint decisions professionally structured\./);
+      assert.match(input, /Turn the accepted source and audience goal into a claim spine/);
+      assert.match(input, /Route unsupported claims or structural overload upstream/);
+      assert.doesNotMatch(input, /## Inputs/);
+      assert.doesNotMatch(input, /## Execution Rules/);
       assert.doesNotMatch(input, /agent\/professional_skills\/rca-ppt-visual-director\/SKILL\.md/);
     },
   );
@@ -239,7 +242,7 @@ test('buildGenerationInput does not require professional specialist guidance for
     outputContract: { type: 'object' },
   });
 
-  assert.doesNotMatch(input, /## RCA Professional Specialist Skill Guidance/);
+  assert.doesNotMatch(input, /## RCA Professional Specialist Roles/);
 });
 
 test('buildGenerationInput includes the Xiaohongshu content strategist for story planning routes', () => {
@@ -252,10 +255,10 @@ test('buildGenerationInput includes the Xiaohongshu content strategist for story
       outputContract: { type: 'object' },
     });
 
-    assert.match(input, /## RCA Professional Specialist Skill Guidance/);
+    assert.match(input, /## RCA Professional Specialist Roles/);
     assert.match(input, /### Xiaohongshu Content Strategist/);
     assert.match(input, /agent\/professional_skills\/rca-xhs-content-strategist\/SKILL\.md/);
-    assert.match(input, /series architecture|系列架构/i);
+    assert.match(input, /Read the full accepted source and audience goal before choosing one note or a series/i);
   }
 });
 
@@ -327,6 +330,40 @@ test('buildGenerationInput keeps native authoring focused on the downstream nati
     }),
     /Missing RCA professional specialist skill guidance for ppt_deck:author_pptx_native/,
   );
+});
+
+test('active route prompts keep runtime contracts and historical geometry out of Codex guidance', () => {
+  const activePromptFiles = [
+    'prompts/ppt_deck/detailed_outline.md',
+    'prompts/ppt_deck/slide_blueprint.md',
+    'prompts/ppt_deck/visual_direction.md',
+    'prompts/ppt_deck/render_html.md',
+    'prompts/ppt_deck/fix_html.md',
+    'prompts/xiaohongshu/single_note_plan.md',
+    'prompts/xiaohongshu/visual_direction.md',
+    'prompts/xiaohongshu/render_html.md',
+    'prompts/xiaohongshu/fix_html.md',
+    'prompts/poster_onepager/poster_blueprint.md',
+    'prompts/poster_onepager/visual_direction.md',
+    'prompts/poster_onepager/render_html.md',
+  ];
+  for (const file of activePromptFiles) {
+    const body = readFileSync(file, 'utf-8');
+    assert.doesNotMatch(body, /^## runtime_(seed|artifact)\b/m, file);
+    assert.doesNotMatch(body, /ring_cross|timeline_band|multi_zone_compare|surface_text_scroll_overflow/, file);
+  }
+
+  const renderInput = buildGenerationInput({
+    family: 'ppt_deck',
+    route: 'render_html',
+    promptRelativePath: 'prompts/ppt_deck/render_html.md',
+    context: { render_scope: 'slide_batch' },
+    outputContract: { type: 'object' },
+  });
+  assert.match(renderInput, /Materialize the current `slide_blueprint` and `visual_direction`/);
+  assert.match(renderInput, /draft artifact until rendered screenshots are independently reviewed/i);
+  assert.doesNotMatch(renderInput, /## Execution Rules/);
+  assert.doesNotMatch(renderInput, /runtime_(seed|artifact)|ring_cross|timeline_band|multi_zone_compare/);
 });
 
 test('generateStructuredArtifactViaCodexCli records deterministic prompt telemetry without faking provider tokens', async () => {

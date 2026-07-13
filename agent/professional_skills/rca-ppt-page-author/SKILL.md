@@ -5,6 +5,10 @@ description: "Use when RedCube AI needs a PPT page authoring specialist to creat
 
 # RCA PPT Page Author
 
+## Runtime Summary
+
+Author audience-facing pages from the accepted source, story/blueprint, visual direction, and selected route. Preserve claims, fit content at readable scale, choose semantic visuals, and emit route-appropriate proof expectations. Repair only blocked pages when possible; reroute story, direction, template, or route defects instead of hiding them with helper defaults.
+
 Operate as the page-level author inside RCA artifact creation. Produce page plans or artifacts only from approved upstream contracts, one page at a time, with enough detail for later screenshot and export QA.
 
 ## AI-First / Contract-Light Boundary
@@ -87,7 +91,7 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 
 Return `typed_blocker` only when:
 
-- No consumable upstream plan or no consumable page artifact can be produced.
+- If no consumable upstream plan or page artifact is produced, return a no-output diagnostic and quality debt; do not block the next declared stage.
 - The selected route conflicts with the authoring-lane authority lock, such as claiming native editable PPTX while only wrapping page images.
 - Permission, credential, explicit human approval, authority, or stage identity/currentness prevents continuation.
 - The only produced artifact is corrupt or unreadable.

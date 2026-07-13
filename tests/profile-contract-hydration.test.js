@@ -133,8 +133,8 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
     'completed_with_quality_debt_when_pptx_is_consumable',
   );
   assert.equal(
-    contract.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.hard_stop_when_missing,
-    'no_consumable_pptx_artifact',
+    contract.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.no_output_policy,
+    'diagnostic_and_quality_debt',
   );
   assert.equal(
     contract.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.renderer_pipeline,

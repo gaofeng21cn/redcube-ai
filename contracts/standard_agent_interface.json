@@ -1,0 +1,90 @@
+{
+  "surface_kind": "opl_standard_agent_interface_descriptor",
+  "owner": "redcube_ai",
+  "consumer": "one-person-lab",
+  "standard_agent_interface": {
+    "version": "opl_standard_agent_interface.v1",
+    "workspace_binding": {
+      "locator_surface_kind": "redcube_workspace",
+      "default_profile_id": "series",
+      "workspace_kind": "visual_theme_workspace",
+      "project_kind": "slide_deck",
+      "project_collection_label": "deliverables",
+      "default_workspace_id": "visual-workspace",
+      "default_project_id": "deck-001",
+      "required_locator_fields": [
+        "workspace_root"
+      ],
+      "optional_locator_fields": [],
+      "entry_command_template": [
+        "redcube",
+        "product",
+        "status",
+        "--workspace-root",
+        "{workspace_root}"
+      ],
+      "manifest_command_template": [
+        "redcube",
+        "product",
+        "manifest",
+        "--workspace-root",
+        "{workspace_root}"
+      ]
+    },
+    "runtime": {
+      "runtime_domain_id": "redcube_ai",
+      "dispatch_command": [
+        "redcube",
+        "domain-handler",
+        "dispatch"
+      ],
+      "registration_ref": "contracts/standard_agent_interface.json#/standard_agent_interface/runtime"
+    },
+    "progress": {
+      "deliverable_delta_aliases": [
+        "visual_deliverable_progress",
+        "deliverable_progress_delta"
+      ],
+      "platform_delta_aliases": [
+        "platform_repair_delta"
+      ]
+    },
+    "routing": {
+      "explicit_aliases": [
+        "rca",
+        "redcube",
+        "redcube-ai",
+        "redcube_ai",
+        "redcubeai",
+        "deck"
+      ],
+      "workstream_ids": [
+        "presentation_ops"
+      ],
+      "intent_signals": [
+        "presentation",
+        "slide",
+        "deck",
+        "slides",
+        "lecture",
+        "committee",
+        "speaker notes",
+        "ppt",
+        "xiaohongshu",
+        "poster",
+        "onepager"
+      ],
+      "ambiguity_policy": "prefer_explicit_alias_then_workstream_then_intent_signals_else_return_ambiguous_without_cross_domain_guess"
+    }
+  },
+  "authority_boundary": {
+    "interface_is_domain_declared_framework_consumed": true,
+    "interface_contains_domain_action_refs": false,
+    "opl_owns_template_expansion_quoting_and_validation": true,
+    "opl_can_write_visual_truth": false,
+    "opl_can_authorize_review_or_export": false,
+    "opl_can_mutate_artifact_body": false,
+    "opl_can_accept_or_reject_visual_memory": false,
+    "opl_can_sign_owner_receipt": false
+  }
+}

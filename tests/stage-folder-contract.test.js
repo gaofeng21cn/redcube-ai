@@ -257,7 +257,7 @@ test('RCA stage folder converts a readable quality block without typed blocker i
   });
 });
 
-test('RCA stage folder hard-stops when neither readable artifact nor typed blocker exists', () => {
+test('RCA stage folder materializes a progress diagnostic when no readable artifact exists', () => {
   withTempOplState(() => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-zero-artifact-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
@@ -274,13 +274,15 @@ test('RCA stage folder hard-stops when neither readable artifact nor typed block
       status: 'blocked',
     };
 
-    assert.throws(
-      () => writeStageFolderArtifact({
-        ...base,
-        artifactFile: stageFolderOutputPath(base),
-      }),
-      /requires a readable artifact or explicit typedBlockerRefs/,
-    );
+    const written = writeStageFolderArtifact({
+      ...base,
+      artifactFile: stageFolderOutputPath(base),
+    });
+    const diagnostic = readJson(written.output_file);
+    assert.equal(written.manifest.status, 'completed_with_quality_debt');
+    assert.equal(diagnostic.surface_kind, 'rca_stage_no_output_diagnostic');
+    assert.equal(diagnostic.progress_first.next_stage_may_start, true);
+    assert.equal(diagnostic.quality_debt.blocks_stage_transition, false);
   });
 });
 

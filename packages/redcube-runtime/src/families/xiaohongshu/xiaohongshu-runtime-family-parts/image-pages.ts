@@ -398,8 +398,7 @@ export function createXiaohongshuImagePageParts(deps) {
     }));
     if (bundlePages.length === 0) {
       const error = new Error(`Xiaohongshu image authoring produced no consumable PNG artifacts: ${generationFailures.map((item) => safeText(item?.slide_id)).filter(Boolean).join(', ')}`);
-      error.failure_kind = 'missing_consumable_artifact';
-      error.hard_stop_kind = 'missing_consumable_artifact';
+      error.failure_kind = 'no_output_diagnostic';
       error.artifact_refs = promptEntries.flatMap((entry) => [entry.prompt_file, entry.prompt_manifest_file, entry.style_manifest_file]);
       throw error;
     }

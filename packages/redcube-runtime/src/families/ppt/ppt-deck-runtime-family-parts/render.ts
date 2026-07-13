@@ -155,10 +155,7 @@ export function createPptDeckRenderStageParts(deps) {
         continuity_rules: [
           '整套 deck 使用同一套标题、卡片标题、正文、标签与页码字号梯度；除封面外，不允许某页整体突然变大或缩小。',
           '若按 batch 生成，后续批次只能参考前面最多三页的 style tokens、typography、palette、spacing 与 visual summary，不得继承其布局结构。',
-          '若标题或短句在当前字号梯度下能单行成立，就不要主动插入换行。',
-          '中文短术语和核心词组必须完整阅读；不得把“科研路径”“质量边界”“署名责任”“可审查”“医生监督”等词拆成单字尾行。',
-          '页面纵向信息分布必须均衡：不要把大部分文字和主结构都压在中段，底部也要承担信息收束或结构支撑，避免出现上重中挤下空的大块死白。',
-          '整套 deck 的页码语法必须一致：要么统一用两位纯页码，要么统一用当前页/总页数，不允许个别页单独换一套样式。',
+          '自然换行、纵向信息分布和页码语法应在全套视觉体系内保持可读与一致。',
         ],
       },
       shell_contract: {
@@ -171,32 +168,12 @@ export function createPptDeckRenderStageParts(deps) {
         '每页输出完整 slide root，必须包含 data-slide-root=true 与匹配的 data-slide-id。',
         '每页至少提供 2 个语义化 data-qa-block，并至少标记 1 个 data-primary-point=true，供截图审稿读取布局结构。',
         '严格遵守 audience_visibility_contract：speaker_notes、transition_sentence、page_goal、page_objective、visual_anchor_tracks、operator_playbook、revision_context、source_id、material_id 都是作者/系统工作面，不得被写入任何听众可见标题、正文、页脚、badge 或卡片。',
-        '若 source 或 title 中存在内部管理编号、项目编号或 material/source ID，而用户给出了对外汇报口径，听众可见文本必须使用对外标签；内部编号只允许留在 provenance 和 artifact 元数据。',
-        '不要把“建议怎么讲”“可发表表达”“待确认的写作口径”“讲稿备忘录”做成投影片正文；这些内容只能影响讲者备注或被压成听众可理解的研究结论/边界。',
-        '标题区与导语区必须形成独立安全带；主体白板、轨道、横带、标签和大型结构不得侵入 header 的首屏阅读入口。',
-        'foundation / substrate / base band 只承担结构基座，不得压住正文、说明卡片、讲者信息或封面辅助卡；所有可读内容都必须完整留在页边界内。',
-        '任何带字元素都必须拥有独立留白：标签、badge、航线节点、callout、段落、底部说明和图内节点不得彼此遮挡，也不得跨压导航轨道或解释段。',
-        '若同一页面家族重复出现，后续页面必须切换首眼信号、构图重心或风险张力，不能只是上一页的弱化复写。',
-        '对 audit_tension / timeline_band 的第二段推进页，controller 必须继续做唯一主峰；红色风险支路必须收成短窄阻断支路，不能膨胀成第二主图。',
-        '若页面同时承载主链说明与风险提示，底部说明区最多保留 2 块；第 3 个观点必须并入主图注释或节点说明，不得再扩成整排说明带。',
-        '若某页 blueprint 附带 revision_focus，必须把它当作该页的硬重画 brief；recommended_fix 提到删减、收短、并入、合并的元素时，必须字面落实，不能保留同样抢眼的等价变体。',
-        '正文页主标题字号需要在整套 deck 中保持一致，除封面外不要突然缩小；如果空间不足，优先压缩卡片正文、减少说明字数或重排结构，不要先牺牲标题一致性。',
-        '整套 deck 的标题、卡片标题、正文、标签与页码必须遵守同一套 typography_plan；不要让某一页整体更大或更小。',
-        '若批次上下文提供 reference_slides，只能把 slide_identity、source_html_hash 与 visual_summary 当成连续风格锚点，用于对齐 style tokens、typography、palette、spacing 与卡片尺度；不得复制、继承或改写参考页的布局结构。',
-        '连接线、时间线、轨道线必须退到节点徽标和数字圆点下层；不允许线条压在数字、badge 或关键词前景上。',
-        '中文讲课页默认中文优先表达；除 contract / review state / publish surface 等必要术语外，不要无意义夹杂英文，术语若出现也要尽量配中文语义。',
-        '所有正文、标签、节点和卡片文案都要在自然语义处分行，优先减少字数和调整容器，不要把中英文硬挤到同一行直到溢出。',
-        '若标题或短句在当前字号梯度下本可单行成立，就不要主动插入 <br/>；短中文词组只能在自然语义处换行。',
-        '中文短术语和核心词组必须完整阅读；不得把“科研路径”“质量边界”“署名责任”“可审查”“医生监督”等词拆成单字尾行。空间不足时用更短文案、更宽容器、语义换行，或用 inline-block/word-break: keep-all 保护短词。',
-        '页面纵向质量分布必须均衡：不能把主要文字信息只堆在 40%-70% 的中段高度；底部必须参与结构承载、总结收束或留白平衡，避免底部只剩装饰条而上中段过挤。',
-        '若双区对照页的主峰卡、节点链和说明条都集中在中段，必须通过下移、扩底部承载区或重分配信息层次来拉开纵向分布，不要让页面下五分之一长期空置。',
-        '对 multi_zone_compare 的“左拆右并”页面，左侧辅助区必须明显窄于且轻于右侧主峰区；不要把左区做成接近等权的大面板，导致整页读成保守双栏。',
-        '多区页面里，主峰区宽度与视觉权重都必须显著高于辅助区；如果辅助区已经承担三张以上卡片，优先缩短它、压轻它，而不是继续加宽。',
-        '页码的位置、语法、字重和灰度必须在整套 deck 中保持一致，不允许某页突然从两位页码切成“当前页 / 总页数”或相反。',
-        'ring_cross 四向骨架页必须保持中心与上下左右卡片近似等距，不能出现单方向明显贴近中心的失衡。',
-        '风险支路只允许一个紧凑 warning badge 与一段短 stub；禁止横向长红线穿越主链中轴，绿色判断词若保留则计入底部说明总数。',
+        '使用用户批准的对外命名；内部编号、讲稿/制作说明和审阅语言只留在作者或 provenance 面。',
+        '标题、主体、注释、页脚和所有带字元素必须按当前视觉方向保持可读层级、自然换行、稳定包含关系、清楚间距与完整画幅。',
+        '结构线、视觉锚点、图标、badge 和装饰不得遮挡或替代正文语义；重复页面家族应按当前 claim/proof object 形成真实差异。',
+        '若某页带 revision_focus，消费其当前 findings、keep/avoid 和 recommended_fix，但由 executor 选择能关闭根因的最小 coherent repair。',
+        'reference_slides 只提供 style/typography/palette/spacing 连续性，不提供可复制布局。',
         '若已有上一轮通过的 render_html 产物，且 revision_context 只点名部分 blocked slides，则只重画这些页面，其余通过页应保持原样复用，不要重新发明已通过页面。',
-        '若 revision_context 点名了 blocked slides 或遮挡问题，必须优先重建这些页面，先消除裁切/遮挡，再保留导演结构意图。',
         '不要使用 renderSlide/layoutByType/cardsGrid/pageType，不要输出 <script>/<style> block，也不要把模板注册表或内部文档写入 HTML。',
         'HTML 必须由 AI 直接创作，不得退化成固定 slot/template compiler 产物。',
       ],
@@ -494,8 +471,7 @@ export function createPptDeckRenderStageParts(deps) {
     });
     if (slidesMarkup.length === 0) {
       const error = new Error(`upstream ppt ${route} produced no consumable HTML pages`);
-      error.failure_kind = 'missing_consumable_artifact';
-      error.hard_stop_kind = 'missing_consumable_artifact';
+      error.failure_kind = 'no_output_diagnostic';
       throw error;
     }
     const contractRender = renderContract(contract);

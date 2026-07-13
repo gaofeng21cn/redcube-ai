@@ -97,7 +97,7 @@ const PROFESSIONAL_DESIGN_PACK_CONTRACT = Object.freeze({
   creative_owner: 'llm_agent',
   materializer_can_select_layout: false,
   helper_template_layout_allowed: false,
-  fail_closed_when_missing: true,
+  quality_debt_when_missing: true,
   layout_archetype_taxonomy: [
     {
       archetype_id: 'flow_hub_to_cards_proof_band',
@@ -233,7 +233,7 @@ export function buildNativePptQualityNonregressionReadModel({
     shape_manifest_ref: {
       file: shapeManifestFile,
       required_metric_refs: [...REQUIRED_NATIVE_QUALITY_METRIC_REFS],
-      fail_closed_when_missing: true,
+      quality_debt_when_missing: true,
       source_surface_kind: 'native_pptx',
       quality_model: 'shape_manifest_layout_metrics_v1',
     },
@@ -257,7 +257,7 @@ export function buildNativePptQualityNonregressionReadModel({
       title_underline_motif_allowed: false,
       concrete_layout_variant_repetition_limit: 2,
       helper_can_replace_ai_creative_owner: false,
-      fail_closed_when_missing: true,
+      quality_debt_when_missing: true,
     },
     professional_design_pack_ref: {
       contract_ref: `${QUALITY_NONREGRESSION_CONTRACT_REF}#/professional_design_pack_contract`,
@@ -273,7 +273,7 @@ export function buildNativePptQualityNonregressionReadModel({
         'layout_rhythm',
         'design_reference_discipline',
       ],
-      fail_closed_when_missing: PROFESSIONAL_DESIGN_PACK_CONTRACT.fail_closed_when_missing,
+      quality_debt_when_missing: PROFESSIONAL_DESIGN_PACK_CONTRACT.quality_debt_when_missing,
     },
     visual_sample_claim_boundary: {
       sample_kind: isTestDouble ? 'deterministic_test_double_plumbing_proof' : 'live_codex_executor_native_ppt_sample',
@@ -291,7 +291,7 @@ export function buildNativePptQualityNonregressionReadModel({
       contract_ref: `${QUALITY_NONREGRESSION_CONTRACT_REF}#/officecli_materializer_policy`,
       source_ref: 'native_ppt_bundle.officecli_materializer_policy',
       refs_only: true,
-      fail_closed_when_missing_when_adapter_active: true,
+      quality_debt_when_missing_when_adapter_active: true,
     },
     officecli_quality_gate: {
       ...OFFICECLI_MATERIALIZER_POLICY,
@@ -303,7 +303,7 @@ export function buildNativePptQualityNonregressionReadModel({
       renderer_kind: safeText(renderProof.renderer_kind),
       renderer_pipeline: safeText(renderProof.renderer_pipeline),
       runtime: safeText(renderProof.runtime),
-      fail_closed_when_missing: true,
+      quality_debt_when_missing: true,
       synthetic_preview_allowed: false,
     },
     repair_policy: {

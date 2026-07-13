@@ -6,7 +6,7 @@ export function createPptRenderReviewMachineGateBuilder({ safeArray, safeText })
     const imagePngRefs = safeArray(input?.imagePngRefs).map((ref) => safeText(ref)).filter(Boolean);
     const materialGapRefs = safeArray(input?.materialGapRefs).map((ref) => safeText(ref)).filter(Boolean);
     const brandGapRefs = safeArray(input?.brandGapRefs).map((ref) => safeText(ref)).filter(Boolean);
-    const typedBlockerRefs = safeArray(input?.typedBlockerRefs).map((ref) => safeText(ref)).filter(Boolean);
+    const observedHardBoundaryRefs = safeArray(input?.typedBlockerRefs).map((ref) => safeText(ref)).filter(Boolean);
     const slideReviews = safeArray(input?.slideReviews);
     const blockedPageRefs = slideReviews
       .filter((slide) => (
@@ -31,14 +31,14 @@ export function createPptRenderReviewMachineGateBuilder({ safeArray, safeText })
         crop_or_safe_bounds_signal_required: true,
         field_leakage_signal_required: true,
         readability_signal_required: true,
-        material_gap_refs_or_typed_blocker_required: true,
-        brand_gap_refs_or_typed_blocker_required: true,
+        material_gap_diagnostic_required: true,
+        brand_gap_diagnostic_required: true,
       },
       required_signal_groups: {
         page_presence: ['rendered_page_refs', 'image_png_refs', 'page_manifest_ref'],
         render_integrity: ['non_empty_signal', 'sha256_or_hash', 'hash_uniqueness', 'crop_or_safe_bounds'],
         content_safety: ['field_leakage', 'readability'],
-        source_and_brand: ['material_gap_refs_or_typed_blocker', 'brand_gap_refs_or_typed_blocker'],
+        source_and_brand: ['material_gap_refs_or_diagnostic', 'brand_gap_refs_or_diagnostic'],
       },
       evidence_refs: {
         rendered_page_refs: renderedPageRefs,
@@ -46,7 +46,7 @@ export function createPptRenderReviewMachineGateBuilder({ safeArray, safeText })
         page_manifest_ref: safeText(input?.pageManifestRef) || null,
         material_gap_refs: materialGapRefs,
         brand_gap_refs: brandGapRefs,
-        typed_blocker_refs: typedBlockerRefs,
+        observed_hard_boundary_refs: observedHardBoundaryRefs,
       },
       machine_check_output: {
         failed_checks: failedChecks,
@@ -57,12 +57,12 @@ export function createPptRenderReviewMachineGateBuilder({ safeArray, safeText })
               target_slide_ids: blockedPageRefs,
             }
           : null,
-        typed_blocker_refs: typedBlockerRefs,
+        observed_hard_boundary_refs: observedHardBoundaryRefs,
       },
       output_boundary: {
         machine_check_may_emit: [
           'repair_target',
-          'typed_blocker',
+          'quality_debt_ref',
           'blocked_page_refs',
           'failed_checks',
           'evidence_gap_ref',

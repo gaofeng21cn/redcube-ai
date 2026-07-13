@@ -368,7 +368,7 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
             ],
             required_for_ready_claim: true,
             missing_policy: 'completed_with_quality_debt_when_pptx_is_consumable',
-            hard_stop_when_missing: 'no_consumable_pptx_artifact',
+            no_output_policy: 'diagnostic_and_quality_debt',
           },
           export_contract_delta: {
             source_artifact_field: 'export_bundle.source_pptx',

@@ -50,48 +50,49 @@ export const POSTER_DELIVERY_CONTRACT = Object.freeze({
 export const POSTER_STAGE_SEQUENCE = {
   flow_id: 'poster_onepager_mainline_flow',
   stages: [
-    { stage_id: 'storyline', prompt_file: 'storyline.md', output_artifact: 'storyline.json', requires_stages: [] },
-    { stage_id: 'poster_blueprint', prompt_file: 'poster_blueprint.md', output_artifact: 'poster_blueprint.json', requires_stages: ['storyline'] },
-    { stage_id: 'visual_direction', prompt_file: 'visual_direction.md', output_artifact: 'visual_direction.json', requires_stages: ['poster_blueprint'] },
-    { stage_id: 'render_html', prompt_file: 'render_html.md', output_artifact: 'render_bundle.json', requires_stages: ['poster_blueprint', 'visual_direction'] },
-    { stage_id: 'visual_director_review', prompt_file: 'director_review.md', output_artifact: 'director_review.json', requires_stages: ['render_html'] },
-    { stage_id: 'screenshot_review', prompt_file: 'screenshot_review.md', output_artifact: 'quality_gate.json', requires_stages: ['visual_director_review'] },
-    { stage_id: 'export_bundle', prompt_file: 'export_bundle.md', output_artifact: 'publish_bundle.json', requires_stages: ['screenshot_review'] }
+    { stage_id: 'storyline', prompt_file: 'storyline.md', output_artifact: 'storyline.json', input_stage_refs: [] },
+    { stage_id: 'poster_blueprint', prompt_file: 'poster_blueprint.md', output_artifact: 'poster_blueprint.json', input_stage_refs: ['storyline'] },
+    { stage_id: 'visual_direction', prompt_file: 'visual_direction.md', output_artifact: 'visual_direction.json', input_stage_refs: ['poster_blueprint'] },
+    { stage_id: 'render_html', prompt_file: 'render_html.md', output_artifact: 'render_bundle.json', input_stage_refs: ['poster_blueprint', 'visual_direction'] },
+    { stage_id: 'visual_director_review', prompt_file: 'director_review.md', output_artifact: 'director_review.json', input_stage_refs: ['render_html'] },
+    { stage_id: 'screenshot_review', prompt_file: 'screenshot_review.md', output_artifact: 'quality_gate.json', input_stage_refs: ['visual_director_review'] },
+    { stage_id: 'export_bundle', prompt_file: 'export_bundle.md', output_artifact: 'publish_bundle.json', input_stage_refs: ['screenshot_review'] }
   ],
-  hard_stops: [
+  quality_route_recommendations: [
     {
       stage_id: 'render_html',
-      requires_stage_outputs: ['poster_blueprint', 'visual_direction'],
+      preferred_input_stage_refs: ['poster_blueprint', 'visual_direction'],
       rerun_from_stage: 'poster_blueprint'
     },
     {
       stage_id: 'screenshot_review',
-      requires_review: ['visual_director_review'],
+      preferred_review_stage_refs: ['visual_director_review'],
       rerun_from_stage: 'visual_director_review'
     },
     {
       stage_id: 'export_bundle',
-      requires_review: ['screenshot_review'],
+      preferred_review_stage_refs: ['screenshot_review'],
       rerun_from_stage: 'screenshot_review'
     }
   ]
 } as const satisfies {
   flow_id: string;
   stages: readonly Record<string, unknown>[];
-  hard_stops: readonly Record<string, unknown>[];
+  quality_route_recommendations: readonly Record<string, unknown>[];
 };
 
 export const POSTER_STAGE_REQUIREMENTS = {
-  storyline: { requires_artifacts: [] },
-  poster_blueprint: { requires_artifacts: ['storyline'] },
-  visual_direction: { requires_artifacts: ['poster_blueprint'] },
-  render_html: { requires_artifacts: ['poster_blueprint', 'visual_direction'] },
-  visual_director_review: { requires_artifacts: ['render_html'] },
-  screenshot_review: { requires_artifacts: ['visual_director_review'] },
-  export_bundle: { requires_artifacts: ['screenshot_review'], requires_review_pass: true },
+  storyline: { input_stage_refs: [], can_block_stage_launch: false },
+  poster_blueprint: { input_stage_refs: ['storyline'], can_block_stage_launch: false },
+  visual_direction: { input_stage_refs: ['poster_blueprint'], can_block_stage_launch: false },
+  render_html: { input_stage_refs: ['poster_blueprint', 'visual_direction'], can_block_stage_launch: false },
+  visual_director_review: { input_stage_refs: ['render_html'], can_block_stage_launch: false },
+  screenshot_review: { input_stage_refs: ['visual_director_review'], can_block_stage_launch: false },
+  export_bundle: { input_stage_refs: ['screenshot_review'], ready_claim_requires_review_pass: true, can_block_stage_launch: false },
 } as const satisfies Record<string, {
-  requires_artifacts: readonly string[];
-  requires_review_pass?: true;
+  input_stage_refs: readonly string[];
+  ready_claim_requires_review_pass?: true;
+  can_block_stage_launch: false;
 }>;
 
 export const POSTER_REVIEW_SURFACE = {

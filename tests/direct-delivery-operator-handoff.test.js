@@ -90,7 +90,7 @@ test('direct-delivery families keep operator handoff on audit/review/projection 
   });
 });
 
-test('direct-delivery audit advances with quality debt while ready handoff stays blocked without source readiness', async () => {
+test('direct-delivery audit advances with quality debt while operator_handoff stays blocked without source readiness', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-direct-handoff-blocked-'));
     await createDeliverable({
@@ -122,6 +122,8 @@ test('direct-delivery audit advances with quality debt while ready handoff stays
     assert.equal(review.operator_handoff.blocking_reasons.includes('source_audit_missing'), true);
     assert.equal(review.lifecycle_stage_summary.route_to_human_stage.poster_blueprint, 'plan');
     assert.equal(audit.status, 'pass_with_quality_debt');
+    assert.equal(audit.quality_debt.blocks_stage_transition, false);
+    assert.equal(audit.quality_debt.blocks_ready_claims, true);
     assert.equal(audit.operator_handoff.gate_status, 'blocked');
     assert.equal(audit.gate_summary.operator_handoff_status, 'blocked');
   });

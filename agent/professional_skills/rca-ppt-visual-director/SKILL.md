@@ -5,6 +5,10 @@ description: "Use when RedCube AI needs a PPT visual direction specialist to con
 
 # RCA PPT Visual Director
 
+## Runtime Summary
+
+Consume the current story/blueprint and any current template profile to set a visual thesis, hierarchy, semantic composition, rhythm, typography, and continuity for the whole deck. Adapt layout to the claim and proof object, not a fixed archetype quota. Return an exact route-back when content or template capacity cannot support the intended visual argument.
+
 Operate as the visual direction specialist between blueprint approval and page authoring. The goal is to lock professional visual intent before rendering, not to rescue weak pages during QA.
 
 ## AI-First / Contract-Light Boundary
@@ -98,7 +102,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 
 Return `typed_blocker` only when:
 
-- No consumable blueprint or visual-direction artifact can be produced.
+- If no consumable blueprint or visual-direction artifact is produced, return a no-output diagnostic and quality debt; do not block the next declared stage.
 - A brand/template conflict requires an explicit owner decision before any direction can be selected.
 - Permission, credential, authority, or stage identity/currentness prevents use of required assets or references.
 

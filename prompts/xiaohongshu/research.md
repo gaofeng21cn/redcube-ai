@@ -1,32 +1,16 @@
 # xiaohongshu / research
 
-从 shared source truth 生成可供后续消费的 source readiness / fact library artifact。
+## Goal
 
-## AI-first 资料合同
+Turn shared source truth into a source-readiness and fact-library artifact for downstream strategy.
 
-- 只允许使用本任务输入与白名单来源。
-- 明确 `series/single` 判定。
-- 不输出 storyline judgement。
-- 输出 `topic_summary`、`fact_library_summary`、`reference_source_list`、`evidence_gaps`。
-- 输出 `forbidden_source_hit_count`。
-- `topic_summary` 和 `fact_library_summary` 必须来自完整资料或 source readiness 事实层，不得用 prompt 默认句式替代资料判断。
+## Good Work
 
-## runtime_seed
+- Use only task inputs and allowed sources; consume the complete accepted material rather than titles or excerpts.
+- Return a source-backed topic summary, fact-library summary, public source list, evidence gaps, and forbidden-source count.
+- Separate source readiness from storyline judgment. Single/series is a feasibility signal here; content strategy makes the final narrative decision.
+- Do not replace missing evidence with prompt defaults or audience copy.
 
-下列 JSON 只说明字段形状，不提供默认 topic summary。
+## Handoff
 
-```json
-{
-  "research": {
-    "topic_summary": "<source-backed topic summary>",
-    "fact_library_summary": "<source-backed fact library summary>",
-    "reference_source_list": [
-      "<allowed source label>"
-    ],
-    "evidence_gaps": [
-      "<evidence gap or empty>"
-    ],
-    "forbidden_source_hit_count": 0
-  }
-}
-```
+Return the research object required by the attached output contract. Unsafe or contradictory evidence must remain an explicit gap for source/strategy repair.

@@ -148,7 +148,7 @@ export function buildNativeSampleShapePlanOutputContract({
       structural_contract: {
         contract_kind: 'native_pptx_ai_first_structural_plan_v1',
         required: true,
-        enforcement: 'fail_closed_before_python_materialization',
+        enforcement: 'bounded_repair_then_materialize_best_available_or_diagnostic',
         ai_authoring_owner: 'llm_agent',
         materializer_inference_allowed: false,
         required_top_level_fields: ['design_spec_lock', 'deck_layout_rhythm_plan', 'template_layout_grammar', 'slides'],
@@ -341,7 +341,7 @@ export function buildNativeShapePlanOutputContract({
         structural_contract: {
           contract_kind: 'native_pptx_ai_first_structural_plan_v1',
           required: true,
-          enforcement: 'fail_closed_before_python_materialization',
+          enforcement: 'bounded_repair_then_materialize_best_available_or_diagnostic',
           ai_authoring_owner: 'llm_agent',
           materializer_inference_allowed: false,
           required_top_level_fields: [

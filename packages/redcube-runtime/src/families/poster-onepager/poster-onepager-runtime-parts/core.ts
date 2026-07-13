@@ -108,7 +108,7 @@ import {
     return {
       ...routeReviewHelpers.attachCommon(route, contract, generationRuntime, adapter),
       owner_receipt_refs: [`rca-owner-receipt:visual-stage:poster_onepager:${safeRoute}:${safeDeliverableId}`],
-      typed_blocker_refs: [`rca-typed-blocker:visual-stage:poster_onepager:${safeRoute}:${safeDeliverableId}`],
+      typed_blocker_refs: [],
     };
   }
   
@@ -486,7 +486,7 @@ import {
   function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId }) {
     const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
     const storedContract = readJson(path.join(deliverablePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
-    const required = safeArray(storedContract?.stage_requirements?.[route]?.requires_artifacts);
+    const required = safeArray(storedContract?.stage_requirements?.[route]?.input_stage_refs);
     const findings = [];
     const missing = required.filter((stageId) => !readStageArtifact(storedContract, deliverablePaths, stageId));
     if (missing.length > 0) {

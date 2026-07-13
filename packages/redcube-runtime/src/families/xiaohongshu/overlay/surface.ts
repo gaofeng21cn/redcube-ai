@@ -37,10 +37,11 @@ const SURFACE_VALIDATORS = {
     && content.stages.some((stage: SurfaceContract) => stage?.stage_id === 'visual_director_review')
     && content.stages.some((stage: SurfaceContract) => stage?.stage_id === 'export_bundle'),
   'contracts/stage-requirements.json': (content: SurfaceContract) => validateSurfaceRequirements(content, [
-    { path: 'render_html.requires_artifacts', includes: 'single_note_plan' },
-    { path: 'render_html.requires_artifacts', includes: 'visual_direction' },
-    { path: 'screenshot_review.requires_artifacts', includes: 'visual_director_review' },
-    { path: 'export_bundle.requires_review_pass', equals: true },
+    { path: 'render_html.input_stage_refs', includes: 'single_note_plan' },
+    { path: 'render_html.input_stage_refs', includes: 'visual_direction' },
+    { path: 'screenshot_review.input_stage_refs', includes: 'visual_director_review' },
+    { path: 'export_bundle.ready_claim_requires_review_pass', equals: true },
+    { path: 'export_bundle.can_block_stage_launch', equals: false },
   ]),
   'contracts/prompt-pack.json': (content: SurfaceContract) => validateSurfaceRequirements(content, [
     { path: 'root', equals: 'prompts/xiaohongshu' },

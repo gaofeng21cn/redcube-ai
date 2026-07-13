@@ -12,6 +12,7 @@ import {
   startMockCodexCli,
   withEnv,
 } from './mock-codex-cli.js';
+import { createPosterOnepagerPromptSourceTruthHelpers } from '../packages/redcube-runtime/dist/families/poster-onepager/poster-onepager-runtime-parts/prompt-source-truth-helpers.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -29,6 +30,19 @@ async function withMockCodexRuntime(testFn) {
     await upstream.close();
   }
 }
+
+test('poster_onepager prompt locator binds a real repo file and body digest', () => {
+  const helpers = createPosterOnepagerPromptSourceTruthHelpers({ repoRoot: path.resolve('.') });
+  const prompt = helpers.promptMeta({
+    prompt_pack: {
+      root: 'prompts/poster_onepager',
+      routes: { storyline: 'prompts/poster_onepager/storyline.md' },
+    },
+  }, 'storyline');
+  assert.equal(prompt.source, 'repo');
+  assert.equal(prompt.relative_path, 'prompts/poster_onepager/storyline.md');
+  assert.match(prompt.body_sha256, /^[a-f0-9]{64}$/);
+});
 
 test('poster_onepager route artifacts record Codex-backed ownership for story, visual, render, and director review surfaces', async () => {
   await withMockCodexRuntime(async () => {

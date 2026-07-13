@@ -79,7 +79,7 @@
     }
   ],
   "generated_array_fields": [],
-  "source_digest": "ae2d900a7f816d58f3f8f945a0b830980377a505812f0dccbee2670feecfe80b",
+  "source_digest": "263302604737eb64140ed0b0ebc2ba0d7dbba8c69b592445f45b6067ecc8d008",
   "source_part_refs": [
     {
       "json_pointer": "/program_id",
@@ -134,8 +134,8 @@
       "json_pointer": "/current_state/active_baton",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 617,
-      "sha256": "b8ca47a380a52224fec44cf75b5833f24798ea135d77391207ad4f66202d628f"
+      "line_count": 609,
+      "sha256": "3a319d8537c334c956667a2026ddce6ac2a8cc7836606d0868c2609f0857d605"
     },
     {
       "json_pointer": "/current_state/active_mainline",
@@ -176,8 +176,8 @@
       "json_pointer": "/current_state/exploration_lanes",
       "ref": "contracts/runtime-program/current-program-parts/current_state/exploration_lanes.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 460,
-      "sha256": "e556f0e118f91c51c64c022013133bb51cb562b454c1b75080fa1be2577af199"
+      "line_count": 463,
+      "sha256": "14b69e6025e278972953298e0387390ad5897ffe7f6c744281f9350733f770b9"
     },
     {
       "json_pointer": "/current_state/foundation_milestones",

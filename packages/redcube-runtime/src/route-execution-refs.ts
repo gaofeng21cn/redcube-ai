@@ -155,7 +155,10 @@ export function startRouteExecutionRef({
     crossProviderAttemptIndex,
     routeRunRef,
   );
-  if (!hasOplRouteAttemptEvidence(normalizedCrossProviderAttemptIndex)) {
+  if (
+    !hasOplRouteAttemptEvidence(normalizedCrossProviderAttemptIndex)
+    && normalizedCrossProviderAttemptIndex?.status !== 'missing_quality_debt'
+  ) {
     throw new Error('startRouteExecutionRef requires OPL-owned stage attempt evidence; RCA-local diagnostic route-run records are retired');
   }
   const run = {

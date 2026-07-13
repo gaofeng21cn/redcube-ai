@@ -113,13 +113,13 @@
         "repair_image_pages",
         "export_pptx"
       ],
-      "stage_receipt_policy": "route_artifact_must_carry_owner_receipt_refs_or_typed_blocker_refs_before_stage_folder_current",
+      "stage_receipt_policy": "every attempted route carries a progress receipt; owner receipts authorize claims and typed blockers are reserved for real hard boundaries",
       "owner": "redcube_ai"
     },
     {
       "return_shape": "typed_blocker",
       "blocker_ref": "rca-typed-blocker:review-export:<family>:<route-stage-id>:<deliverable-id>",
-      "blocker_kind": "missing_required_artifact_or_review_export_gate_blocked",
+      "blocker_kind": "authority_safety_human_or_irreversible_boundary",
       "source_contract": "rca.domain_owner_receipt.v1",
       "review_export_ref": "rca-review-export:<family>:<route-stage-id>:<deliverable-id>",
       "producer_routes": [
@@ -129,7 +129,7 @@
         "export_pptx"
       ],
       "owner": "redcube_ai",
-      "next_required_owner_action": "repair_or_rerun_required_route_stage"
+      "next_required_owner_action": "codex_selects_advance_repeat_reverse_or_route_back"
     },
     {
       "return_shape": "controlled_visual_stage_long_soak_evidence",

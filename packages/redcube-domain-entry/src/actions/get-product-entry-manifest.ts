@@ -3,6 +3,7 @@ import { FAMILY_ACTION_CATALOG_CONTRACT_REF } from './family-action-catalog.js';
 import { DECLARATIVE_STAGE_MANIFEST_REF } from './declarative-stage-manifest.js';
 import { buildRedCubeDomainAuthorityRefs } from './domain-authority-refs.js';
 import { normalizeWorkspaceRoot } from './domain-action-adapter-parts/task-utils.js';
+import standardAgentInterfaceDescriptor from '../../../../contracts/standard_agent_interface.json' with { type: 'json' };
 
 const GENERATED_STAGE_CONTROL_PLANE_REF = {
   ref_kind: 'generated_surface',
@@ -44,6 +45,7 @@ function buildStandardDomainAgentSkeleton() {
     contracts: {
       descriptor_refs: [
         'contracts/domain_descriptor.json',
+        'contracts/standard_agent_interface.json',
         'contracts/pack_compiler_input.json',
         'agent/stages/manifest.json',
       ],
@@ -88,6 +90,10 @@ export async function getProductEntryManifest(request: Record<string, unknown> =
     manifest_version: 'rca-domain-authority-refs.v1',
     agent_id: 'rca',
     target_domain_id: 'redcube_ai',
+    standard_agent_interface_ref: 'contracts/standard_agent_interface.json#/standard_agent_interface',
+    standard_agent_interface: structuredClone(
+      standardAgentInterfaceDescriptor.standard_agent_interface,
+    ),
     standard_domain_agent_skeleton: buildStandardDomainAgentSkeleton(),
     formal_entry: {
       default: 'CLI',

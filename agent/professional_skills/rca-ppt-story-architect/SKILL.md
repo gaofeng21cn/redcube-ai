@@ -5,6 +5,10 @@ description: "Use when RedCube AI needs a PPT story specialist to turn frozen so
 
 # RCA PPT Story Architect
 
+## Runtime Summary
+
+Turn the accepted source and audience goal into a claim spine, storyline, slide roles, evidence placement, and transitions. Preserve source meaning and public naming while allowing outline, blueprint, capacity, and visual discoveries to iterate. Route unsupported claims or structural overload upstream instead of solving them with layout.
+
 Operate as the PPT narrative specialist inside the RCA stage chain. Keep the stage prompt as the canonical schema owner; use this skill to make the story work professional, source-faithful, page-by-page, and ready for visual direction.
 
 ## AI-First / Contract-Light Boundary
@@ -40,7 +44,7 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 
 ## Execution Rules
 
-1. Freeze the source first. If the source package is partial, conflicting, or too thin for the requested claim, return a typed blocker instead of inventing story material.
+1. Freeze the source first. If the source package is partial, conflicting, or too thin for the requested claim, preserve the gap as quality debt and continue with a bounded candidate or no-output diagnostic instead of inventing story material; reserve typed blockers for the explicit hard-stop whitelist.
 2. Build a claim spine before slide count. Each slide must earn its place by advancing the audience from problem to evidence to decision. When the user allows structural adjustment, optimize the story before preserving the old page count.
 3. Use action titles. Do not write chapter labels as slide titles unless the stage explicitly asks for divider pages.
 4. Keep visible slide fields audience-facing. Rewrite internal names, route labels, operator requirements, prompt names, and file paths into project-facing language.
@@ -92,7 +96,7 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 
 Return `typed_blocker` only when:
 
-- No consumable source or planning artifact can be produced at all.
+- If no consumable source or planning artifact is produced, return a no-output diagnostic and quality debt; do not block the next declared stage.
 - The requested claim is legally or authoritatively disallowed, or requires an explicit owner decision.
 - Permission, credential, approval, authority, or stage identity/currentness prevents continuation.
 

@@ -7,6 +7,10 @@ description: "Use when RedCube AI needs Xiaohongshu single-note or series conten
 
 Operate as the professional content strategist inside `communication_strategy`. Consume the source readiness result, decide whether the source supports one note or a series, design the narrative and note responsibilities, and hand an actionable brief to `single_note_plan`. Program code may validate and persist this work, but it must not author the strategy.
 
+## Runtime Summary
+
+Read the full accepted source and audience goal before choosing one note or a series. Build the claim and reader-task spine before note count, bind medical/action claims to evidence and uncertainty, and hand off distinct note/page roles with continuity. Route source insufficiency or strategy overload upstream; rendering cannot repair it.
+
 ## Inputs
 
 - Frozen `source_materials_full_text`, source refs, evidence gaps, and user constraints.
@@ -55,4 +59,4 @@ Operate as the professional content strategist inside `communication_strategy`. 
 
 ## Blockers And Repair Targets
 
-Return a typed blocker when required source evidence is missing, contradictory, or unsafe for the requested medical claim. Return a repair target when series notes overlap, a note crosses too many reader tasks, evidence anchors disappear, or the plan exceeds the page/readability boundary.
+When required source evidence is missing or contradictory, return quality debt, bounded claims, or a no-output diagnostic and let Codex continue or route back. Return a typed blocker only when the requested medical claim is unsafe or crosses authority, permission, identity/currentness, irreversible-action, executor-unavailable, or explicit human-decision boundaries. Return a repair target when series notes overlap, a note crosses too many reader tasks, evidence anchors disappear, or the plan exceeds the page/readability boundary.

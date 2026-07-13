@@ -80,7 +80,7 @@ function assertNativeTrueRenderRendererPolicy(policy, label) {
     'completed_with_quality_debt_when_pptx_is_consumable',
     `${label}.missing_policy`,
   );
-  assert.equal(policy.hard_stop_when_missing, 'no_consumable_pptx_artifact', `${label}.hard_stop_when_missing`);
+  assert.equal(policy.no_output_policy, 'diagnostic_and_quality_debt', `${label}.no_output_policy`);
   assert.equal(policy.synthetic_preview_allowed, false, `${label}.synthetic_preview_allowed`);
   assert.equal(policy.html_render_substitute_allowed, false, `${label}.html_render_substitute_allowed`);
   assert.equal(policy.officecli_validate_substitute_allowed, false, `${label}.officecli_validate_substitute_allowed`);
