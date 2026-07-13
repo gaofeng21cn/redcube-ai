@@ -18,6 +18,19 @@ test('stage manifest gives Codex unrestricted declared-stage routing', () => {
   assert.equal(policy.no_output_or_failure_diagnostic_advances_stage, true);
 });
 
+test('stage operating principles mirror the OPL route-authority ABI', () => {
+  const principles = JSON.parse(
+    fs.readFileSync(new URL('../contracts/stage_operating_principles.json', import.meta.url), 'utf8'),
+  );
+  const policy = principles.speed_policy;
+
+  assert.equal(policy.route_selection_owner, 'codex_cli');
+  assert.equal(policy.codex_may_advance_skip_repeat_reverse_or_route_back, true);
+  assert.equal(policy.any_declared_stage_may_start_from_any_prior_stage_result, true);
+  assert.equal(policy.declared_requires_are_quality_context_not_launch_gates, true);
+  assert.equal(policy.next_stage_refs_are_recommendations_not_constraints, true);
+});
+
 test('zero domain output becomes a non-blocking progress diagnostic', () => {
   const admitted = admitStageArtifactForProgress(null, { route: 'author_image_pages' });
 
