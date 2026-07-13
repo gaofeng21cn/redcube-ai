@@ -50,6 +50,18 @@
     "canonical_primary_skill_source_ref": "agent/primary_skill/SKILL.md",
     "plugin_carrier_skill_ref": "plugins/redcube-ai/skills/redcube-ai/SKILL.md"
   },
+  "lifecycle": {
+    "owner": "opl_packages",
+    "module_id": "rca",
+    "commands": {
+      "install": "opl packages install rca",
+      "update": "opl packages update rca",
+      "uninstall": "opl packages uninstall rca"
+    },
+    "repo_local_installer_allowed": false,
+    "repo_local_marketplace_mutation_allowed": false,
+    "repo_local_user_symlink_mutation_allowed": false
+  },
   "skill_packs": [
     {
       "id": "redcube-ai",

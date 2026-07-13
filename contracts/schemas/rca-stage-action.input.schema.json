@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://one-person-lab.local/contracts/rca/stage-action.input.schema.json",
+  "title": "RCA hosted stage action input",
+  "type": "object",
+  "required": [
+    "workspace_root"
+  ],
+  "properties": {
+    "workspace_root": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^/"
+    }
+  },
+  "additionalProperties": false
+}

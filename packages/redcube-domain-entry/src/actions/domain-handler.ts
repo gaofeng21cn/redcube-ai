@@ -21,8 +21,6 @@ export async function exportDomainHandler(request) {
     wrapped_projection_surface_kind: projection.surface_kind,
     repo_local_legacy_product_domain_action_adapter_command_available: false,
     compatibility_alias_allowed: false,
-    command: 'redcube domain-handler export',
-    dispatch_command: 'redcube domain-handler dispatch',
   };
 }
 
@@ -36,6 +34,5 @@ export async function dispatchDomainHandler(request) {
     wrapped_dispatch_surface_kind: receipt.surface_kind,
     repo_local_legacy_product_domain_action_adapter_command_available: false,
     compatibility_alias_allowed: false,
-    command: 'redcube domain-handler dispatch',
   };
 }

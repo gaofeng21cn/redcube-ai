@@ -28,8 +28,6 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
       workspace_root: workspaceRoot,
     },
     action_handler_refs: {
-      export_command: 'redcube domain-handler export',
-      dispatch_command: 'redcube domain-handler dispatch',
       family_action_catalog_ref: manifest.family_action_catalog_ref,
       handler_target_ref:
         'packages/redcube-domain-entry/src/actions/domain-handler.ts',

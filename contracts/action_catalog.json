@@ -1,126 +1,38 @@
 {
   "surface_kind": "family_action_catalog",
-  "version": "family-action-catalog.v1",
-  "catalog_id": "redcube_product_entry_action_catalog",
+  "version": "family-action-catalog.v2",
+  "catalog_id": "redcube_visual_delivery_action_catalog",
   "target_domain_id": "redcube_ai",
   "owner": "redcube_ai",
   "authority_boundary": {
     "domain_truth_owner": "redcube_ai",
     "opl_role": "projection_consumer_only",
-    "generated_interface_owner": "one-person-lab",
-    "repo_local_redcube_cli_role": "domain_handler_target_or_direct_entry_only",
-    "opl_generated_mcp_descriptor_role": "protocol_descriptor_for_domain_handler_targets",
-    "domain_handler_role": "domain_handler_target_or_refs_only_adapter",
-    "generic_session_shell_owner": "one-person-lab",
-    "generic_workbench_owner": "one-person-lab",
-    "default_generic_dispatch_owner": "one-person-lab",
-    "default_supervision_owner": "one-person-lab",
-    "temporal_stage_run_consumption_policy": {
-      "policy_ref": "/temporal_stage_run_consumption_policy",
-      "temporal_attempt_ledger_owner": "one-person-lab/OPL",
-      "provider_completion_is_domain_completion": false,
-      "domain_repo_can_own_temporal_runtime": false,
-      "rca_writes_opl_stage_attempts": false,
-      "generated_surface_ready_can_claim_domain_ready": false,
-      "domain_completion_requires_one_of": [
-        "owner_receipt_ref",
-        "typed_blocker_ref",
-        "human_gate_ref",
-        "route_back_ref"
-      ]
-    },
-    "write_policy": "no_domain_truth_writes"
+    "write_policy": "no_domain_truth_writes",
+    "opl_can_write_domain_truth": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_mutate_domain_artifact_body": false,
+    "opl_can_authorize_quality_or_export": false,
+    "provider_completion_is_domain_completion": false
   },
   "actions": [
     {
-      "action_id": "get_product_status",
-      "title": "Read RedCube product status",
-      "summary": "读取 OPL generated product-entry overview/status shell 所需的 RCA refs；RCA 不再发布 repo-local product status 默认 wrapper。",
-      "owner": "redcube_ai",
-      "effect": "read_only",
-      "source_command": {
-        "command": "opl_generated:product_status",
-        "surface_kind": "product_status"
-      },
-      "source_of_work": {
-        "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "contracts/action_catalog.json",
-        "source_action_id": "get_product_status",
-        "stage_catalog_ref": "agent/stages/manifest.json",
-        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
-        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
-      },
-      "input_schema_ref": "schema:redcube.product_status.request.v1",
-      "output_schema_ref": "schema:redcube.product_status.response.v1",
-      "workspace_locator_fields": [],
-      "human_gate_ids": [],
-      "supported_surfaces": {
-        "cli": null,
-        "mcp": null,
-        "skill": null,
-        "product_entry": null,
-        "openai": null,
-        "ai_sdk": null
-      },
-      "authority_boundary": {}
-    },
-    {
-      "action_id": "get_product_preflight",
-      "title": "Read RedCube product preflight",
-      "summary": "读取 OPL generated preflight shell 所需的 RCA workspace/runtime refs；RCA 不持有通用 preflight wrapper owner。",
-      "owner": "redcube_ai",
-      "effect": "read_only",
-      "source_command": {
-        "command": "opl_generated:product_preflight",
-        "surface_kind": "product_entry_preflight"
-      },
-      "source_of_work": {
-        "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "contracts/action_catalog.json",
-        "source_action_id": "get_product_preflight",
-        "stage_catalog_ref": "agent/stages/manifest.json",
-        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
-        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
-      },
-      "input_schema_ref": "schema:redcube.product_preflight.request.v1",
-      "output_schema_ref": "schema:redcube.product_preflight.response.v1",
-      "workspace_locator_fields": [],
-      "human_gate_ids": [],
-      "supported_surfaces": {
-        "cli": null,
-        "mcp": null,
-        "skill": null,
-        "product_entry": null,
-        "openai": null,
-        "ai_sdk": null
-      },
-      "authority_boundary": {}
-    },
-    {
       "action_id": "invoke_product_entry",
-      "title": "Invoke RedCube product entry",
-      "summary": "以 direct RedCube product entry 方式创建或继续同一 deliverable，并下沉到同一个 service-safe domain entry。",
+      "title": "Run RedCube visual delivery",
+      "summary": "Start or continue the complete RedCube visual-delivery stage route through the OPL-hosted Standard Agent runtime.",
       "owner": "redcube_ai",
       "effect": "mutating",
-      "source_command": {
-        "command": "redcube product invoke",
-        "surface_kind": "product_entry"
+      "execution_binding": {
+        "kind": "stage_binding",
+        "stage_manifest_ref": "agent/stages/manifest.json"
       },
-      "source_of_work": {
-        "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "contracts/action_catalog.json",
-        "source_action_id": "invoke_product_entry",
-        "stage_catalog_ref": "agent/stages/manifest.json",
-        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
-        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
-      },
-      "input_schema_ref": "schema:redcube.product_entry.invoke.request.v1",
-      "output_schema_ref": "schema:redcube.product_entry.invoke.response.v1",
+      "input_schema_ref": "contracts/schemas/rca-stage-action.input.schema.json",
+      "output_schema_ref": "contracts/schemas/rca-stage-action.output.schema.json",
+      "required_fields": [
+        "workspace_root"
+      ],
+      "optional_fields": [],
       "workspace_locator_fields": [
-        "entry_session_id",
-        "overlay",
-        "topic_id",
-        "deliverable_id"
+        "workspace_root"
       ],
       "human_gate_ids": [
         "redcube_operator_review_gate"
@@ -142,241 +54,54 @@
         "route_policy": "ai_selected_progress_route"
       },
       "supported_surfaces": {
-        "cli": {
-          "surface_kind": "product_entry"
-        },
+        "cli": {},
         "mcp": {
-          "tool_name": "redcube_product_entry",
-          "action_key": "invoke_product_entry"
+          "tool_name": "rca_invoke_product_entry",
+          "descriptor_only": true,
+          "public_runtime": false
         },
         "skill": {
-          "surface_kind": "product_entry",
-          "command_contract_id": "invoke_product_entry"
+          "command_contract_id": "rca.invoke_product_entry"
         },
         "product_entry": {
-          "surface_kind": "product_entry",
-          "action_key": "start_deliverable"
+          "action_key": "invoke_product_entry"
         },
-        "openai": null,
-        "ai_sdk": null
-      },
-      "authority_boundary": {}
-    },
-    {
-      "action_id": "get_product_entry_session",
-      "title": "Read RedCube product-entry session",
-      "summary": "读取 OPL generated session shell 所需的 RCA entry-session domain snapshot refs；RCA 不持有 generic session/workbench owner。",
-      "owner": "redcube_ai",
-      "effect": "read_only",
-      "source_command": {
-        "command": "opl_generated:product_session",
-        "surface_kind": "product_entry_session"
-      },
-      "source_of_work": {
-        "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "contracts/action_catalog.json",
-        "source_action_id": "get_product_entry_session",
-        "stage_catalog_ref": "agent/stages/manifest.json",
-        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
-        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
-      },
-      "input_schema_ref": "schema:redcube.product_entry.session.request.v1",
-      "output_schema_ref": "schema:redcube.product_entry.session.response.v1",
-      "workspace_locator_fields": [
-        "entry_session_id"
-      ],
-      "human_gate_ids": [],
-      "supported_surfaces": {
-        "cli": null,
-        "mcp": null,
-        "skill": null,
-        "product_entry": null,
-        "openai": null,
-        "ai_sdk": null
-      },
-      "authority_boundary": {
-        "generic_session_shell_owner": "one-person-lab",
-        "domain_snapshot_owner": "redcube_ai",
-        "rca_role": "entry_session_domain_snapshot_refs_only_adapter",
-        "implements_generic_workbench": false
-      }
-    },
-    {
-      "action_id": "get_product_entry_manifest",
-      "title": "Read RedCube product-entry manifest",
-      "summary": "读取 OPL generated manifest shell 所需的 RCA machine-readable descriptor、domain handler target 与 authority refs。",
-      "owner": "redcube_ai",
-      "effect": "read_only",
-      "source_command": {
-        "command": "opl_generated:product_entry_manifest",
-        "surface_kind": "product_entry_manifest"
-      },
-      "source_of_work": {
-        "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "contracts/action_catalog.json",
-        "source_action_id": "get_product_entry_manifest",
-        "stage_catalog_ref": "agent/stages/manifest.json",
-        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
-        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
-      },
-      "input_schema_ref": "schema:redcube.product_entry.manifest.request.v1",
-      "output_schema_ref": "schema:redcube.product_entry.manifest.response.v2",
-      "workspace_locator_fields": [],
-      "human_gate_ids": [],
-      "supported_surfaces": {
-        "cli": null,
-        "mcp": null,
-        "skill": null,
-        "product_entry": null,
-        "openai": null,
-        "ai_sdk": null
-      },
-      "authority_boundary": {
-        "manifest_owner": "redcube_ai",
-        "generated_surface_owner": "one-person-lab",
-        "rca_role": "declarative_visual_pack_and_domain_handler_refs",
-        "temporal_stage_run_consumption_policy_ref": "/temporal_stage_run_consumption_policy",
-        "provider_completion_is_domain_completion": false,
-        "generated_surface_ready_can_claim_domain_ready": false
-      }
-    },
-    {
-      "action_id": "export_domain_handler",
-      "title": "Export RedCube product domain handler projection",
-      "summary": "导出 RCA OPL standard domain handler refs-only projection，供 OPL typed family queue / configured family runtime provider 索引；不授予 visual truth、review verdict 或 publication gate 写权。",
-      "owner": "redcube_ai",
-      "effect": "read_only",
-      "source_command": {
-        "command": "redcube domain-handler export",
-        "surface_kind": "product_domain_handler_export"
-      },
-      "source_of_work": {
-        "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "contracts/action_catalog.json",
-        "source_action_id": "export_domain_handler",
-        "stage_catalog_ref": "agent/stages/manifest.json",
-        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
-        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
-      },
-      "input_schema_ref": "schema:redcube.domain_handler.export.request.v1",
-      "output_schema_ref": "schema:redcube.domain_handler.export.response.v1",
-      "workspace_locator_fields": [],
-      "human_gate_ids": [],
-      "supported_surfaces": {
-        "cli": {
-          "surface_kind": "product_domain_handler_export"
+        "openai": {
+          "tool_name": "rca_invoke_product_entry"
         },
-        "mcp": null,
-        "skill": null,
-        "product_entry": null,
-        "openai": null,
-        "ai_sdk": null
+        "ai_sdk": {
+          "tool_name": "rca_invoke_product_entry"
+        }
       },
       "authority_boundary": {
-        "opl_role": "typed_family_control_plane",
-        "provider_role": "stage_attempt_queue_wakeup_transport",
-        "generated_surface_owner": "one-person-lab",
-        "rca_role": "domain_handler_target_or_refs_only_adapter",
-        "internal_implementation_ref": "exportDomainHandler",
-        "write_policy": "read_projection_only",
-        "temporal_stage_run_consumption_policy_ref": "/temporal_stage_run_consumption_policy",
-        "domain_repo_can_own_temporal_runtime": false,
-        "rca_writes_opl_stage_attempts": false
-      }
-    },
-    {
-      "action_id": "dispatch_domain_handler",
-      "title": "Dispatch RedCube product domain handler guarded action",
-      "summary": "调度 RCA-owned guarded domain handler actions：no-regression evidence、Temporal controlled visual-stage long-soak evidence、domain owner receipt、visual memory writeback、workspace lifecycle receipt、visual transition evaluation、workspace receipt proof、notification receipt；runtime watch、generic supervise/continuation 入口归 OPL status/workbench/runtime read model 与 runner/session shell，不在 RCA handler 默认派发面暴露。",
-      "owner": "redcube_ai",
-      "effect": "mutating",
-      "source_command": {
-        "command": "redcube domain-handler dispatch",
-        "surface_kind": "product_domain_handler_dispatch"
-      },
-      "source_of_work": {
-        "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "contracts/action_catalog.json",
-        "source_action_id": "dispatch_domain_handler",
-        "stage_catalog_ref": "agent/stages/manifest.json",
-        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
-        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
-      },
-      "input_schema_ref": "schema:redcube.domain_handler.dispatch.request.v1",
-      "output_schema_ref": "schema:redcube.domain_handler.dispatch.response.v1",
-      "workspace_locator_fields": [],
-      "human_gate_ids": [],
-      "stage_route": {
-        "entry_stage_ref": "package_and_handoff",
-        "required_stage_refs": [
-          "package_and_handoff"
-        ],
-        "optional_stage_refs": [],
-        "terminal_stage_refs": [
-          "package_and_handoff"
-        ],
-        "route_policy": "ai_selected_progress_route"
-      },
-      "supported_surfaces": {
-        "cli": {
-          "surface_kind": "product_domain_handler_dispatch"
-        },
-        "mcp": null,
-        "skill": null,
-        "product_entry": null,
-        "openai": null,
-        "ai_sdk": null
-      },
-      "authority_boundary": {
-        "allowed_actions": [
-          "emit_no_regression_evidence",
-          "emit_temporal_controlled_visual_stage_long_soak_evidence",
-          "emit_domain_owner_receipt",
-          "apply_visual_memory_writeback",
-          "apply_visual_workspace_lifecycle",
-          "emit_workspace_receipt_proof",
-          "emit_external_work_order_owner_closeout",
-          "notification_receipt"
-        ],
-        "forbidden_writes": [
-          "visual_truth",
-          "review_verdict",
-          "publication_gate",
-          "canonical_artifacts"
-        ],
-        "default_generic_dispatch_owner": "one-person-lab",
-        "default_supervision_owner": "one-person-lab",
-        "rca_role": "guarded_domain_handler_target_only",
-        "internal_implementation_ref": "dispatchDomainActionAdapter",
-        "temporal_stage_run_consumption_policy_ref": "/temporal_stage_run_consumption_policy",
-        "allowed_temporal_stage_run_writes": [],
-        "rca_writes_opl_stage_attempts": false
+        "domain_truth_owner": "redcube_ai",
+        "quality_verdict_owner": "redcube_ai",
+        "artifact_authority_owner": "redcube_ai",
+        "opl_can_write_domain_truth": false,
+        "opl_can_write_memory_body": false,
+        "opl_can_mutate_domain_artifact_body": false,
+        "opl_can_authorize_quality_or_export": false,
+        "provider_completion_is_domain_completion": false
       }
     },
     {
       "action_id": "run_image_ppt_proof",
       "title": "Run image-first PPT proof",
-      "summary": "受控执行 ppt_deck image-first lightweight proof runner；默认 mock，不调用真实图片 API，live 必须显式开启。",
+      "summary": "Run the RCA image-first PPT proof as an artifact-creation stage action with RCA-owned visual and artifact authority.",
       "owner": "redcube_ai",
       "effect": "mutating",
-      "source_command": {
-        "command": "redcube image-ppt proof",
-        "surface_kind": "image_ppt_product_entry_proof"
+      "execution_binding": {
+        "kind": "stage_binding",
+        "stage_manifest_ref": "agent/stages/manifest.json"
       },
-      "source_of_work": {
-        "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "contracts/action_catalog.json",
-        "source_action_id": "run_image_ppt_proof",
-        "stage_catalog_ref": "agent/stages/manifest.json",
-        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
-        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
-      },
-      "input_schema_ref": "schema:redcube.image_ppt_proof.request.v1",
-      "output_schema_ref": "schema:redcube.image_ppt_proof.response.v1",
+      "input_schema_ref": "contracts/schemas/rca-stage-action.input.schema.json",
+      "output_schema_ref": "contracts/schemas/rca-stage-action.output.schema.json",
+      "required_fields": [
+        "workspace_root"
+      ],
+      "optional_fields": [],
       "workspace_locator_fields": [
-        "entry_session_id",
-        "topic_id",
-        "deliverable_id"
+        "workspace_root"
       ],
       "human_gate_ids": [],
       "stage_route": {
@@ -391,47 +116,54 @@
         "route_policy": "ai_selected_progress_route"
       },
       "supported_surfaces": {
-        "cli": {
-          "surface_kind": "image_ppt_product_entry_proof"
+        "cli": {},
+        "mcp": {
+          "tool_name": "rca_run_image_ppt_proof",
+          "descriptor_only": true,
+          "public_runtime": false
         },
-        "mcp": null,
         "skill": {
-          "surface_kind": "image_ppt_product_entry_proof",
-          "command_contract_id": "run_image_ppt_proof"
+          "command_contract_id": "rca.run_image_ppt_proof"
         },
         "product_entry": {
-          "surface_kind": "image_ppt_product_entry_proof",
           "action_key": "run_image_ppt_proof"
         },
-        "openai": null,
-        "ai_sdk": null
+        "openai": {
+          "tool_name": "rca_run_image_ppt_proof"
+        },
+        "ai_sdk": {
+          "tool_name": "rca_run_image_ppt_proof"
+        }
       },
-      "authority_boundary": {}
+      "authority_boundary": {
+        "domain_truth_owner": "redcube_ai",
+        "quality_verdict_owner": "redcube_ai",
+        "artifact_authority_owner": "redcube_ai",
+        "opl_can_write_domain_truth": false,
+        "opl_can_write_memory_body": false,
+        "opl_can_mutate_domain_artifact_body": false,
+        "opl_can_authorize_quality_or_export": false,
+        "provider_completion_is_domain_completion": false
+      }
     },
     {
       "action_id": "run_native_ppt_proof",
       "title": "Run native PPT proof",
-      "summary": "受控执行 ppt_deck native PPT proof route；只调用 repo-owned proof runner，并保持 product-entry review/export gates。",
+      "summary": "Run the RCA native PPT proof as an artifact-creation stage action while preserving RCA review, export, and native-helper authority.",
       "owner": "redcube_ai",
       "effect": "mutating",
-      "source_command": {
-        "command": "redcube native-ppt proof",
-        "surface_kind": "native_ppt_product_entry_proof"
+      "execution_binding": {
+        "kind": "stage_binding",
+        "stage_manifest_ref": "agent/stages/manifest.json"
       },
-      "source_of_work": {
-        "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "contracts/action_catalog.json",
-        "source_action_id": "run_native_ppt_proof",
-        "stage_catalog_ref": "agent/stages/manifest.json",
-        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
-        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
-      },
-      "input_schema_ref": "schema:redcube.native_ppt_proof.request.v1",
-      "output_schema_ref": "schema:redcube.native_ppt_proof.response.v1",
+      "input_schema_ref": "contracts/schemas/rca-stage-action.input.schema.json",
+      "output_schema_ref": "contracts/schemas/rca-stage-action.output.schema.json",
+      "required_fields": [
+        "workspace_root"
+      ],
+      "optional_fields": [],
       "workspace_locator_fields": [
-        "entry_session_id",
-        "topic_id",
-        "deliverable_id"
+        "workspace_root"
       ],
       "human_gate_ids": [],
       "stage_route": {
@@ -446,100 +178,39 @@
         "route_policy": "ai_selected_progress_route"
       },
       "supported_surfaces": {
-        "cli": {
-          "surface_kind": "native_ppt_product_entry_proof"
+        "cli": {},
+        "mcp": {
+          "tool_name": "rca_run_native_ppt_proof",
+          "descriptor_only": true,
+          "public_runtime": false
         },
-        "mcp": null,
         "skill": {
-          "surface_kind": "native_ppt_product_entry_proof",
-          "command_contract_id": "run_native_ppt_proof"
+          "command_contract_id": "rca.run_native_ppt_proof"
         },
         "product_entry": {
-          "surface_kind": "native_ppt_product_entry_proof",
           "action_key": "run_native_ppt_proof"
         },
-        "openai": null,
-        "ai_sdk": null
-      },
-      "authority_boundary": {}
-    },
-    {
-      "action_id": "invoke_domain_entry",
-      "title": "Invoke service-safe RedCube domain entry",
-      "summary": "Invoke the shared service-safe RedCube domain entry underneath direct product entry and OPL-hosted stage runtime callers.",
-      "owner": "redcube_ai",
-      "effect": "mutating",
-      "source_command": {
-        "command": "redcube service-safe domain entry",
-        "surface_kind": "domain_entry"
-      },
-      "source_of_work": {
-        "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "contracts/action_catalog.json",
-        "source_action_id": "invoke_domain_entry",
-        "stage_catalog_ref": "agent/stages/manifest.json",
-        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
-        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
-      },
-      "input_schema_ref": "schema:redcube.domain_entry.request.v1",
-      "output_schema_ref": "schema:redcube.domain_entry.response.v1",
-      "workspace_locator_fields": [
-        "workspace_root",
-        "task_intent"
-      ],
-      "human_gate_ids": [],
-      "stage_route_exempt": "domain_handler_target_only",
-      "supported_surfaces": {
-        "cli": null,
-        "mcp": {
-          "command": "redcube service-safe domain entry",
-          "tool_name": "redcube_product_entry",
-          "action_key": "invoke_domain_entry",
-          "surface_kind": "domain_handler_target_descriptor",
-          "descriptor_only": true,
-          "public_runtime": false
+        "openai": {
+          "tool_name": "rca_run_native_ppt_proof"
         },
-        "skill": null,
-        "product_entry": {
-          "surface_kind": "domain_handler_target_metadata",
-          "action_key": "invoke_domain_entry",
-          "descriptor_only": true,
-          "public_runtime": false
-        },
-        "openai": null,
-        "ai_sdk": null
+        "ai_sdk": {
+          "tool_name": "rca_run_native_ppt_proof"
+        }
       },
       "authority_boundary": {
-        "target_role": "internal_domain_handler_target_only",
-        "descriptor_only": true,
-        "public_runtime": false
+        "domain_truth_owner": "redcube_ai",
+        "quality_verdict_owner": "redcube_ai",
+        "artifact_authority_owner": "redcube_ai",
+        "opl_can_write_domain_truth": false,
+        "opl_can_write_memory_body": false,
+        "opl_can_mutate_domain_artifact_body": false,
+        "opl_can_authorize_quality_or_export": false,
+        "provider_completion_is_domain_completion": false
       }
     }
   ],
   "notes": [
-    "RCA owns action semantics and domain handlers; OPL owns generated CLI/MCP/Skill/product/status/workbench descriptors derived from this catalog.",
-    "Repo-local redcube CLI/MCP remain domain handler targets and direct diagnostic entries, not unified metadata owners."
-  ],
-  "forbidden_generic_owner_roles": [
-    "generic_scheduler_owner",
-    "generic_daemon_owner",
-    "generic_lifecycle_owner",
-    "generic_queue_owner",
-    "generic_attempt_ledger_owner",
-    "generic_state_machine_runner_owner",
-    "generic_cli_mcp_product_wrapper_owner",
-    "generic_sidecar_owner",
-    "generic_session_store_owner",
-    "generic_status_workbench_owner",
-    "generic_workspace_source_intake_owner",
-    "generic_memory_transport_owner",
-    "generic_artifact_gallery_owner",
-    "generic_operator_workbench_owner",
-    "generic_observability_slo_owner",
-    "generic_persistence_engine_owner",
-    "generic_sqlite_lifecycle_owner",
-    "generic_native_helper_envelope_owner",
-    "generic_review_repair_transport_owner",
-    "generated_surface_owner_in_domain_repo"
+    "All public Standard Agent actions are hosted stage bindings; RCA does not publish a second status, session, manifest, workbench, or generic dispatch control plane.",
+    "The direct RCA skill and visual runtime remain domain-owned implementation paths inside the declared stage/tool boundary."
   ]
 }
