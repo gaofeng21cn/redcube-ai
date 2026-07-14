@@ -39,7 +39,17 @@
     "version": "opl_standard_agent_interface.v1",
     "ref_kind": "repo_json_pointer",
     "ref": "contracts/standard_agent_interface.json#/standard_agent_interface",
-    "projection_ref": "opl_generated:standard_agent_interface"
+    "projection_ref": "opl_generated:standard_agent_interface",
+    "stage_catalog": {
+      "source_kind": "agent_repo_relative_json",
+      "relative_path": "agent/stages/manifest.json",
+      "items_pointer": "/stages",
+      "field_map": {
+        "stage_id": "stage_id",
+        "display_name": "title",
+        "display_names": "display_names"
+      }
+    }
   },
   "authority_boundary": {
     "redcube_ai_owns_visual_truth": true,

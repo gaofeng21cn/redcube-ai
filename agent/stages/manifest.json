@@ -10,6 +10,10 @@
       "stage_id": "source_intake",
       "stage_kind": "intake",
       "title": "Source intake",
+      "display_names": {
+        "en-US": "Source intake",
+        "zh-CN": "资料接收与梳理"
+      },
       "goal": "Freeze source truth, audience, constraints, and missing-material risk before visual planning.",
       "policy_ref": "agent/stages/source_intake.md",
       "prompt_ref": "agent/prompts/source_intake.md",
@@ -26,6 +30,10 @@
       "stage_id": "communication_strategy",
       "stage_kind": "planning",
       "title": "Communication strategy",
+      "display_names": {
+        "en-US": "Communication strategy",
+        "zh-CN": "传播策略"
+      },
       "goal": "Shape storyline, outline, audience fit, information density, and key takeaways.",
       "policy_ref": "agent/stages/communication_strategy.md",
       "prompt_ref": "agent/prompts/communication_strategy.md",
@@ -42,6 +50,10 @@
       "stage_id": "visual_direction",
       "stage_kind": "planning",
       "title": "Visual direction",
+      "display_names": {
+        "en-US": "Visual direction",
+        "zh-CN": "视觉方向"
+      },
       "goal": "Define layout density, image strategy, visual language, and feasibility before artifact creation.",
       "policy_ref": "agent/stages/visual_direction.md",
       "prompt_ref": "agent/prompts/visual_direction.md",
@@ -58,6 +70,10 @@
       "stage_id": "artifact_creation",
       "stage_kind": "creation",
       "title": "Artifact creation",
+      "display_names": {
+        "en-US": "Artifact creation",
+        "zh-CN": "视觉成果制作"
+      },
       "goal": "Create the visual deliverable through the selected RCA route while preserving source truth.",
       "policy_ref": "agent/stages/artifact_creation.md",
       "prompt_ref": "agent/prompts/artifact_creation.md",
@@ -75,6 +91,10 @@
       "stage_kind": "review",
       "stage_role": "cross_stage_meta_review",
       "title": "Review and revision",
+      "display_names": {
+        "en-US": "Review and revision",
+        "zh-CN": "评审与修订"
+      },
       "goal": "Independently review the whole deliverable, identify the earliest defect-owning stage, and issue pass, route-back, quality-debt, human-gate, or typed-blocker verdicts before export.",
       "policy_ref": "agent/stages/review_and_revision.md",
       "prompt_ref": "agent/prompts/review_and_revision.md",
@@ -91,6 +111,10 @@
       "stage_id": "package_and_handoff",
       "stage_kind": "packaging",
       "title": "Package and handoff",
+      "display_names": {
+        "en-US": "Package and handoff",
+        "zh-CN": "打包与交付"
+      },
       "goal": "Export final files, preview metadata, resume handles, and operator handoff refs.",
       "policy_ref": "agent/stages/package_and_handoff.md",
       "prompt_ref": "agent/prompts/package_and_handoff.md",

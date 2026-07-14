@@ -9,8 +9,29 @@ import {
   repoRoot,
 } from './helpers/opl-agent-pack-contracts.js';
 
+const EXPECTED_STAGE_DISPLAY_NAMES = {
+  source_intake: { 'en-US': 'Source intake', 'zh-CN': '资料接收与梳理' },
+  communication_strategy: { 'en-US': 'Communication strategy', 'zh-CN': '传播策略' },
+  visual_direction: { 'en-US': 'Visual direction', 'zh-CN': '视觉方向' },
+  artifact_creation: { 'en-US': 'Artifact creation', 'zh-CN': '视觉成果制作' },
+  review_and_revision: { 'en-US': 'Review and revision', 'zh-CN': '评审与修订' },
+  package_and_handoff: { 'en-US': 'Package and handoff', 'zh-CN': '打包与交付' },
+};
+
+const EXPECTED_STAGE_CATALOG = {
+  source_kind: 'agent_repo_relative_json',
+  relative_path: 'agent/stages/manifest.json',
+  items_pointer: '/stages',
+  field_map: {
+    stage_id: 'stage_id',
+    display_name: 'title',
+    display_names: 'display_names',
+  },
+};
+
 test('RCA canonical semantic pack remains concrete while root stage/pack contracts are refs-only', () => {
   const packRefs = readJson('contracts/pack_compiler_input.json');
+  const domainDescriptor = readJson('contracts/domain_descriptor.json');
   const stageManifest = readJson('agent/stages/manifest.json');
 
   assert.equal(packRefs.canonical_semantic_pack_root, 'agent/');
@@ -18,6 +39,13 @@ test('RCA canonical semantic pack remains concrete while root stage/pack contrac
   assert.equal(packRefs.projection_mode, 'repo_source_refs_only');
   assert.equal(stageManifest.surface_kind, 'opl_standard_agent_declarative_stage_manifest');
   assert.equal(stageManifest.version, 'opl-standard-agent-declarative-stage-manifest.v1');
+  assert.deepEqual(domainDescriptor.standard_agent_interface, {
+    version: 'opl_standard_agent_interface.v1',
+    ref_kind: 'repo_json_pointer',
+    ref: 'contracts/standard_agent_interface.json#/standard_agent_interface',
+    projection_ref: 'opl_generated:standard_agent_interface',
+    stage_catalog: EXPECTED_STAGE_CATALOG,
+  });
 
   for (const relativePath of packRefs.required_domain_pack_paths) {
     assert.equal(relativePath.startsWith('agent/'), true, relativePath);
@@ -28,16 +56,21 @@ test('RCA canonical semantic pack remains concrete while root stage/pack contrac
     assert.equal(/\b(?:TODO|TBD)\b/i.test(content), false, relativePath);
   }
 
-  assert.deepEqual(stageManifest.stages.map((stage) => stage.stage_id), [
-    'source_intake',
-    'communication_strategy',
-    'visual_direction',
-    'artifact_creation',
-    'review_and_revision',
-    'package_and_handoff',
-  ]);
+  assert.deepEqual(
+    stageManifest.stages.map((stage) => stage.stage_id),
+    Object.keys(EXPECTED_STAGE_DISPLAY_NAMES),
+  );
 
-  for (const stageId of stageManifest.stages.map((stage) => stage.stage_id)) {
+  for (const stage of stageManifest.stages) {
+    const stageId = stage.stage_id;
+    const expectedNames = EXPECTED_STAGE_DISPLAY_NAMES[stageId];
+
+    assert.equal(typeof stage.display_names, 'object', `${stageId}.display_names`);
+    assert.deepEqual({
+      'en-US': stage.display_names?.['en-US'],
+      'zh-CN': stage.display_names?.['zh-CN'],
+    }, expectedNames, `${stageId}.display_names`);
+    assert.equal(stage.title, stage.display_names['en-US'], `${stageId}.title`);
     assertCleanAgentRepoPathRef(
       { ref_kind: 'repo_path', ref: `agent/prompts/${stageId}.md` },
       'agent/prompts/',
