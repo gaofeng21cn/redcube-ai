@@ -124,6 +124,9 @@ test('RCA Review routes cross-Stage repairs early without bypassing local repair
   assert.match(handoffPrompt, /`cross_stage_route_back_before_budget_exhaustion`/);
   assert.match(handoffPrompt, /package-local defect with repair budget remaining returns only a recommendation/);
   assert.match(handoffPrompt, /upstream-owned defect may instead terminate this StageRun/);
+  assert.match(handoffPrompt, /exact-ref-and-hash no-output diagnostic/);
+  assert.match(handoffPrompt, /diagnostic remains consumable and may support that owner route/);
+  assert.match(handoffPrompt, /neither candidate nor diagnostic exists/);
   assert.match(
     artifactPrompt,
     /candidate -> render\/mechanical evidence -> visual-director QA -> screenshot QA -> targeted repair -> rerender -> fresh re-review/,
