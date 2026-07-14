@@ -120,6 +120,8 @@ test('RCA Review routes cross-Stage repairs early without bypassing local repair
     assert.match(section, /only terminal route permitted.*while budget remains/);
     assert.match(section, /zero consumable artifact returns no Stage route decision or recommendation/);
   }
+  assert.match(handoffPrompt, /`same_stage_repair_required`/);
+  assert.match(handoffPrompt, /`cross_stage_route_back_before_budget_exhaustion`/);
   assert.match(handoffPrompt, /package-local defect with repair budget remaining returns only a recommendation/);
   assert.match(handoffPrompt, /upstream-owned defect may instead terminate this StageRun/);
   assert.match(
