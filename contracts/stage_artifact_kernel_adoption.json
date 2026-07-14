@@ -276,7 +276,7 @@
     "opl_can_create_domain_owner_receipt": false,
     "opl_can_write_domain_truth": false,
     "opl_can_write_memory_body": false,
-    "opl_can_mutate_artifact_body": false,
+    "opl_can_mutate_domain_artifact_body": false,
     "opl_can_authorize_quality_or_export": false,
     "opl_can_declare_visual_or_quality_verdict": false
   },

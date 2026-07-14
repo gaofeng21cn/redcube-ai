@@ -14,11 +14,19 @@ test('repo-local OPL agent package manifest keeps RCA package and authority boun
   const domainDescriptor = readJson('contracts/domain_descriptor.json');
   const registration = readJson('contracts/opl_domain_manifest_registration.json');
   const pluginManifest = readJson('plugins/redcube-ai/.codex-plugin/plugin.json');
+  const packageJson = readJson('package.json');
+  const packageLock = readJson('package-lock.json');
+  const pyproject = fs.readFileSync(path.join(repoRoot, 'pyproject.toml'), 'utf8');
 
   assert.equal(manifest.surface_kind, 'opl_agent_package_manifest.v1');
   assert.equal(manifest.agent_id, 'rca');
   assert.equal(manifest.package_id, 'rca');
-  assert.equal(manifest.version, '0.2.4');
+  assert.equal(manifest.version, '0.2.5');
+  assert.equal(packageJson.version, manifest.version);
+  assert.equal(packageLock.version, manifest.version);
+  assert.equal(packageLock.packages[''].version, manifest.version);
+  assert.equal(manifest.skill_packs[0].version, manifest.version);
+  assert.match(pyproject, /^version = "0\.2\.5"$/m);
   assert.equal(manifest.package_id, manifest.agent_id);
   assert.equal(manifest.source, 'first_party_repo_local');
   assert.equal(manifest.source_contract.central_manifest_ref, 'contracts/opl-framework/packages/rca.json');
