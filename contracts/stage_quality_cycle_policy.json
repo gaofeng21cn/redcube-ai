@@ -5,6 +5,18 @@
   "target_domain_id": "redcube_ai",
   "shared_contract_ref": "opl-framework:contracts/opl-framework/stage-quality-cycle-contract.json",
   "route_selection_contract_ref": "opl-framework:contracts/opl-framework/stage-quality-cycle-contract.json#/cross_stage_route_selection",
+  "cross_stage_route_selection": {
+    "primary_only_decisive_attempt_role": "producer",
+    "formal_review_decisive_attempt_roles": ["reviewer", "re_reviewer"],
+    "repairer_can_be_decisive_attempt": false,
+    "producer_can_be_decisive_attempt_in_formal_review": false,
+    "repair_required_review_or_re_review_may_select_cross_stage_route_back_before_budget_exhaustion": true,
+    "repair_required_cross_stage_route_back_requires_target_different_from_current_stage": true,
+    "repair_required_review_or_re_review_may_select_other_terminal_route_before_budget_exhaustion": false,
+    "repair_required_review_or_re_review_may_select_terminal_route_after_budget_exhaustion": true,
+    "same_stage_repair_required_with_budget_remaining_continues_quality_loop": true,
+    "cross_stage_route_back_requires_narrowest_canonical_owner_stage": true
+  },
   "attempt_roles": [
     "producer",
     "reviewer",
@@ -112,7 +124,8 @@
     "route_output_policy": {
       "pass": "terminal_stage_route_decision",
       "quality_debt": "terminal_stage_route_decision",
-      "repair_required_with_budget_remaining": "stage_route_recommendation_only",
+      "same_stage_repair_required": "continue_quality_loop_with_stage_route_recommendation",
+      "cross_stage_route_back_before_budget_exhaustion": "terminal_stage_route_decision",
       "repair_required_at_budget_exhaustion_with_consumable_artifact": "terminal_stage_route_decision_and_completed_with_quality_debt",
       "repair_required_at_budget_exhaustion_without_consumable_artifact": "no_stage_route_decision_and_typed_blocker",
       "blocked_or_human_gate": "no_stage_route_decision"

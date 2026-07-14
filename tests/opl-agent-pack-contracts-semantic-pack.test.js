@@ -69,6 +69,74 @@ test('package handoff prompt keeps the quality loop under the StageRun controlle
   assert.match(prompt, /producer -> reviewer -> repairer -> re_reviewer/);
 });
 
+test('RCA Review routes cross-Stage repairs early without bypassing local repair or visual order', () => {
+  const policy = readJson('contracts/stage_quality_cycle_policy.json');
+  const routePolicy = policy.finding_and_repair_contract.route_output_policy;
+  const rolePrompt = fs.readFileSync(
+    path.join(repoRoot, 'agent/prompts/stage-quality-cycle-roles.md'),
+    'utf8',
+  );
+  const handoffPrompt = fs.readFileSync(
+    path.join(repoRoot, 'agent/prompts/package_and_handoff.md'),
+    'utf8',
+  );
+  const artifactPrompt = fs.readFileSync(
+    path.join(repoRoot, 'agent/prompts/artifact_creation.md'),
+    'utf8',
+  );
+
+  assert.deepEqual(policy.cross_stage_route_selection, {
+    primary_only_decisive_attempt_role: 'producer',
+    formal_review_decisive_attempt_roles: ['reviewer', 're_reviewer'],
+    repairer_can_be_decisive_attempt: false,
+    producer_can_be_decisive_attempt_in_formal_review: false,
+    repair_required_review_or_re_review_may_select_cross_stage_route_back_before_budget_exhaustion: true,
+    repair_required_cross_stage_route_back_requires_target_different_from_current_stage: true,
+    repair_required_review_or_re_review_may_select_other_terminal_route_before_budget_exhaustion: false,
+    repair_required_review_or_re_review_may_select_terminal_route_after_budget_exhaustion: true,
+    same_stage_repair_required_with_budget_remaining_continues_quality_loop: true,
+    cross_stage_route_back_requires_narrowest_canonical_owner_stage: true,
+  });
+  assert.deepEqual(routePolicy, {
+    pass: 'terminal_stage_route_decision',
+    quality_debt: 'terminal_stage_route_decision',
+    same_stage_repair_required: 'continue_quality_loop_with_stage_route_recommendation',
+    cross_stage_route_back_before_budget_exhaustion: 'terminal_stage_route_decision',
+    repair_required_at_budget_exhaustion_with_consumable_artifact:
+      'terminal_stage_route_decision_and_completed_with_quality_debt',
+    repair_required_at_budget_exhaustion_without_consumable_artifact:
+      'no_stage_route_decision_and_typed_blocker',
+    blocked_or_human_gate: 'no_stage_route_decision',
+  });
+  for (const section of [
+    rolePrompt.match(/## Reviewer\n\n([\s\S]*?)\n\n## Repairer/)?.[1] ?? '',
+    rolePrompt.match(/## Re Reviewer\n\n([\s\S]*)$/)?.[1] ?? '',
+  ]) {
+    assert.match(section, /`same_stage_repair_required`/);
+    assert.match(section, /`cross_stage_route_back_before_budget_exhaustion`/);
+    assert.match(section, /different declared Stage is the narrowest owner/);
+    assert.match(section, /decision_kind=route_back/);
+    assert.match(section, /target_stage_id.*different from the current Stage/);
+    assert.match(section, /only terminal route permitted.*while budget remains/);
+    assert.match(section, /zero consumable artifact returns no Stage route decision or recommendation/);
+  }
+  assert.match(handoffPrompt, /package-local defect with repair budget remaining returns only a recommendation/);
+  assert.match(handoffPrompt, /upstream-owned defect may instead terminate this StageRun/);
+  assert.match(
+    artifactPrompt,
+    /candidate -> render\/mechanical evidence -> visual-director QA -> screenshot QA -> targeted repair -> rerender -> fresh re-review/,
+  );
+  assert.deepEqual(policy.professional_sequence.ppt_visual_quality_loop, [
+    'candidate',
+    'render_and_mechanical_evidence',
+    'visual_director_route_qa_evidence',
+    'screenshot_route_qa_evidence',
+    'targeted_repair',
+    'rerender',
+    'fresh_re_review',
+  ]);
+});
+
 test('RCA capability map routes visual feedback fixtures through declarative professional skills', () => {
   const capabilityMap = readJson('contracts/capability_map.json');
   const handoff = readJson('contracts/agent_lab_handoff.json');
