@@ -157,7 +157,7 @@ test('RCA contracts split semantic route decisions from controller transition ma
   assert.equal(stageManifest.progress_first_policy.route_execution_grants_stage_transition_authority, false);
 });
 
-test('RCA consumes generic Stage Artifact and owner-closeout authority fields', () => {
+test('RCA consumes canonical Stage Artifact and owner-closeout authority fields', () => {
   const adoption = readJson('contracts/stage_artifact_kernel_adoption.json');
   const registration = readJson('contracts/opl_domain_manifest_registration.json');
   const ownerReceipt = readJson('contracts/owner_receipt_contract.json');
@@ -166,12 +166,12 @@ test('RCA consumes generic Stage Artifact and owner-closeout authority fields', 
   assert.equal(ownerReceipt.contract_id, 'rca.domain_owner_receipt.v2');
   assert.equal(boundary.opl_can_create_domain_owner_receipt, false);
   assert.equal(boundary.opl_can_write_domain_truth, false);
-  assert.equal(boundary.opl_can_mutate_artifact_body, false);
+  assert.equal(boundary.opl_can_mutate_domain_artifact_body, false);
   assert.equal(boundary.opl_can_authorize_quality_or_export, false);
   for (const legacyField of [
     'opl_can_create_rca_owner_receipt',
     'opl_can_write_rca_visual_truth',
-    'opl_can_mutate_domain_artifact_body',
+    'opl_can_mutate_artifact_body',
     'opl_can_mutate_rca_artifact_body',
   ]) {
     assert.equal(legacyField in boundary, false, legacyField);

@@ -32,7 +32,7 @@ User / Codex App
 
 ### 3. RCA authority
 
-RCA 保留 source-readiness、visual-direction、review/export、artifact mutation、visual-memory 与 owner-receipt 领域判断。OPL 可以验证 ref、持久化 receipt 和投影结果，但不能改写 RCA visual truth 或伪造 RCA authority。
+RCA 保留 source-readiness、visual-direction、review/export、artifact mutation、visual-memory 与 owner-receipt 领域判断。OPL 可以验证 ref、持久化 receipt 和投影结果，但不能改写 RCA visual truth 或伪造 RCA authority。`contracts/stage_artifact_kernel_adoption.json#/authority_boundary/opl_can_mutate_domain_artifact_body=false` 只禁止 OPL 改写领域 artifact body；RCA 仍是 artifact mutation authorization 与 canonical artifact authority 的唯一 owner。
 
 ### 4. Native helpers
 
