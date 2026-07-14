@@ -18,6 +18,7 @@ test('repo-local OPL agent package manifest keeps RCA package and authority boun
   assert.equal(manifest.surface_kind, 'opl_agent_package_manifest.v1');
   assert.equal(manifest.agent_id, 'rca');
   assert.equal(manifest.package_id, 'rca');
+  assert.equal(manifest.version, '0.2.4');
   assert.equal(manifest.package_id, manifest.agent_id);
   assert.equal(manifest.source, 'first_party_repo_local');
   assert.equal(manifest.source_contract.central_manifest_ref, 'contracts/opl-framework/packages/rca.json');

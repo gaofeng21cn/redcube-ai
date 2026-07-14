@@ -1,6 +1,6 @@
 {
   "surface_kind": "owner_receipt_contract",
-  "contract_id": "rca.domain_owner_receipt.v1",
+  "contract_id": "rca.domain_owner_receipt.v2",
   "owner": "redcube_ai",
   "contract_model": "domain_receipt_typed_blocker_no_regression_refs_only",
   "allowed_return_shapes": [
@@ -47,7 +47,7 @@
     "allowed_return_shapes_ref": "opl_generated:product_entry_manifest#/domain_owner_receipt_contract/allowed_return_shapes",
     "refs_only": true,
     "projects_receipt_body": false,
-    "writes_visual_truth": false,
+    "writes_domain_truth": false,
     "writes_artifact_body": false,
     "writes_memory_body": false,
     "authorizes_quality_or_export": false
@@ -60,7 +60,7 @@
     "allowed_return_shapes_ref": "opl_generated:product_entry_manifest#/domain_owner_receipt_contract/allowed_return_shapes",
     "refs_only": true,
     "projects_receipt_body": false,
-    "writes_visual_truth": false,
+    "writes_domain_truth": false,
     "writes_artifact_body": false,
     "writes_memory_body": false,
     "authorizes_quality_or_export": false
@@ -96,7 +96,7 @@
       "rca_owns_closeout_evidence": true,
       "opl_can_store_closeout_ref": true,
       "opl_can_store_typed_blocker": true,
-      "opl_can_write_rca_visual_truth": false,
+      "opl_can_write_domain_truth": false,
       "opl_can_store_artifact_body": false,
       "opl_can_store_memory_body": false,
       "opl_can_authorize_quality_or_export": false

@@ -74,7 +74,7 @@
   "forbidden_claims": [
     "repo_contract_alone_repaired_live_opl_workspace_registry",
     "descriptor_ready_is_visual_ready",
-    "opl_can_write_rca_visual_truth",
+    "opl_can_write_domain_truth",
     "workspace_yaml_is_repo_source",
     "shared_resource_manifests_are_repo_source"
   ]
