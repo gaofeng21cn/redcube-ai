@@ -6,23 +6,15 @@ import process from 'node:process';
 
 import {
   assertRootTestPartition,
-  assertRequiredRuntimeSharedResolution,
-  assertWorkspacePackageResolution,
   buildNodeTestArgs,
   discoverRootTestFiles,
-  resolveRedCubePythonCommand,
 } from './run-test-group-lib.ts';
 import {
   assertValidTestRegistry,
   buildTestGroups,
-  groupRequiresLiveCodexPreflight,
   partitionTestFilesForExecution,
   rootPartitionFiles,
 } from './test-registry.ts';
-import {
-  probeCodexCli,
-  readCodexCliContract,
-} from '@redcube/runtime';
 
 const scriptDir = import.meta.dirname;
 const repoRoot = path.resolve(scriptDir, '..');
@@ -92,36 +84,8 @@ const hygieneResult = spawnSync('scripts/repo-hygiene.sh', {
 if (hygieneResult.status !== 0) {
   process.exit(hygieneResult.status ?? 1);
 }
-assertWorkspacePackageResolution({ repoRoot });
-assertRequiredRuntimeSharedResolution({ repoRoot });
-
 assertValidTestRegistry();
 const GROUPS = buildTestGroups();
-async function prepareSerializedVerification(groupName) {
-  if (!groupRequiresLiveCodexPreflight(groupName)) {
-    return null;
-  }
-
-  const pythonCommand = resolveRedCubePythonCommand();
-  process.env.REDCUBE_PYTHON_COMMAND = pythonCommand.command;
-
-  const codexProbe = await probeCodexCli({
-    contract: readCodexCliContract(process.env),
-    cwd: repoRoot,
-    timeoutMs: 60000,
-  });
-  if (!codexProbe.ok) {
-    throw new Error([
-      '无法完成本地 Codex CLI 预检',
-      JSON.stringify(codexProbe, null, 2),
-    ].join('\n'));
-  }
-
-  process.stdout.write(`[run-test-group] local codex command: ${codexProbe.contract.command.join(' ')}\n`);
-  process.stdout.write(`[run-test-group] local codex python command: ${pythonCommand.command}\n`);
-  process.stdout.write('[run-test-group] local codex exec preflight passed\n');
-}
-
 function assertTrackedFiles(files, groupName) {
   for (const file of files) {
     if (!existsSync(path.resolve(file))) {
@@ -142,7 +106,7 @@ function printUsage() {
   process.stdout.write([
     `用法: node scripts/run-test-group.ts <${groupNames}> [tests/example.test.js] [node --test 参数]`,
     '示例: node scripts/run-test-group.ts smoke --test-reporter=dot',
-    '示例: node scripts/run-test-group.ts integration tests/source-intake.test.js --test-reporter=dot',
+    '示例: node scripts/run-test-group.ts integration tests/python-native-helper-catalog.test.js --test-reporter=dot',
   ].join('\n'));
 }
 
@@ -165,7 +129,6 @@ if (missingRequestedFiles.length > 0) {
   throw new Error(`${groupName} 分组不包含请求的测试文件: ${missingRequestedFiles.join(', ')}`);
 }
 const selectedFiles = requestedFiles.length > 0 ? requestedFiles : GROUPS[groupName];
-await prepareSerializedVerification(groupName);
 const executionPlan = partitionTestFilesForExecution({
   groupName,
   files: selectedFiles,
@@ -181,7 +144,7 @@ function runNodeTestBatch({ label, files, serialized }) {
     serialized ? '(file concurrency = 1)' : '(runner default concurrency)',
   ].join(' ') + '\n');
 
-  const result = spawnSync(process.execPath, [...buildNodeTestArgs({ forwardedArgs, serialized }), ...files], {
+  const result = spawnSync('node', [...buildNodeTestArgs({ forwardedArgs, serialized }), ...files], {
     stdio: 'inherit',
     cwd: repoRoot,
     env: process.env,

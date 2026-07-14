@@ -1,330 +1,50 @@
 {
   "surface_kind": "domain_live_stage_run_progress_evidence",
-  "rca_surface_kind": "rca_live_stage_run_progress_evidence",
-  "schema_ref": "contracts/opl-framework/domain-live-stage-run-progress-evidence.schema.json",
   "schema_version": 1,
-  "version": "live-stage-run-progress-evidence.v1",
-  "domain_id": "redcube-ai",
+  "domain_id": "redcube_ai",
+  "domain_agent_id": "rca",
   "owner": "redcube_ai",
+  "state": "active_post_standardization_evidence_gate",
   "status": "owner_typed_blocker_recorded_not_ready_claim",
-  "state": "active_contract",
-  "purpose": "OPL-standard RCA live visual stage progress evidence and typed-blocker surface for StageRun consumers.",
-  "machine_boundary": "This surface is the RCA-owned OPL consumption contract for body-free live stage progress refs. It records owner receipt refs, typed blocker refs, human gate refs, quality/export receipt refs, memory/lifecycle refs, no-regression refs, long-soak refs, doc refs, and next verification refs. It does not contain visual truth, artifact bodies, review/export verdict bodies, memory bodies, owner receipt bodies, typed blocker bodies, or production-ready claims.",
-  "evidence_scope": "live_visual_stage_progress_refs_or_domain_owned_typed_blocker",
-  "source_contract_refs": {
-    "stage_run_kernel_profile_ref": "contracts/stage_run_kernel_profile.json",
-    "temporal_stage_run_consumption_policy_ref": "contracts/temporal_stage_run_consumption_policy.json",
-    "owner_chain_input_ref": "contracts/owner_chain_live_progress_evidence.json",
-    "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
-    "production_acceptance_ref": "contracts/production_acceptance/rca-production-acceptance.json",
-    "stage_artifact_kernel_adoption_ref": "contracts/stage_artifact_kernel_adoption.json"
-  },
+  "purpose": "Record the owner-side blocker for fresh OPL-hosted RCA StageRun evidence after retirement of the repo-local control plane.",
   "refs": {
-    "owner_receipt_refs": [
-      "rca-owner-receipt:visual-stage:owner-chain-canary-domain-owner",
-      "rca-owner-receipt:visual-stage:production-evidence-tail-ppt-image-first-domain-owner",
-      "rca-owner-receipt:review-export:ppt_deck:visual_director_review:deck-owner-chain",
-      "rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-owner-chain",
-      "rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-owner-chain",
-      "rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614"
-    ],
+    "owner_receipt_refs": [],
     "typed_blocker_refs": [
-      "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
-      "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending",
-      "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending"
+      "rca-typed-blocker:post-standardization-live-stage-evidence-required"
     ],
-    "human_gate_refs": [
-      "human_gate:redcube_operator_review_gate",
-      "rca-typed-blocker:stage-replay-human-gate:communication_strategy:redcube_operator_review_gate/operator-review-receipt-pending",
-      "rca-typed-blocker:stage-replay-human-gate:visual_direction:redcube_operator_review_gate/operator-review-receipt-pending",
-      "rca-typed-blocker:stage-replay-human-gate:artifact_creation:redcube_operator_review_gate/operator-review-receipt-pending",
-      "rca-typed-blocker:stage-replay-human-gate:review_and_revision:redcube_operator_review_gate/operator-review-receipt-pending"
+    "human_gate_refs": [],
+    "quality_or_export_receipt_refs": [],
+    "no_regression_refs": [],
+    "long_soak_refs": [],
+    "doc_refs": [
+      "docs/status.md",
+      "docs/architecture.md"
     ],
-    "quality_or_export_receipt_refs": [
-      "rca-review-export:ppt_deck:visual_director_review:deck-owner-chain",
-      "rca-review-export:ppt_deck:screenshot_review:deck-owner-chain",
-      "rca-review-export:ppt_deck:export_pptx:deck-owner-chain",
-      "workspace-runtime-ref:review-export:production-evidence-tail-ppt-image-first"
-    ],
-    "memory_lifecycle_refs": [
-      "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted",
-      "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-rejected",
-      "rca-lifecycle-receipt:cleanup:production-evidence-tail-ppt-image-first-cleanup",
-      "rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore",
-      "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
-    ],
-    "no_regression_refs": [
-      "rca-no-regression:visual-stage:production-evidence-tail-ppt-image-first-no-regression",
-      "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
-      "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
-      "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
-      "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
-      "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-      "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
-      "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
-    ],
-    "long_soak_refs": [
-      "rca-typed-blocker:controlled-soak:temporal-long-soak-pending"
+    "next_verification_command_refs": [
+      "command:opl agents conformance --family-defaults --json",
+      "command:opl agents run --domain redcube_ai --action invoke_product_entry --workspace <workspace>"
     ]
   },
-  "doc_refs": [
-    "docs/status.md#current-running-and-doc-facts",
-    "docs/architecture.md#main-chain",
-    "docs/active/rca-ideal-state-gap-plan.md#temporal-controlled-visual-stage-long-soak"
-  ],
-  "progress_entries": [
+  "evidence_items": [
     {
-      "entry_id": "mock_safe_visual_owner_chain_canary",
-      "status": "refs_observed",
-      "evidence_kind": "mock_safe_artifact_producing_owner_chain_canary",
-      "refs": {
-        "owner_receipt_refs": [
-          "rca-owner-receipt:review-export:ppt_deck:visual_director_review:deck-owner-chain",
-          "rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-owner-chain",
-          "rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-owner-chain"
-        ],
-        "quality_or_export_receipt_refs": [
-          "rca-review-export:ppt_deck:visual_director_review:deck-owner-chain",
-          "rca-review-export:ppt_deck:screenshot_review:deck-owner-chain",
-          "rca-review-export:ppt_deck:export_pptx:deck-owner-chain"
-        ],
-        "typed_blocker_refs": [],
-        "human_gate_refs": [],
-        "memory_lifecycle_refs": [],
-        "no_regression_refs": [],
-        "long_soak_refs": []
-      },
-      "image_api_called": false,
-      "workspace_artifact_written": true,
-      "repo_tracks_workspace_artifacts": false,
-      "ready_claim_allowed": false
-    },
-    {
-      "entry_id": "human_ready_export_handoff",
-      "status": "refs_observed",
-      "evidence_kind": "human_operator_ready_export_handoff",
-      "refs": {
-        "owner_receipt_refs": [
-          "rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614",
-          "rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-owner-chain"
-        ],
-        "quality_or_export_receipt_refs": [
-          "rca-review-export:ppt_deck:visual_director_review:deck-owner-chain",
-          "rca-review-export:ppt_deck:screenshot_review:deck-owner-chain",
-          "rca-review-export:ppt_deck:export_pptx:deck-owner-chain"
-        ],
-        "typed_blocker_refs": [],
-        "human_gate_refs": [
-          "human_gate:redcube_operator_review_gate"
-        ],
-        "memory_lifecycle_refs": [],
-        "no_regression_refs": [],
-        "long_soak_refs": []
-      },
-      "required_success_ref_shapes": [
-        "rca-operator-ready:export-handoff:<handoff-id>",
-        "rca-owner-receipt:review-export:<family>:export_pptx:<deliverable-id>"
-      ],
-      "next_verification_command_refs": [
-        "command:npm run --silent build && node --test tests/rca-owner-chain-live-progress-evidence.test.js tests/stage-run-kernel-profile.test.js"
-      ],
-      "owner_followthrough_ref": "rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614",
-      "closed_typed_blocker_ref": "rca-typed-blocker:review-export:human-ready-export-handoff-pending",
-      "ready_claim_allowed": false
-    },
-    {
-      "entry_id": "temporal_controlled_visual_stage_long_soak",
-      "status": "blocked_by_domain_owned_typed_blocker",
-      "evidence_kind": "opl_temporal_controlled_visual_stage_long_soak",
-      "refs": {
-        "owner_receipt_refs": [],
-        "quality_or_export_receipt_refs": [
-          "workspace-runtime-ref:review-export:production-evidence-tail-ppt-image-first"
-        ],
-        "typed_blocker_refs": [
-          "rca-typed-blocker:controlled-soak:temporal-long-soak-pending"
-        ],
-        "human_gate_refs": [],
-        "memory_lifecycle_refs": [],
-        "no_regression_refs": [],
-        "long_soak_refs": [
-          "rca-typed-blocker:controlled-soak:temporal-long-soak-pending"
-        ]
-      },
-      "required_success_ref_shapes": [
-        "rca-long-soak:visual-stage:<soak-id>",
-        "workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:<soak-id>"
-      ],
-      "next_verification_command_refs": [
-        "command:npm run --silent build && node --test tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
-      ],
-      "ready_claim_allowed": false
-    },
-    {
-      "entry_id": "memory_lifecycle_receipt_scaleout",
-      "status": "blocked_by_domain_owned_typed_blocker",
-      "evidence_kind": "real_visual_memory_lifecycle_receipt_instances",
-      "refs": {
-        "owner_receipt_refs": [
-          "rca-owner-receipt:visual-stage:production-evidence-tail-ppt-image-first-domain-owner"
-        ],
-        "quality_or_export_receipt_refs": [
-          "workspace-runtime-ref:review-export:production-evidence-tail-ppt-image-first"
-        ],
-        "typed_blocker_refs": [
-          "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending"
-        ],
-        "human_gate_refs": [],
-        "memory_lifecycle_refs": [
-          "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted",
-          "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-rejected",
-          "rca-lifecycle-receipt:cleanup:production-evidence-tail-ppt-image-first-cleanup",
-          "rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore",
-          "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
-        ],
-        "no_regression_refs": [],
-        "long_soak_refs": []
-      },
-      "required_success_ref_shapes": [
-        "rca-memory-receipt:visual-pattern:<accepted-receipt-id>",
-        "rca-memory-receipt:visual-pattern:<rejected-receipt-id>",
-        "rca-lifecycle-receipt:cleanup:<receipt-id>",
-        "rca-lifecycle-receipt:restore:<receipt-id>",
-        "rca-lifecycle-receipt:retention:<receipt-id>"
-      ],
-      "next_verification_command_refs": [
-        "command:npm run --silent build && node --test tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
-      ],
-      "ready_claim_allowed": false
-    },
-    {
-      "entry_id": "cross_family_repeated_no_regression",
-      "status": "blocked_by_domain_owned_typed_blocker",
-      "evidence_kind": "production_like_cross_family_repeated_no_regression",
-      "refs": {
-        "owner_receipt_refs": [
-          "rca-owner-receipt:visual-stage:production-evidence-tail-ppt-image-first-domain-owner"
-        ],
-        "quality_or_export_receipt_refs": [
-          "workspace-runtime-ref:review-export:production-evidence-tail-ppt-image-first"
-        ],
-        "typed_blocker_refs": [
-          "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending"
-        ],
-        "human_gate_refs": [],
-        "memory_lifecycle_refs": [],
-        "no_regression_refs": [
-          "rca-no-regression:visual-stage:production-evidence-tail-ppt-image-first-no-regression",
-          "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
-          "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
-          "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
-          "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
-          "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-          "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
-          "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
-        ],
-        "long_soak_refs": []
-      },
-      "required_success_ref_shapes": [
-        "rca-no-regression:visual-stage:ppt_deck:<run-id>",
-        "rca-no-regression:visual-stage:xiaohongshu:<run-id>",
-        "workspace-runtime-ref:no-regression:<run-id>"
-      ],
-      "next_verification_command_refs": [
-        "command:npm run --silent build && node --test tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
-      ],
-      "ready_claim_allowed": false
+      "ref_shape": "typed_blocker_ref",
+      "ref": "rca-typed-blocker:post-standardization-live-stage-evidence-required"
     }
   ],
-  "next_verification_command_refs": [
-    "command:npm run --silent build && node --test tests/rca-owner-chain-live-progress-evidence.test.js tests/stage-run-kernel-profile.test.js",
-    "command:npm run --silent build && node --test tests/rca-production-acceptance.test.js"
-  ],
-  "owner_chain_completion_audit": {
-    "audit_id": "rca.live_stage_run_owner_chain_completion_audit.v1",
-    "source_policy_ref": "contracts/temporal_stage_run_consumption_policy.json#/owner_chain_completion_audit",
-    "source_owner_chain_ref": "contracts/owner_chain_live_progress_evidence.json#/owner_chain_completion_audit",
-    "completion_status": "blocked_requires_real_visual_stage_owner_acceptance",
-    "accepted_terminal_evidence_refs": [
-      "progress_delta_receipt_ref",
-      "owner_receipt_ref",
-      "typed_blocker_ref",
-      "human_gate_ref",
-      "route_back_ref",
-      "review_export_receipt_ref",
-      "artifact_authority_receipt_ref",
-      "no_regression_evidence_ref"
-    ],
-    "forbidden_completion_substitutes": [
-      "provider_completion",
-      "generated_surface_ready",
-      "stage_run_terminal_state",
-      "queue_empty",
-      "attempt_ledger_written",
-      "mock_safe_canary",
-      "controlled_canary",
-      "conformance_pass",
-      "read_model_current"
-    ],
-    "temporal_long_soak_status": "blocked_by_domain_owned_typed_blocker",
-    "temporal_long_soak_blocker_ref": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
-    "requires_real_visual_stage_owner_acceptance": true,
-    "requires_review_export_acceptance_for_export_claim": true,
-    "mock_safe_canary_counts_as_completion": false,
-    "generated_surface_readiness_counts_as_completion": false,
-    "provider_completion_counts_as_completion": false,
-    "stage_run_terminal_state_counts_as_completion": false,
-    "declares_owner_chain_complete": false,
-    "declares_visual_ready": false,
-    "declares_exportable": false,
-    "declares_domain_ready": false,
-    "declares_production_ready": false,
-    "declares_production_visual_stage_long_soak_complete": false
+  "typed_blocker_kind": "post_standardization_live_stage_evidence_required",
+  "non_claims": {
+    "domain_ready": false,
+    "production_ready": false
   },
   "authority_boundary": {
     "refs_only": true,
-    "rca_owns_owner_receipts": true,
-    "rca_owns_typed_blockers": true,
-    "rca_owns_review_export_verdict": true,
-    "opl_can_store_refs": true,
-    "opl_can_record_human_gate_refs": true,
-    "opl_can_record_no_regression_refs": true,
-    "opl_can_write_rca_visual_truth": false,
-    "opl_can_write_artifact_body": false,
-    "opl_can_write_memory_body": false,
-    "opl_can_issue_rca_owner_receipt": false,
+    "opl_can_write_domain_truth": false,
     "opl_can_sign_owner_receipt": false,
-    "opl_can_create_rca_typed_blocker": false,
     "opl_can_create_typed_blocker": false,
-    "opl_can_authorize_review_export": false,
     "opl_can_authorize_quality_or_export": false,
     "opl_can_claim_domain_ready": false,
     "opl_can_claim_production_ready": false,
     "provider_completion_counts_as_domain_ready": false,
-    "structural_conformance_counts_as_live_progress": false,
-    "provider_completion_counts_as_visual_ready": false,
-    "generated_surface_ready_counts_as_visual_ready": false,
-    "stage_run_terminal_counts_as_owner_chain_completion": false,
-    "queue_empty_counts_as_owner_chain_completion": false,
-    "attempt_ledger_written_counts_as_owner_chain_completion": false,
-    "conformance_pass_counts_as_visual_ready": false,
-    "mock_safe_canary_counts_as_production_progress": false,
-    "declares_visual_ready": false,
-    "declares_exportable": false,
-    "declares_handoffable": false,
-    "declares_domain_ready": false,
-    "declares_production_ready": false,
-    "declares_production_visual_stage_long_soak_complete": false
-  },
-  "forbidden_payload_classes": [
-    "visual_truth_body",
-    "review_export_verdict_body",
-    "artifact_blob",
-    "artifact_body",
-    "visual_memory_body",
-    "memory_body",
-    "owner_receipt_body",
-    "typed_blocker_body",
-    "generic_runtime_state"
-  ]
+    "structural_conformance_counts_as_live_progress": false
+  }
 }

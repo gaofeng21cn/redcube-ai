@@ -24,7 +24,6 @@ OPTIONAL_IMPORT_NAMES = {
     "python-pptx": "pptx",
     "playwright": "playwright",
     "LibreOffice headless": None,
-    "upstream-hermes-agent-local": None,
 }
 
 def _pyproject_metadata(pyproject_file: Path) -> dict[str, Any]:
@@ -33,7 +32,6 @@ def _pyproject_metadata(pyproject_file: Path) -> dict[str, Any]:
     return {
         "name": project.get("name"),
         "version": project.get("version"),
-        "scripts": project.get("scripts", {}) if isinstance(project.get("scripts"), dict) else {},
     }
 
 
@@ -134,7 +132,9 @@ def _renderer_availability() -> dict[str, Any]:
         "python_dependencies": python_deps,
         "desktop_app_fallback_allowed": False,
         "dependency_install": {
-            "automatic_installer": "tools/native-ppt-proof/install-deps.sh",
+            "automatic_install_allowed": False,
+            "provisioning_owner": "opl_connect_or_operator",
+            "developer_proof_installer": "tools/native-ppt-proof/install-deps.sh",
             "suggested_command": platform_install_hint(),
             "commands": install_commands(),
             "executes_generation": False,
@@ -144,13 +144,42 @@ def _renderer_availability() -> dict[str, Any]:
     }
 
 
-def _helper_diagnostics(helper: dict[str, Any], scripts: dict[str, str]) -> dict[str, Any]:
+def _helper_diagnostics(helper: dict[str, Any], root: Path) -> dict[str, Any]:
     module = str(helper.get("package_module") or "")
-    entrypoint = helper.get("package_entrypoint", {}) if isinstance(helper.get("package_entrypoint"), dict) else {}
-    console_script = str(entrypoint.get("console_script") or "")
-    callable_name = str(entrypoint.get("callable") or "")
-    expected_script = f"{module}:{callable_name}" if module and callable_name else None
     module_spec_found = importlib.util.find_spec(module) is not None if module else False
+    descriptor_ref = str(helper.get("probe_descriptor_ref") or "")
+    source_ref = str(helper.get("source_ref") or "")
+    descriptor_file = (root / descriptor_ref).resolve() if descriptor_ref else None
+    source_file = (root / source_ref).resolve() if source_ref else None
+    descriptor: dict[str, Any] = {}
+    if descriptor_file and descriptor_file.is_file():
+        try:
+            candidate = json.loads(descriptor_file.read_text(encoding="utf-8"))
+            if isinstance(candidate, dict):
+                descriptor = candidate
+        except (OSError, json.JSONDecodeError):
+            descriptor = {}
+    entrypoint_ref = str(descriptor.get("entrypoint_ref") or "")
+    descriptor_entrypoint = (
+        (descriptor_file.parent / entrypoint_ref).resolve()
+        if descriptor_file and entrypoint_ref
+        else None
+    )
+    authority = descriptor.get("authority_boundary")
+    authority_is_false = (
+        isinstance(authority, dict)
+        and bool(authority)
+        and all(value is False for value in authority.values())
+    )
+    descriptor_matches_source = bool(
+        descriptor_file
+        and source_file
+        and descriptor.get("surface_kind") == "opl_pack_native_helper_probe_descriptor"
+        and descriptor.get("schema_version") == 1
+        and descriptor.get("helper_id") == helper.get("helper_id")
+        and descriptor_entrypoint == source_file
+        and authority_is_false
+    )
 
     return {
         "helper_id": helper.get("helper_id"),
@@ -159,11 +188,11 @@ def _helper_diagnostics(helper: dict[str, Any], scripts: dict[str, str]) -> dict
             "module_spec_found": module_spec_found,
         },
         "entrypoint": {
-            "console_script": console_script,
-            "module_command": entrypoint.get("module_command"),
-            "callable": callable_name,
-            "pyproject_target": scripts.get(console_script),
-            "matches_pyproject": bool(expected_script and scripts.get(console_script) == expected_script),
+            "source_ref": source_ref,
+            "probe_descriptor_ref": descriptor_ref,
+            "probe_descriptor_exists": bool(descriptor_file and descriptor_file.is_file()),
+            "probe_descriptor_matches_source": descriptor_matches_source,
+            "public_launcher": False,
         },
         "optional_dependencies": {
             "declared": list(helper.get("requires") or []),
@@ -187,9 +216,12 @@ def build_report(catalog_file: Path | None = None) -> dict[str, Any]:
     pyproject_file = root / str(package.get("pyproject") or "pyproject.toml")
     pyproject = _pyproject_metadata(pyproject_file)
     helpers = catalog.get("helpers", []) if isinstance(catalog.get("helpers"), list) else []
-    helper_reports = [_helper_diagnostics(helper, pyproject["scripts"]) for helper in helpers]
+    helper_reports = [_helper_diagnostics(helper, root) for helper in helpers]
     required_gates = list(catalog.get("bypass_policy", {}).get("required_review_export_gates") or [])
-    all_entrypoints_registered = all(report["entrypoint"]["matches_pyproject"] for report in helper_reports)
+    all_entrypoints_registered = all(
+        report["entrypoint"]["probe_descriptor_matches_source"]
+        for report in helper_reports
+    )
     all_modules_found = all(report["importability"]["module_spec_found"] for report in helper_reports)
 
     return {

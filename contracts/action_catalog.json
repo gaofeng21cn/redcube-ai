@@ -6,6 +6,8 @@
   "owner": "redcube_ai",
   "authority_boundary": {
     "domain_truth_owner": "redcube_ai",
+    "quality_verdict_owner": "redcube_ai",
+    "artifact_authority_owner": "redcube_ai",
     "opl_role": "projection_consumer_only",
     "write_policy": "no_domain_truth_writes",
     "opl_can_write_domain_truth": false,
@@ -17,13 +19,21 @@
   "actions": [
     {
       "action_id": "invoke_product_entry",
-      "title": "Run RedCube visual delivery",
-      "summary": "Start or continue the complete RedCube visual-delivery stage route through the OPL-hosted Standard Agent runtime.",
+      "title": "Create or continue a visual deliverable",
+      "summary": "Run the RCA visual-deliverable stages through the OPL-hosted StageRun controller while preserving RCA visual truth and review/export authority.",
       "owner": "redcube_ai",
       "effect": "mutating",
       "execution_binding": {
         "kind": "stage_binding",
         "stage_manifest_ref": "agent/stages/manifest.json"
+      },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "contracts/action_catalog.json",
+        "source_action_id": "invoke_product_entry",
+        "stage_catalog_ref": "agent/stages/manifest.json",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
       "input_schema_ref": "contracts/schemas/rca-stage-action.input.schema.json",
       "output_schema_ref": "contracts/schemas/rca-stage-action.output.schema.json",
@@ -77,6 +87,8 @@
         "domain_truth_owner": "redcube_ai",
         "quality_verdict_owner": "redcube_ai",
         "artifact_authority_owner": "redcube_ai",
+        "opl_role": "projection_consumer_only",
+        "write_policy": "no_domain_truth_writes",
         "opl_can_write_domain_truth": false,
         "opl_can_write_memory_body": false,
         "opl_can_mutate_domain_artifact_body": false,
@@ -87,12 +99,20 @@
     {
       "action_id": "run_image_ppt_proof",
       "title": "Run image-first PPT proof",
-      "summary": "Run the RCA image-first PPT proof as an artifact-creation stage action with RCA-owned visual and artifact authority.",
+      "summary": "Run the RCA artifact-creation stage for an image-first PPT proof through OPL-hosted StageRun and return artifact, review, and blocker refs.",
       "owner": "redcube_ai",
       "effect": "mutating",
       "execution_binding": {
         "kind": "stage_binding",
         "stage_manifest_ref": "agent/stages/manifest.json"
+      },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "contracts/action_catalog.json",
+        "source_action_id": "run_image_ppt_proof",
+        "stage_catalog_ref": "agent/stages/manifest.json",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
       "input_schema_ref": "contracts/schemas/rca-stage-action.input.schema.json",
       "output_schema_ref": "contracts/schemas/rca-stage-action.output.schema.json",
@@ -139,6 +159,8 @@
         "domain_truth_owner": "redcube_ai",
         "quality_verdict_owner": "redcube_ai",
         "artifact_authority_owner": "redcube_ai",
+        "opl_role": "projection_consumer_only",
+        "write_policy": "no_domain_truth_writes",
         "opl_can_write_domain_truth": false,
         "opl_can_write_memory_body": false,
         "opl_can_mutate_domain_artifact_body": false,
@@ -149,12 +171,20 @@
     {
       "action_id": "run_native_ppt_proof",
       "title": "Run native PPT proof",
-      "summary": "Run the RCA native PPT proof as an artifact-creation stage action while preserving RCA review, export, and native-helper authority.",
+      "summary": "Run the RCA artifact-creation stage for an editable native PPT proof through OPL-hosted StageRun and the declared RCA native-helper implementation.",
       "owner": "redcube_ai",
       "effect": "mutating",
       "execution_binding": {
         "kind": "stage_binding",
         "stage_manifest_ref": "agent/stages/manifest.json"
+      },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "contracts/action_catalog.json",
+        "source_action_id": "run_native_ppt_proof",
+        "stage_catalog_ref": "agent/stages/manifest.json",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
       "input_schema_ref": "contracts/schemas/rca-stage-action.input.schema.json",
       "output_schema_ref": "contracts/schemas/rca-stage-action.output.schema.json",
@@ -201,6 +231,8 @@
         "domain_truth_owner": "redcube_ai",
         "quality_verdict_owner": "redcube_ai",
         "artifact_authority_owner": "redcube_ai",
+        "opl_role": "projection_consumer_only",
+        "write_policy": "no_domain_truth_writes",
         "opl_can_write_domain_truth": false,
         "opl_can_write_memory_body": false,
         "opl_can_mutate_domain_artifact_body": false,
@@ -210,7 +242,7 @@
     }
   ],
   "notes": [
-    "All public Standard Agent actions are hosted stage bindings; RCA does not publish a second status, session, manifest, workbench, or generic dispatch control plane.",
-    "The direct RCA skill and visual runtime remain domain-owned implementation paths inside the declared stage/tool boundary."
+    "OPL derives CLI, MCP, skill, product-entry, OpenAI, AI SDK, status, and workbench surfaces from this catalog.",
+    "RCA keeps visual truth, artifact authority, review/export verdicts, visual-memory decisions, native-helper implementation, and owner receipt authority; hosted transport and StageRun lifecycle remain OPL-owned."
   ]
 }

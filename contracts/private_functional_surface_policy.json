@@ -1,133 +1,48 @@
 {
   "surface_kind": "opl_domain_private_functional_surface_admission_policy",
-  "schema_version": 1,
+  "schema_version": 2,
   "domain_id": "redcube_ai",
-  "default_posture": "forbidden_until_classified_and_receipted",
-  "forbidden_private_surface_classes": [
-    "generic_scheduler",
-    "generic_queue_or_attempt_ledger",
-    "generic_cli_mcp_product_wrapper",
-    "generic_workbench_shell",
-    "generic_observability_runtime"
+  "default_posture": "forbidden",
+  "physical_source_morphology_policy_ref": "contracts/physical_source_morphology_policy.json",
+  "allowed_domain_surfaces": [
+    "declarative_visual_pack",
+    "visual_authority_contract",
+    "visual_native_helper_implementation"
   ],
-  "allowed_private_surface_classes": [
-    "minimal_authority_function",
-    "visual_native_helper_implementation",
-    "ai_first_review_export_ref_materializer"
+  "allowed_developer_surfaces": [
+    "developer_proof",
+    "repo_verification"
   ],
-  "purpose_first_owner_delta_policy": {
-    "default_operator_question": "which_owner_must_produce_which_delta_or_typed_blocker",
-    "accepted_next_delta_kinds": [
-      "artifact_producing_owner_receipt",
-      "visual_review_export_receipt",
-      "visual_memory_accept_reject_receipt",
-      "workspace_receipt_scaleout_receipt",
-      "production_like_no_regression_ref",
-      "temporal_controlled_visual_stage_long_soak_ref",
-      "human_review_receipt",
-      "domain_owned_typed_blocker"
-    ],
-    "refs_only_accounting_is_progress": false,
-    "provider_completion_is_visual_progress": false,
-    "session_currentness_is_visual_progress": false,
-    "workbench_projection_is_visual_progress": false
-  },
-  "repo_local_owner_delta_surface_policy": {
-    "default_surface_role": "refs_only_owner_delta_adapter_until_exit_gate",
-    "scoped_surface_ids": [
-      "repo_local_wrapper",
-      "product_entry_session",
-      "runtime_watch",
-      "operator_projection",
-      "domain_action_adapter_compatibility",
-      "neutral_route_run_record_adapter"
-    ],
-    "allowed_roles_before_exit_gate": [
-      "refs_only_adapter",
-      "domain_handler_target",
-      "native_helper_target",
-      "migration_input",
-      "negative_input_guard"
-    ],
-    "required_next_delta_kinds": [
-      "artifact_producing_owner_receipt",
-      "visual_review_export_receipt",
-      "visual_memory_accept_reject_receipt",
-      "workspace_receipt_scaleout_receipt",
-      "production_like_no_regression_ref",
-      "temporal_controlled_visual_stage_long_soak_ref",
-      "human_review_receipt",
-      "domain_owned_typed_blocker"
-    ],
-    "disallowed_progress_claims": [
-      "mock_sample_ref_accounting",
-      "sample_ref_accounting",
-      "refs_only_accounting",
-      "provider_completion",
-      "session_currentness",
-      "workbench_projection",
-      "structural_contract_pass"
-    ],
-    "production_ready_claim_allowed": false,
-    "visual_ready_claim_allowed": false,
-    "artifact_ready_claim_allowed": false,
-    "mock_sample_ref_accounting_is_production_ready": false,
-    "sample_ref_accounting_is_production_ready": false
-  },
-  "domain_thinning_exit_gate": {
-    "candidate_surface_classes": [
-      "generic_cli_mcp_product_wrapper",
-      "generic_session_store_owner",
-      "generic_status_workbench_owner",
-      "generic_domain_action_adapter_owner",
-      "generic_operator_workbench_owner",
-      "generic_observability_runtime",
-      "generic_queue_or_attempt_ledger",
-      "generic_review_repair_transport_owner"
-    ],
-    "required_before_delete_or_thin": [
-      "opl_default_caller_parity",
-      "no_active_caller",
-      "rca_owner_receipt_or_typed_blocker_roundtrip",
-      "no_forbidden_write_proof",
-      "current_role_guard_no_alias_proof",
-      "compressed_history_index_pointer"
-    ],
-    "allowed_before_gate": [
-      "refs_only_adapter",
-      "domain_handler_target",
-      "migration_input",
-      "negative_input_guard"
-    ],
-    "forbidden_after_gate": [
-      "compatibility_alias",
-      "facade",
-      "default_dispatch",
-      "old_public_path_test",
-      "success_payload_compatibility_field"
-    ]
-  },
   "forbidden_generic_owner_roles": [
     "generic_scheduler_owner",
-    "generic_daemon_owner",
-    "generic_lifecycle_owner",
-    "generic_queue_owner",
+    "generic_runner_owner",
     "generic_attempt_ledger_owner",
-    "generic_state_machine_runner_owner",
-    "generic_cli_mcp_product_wrapper_owner",
-    "generic_domain_action_adapter_owner",
-    "generic_sidecar_owner",
     "generic_session_store_owner",
-    "generic_status_workbench_owner",
     "generic_workspace_source_intake_owner",
-    "generic_memory_transport_owner",
-    "generic_artifact_gallery_owner",
-    "generic_operator_workbench_owner",
-    "generic_observability_slo_owner",
-    "generic_persistence_engine_owner",
-    "generic_sqlite_lifecycle_owner",
-    "generic_native_helper_envelope_owner",
+    "generic_artifact_lifecycle_owner",
     "generic_review_repair_transport_owner",
+    "generic_cli_mcp_product_wrapper_owner",
+    "generic_status_workbench_owner",
+    "generic_domain_entry_runtime_owner",
     "generated_surface_owner_in_domain_repo"
-  ]
+  ],
+  "no_second_control_plane_gate": {
+    "repo_local_cli_allowed": false,
+    "repo_local_domain_entry_allowed": false,
+    "repo_local_runtime_allowed": false,
+    "repo_local_runtime_protocol_allowed": false,
+    "repo_local_governance_runtime_allowed": false,
+    "repo_local_overlay_runtime_allowed": false,
+    "compatibility_alias_allowed": false,
+    "fallback_runtime_allowed": false
+  },
+  "authority_boundary": {
+    "policy_can_write_domain_truth": false,
+    "policy_can_write_memory_body": false,
+    "policy_can_mutate_domain_artifact_body": false,
+    "policy_can_authorize_quality_or_export": false,
+    "policy_can_sign_owner_receipt": false,
+    "policy_can_claim_domain_ready": false,
+    "policy_can_claim_production_ready": false
+  }
 }

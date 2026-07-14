@@ -1,8 +1,8 @@
-# RedCube AI Runtime Boundary
+# RCA Authority Boundary
 
 Owner: RedCube AI
-Purpose: repo-source anchor for runtime descriptors, domain_action_adapter projections, and lifecycle adapter contracts.
-State: descriptor/index surface only.
-Machine boundary: runtime instances live under `$CODEX_HOME/projects/redcube-ai/runtime-state/` or workspace artifact roots, not in this repository.
+Purpose: 为标准 Agent pack 提供最小 authority-function source root。
+State: active_descriptor_only
+Machine boundary: 本目录不实现 scheduler、runner、session、workspace、review transport、native-helper envelope 或 package lifecycle。
 
-This directory keeps the skeleton root explicit while PNG/PPTX/PDF artifacts, receipt instances, memory bodies, and export bundles remain outside repo-tracked source.
+具体声明见 `authority_functions/README.md`。运行实例、StageRun、Attempt、receipt、artifact body 与 workspace state 均由 OPL runtime / workspace owner 保存，不进入 repo source。

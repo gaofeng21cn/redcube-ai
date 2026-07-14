@@ -1,26 +1,16 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "allowImportingTsExtensions": true,
-    "composite": true,
-    "tsBuildInfoFile": "./.tsbuildinfo/typecheck.tsbuildinfo"
+    "allowImportingTsExtensions": true
   },
   "include": [
     "tests/**/*.js",
     "tests/**/*.mjs",
     "tests/**/*.cjs",
     "tests/**/*.ts",
-    "packages/**/*.js",
-    "packages/**/*.mjs",
-    "packages/**/*.cjs",
-    "packages/**/*.ts",
-    "apps/**/*.js",
-    "apps/**/*.mjs",
-    "apps/**/*.cjs",
     "scripts/**/*.mjs",
     "scripts/**/*.ts",
     "tools/**/*.mjs",
-    "tools/**/*.ts",
-    "apps/**/*.ts"
+    "tools/**/*.ts"
   ]
 }

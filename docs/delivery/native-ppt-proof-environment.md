@@ -3,11 +3,11 @@
 Owner: `RedCube AI`
 Purpose: `native_ppt_proof_environment_support`
 State: `active_support`
-Machine boundary: 人读 proof environment support。机器真相继续归 native helper catalog、proof runner scripts、CI config、runtime-family source、workspace artifacts、rendered proof artifacts 和 review/export receipts。
+Machine boundary: 人读 proof environment support。机器真相继续归 native-helper catalog/probe descriptors、OPL-hosted StageRun action、proof runner scripts、CI config、rendered proof artifacts 和 RCA review/export receipts。
 
 ## Scope
 
-This environment is for renderer diagnostics and native proof readiness checks. It does not replace RedCube product-entry, runtime-family routes, `visual_director_review`, `screenshot_review`, or `export_pptx`.
+This environment is for renderer diagnostics and native proof readiness checks. It does not replace the OPL-hosted `run_native_ppt_proof` action, declarative route contract, `visual_director_review`, `screenshot_review`, or `export_pptx`.
 
 Native PPT production proof requires true render proof from a supported renderer selected by RCA capability probe / auto bootstrap. The current supported renderer stack is LibreOffice headless -> PDF -> Poppler PNG. Operators do not need to preinstall LibreOffice as a precondition for selecting the native lane; RCA probes the host, may bootstrap through the repo-owned installer or proof container, and fails closed with typed blocker `missing_renderer_dependency` when no supported renderer can be resolved.
 
@@ -21,7 +21,7 @@ Native editable PPTX 的固定路线是：
 
 其中 `contracts/runtime-program/ppt-native-ai-first-design-pack.json` 是设计纪律合同，不是模板资产、样片库或外部 agent 所有权转移。`editable_shape_plan` 必须由 AI executor 持有具体页面设计、版式语义、坐标、shape role、字体、色彩、connector 和非文字视觉信号；officecli writer / validator 和 Python native helper 只负责物化、保存、校验、渲染、导出 refs 和 fail-closed blocker，不能选择模板、补设计、替换 `design_spec_lock` 或写 RCA visual verdict。
 
-AgentLab suite 只记录 refs：它可以读取 `contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json`、收集 native terminal refs、比较 non-regression refs，并把报告交给 OPL / OMA 使用；它不能写 RCA visual truth、artifact body、visual memory body、owner receipt、quality verdict、export verdict，也不能把 suite score 升级成 `visual_ready`、`exportable`、`handoffable` 或 production soak complete。
+Agent Lab 只消费 refs：当前 controlled evaluation fixture 由 `contracts/stage_run_canary_evidence.json` 与 `contracts/agent_lab_handoff.json` 声明。它可以比较 native non-regression refs 并把报告交给 OPL/OMA 使用；它不能写 RCA visual truth、artifact body、visual memory body、owner receipt、quality verdict、export verdict，也不能把 suite score 升级成 `visual_ready`、`exportable`、`handoffable` 或 production soak complete。
 
 Mock provider、mock Codex helper 和 deterministic fixture 只用于 route plumbing、contract validation、fail-closed check、officecli materialization、true render proof wiring 和 export-file wiring。它们不能作为 native visual sample、不能展示为视觉质量样片、不能证明真实设计质量。任何 native PPTX visual sample claim 都必须来自 live Codex executor 生成的 `editable_shape_plan`，并同时具备 `design_spec_lock`、`professional_design_brief`、true render screenshots、RCA visual director review、screenshot review 和 export evidence。
 
@@ -31,11 +31,7 @@ Mock provider、mock Codex helper 和 deterministic fixture 只用于 route plum
 
 AgentLab refs-only suite：
 
-```bash
-opl agent-lab run --suite contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json --json
-```
-
-该命令验证 suite 可读性、refs-only handoff 和 forbidden-authority boundary。它不创建 RCA visual truth，不检查 artifact body，也不能授权 `visual_ready`、`exportable`、`handoffable`、production soak complete 或 owner receipt body。
+这些 fixture 只验证 refs-only handoff 与 forbidden-authority boundary。真实 suite 编译和执行归 OPL Foundry Lab；RCA 仓不提供私有 suite runner，也不创建 visual truth 或 owner receipt body。
 
 ## OfficeCLI Materializer Discipline
 
@@ -58,11 +54,11 @@ Native PPTX adopts the useful design discipline from `ppt-master`, `officecli-pp
 
 The native helper does not choose templates or redesign pages. It also does not infer visual defaults for missing shape design fields: `quality_role`, text `font_size`, and non-text fill/line styling must come from the AI-authored shape plan. `slide_blueprint.slides` is context only and cannot substitute for `editable_shape_plan.slides`. The helper validates and materializes the plan, runs officecli writer / QA gates, renders the PPTX through LibreOffice / Poppler, and emits the shape manifest consumed by RCA review gates.
 
-`officecli` is therefore the editable PPTX materializer, not the designer. `ppt-master` is the reference for process discipline: lock a design spec before page authoring, make every page carry a concrete visual plan, run page-level SVG / rendered QA before export, and treat visual drift as a re-authoring problem. RCA keeps those ideas inside its own `visual_direction -> author_pptx_native -> visual_director_review -> screenshot_review -> export_pptx` chain; it does not hand product-entry ownership to `ppt-master`.
+`officecli` is therefore the editable PPTX materializer, not the designer. `ppt-master` is the reference for process discipline: lock a design spec before page authoring, make every page carry a concrete visual plan, run page-level SVG/rendered QA before export, and treat visual drift as a re-authoring problem. RCA keeps those ideas inside its own `visual_direction -> author_pptx_native -> visual_director_review -> screenshot_review -> export_pptx` chain; it does not hand stage/runtime ownership to `ppt-master`.
 
 Mock Codex helpers are only deterministic test doubles. They may generate fixed shape plans so CI can prove route plumbing, contract validation, fail-closed checks, OfficeCLI materialization, true render proof, and export file wiring. They are not templates, not native PPTX design references, and must not be displayed as visual quality samples. Any native PPTX visual sample claim requires a live Codex executor shape plan plus `editable_shape_plan.design_spec_lock`, per-slide layout intent, LibreOffice / Poppler screenshots, RCA visual director review, screenshot review, and export evidence.
 
-Native visual samples are activated through product-entry machine input, not by patching runtime files or manually selecting helper templates. `delivery_request.constraints.native_visual_sample=true` must hydrate into `contracts/hydrated-deliverable.json`, route cache keys must include the constraint surface, and `author_pptx_native` must then use `prompts/ppt_deck/author_pptx_native_sample.md` with `native_visual_sample_compact`. Existing deliverables may be rehydrated with new constraints by `redcube product invoke` / `redcube native-ppt proof`; the native helper still only validates, materializes, renders, and exports the AI-authored shape plan.
+Native visual samples are requested through the installed OPL-generated `run_native_ppt_proof` action or an `artifact_creation` StageRun input, never by patching helper files or selecting hidden templates. The decisive Attempt must author an explicit `editable_shape_plan`; `prompts/ppt_deck/author_pptx_native_sample.md` is stage guidance, while the native helper only validates, materializes, renders, and exports the AI-authored plan.
 
 The hard design floor is:
 
@@ -98,14 +94,14 @@ The route boundary remains unchanged:
 
 Native proof dependency handling is contract-backed:
 
-- `renderer_selection_policy`: `capability_probe_auto_bootstrap`
+- `renderer_selection_policy`: `opl_probe_then_helper_capability_bind`
 - `supported_renderers`: `libreoffice_headless` with pipeline `libreoffice_headless_pdf_png_v1`
 - required capabilities: `soffice_headless`, `pdftoppm`
-- repo-owned installer: `tools/native-ppt-proof/install-deps.sh`
+- developer/CI proof installer: `tools/native-ppt-proof/install-deps.sh`
 - proof container: `tools/native-ppt-proof/Dockerfile`
 - fail-closed typed blocker: `missing_renderer_dependency`
 
-RCA may install or provide these system dependencies for proof execution:
+OPL Connect/operator 管理已安装 Package 的依赖 currentness；显式 developer/CI proof lane 可以 provision：
 
 - `libreoffice`
 - `poppler-utils`
@@ -116,7 +112,7 @@ Required project dependencies:
 - Python packages from `pyproject.toml` and the exact `uv.lock` resolution
 - Node packages from `npm ci`
 
-Manually running the installer is optional operator preparation, not a product-entry precondition:
+手工运行 installer 只属于 developer/CI proof preparation，不是 hosted action 的隐式 bootstrap，也不是运行时前置命令：
 
 ```bash
 tools/native-ppt-proof/install-deps.sh
@@ -141,27 +137,17 @@ Run the repo-owned native proof runner:
 tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof
 ```
 
-Run a product-entry native one-slide sample proof through the controlled helper surface:
-
-```bash
-npm run --prefix /Users/gaofeng/workspace/redcube-ai redcube -- native-ppt proof \
-  --workspace-root <workspace-root> \
-  --entry-session-id <entry-session-id> \
-  --topic-id <topic-id> \
-  --deliverable-id <deliverable-id> \
-  --route author_pptx_native \
-  --native-sample-slide-count 1
-```
-
-The runner probes native proof system dependencies and installs them unless `--skip-system-deps` or `REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS=1` is set, builds the TypeScript packages, checks the product-entry manifest/status native lane, and renders the `data_charts` suite from the V2 native PPT benchmark through LibreOffice headless -> PDF -> Poppler PNG. It writes `doctor.json`, `product-manifest.json`, `product-status.json`, `native-helper-output.json`, `proof-summary.json`, `artifact-index.json`, editable PPTX/PDF, shape manifest, and PNG screenshots under the output directory.
+The developer runner probes proof dependencies and may invoke the explicit developer installer unless `--skip-system-deps` or `REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS=1` is set. It then exercises the exact RCA helper/probe contract and renders the `data_charts` fixture through LibreOffice headless -> PDF -> Poppler PNG. It writes `doctor.json`, `native-helper-output.json`, `native-package-readback.json`, `native-quality-verdict.json`, `proof-summary.json`, `artifact-index.json`, editable PPTX/PDF, shape manifest, and PNG screenshots under the output directory. This behavior is isolated from the hosted runtime dependency lifecycle.
 
 The native proof CI job is intentionally optional. It runs on `workflow_dispatch`, the nightly schedule, or a pull request labeled `native-ppt-proof`; default push and PR quality jobs keep true renderer execution out of the fast/meta lane.
 
-For a full product-entry smoke instead of the fixture runner, use:
+For contract and exact-helper focused checks, use:
 
 ```bash
-REDCUBE_TEST_PYTHON=/path/to/playwright-enabled/python \
-  node --test tests/product-entry-native-ppt-live-proof.test.js
+node --test \
+  tests/python-native-helper-catalog.test.js \
+  tests/native-ppt-proof-fixture-contract.test.js \
+  tests/ppt-native-quality-package-gates.test.js
 ```
 
 Build and run the Docker proof image:

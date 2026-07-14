@@ -3,7 +3,7 @@
 Owner: `RedCube AI`
 Purpose: `ai_first_quality_boundary_policy`
 State: `current_policy`
-Machine boundary: 人读质量边界 policy。机器真相继续归 contracts、source、CLI/MCP/API 行为、runtime artifacts、author/reviewer artifacts、owner receipts 和 RCA-owned review/export gates。
+Machine boundary: 人读质量边界 policy。机器真相继续归 contracts、declarative pack、OPL-generated/hosted surface 行为、StageRun artifacts、author/reviewer artifacts、owner receipts 和 RCA-owned review/export gates。
 
 这份 policy 固定 `RedCube AI` 的 AI-first 质量边界。它记录 RCA 近期修复后的长期规则：结构化 pack、schema、gate、audit、review projection 和 scorecard 只能约束流程、传递证据和表达机械状态；创作判断、视觉判断、审稿判断和最终交付质量判断必须由 AI-authored author / reviewer artifact 持有。
 
@@ -34,16 +34,15 @@ Machine boundary: 人读质量边界 policy。机器真相继续归 contracts、
 - 程序化 helper 只能生成 evidence、metrics、artifact refs、layout facts、rerun hints 或 mutation envelope。
 - 不得新增 hidden templates、hardcoded prose、heuristic-only visual verdict、scorecard-only ready verdict 或程序化正文/HTML/视觉创作 fallback。
 - 修复 visual quality bug 时，应把问题收回到 AI review / authoring loop，再加固 renderer、QC 或 gate；不得只改某个样例 artifact。
-- OPL 托管路径、Runtime Manager、OPL-owned hosted executor 或 native helper 只改变运行/投影/执行位置，不改变 RedCube 的 visual-domain judgment owner。
+- OPL-hosted StageRun、executor adapter 或 native helper 只改变运行、投影或确定性物化位置，不改变 RedCube 的 visual-domain judgment owner。
 
 ## Verification
 
 涉及创作、视觉审阅、截图复核、质量 promotion 或 publication projection 的改动，至少检查相关 guard：
 
-- `tests/screenshot-review-ai-first.test.js`
-- `tests/ppt-creative-ownership.test.js`
-- `tests/xiaohongshu-creative-ownership.test.js`
-- `tests/poster-creative-ownership.test.js`
-- `tests/review-platform.test.js`
+- `tests/opl-agent-pack-contracts-semantic-pack.test.js`
+- `tests/ppt-native-quality-semantic-gates.test.js`
+- `tests/block-content-fit-review.test.js`
+- `tests/python-native-helper-catalog.test.js`
 - `scripts/verify.sh meta`
 - `npm run test:fast`

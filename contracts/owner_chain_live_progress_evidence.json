@@ -1,277 +1,48 @@
 {
   "surface_kind": "rca_owner_chain_live_progress_evidence",
-  "version": "owner-chain-live-progress-evidence.v1",
-  "domain_id": "redcube-ai",
+  "schema_version": 2,
+  "domain_id": "redcube_ai",
+  "domain_agent_id": "rca",
   "owner": "redcube_ai",
-  "state": "active_contract",
-  "purpose": "Machine-readable RCA owner-chain live progress evidence lane for OPL-hosted visual-stage/review/export paths. It records accepted body-free ref shapes for RCA-owned owner receipt, typed blocker, review/export receipt, and no-regression evidence outputs.",
-  "machine_boundary": "This surface only records refs, return shapes, authority boundaries, and live progress evidence lane readiness. It does not generate visual artifacts, PPT artifacts, image artifacts, receipt instances, review/export verdict bodies, visual truth, memory bodies, domain readiness, production readiness, or production visual-stage long-soak success.",
-  "evidence_scope": "live_owner_chain_progress_refs_only",
-  "controlled_fixture_ref": "contracts/stage_run_canary_evidence.json",
+  "state": "active_post_standardization_evidence_gate",
+  "status": "owner_typed_blocker_recorded_not_ready_claim",
+  "purpose": "Expose only the current owner-side evidence blocker after RCA private runtime retirement.",
+  "evidence_scope": "post_standardization_owner_chain_refs_only",
   "controlled_fixture_is_live_progress": false,
+  "controlled_fixture_ref": "contracts/stage_run_canary_evidence.json",
   "source_contract_refs": {
     "stage_run_kernel_profile_ref": "contracts/stage_run_kernel_profile.json",
     "temporal_stage_run_consumption_policy_ref": "contracts/temporal_stage_run_consumption_policy.json",
     "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
-    "production_acceptance_ref": "contracts/production_acceptance/rca-production-acceptance.json",
-    "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
+    "live_stage_run_progress_evidence_ref": "contracts/live_stage_run_progress_evidence.json"
   },
   "live_visual_owner_chain_canary": {
-    "canary_kind": "mock_safe_artifact_producing_visual_owner_chain",
-    "source_test_ref": "tests/rca-owner-chain-live-progress-evidence.test.js#RCA mock-safe visual owner-chain canary reaches review/export refs and owner-action refs",
-    "deliverable_family": "ppt_deck",
-    "visual_route": "author_image_pages",
-    "route_chain": [
-      "storyline",
-      "detailed_outline",
-      "slide_blueprint",
-      "visual_direction",
-      "author_image_pages",
-      "visual_director_review",
-      "screenshot_review",
-      "export_pptx"
-    ],
-    "workspace_artifact_policy": "test_workspace_only_not_repo_tracked",
-    "image_api_called": false,
-    "mock_provider_required": true,
-    "observed_owner_receipt_refs": [
-      "rca-owner-receipt:review-export:ppt_deck:visual_director_review:deck-owner-chain",
-      "rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-owner-chain",
-      "rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-owner-chain"
-    ],
-    "observed_review_export_receipt_refs": [
-      "rca-review-export:ppt_deck:visual_director_review:deck-owner-chain",
-      "rca-review-export:ppt_deck:screenshot_review:deck-owner-chain",
-      "rca-review-export:ppt_deck:export_pptx:deck-owner-chain"
-    ],
-    "observed_typed_blocker_refs": [],
-    "artifact_refs_observed": true,
-    "artifact_body_included": false,
-    "review_export_verdict_body_included": false,
-    "claims_visual_ready": false,
-    "claims_exportable": false,
-    "claims_domain_ready": false,
-    "claims_production_ready": false
-  },
-  "rca_owned_owner_action_canary": {
-    "canary_kind": "refs_only_owner_action_runtime_canary",
-    "source_test_ref": "tests/rca-owner-chain-live-progress-evidence.test.js#RCA mock-safe visual owner-chain canary reaches review/export refs and owner-action refs",
-    "guarded_action": "emit_workspace_receipt_proof",
-    "observed_return_shapes": [
-      "workspace_receipt_proof",
-      "domain_receipt",
-      "no_regression_evidence",
-      "typed_blocker"
-    ],
-    "observed_owner_receipt_ref": "rca-owner-receipt:visual-stage:owner-chain-canary-domain-owner",
-    "observed_no_regression_evidence_ref": "rca-no-regression:visual-stage:owner-chain-canary-no-regression",
-    "observed_typed_blocker_ref": "rca-typed-blocker:workspace_receipt_proof_missing_required_refs:owner-chain-canary-blocker",
-    "payload_body_included": false,
-    "runtime_instance_policy": "workspace_runtime_only_not_repo_tracked",
-    "readiness_claims": {
-      "claims_visual_ready": false,
-      "claims_exportable": false,
-      "claims_handoffable": false,
-      "claims_production_visual_soak_complete": false
-    }
-  },
-  "human_ready_export_handoff_followthrough": {
-    "followthrough_kind": "operator_ready_export_handoff_owner_followthrough_ref",
-    "source_contract_ref": "contracts/live_stage_run_progress_evidence.json#/progress_entries/human_ready_export_handoff",
-    "observed_owner_receipt_refs": [
-      "rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614"
-    ],
-    "observed_closed_typed_blocker_ref": "rca-typed-blocker:review-export:human-ready-export-handoff-pending",
-    "review_export_receipt_ref": "rca-review-export:ppt_deck:export_pptx:deck-owner-chain",
-    "payload_body_included": false,
-    "readiness_claims": {
-      "claims_visual_ready": false,
-      "claims_exportable": false,
-      "claims_handoffable": false,
-      "claims_production_visual_soak_complete": false
-    }
-  },
-  "producer_surface_refs": {
-    "review_export_closeout_builder": "packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/review-export-closeout.ts#buildReviewExportCloseout",
-    "domain_handler_owner_receipt_action": "domain-handler:dispatch#emit_domain_owner_receipt",
-    "domain_handler_no_regression_action": "domain-handler:dispatch#emit_no_regression_evidence",
-    "domain_handler_external_work_order_closeout_action": "domain-handler:dispatch#emit_external_work_order_owner_closeout",
-    "workspace_receipt_proof_action": "domain-handler:dispatch#emit_workspace_receipt_proof"
-  },
-  "repository_boundary": {
-    "repo_tracks_live_artifacts": false,
-    "repo_tracks_live_receipt_instances": false,
-    "repo_tracks_evidence_ref_shapes": true,
-    "repo_tracks_visual_truth": false,
-    "repo_tracks_artifact_body": false,
-    "repo_tracks_memory_body": false,
-    "repo_tracks_review_export_verdict_body": false
-  },
-  "owner_chain_stages": [
-    {
-      "stage_id": "visual_direction",
-      "domain_role": "visual_stage_progress_receipt_or_owner_answer_or_hard_stop_closeout",
-      "accepted_success_ref_shape": "rca-owner-receipt:visual-stage:<receipt-id>",
-      "accepted_blocker_ref_shape": "rca-typed-blocker:controlled-soak:<blocker-id>",
-      "required_return_shape": "domain_receipt_or_typed_blocker",
-      "artifact_body_required": false
-    },
-    {
-      "stage_id": "visual_director_review",
-      "domain_role": "review_export_receipt_or_typed_blocker_closeout",
-      "accepted_success_ref_shape": "rca-owner-receipt:review-export:<family>:visual_director_review:<deliverable-id>",
-      "accepted_review_export_ref_shape": "rca-review-export:<family>:visual_director_review:<deliverable-id>",
-      "accepted_blocker_ref_shape": "rca-typed-blocker:review-export:<family>:visual_director_review:<deliverable-id>",
-      "required_return_shape": "domain_receipt_or_typed_blocker",
-      "artifact_body_required": false
-    },
-    {
-      "stage_id": "screenshot_review",
-      "domain_role": "review_export_receipt_or_typed_blocker_closeout",
-      "accepted_success_ref_shape": "rca-owner-receipt:review-export:<family>:screenshot_review:<deliverable-id>",
-      "accepted_review_export_ref_shape": "rca-review-export:<family>:screenshot_review:<deliverable-id>",
-      "accepted_blocker_ref_shape": "rca-typed-blocker:review-export:<family>:screenshot_review:<deliverable-id>",
-      "required_return_shape": "domain_receipt_or_typed_blocker",
-      "artifact_body_required": false
-    },
-    {
-      "stage_id": "export_pptx",
-      "domain_role": "review_export_receipt_or_typed_blocker_closeout",
-      "accepted_success_ref_shape": "rca-owner-receipt:review-export:<family>:export_pptx:<deliverable-id>",
-      "accepted_review_export_ref_shape": "rca-review-export:<family>:export_pptx:<deliverable-id>",
-      "accepted_blocker_ref_shape": "rca-typed-blocker:review-export:<family>:export_pptx:<deliverable-id>",
-      "required_return_shape": "domain_receipt_or_typed_blocker",
-      "artifact_body_required": false
-    },
-    {
-      "stage_id": "no_regression_closeout",
-      "domain_role": "refs_only_no_regression_or_typed_blocker_closeout",
-      "accepted_success_ref_shape": "rca-no-regression:visual-stage:<evidence-id>",
-      "accepted_external_work_order_ref_shape": "rca-no-regression:external-work-order:<work-order-id>",
-      "accepted_blocker_ref_shape": "rca-typed-blocker:external-work-order-owner-closeout:<blocker-id>",
-      "required_return_shape": "no_regression_evidence_or_typed_blocker",
-      "artifact_body_required": false
-    },
-    {
-      "stage_id": "memory_lifecycle_closeout",
-      "domain_role": "refs_only_visual_memory_lifecycle_receipt_or_typed_blocker_closeout",
-      "accepted_success_ref_shape": "rca-memory-receipt:visual-pattern:<receipt-id>",
-      "accepted_lifecycle_success_ref_shape": "rca-lifecycle-receipt:<lifecycle-action>:<receipt-id>",
-      "accepted_blocker_ref_shape": "rca-typed-blocker:memory-lifecycle:<blocker-id>",
-      "required_return_shape": "memory_lifecycle_refs_or_typed_blocker",
-      "artifact_body_required": false,
-      "memory_body_required": false
-    }
-  ],
-  "accepted_ref_shapes": {
-    "required_ref_groups": [
-      "domain_owner_receipt_refs",
-      "typed_blocker_refs",
-      "review_export_receipt_refs",
-      "memory_lifecycle_receipt_refs",
-      "no_regression_evidence_refs"
-    ],
-    "domain_owner_receipt_refs": [
-      "rca-owner-receipt:visual-stage:<receipt-id>",
-      "rca-owner-receipt:review-export:<family>:<route-stage-id>:<deliverable-id>",
-      "rca-operator-ready:export-handoff:<handoff-id>"
-    ],
-    "typed_blocker_refs": [
-      "rca-typed-blocker:review-export:<family>:<route-stage-id>:<deliverable-id>",
-      "rca-typed-blocker:controlled-soak:<blocker-id>",
-      "rca-typed-blocker:memory-lifecycle:<blocker-id>",
-      "rca-typed-blocker:no-regression:<blocker-id>"
-    ],
-    "review_export_receipt_refs": [
-      "rca-review-export:<family>:visual_director_review:<deliverable-id>",
-      "rca-review-export:<family>:screenshot_review:<deliverable-id>",
-      "rca-review-export:<family>:export_pptx:<deliverable-id>"
-    ],
-    "memory_lifecycle_receipt_refs": [
-      "rca-memory-receipt:visual-pattern:<receipt-id>",
-      "rca-lifecycle-receipt:cleanup:<receipt-id>",
-      "rca-lifecycle-receipt:restore:<receipt-id>",
-      "rca-lifecycle-receipt:retention:<receipt-id>"
-    ],
-    "no_regression_evidence_refs": [
-      "rca-no-regression:visual-stage:<evidence-id>",
-      "rca-no-regression:external-work-order:<work-order-id>"
+    "status": "blocked_requires_fresh_opl_hosted_stage_run",
+    "observed_owner_receipt_refs": [],
+    "observed_review_export_receipt_refs": [],
+    "observed_typed_blocker_refs": [
+      "rca-typed-blocker:post-standardization-live-stage-evidence-required"
     ]
   },
-  "accepted_return_shapes": [
-    "domain_receipt",
-    "typed_blocker",
-    "no_regression_evidence"
-  ],
-  "domain_owner_chain_scaleout": {
-    "surface_kind": "rca_domain_owner_chain_scaleout_evidence_lane",
-    "gate_id": "domain_owner_chain_scaleout",
-    "owner": "redcube_ai",
-    "status": "domain_owned_refs_recorded_live_provider_evidence_open",
-    "opl_consumption_status": "owner_chain_refs_available_with_open_real_provider_tail",
-    "ready_claim_authorized": false,
-    "visual_ready_claimed": false,
-    "exportable_claimed": false,
-    "domain_ready_claimed": false,
-    "production_ready_claimed": false,
-    "evidence_ref": "contracts/owner_chain_live_progress_evidence.json#/domain_owner_chain_scaleout",
-    "accepted_ref_shapes": [
-      "owner_receipt_ref",
-      "review_export_receipt_ref",
-      "typed_blocker_ref",
-      "memory_lifecycle_receipt_ref",
-      "no_regression_ref"
-    ],
-    "opl_backfill_refs": {
-      "owner_receipt_refs": [
-        "rca-owner-receipt:review-export:ppt_deck:visual_director_review:deck-owner-chain",
-        "rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-owner-chain",
-        "rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-owner-chain",
-        "rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614",
-        "rca-owner-receipt:visual-stage:owner-chain-canary-domain-owner"
-      ],
-      "review_export_receipt_refs": [
-        "rca-review-export:ppt_deck:visual_director_review:deck-owner-chain",
-        "rca-review-export:ppt_deck:screenshot_review:deck-owner-chain",
-        "rca-review-export:ppt_deck:export_pptx:deck-owner-chain"
-      ],
-      "typed_blocker_refs": [
-        "rca-typed-blocker:workspace_receipt_proof_missing_required_refs:owner-chain-canary-blocker"
-      ],
-      "memory_lifecycle_receipt_refs": [],
-      "no_regression_refs": [
-        "rca-no-regression:visual-stage:owner-chain-canary-no-regression"
-      ]
-    },
-    "observed_ref_counts": {
-      "owner_receipt_ref_count": 5,
-      "review_export_receipt_ref_count": 3,
-      "typed_blocker_ref_count": 1,
-      "memory_lifecycle_receipt_ref_count": 0,
-      "no_regression_ref_count": 1
-    },
-    "blocked_gate_categories": [
-      "real_visual_artifact_generation",
-      "real_review_export_receipt_instance",
-      "real_memory_lifecycle_receipt_instances",
-      "temporal_controlled_visual_stage_long_soak",
-      "cross_family_repeated_no_regression_evidence"
-    ],
-    "authority_boundary": {
-      "refs_only": true,
-      "rca_owns_owner_chain_refs": true,
-      "opl_can_consume_refs": true,
-      "opl_can_write_rca_visual_truth": false,
-      "opl_can_issue_rca_owner_receipt": false,
-      "opl_can_create_rca_typed_blocker": false,
-      "opl_can_authorize_review_export": false,
-      "opl_can_claim_visual_or_production_ready": false
-    }
+  "rca_owned_owner_action_canary": {
+    "status": "typed_blocker_recorded",
+    "observed_owner_receipt_ref": null,
+    "observed_typed_blocker_ref": "rca-typed-blocker:post-standardization-live-stage-evidence-required",
+    "observed_no_regression_evidence_ref": null
+  },
+  "remaining_evidence_gates": {
+    "fresh_opl_hosted_visual_artifact_generation": "blocked_by_domain_owned_typed_blocker",
+    "fresh_review_export_receipt_instance": "blocked_by_domain_owned_typed_blocker",
+    "fresh_owner_receipt_instance": "blocked_by_domain_owned_typed_blocker",
+    "temporal_controlled_visual_stage_long_soak": "blocked_by_domain_owned_typed_blocker",
+    "production_visual_ready": "not_claimed",
+    "domain_ready": "not_claimed",
+    "production_ready": "not_claimed"
   },
   "owner_chain_completion_audit": {
-    "audit_id": "rca.owner_chain_completion_audit.v1",
+    "audit_id": "rca.owner_chain_completion_audit.v2",
     "source_policy_ref": "contracts/temporal_stage_run_consumption_policy.json#/owner_chain_completion_audit",
-    "completion_status": "blocked_requires_real_visual_stage_owner_acceptance",
+    "completion_status": "blocked_requires_fresh_opl_hosted_visual_stage_owner_acceptance",
     "accepted_terminal_evidence_refs": [
       "progress_delta_receipt_ref",
       "owner_receipt_ref",
@@ -288,91 +59,33 @@
       "stage_run_terminal_state",
       "queue_empty",
       "attempt_ledger_written",
-      "mock_safe_canary",
       "controlled_canary",
       "conformance_pass",
-      "read_model_current"
+      "read_model_current",
+      "pre_standardization_evidence_snapshot"
     ],
     "requires_real_visual_stage_owner_acceptance": true,
     "requires_review_export_acceptance_for_export_claim": true,
-    "mock_safe_canary_counts_as_completion": false,
-    "generated_surface_readiness_counts_as_completion": false,
-    "provider_completion_counts_as_completion": false,
     "declares_owner_chain_complete": false,
     "declares_visual_ready": false,
     "declares_exportable": false,
     "declares_domain_ready": false,
-    "declares_production_ready": false,
-    "declares_production_visual_stage_long_soak_complete": false
+    "declares_production_ready": false
   },
-  "opl_hosted_path_boundary": {
-    "entry_path": "opl_hosted_product_entry_to_redcube_service_safe_domain_entry",
-    "opl_can_store_owner_chain_refs": true,
-    "opl_can_store_typed_blocker_refs": true,
-    "opl_can_store_no_regression_refs": true,
-    "opl_can_write_rca_visual_truth": false,
-    "opl_can_issue_rca_owner_receipt": false,
-    "opl_can_create_rca_typed_blocker": false,
-    "opl_can_authorize_review_export": false,
-    "opl_can_claim_visual_or_production_ready": false
-  },
-  "progress_readout": {
-    "current_status": "mock_safe_visual_owner_chain_canary_recorded_live_provider_evidence_open",
-    "live_progress_claimed": true,
-    "live_progress_claim_kind": "mock_safe_artifact_producing_owner_chain_canary_plus_refs_only_owner_actions",
-    "artifact_generation_run": true,
-    "mock_safe_artifact_generation_run": true,
-    "image_api_called": false,
-    "workspace_artifact_written": true,
-    "repo_tracks_workspace_artifacts": false,
-    "visual_ready_claimed": false,
-    "exportable_claimed": false,
-    "handoffable_claimed": false,
-    "domain_ready_claimed": false,
-    "production_ready_claimed": false,
-    "production_visual_stage_long_soak_complete_claimed": false
-  },
-  "false_authority_flags": {
+  "authority_boundary": {
     "declares_visual_ready": false,
     "declares_exportable": false,
     "declares_handoffable": false,
     "declares_domain_ready": false,
     "declares_production_ready": false,
-    "declares_production_visual_stage_long_soak_complete": false,
     "provider_completion_counts_as_visual_progress": false,
     "generated_surface_ready_counts_as_visual_progress": false,
     "stage_run_terminal_counts_as_live_progress": false,
-    "queue_empty_counts_as_live_progress": false,
-    "attempt_ledger_written_counts_as_live_progress": false,
     "conformance_pass_counts_as_live_progress": false,
     "controlled_canary_counts_as_live_progress": false,
-    "mock_safe_canary_counts_as_production_progress": false,
     "writes_visual_truth": false,
     "writes_artifact_body": false,
     "writes_memory_body": false,
     "writes_review_export_verdict_body": false
-  },
-  "remaining_evidence_gates": {
-    "real_visual_artifact_generation": "mock_safe_canary_recorded_live_provider_not_run",
-    "real_review_export_receipt_instance": "mock_safe_canary_recorded_live_provider_not_run",
-    "real_memory_lifecycle_receipt_instances": "blocked_by_domain_owned_typed_blocker",
-    "temporal_controlled_visual_stage_long_soak": "open",
-    "cross_family_repeated_no_regression_evidence": "blocked_by_domain_owned_typed_blocker",
-    "production_visual_ready": "not_claimed",
-    "exportable": "not_claimed",
-    "handoffable": "not_claimed",
-    "domain_ready": "not_claimed",
-    "production_ready": "not_claimed"
-  },
-  "forbidden_payload_classes": [
-    "visual_truth_body",
-    "review_export_verdict_body",
-    "artifact_blob",
-    "artifact_body",
-    "visual_memory_body",
-    "memory_body",
-    "generic_runtime_state",
-    "owner_receipt_body",
-    "typed_blocker_body"
-  ]
+  }
 }

@@ -1,156 +1,30 @@
 import path from 'node:path';
-import { readdirSync } from 'node:fs';
-import { createRequire } from 'node:module';
-
-export { resolveRedCubePythonCommand } from '@redcube/runtime-protocol';
-
-type Resolver = (specifier: string) => string;
-type RuntimeSharedResolutionCheck = Readonly<{
-  specifier: string;
-  resolve_from?: string;
-}>;
-type WorkspacePackageResolutionOptions = Readonly<{
-  repoRoot?: string;
-  specifiers?: readonly string[];
-  resolve?: Resolver;
-}>;
-type RuntimeSharedResolutionOptions = Readonly<{
-  repoRoot?: string;
-  checks?: readonly RuntimeSharedResolutionCheck[];
-  resolve?: (specifier: string, check: RuntimeSharedResolutionCheck) => string;
-}>;
+import process from 'node:process';
+import { existsSync, readdirSync } from 'node:fs';
 type BuildNodeTestArgsOptions = Readonly<{
   forwardedArgs?: readonly string[];
   serialized?: boolean;
 }>;
 
-const WORKSPACE_PACKAGE_SPECIFIERS = Object.freeze([
-  '@redcube/runtime',
-  '@redcube/runtime-protocol',
-  '@redcube/domain-entry',
-]);
-const REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS = Object.freeze([
-  {
-    specifier: 'opl-framework/product-entry-companions',
-    resolve_from: 'packages/redcube-domain-entry/package.json',
-  },
-  {
-    specifier: 'opl-framework/product-entry-program-companions',
-    resolve_from: 'packages/redcube-domain-entry/package.json',
-  },
-]);
-
-function nodeErrorCode(error: unknown, fallback: string): string {
-  if (typeof error === 'object' && error !== null && 'code' in error) {
-    return String((error as { code?: unknown }).code ?? fallback);
-  }
-  return fallback;
-}
-
-function isWithinRepoRoot(repoRoot: string, resolvedPath: string): boolean {
-  const relative = path.relative(repoRoot, resolvedPath);
-  return relative === '.' || (!relative.startsWith('..') && !path.isAbsolute(relative));
-}
-
-function inspectWorkspacePackageResolution({
-  repoRoot,
-  specifiers = WORKSPACE_PACKAGE_SPECIFIERS,
-  resolve,
-}: WorkspacePackageResolutionOptions = {}) {
-  const resolvedRepoRoot = path.resolve(String(repoRoot || process.cwd()));
-  const resolver = resolve || createRequire(path.join(resolvedRepoRoot, 'package.json')).resolve;
-  const resolvedPackages = specifiers.map((specifier) => ({
-    specifier,
-    resolved_path: path.resolve(resolver(specifier)),
-  }));
-  const leakingResolutions = resolvedPackages.filter(
-    (entry) => !isWithinRepoRoot(resolvedRepoRoot, entry.resolved_path),
-  );
-
-  return {
-    ok: leakingResolutions.length === 0,
-    repo_root: resolvedRepoRoot,
-    resolved_packages: resolvedPackages,
-    leaking_resolutions: leakingResolutions,
-    message: leakingResolutions.length === 0
-      ? 'workspace package resolution is pinned to the current checkout'
-      : 'workspace package resolution leaked outside the current checkout; run `npm install` inside this worktree before verifying',
-  };
-}
-
-export function assertWorkspacePackageResolution(options: WorkspacePackageResolutionOptions = {}) {
-  const inspection = inspectWorkspacePackageResolution(options);
-  if (!inspection.ok) {
-    const leaked = inspection.leaking_resolutions
-      .map((entry) => `${entry.specifier} -> ${entry.resolved_path}`)
-      .join('\n');
-    throw new Error(
-      `${inspection.message}\nCurrent repo root: ${inspection.repo_root}\n${leaked}`,
-    );
-  }
-  return inspection;
-}
-
-function inspectRequiredRuntimeSharedResolution({
-  repoRoot,
-  checks = REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS,
-  resolve,
-}: RuntimeSharedResolutionOptions = {}) {
-  const resolvedRepoRoot = path.resolve(String(repoRoot || process.cwd()));
-  const resolvedSpecifiers: Array<{
-    specifier: string;
-    resolve_from: string;
-    resolved_path: string;
-  }> = [];
-  const missingSpecifiers: Array<{
-    specifier: string;
-    resolve_from: string;
-    error_code: string;
-  }> = [];
-
-  for (const check of checks) {
-    const specifier = check.specifier;
-    const resolveFrom = check.resolve_from || 'package.json';
-    try {
-      const resolver = resolve
-        ? (targetSpecifier: string) => resolve(targetSpecifier, check)
-        : createRequire(path.join(resolvedRepoRoot, resolveFrom)).resolve;
-      resolvedSpecifiers.push({
-        specifier,
-        resolve_from: resolveFrom,
-        resolved_path: path.resolve(resolver(specifier)),
-      });
-    } catch (error) {
-      missingSpecifiers.push({
-        specifier,
-        resolve_from: resolveFrom,
-        error_code: nodeErrorCode(error, 'ERR_MODULE_NOT_FOUND'),
-      });
+export function resolveRedCubePythonCommand(
+  env: NodeJS.ProcessEnv = process.env,
+): { command: string; args: string[] } {
+  const configured = String(env.REDCUBE_TEST_PYTHON || env.REDCUBE_PYTHON_COMMAND || '').trim();
+  if (configured.startsWith('[')) {
+    const parsed = JSON.parse(configured) as unknown;
+    if (!Array.isArray(parsed) || parsed.length === 0 || !parsed.every((entry) => typeof entry === 'string')) {
+      throw new Error('REDCUBE_PYTHON_COMMAND JSON form must be a non-empty string array.');
     }
+    return { command: parsed[0], args: parsed.slice(1) };
   }
+  if (configured) return { command: configured, args: [] };
 
-  return {
-    ok: missingSpecifiers.length === 0,
-    repo_root: resolvedRepoRoot,
-    resolved_specifiers: resolvedSpecifiers,
-    missing_specifiers: missingSpecifiers,
-    message: missingSpecifiers.length === 0
-      ? 'required runtime/shared package resolution is ready in this checkout'
-      : 'required runtime/shared package resolution is missing in this checkout; run `npm install` in this checkout before verifying',
-  };
-}
-
-export function assertRequiredRuntimeSharedResolution(options: RuntimeSharedResolutionOptions = {}) {
-  const inspection = inspectRequiredRuntimeSharedResolution(options);
-  if (!inspection.ok) {
-    const missing = inspection.missing_specifiers
-      .map((entry) => `${entry.specifier} (from ${entry.resolve_from}) -> ${entry.error_code}`)
-      .join('\n');
-    throw new Error(
-      `${inspection.message}\nCurrent repo root: ${inspection.repo_root}\n${missing}`,
-    );
+  const projectEnvironment = String(env.UV_PROJECT_ENVIRONMENT || '').trim();
+  if (projectEnvironment) {
+    const candidate = path.join(projectEnvironment, process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python');
+    if (existsSync(candidate)) return { command: candidate, args: [] };
   }
-  return inspection;
+  return { command: process.platform === 'win32' ? 'python' : 'python3', args: [] };
 }
 
 export function buildNodeTestArgs({

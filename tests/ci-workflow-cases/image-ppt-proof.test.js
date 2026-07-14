@@ -48,13 +48,11 @@ test('image PPT proof optional CI lane never runs live image generation by defau
   assert.doesNotMatch(workflow, /tools\/image-ppt-proof\/run\.sh[^\n]*--live-image-generation/);
   assert.match(workflow, /name:\s*image-ppt-proof[\s\S]*?artifacts\/image-ppt-proof\/artifact-index\.json/);
   assert.match(runner, /--mock-image-generation/);
-  assert.match(runner, /--live-image-generation/);
-  assert.match(runner, /Codex executor native imagegen skill/);
-  assert.match(runner, /does not read provider Base URL or API tokens/);
-  assert.match(proofImplementation, /image_generation/);
-  assert.match(proofImplementation, /codex_native_imagegen_skill/);
-  assert.doesNotMatch(proofImplementation, /experimental_bearer_token/);
-  assert.doesNotMatch(proofImplementation, /os\.environ\.get\("OPENAI_API_KEY"\)/);
+  assert.doesNotMatch(runner, /--live-image-generation/);
+  assert.match(runner, /never invokes an executor or a real image API/);
+  assert.match(runner, /OPL-hosted run_image_ppt_proof StageRun action/);
+  assert.doesNotMatch(proofImplementation, /codex_native_imagegen_skill|OPENAI_API_KEY|experimental_bearer_token/);
+  assert.doesNotMatch(proofImplementation, /mode\s*==\s*["']live["']/);
   assert.match(proofImplementation, /prompt-manifest\.json/);
   assert.match(proofImplementation, /final-delivery-manifest\.json/);
 });

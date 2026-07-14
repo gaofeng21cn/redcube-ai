@@ -11,13 +11,6 @@
       "optional": true,
       "entries": [
         {
-          "language": "typescript",
-          "role": "domain_helper",
-          "source_roots": [
-            "packages/redcube-runtime/src/families/"
-          ]
-        },
-        {
           "language": "python",
           "role": "native_helper",
           "source_roots": [

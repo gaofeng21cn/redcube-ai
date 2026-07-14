@@ -10,14 +10,14 @@
 - 用户级 `~/.codex/TASTE.md` 记录 OPL family 共享维护开发偏好；进行架构、代码、文档、测试、review、cleanup 和 closeout 判断时，先按用户级 taste 校准，再读取 RCA 事实、contracts、docs 与源码。
 - 项目知识默认从 `README*`、`docs/README*`、`docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md` 读取。
 - `RedCube AI` 是独立 visual-deliverable domain agent，也可以作为 `OPL` stage-led 智能体运行框架中的 admitted domain agent 被托管。`Stage` 表示大型视觉交付步骤，Agent executor 是 stage 内最小执行单位；`Codex CLI` 是当前第一公民 executor，其他 executor adapter 只能显式接入且不承诺行为效果等价。RCA 持有 visual truth、layout/review/export verdict、route owner、artifact authority、visual memory accept/reject authority 和 owner receipt；通用 runtime、queue、attempt ledger、state-machine runner、workspace/source intake shell、artifact gallery/handoff shell、review/repair transport、native-helper envelope、memory locator 与 App/workbench shell 归 OPL Framework / shared family layer。
-- RCA 的理想形态是标准 OPL Agent：`Declarative Visual Pack + OPL generated/hosted surfaces + minimal authority functions`。当前仓内已存在的 managed DAG、attempt/state-machine runner、session store、workspace/source intake、memory/artifact lifecycle、review/repair transport、operator projection、CLI/MCP/product-entry/domain_action_adapter/status wrapper 只能作为迁移输入；不能因为已有 active caller 就写成长期合理私有平台。
+- RCA 的当前形态是标准 OPL Agent：`Declarative Visual Pack + OPL generated/hosted surfaces + minimal authority functions + Python native helpers`。历史 managed DAG、attempt/state-machine runner、session store、workspace/source intake、memory/artifact lifecycle、review/repair transport、operator projection、CLI/MCP/product-entry/domain_action_adapter/status wrapper 已物理退役；不得作为 compatibility surface 恢复。
 - `agent/primary_skill/SKILL.md` 是标准 OPL Agent 的 canonical rich primary skill；`plugins/<agent>/skills/<agent>/SKILL.md` 是 Codex plugin 安装要求的 materialized full-skill carrier mirror。该关系以 `contracts/capability_map.json` 中的 `carrier_projection_contract` 为机器权威；两者字节相同表示同步健康，不表示应删除重复，mirror 漂移才是问题。
 - OPL canonical agent/package id 都固定为 `rca`；`redcube-ai` 只作为 repo slug、语言实现包名和 Codex plugin/skill carrier locator，不得作为第二个 package identity 或 compatibility alias。
 - 文档和开发计划先设理想态，再找差距；差距不是妥协清单。为了标准 OPL Agent 目标态，可以革命式重构 RCA 并完全抛弃旧模块、旧接口、旧测试、旧目录和旧文案，不以兼容为理由保留历史污染面。
 - `gateway / harness` 只作为仓内边界层、执行层或历史语境保留；对外第一身份是 RedCube AI visual-deliverable domain agent。
 - 若文档提到 `Hermes-Agent`，只能指上游外部 runtime 项目 / 服务；仓内自写的 runtime package、pilot、shim 或 scaffold，不得写成“已接入 Hermes-Agent”。
-- 当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
-- 关键 durable surface 继续围绕 `program_id`、`topic_id`、`deliverable_id` 与 OPL-owned `run_id` refs 收口；`auditDeliverable`、`getReviewState`、`getPublicationProjection` 持有 RCA review/projection truth，`runtimeWatch` 只返回 visual review/artifact/blocker/owner evidence refs。
+- 当前 formal-entry matrix 由 OPL 从 action/stage contracts 生成：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`；RCA 不实现这些 wrapper。
+- 关键 durable surface 围绕 OPL-owned StageRun/Attempt refs 与 RCA artifact/review/blocker/owner refs 收口；具体 visual/review/export authority 由 declarative pack 与 owner contracts 表达，不再通过 repo-local handler 暴露。
 
 ## 开发原则
 
@@ -43,9 +43,9 @@
 - 每份长期文档都必须能说明 `owner`、`purpose`、`state`、`machine boundary`；缺少任一信号时，先补入口或归位，再继续扩写。
 - 文档治理按内容生命周期判断，文件名和目录名只作为辅助信号；同一文档内的当前事实、active baton、absorbed tranche、support reference、legacy brief 和历史计划应分别归入当前 owner doc、active/reference 层或 history/tombstone 语境。
 - 入口文档应先呈现当前状态、层级、新旧关系和下一跳；旧 gateway / bridge / harness / Hermes-first 材料进入 internal integration、provenance 或 tombstone 语境。
-- `AGENTS.md` 只保留协作方式、硬约束和少量稳定身份边界；项目事实的完整当前态以 `docs/status.md`、`docs/project.md`、`docs/architecture.md`、`docs/invariants.md`、`contracts/runtime-program/current-program.index.json` 和 `contracts/runtime-program/current-program-parts/**` 为准。
+- `AGENTS.md` 只保留协作方式、硬约束和少量稳定身份边界；项目事实的完整当前态以 `docs/status.md`、`docs/project.md`、`docs/architecture.md`、`docs/invariants.md`、root standard-agent contracts 与 `agent/stages/manifest.json` 为准。
 - `docs/product/`：product entry、quickstart、operator handoff、profile 设置与发布协作。
-- `docs/runtime/`：runtime topology、executor / substrate、service-safe entry、watch / projection 语义说明。
+- `docs/runtime/`：OPL-hosted StageRun、executor / substrate、authority 与 native-helper envelope 边界说明。
 - `docs/delivery/`：交付物 family、route、proof 环境、示例与人工验证材料。
 - `docs/source/`：source readiness、augmentation、research trigger / gate 与 source truth 消费说明。
 - `docs/active/`：当前执行、当前计划、当前差距、contract-linked active baton 与 closeout evidence；旧 `docs/program/` active baton 目录已物理退役，新增 recurring active material 不再进入旧目录。
@@ -53,8 +53,8 @@
 - `docs/specs/`：当前仍有效的技术规格索引；不扩成杂物层。
 - `docs/history/phase-2/`：已吸收 Phase 2 tranche、prefrozen follow-on board 与 provenance brief；旧 `docs/program/phase-2/` 已迁入 history。
 - `docs/history/hermes/`：upstream Hermes proof / cutover provenance；旧 `docs/program/` 下 Hermes 记录已迁入 history。
-- `contracts/runtime-program/current-program.index.json` 与 `contracts/runtime-program/current-program-parts/**`：当前机器可读主线合同与 active baton 指针。
-- `contracts/runtime-program/*.json`：机器可读主线合同。
+- root `contracts/*.json` 与 `agent/stages/manifest.json`：标准 Agent 机器主线。
+- `contracts/runtime-program/*.json`：只保留 RCA domain quality、native-helper 与 developer-proof 合同，不承载 runtime/control-plane baton。
 - `docs/policies/*`：稳定规则。
 - `docs/references/*`：定位、背景、审计、target-state 与维护者实践参考。
 - `docs/history/`：repo-tracked 历史 provenance、归档过程记录与不再服务当前 baton 的历史计划。
@@ -63,7 +63,7 @@
 
 - `docs/**` 默认只维护中文 canonical 内容；稳定路径优先使用无语言后缀 `.md`。
 - 根层 `README*` 是否保留公开双语入口，由产品分发和 public 需求单独决定。
-- narrative 规则放根 `AGENTS.md`、`docs/README*` 与核心五件套；machine-readable contract 放 `contracts/runtime-program/*.json`。
+- narrative 规则放根 `AGENTS.md`、`docs/README*` 与核心五件套；machine-readable standard-agent contract 优先放 root `contracts/*.json`，domain proof contract 才放 `contracts/runtime-program/`。
 - 新文档先判断角色，再决定落点；不要把核心知识、program brief、参考材料和历史记录混在同一层。
 - `README*`、`docs/**` 与参考文档是人读面。代码、测试、contracts、dashboard 或 runtime 不得把 prose path、Markdown 章节或文案当成稳定机器接口；确需关联人读材料时，使用 contract/schema/source 路径或 `human_doc:*` 语义 ID。
 

@@ -130,7 +130,7 @@
   "true_render_proof": {
     "required": true,
     "source_surface_kind": "native_pptx",
-    "renderer_selection_policy": "capability_probe_auto_bootstrap",
+    "renderer_selection_policy": "opl_probe_then_helper_capability_bind",
     "user_preinstalled_libreoffice_required": false,
     "renderer_kind": "libreoffice_headless",
     "renderer_pipeline": "libreoffice_headless_pdf_png_v1",
@@ -156,10 +156,11 @@
       }
     ],
     "bootstrap_policy": {
-      "capability_probe": "native_ppt_renderer_capability_probe",
-      "automatic_bootstrap_allowed": true,
+      "capability_probe": "opl pack native-helper probe",
+      "automatic_bootstrap_allowed": false,
       "user_preinstall_required": false,
-      "repo_owned_installer": "tools/native-ppt-proof/install-deps.sh",
+      "dependency_provisioning_owner": "opl_connect_or_operator",
+      "developer_proof_installer": "tools/native-ppt-proof/install-deps.sh",
       "proof_container": "tools/native-ppt-proof/Dockerfile"
     },
     "cross_platform_render_required": true,
@@ -292,9 +293,12 @@
     "review_behavior": "screenshot_review consumes native shape manifest metrics; missing or failing quality checks block ready claims but not stage transition",
     "chart_table_metric_grid_review_behavior": "missing editable chart/table/metric-grid metrics record page quality debt and repair targets while a readable PPTX continues"
   },
-  "production_hardening": {
-    "live_product_entry_proof": "tests/product-entry-native-ppt-live-proof.test.js",
-    "live_product_entry_proof_scope": "product_entry_route_review_export_and_true_render_proof",
+  "developer_proof": {
+    "hosted_action_id": "run_native_ppt_proof",
+    "hosted_action_catalog_ref": "contracts/action_catalog.json",
+    "native_helper_contract_test": "tests/python-native-helper-catalog.test.js",
+    "native_fixture_contract_test": "tests/native-ppt-proof-fixture-contract.test.js",
+    "proof_scope": "exact_helper_contract_fixture_materialization_and_true_render_proof",
     "mock_codex_test_double_policy": {
       "allowed": true,
       "purpose": "deterministic_contract_route_plumbing_and_fail_closed_tests",

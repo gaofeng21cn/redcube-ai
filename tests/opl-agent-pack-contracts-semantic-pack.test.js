@@ -54,3 +54,48 @@ test('RCA canonical semantic pack remains concrete while root stage/pack contrac
   assert.equal(stageManifest.authority_boundary.provider_completion_is_domain_completion, false);
   assert.equal(packRefs.source_refs.stage_graph_source_ref, 'agent/stages/manifest.json');
 });
+
+test('RCA capability map routes visual feedback fixtures through declarative professional skills', () => {
+  const capabilityMap = readJson('contracts/capability_map.json');
+  const handoff = readJson('contracts/agent_lab_handoff.json');
+  const capabilities = new Map(
+    capabilityMap.capabilities.map((entry) => [entry.capability_id, entry]),
+  );
+
+  assert.equal(handoff.agent_lab_owner, 'one-person-lab');
+  assert.equal(handoff.authority_boundary.domain_repo_can_own_agent_lab_runtime, false);
+  for (const token of handoff.visual_feedback_failure_fixture.tokens) {
+    const mapping = capabilityMap.feedback_token_index[token];
+    assert.ok(mapping, token);
+    assert.notDeepEqual(mapping.canonical_capability_ids, [], token);
+    for (const capabilityId of mapping.canonical_capability_ids) {
+      const capability = capabilities.get(capabilityId);
+      assert.ok(capability, `${token}:${capabilityId}`);
+      assert.equal(capability.surface_role, 'professional_skill');
+      assertCleanAgentRepoPathRef(
+        capability.physical_source_ref,
+        'agent/professional_skills/',
+        `${token}:${capabilityId}`,
+      );
+    }
+  }
+});
+
+test('RCA capability map dry-run tokens resolve without private runtime callers', () => {
+  const capabilityMap = readJson('contracts/capability_map.json');
+  const dryRun = capabilityMap.dry_run_token_mapping_check;
+
+  assert.equal(dryRun.dry_run_only, true);
+  assert.equal(dryRun.invokes_live_provider, false);
+  assert.equal(dryRun.writes_runtime_state, false);
+  for (const tokenCase of dryRun.token_cases) {
+    assert.ok(capabilityMap.feedback_token_index[tokenCase.feedback_token], tokenCase.feedback_token);
+    for (const skillRef of tokenCase.primary_skill_refs) {
+      assertCleanAgentRepoPathRef(
+        { ref_kind: 'repo_path', ref: skillRef },
+        'agent/professional_skills/',
+        `${tokenCase.feedback_token}:${skillRef}`,
+      );
+    }
+  }
+});

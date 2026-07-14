@@ -11,8 +11,9 @@
     "diagnostics": {
       "surface_kind": "python_native_helper_doctor",
       "package_module": "redcube_ai.native_helpers.doctor",
-      "console_script": "redcube-native-helper-doctor",
       "module_command": "python -m redcube_ai.native_helpers.doctor",
+      "developer_diagnostic_only": true,
+      "public_launcher": false,
       "output_format": "fixed_json",
       "executes_generation": false,
       "executes_review_export_gates": false,
@@ -21,7 +22,7 @@
     }
   },
   "scope": "Repo-tracked Python helper catalog for native PPT/Office/document automation surfaces.",
-  "typescript_boundary": "RCA TypeScript owns product entry, domain-entry protocol contracts, runtime-family visual route orchestration, review/export gate wiring, and the thin OPL invocation client; OPL owns catalog resolution, Python environment selection, process lifecycle, timeout, and JSON execution receipt envelope.",
+  "typescript_boundary": "RCA declares visual route semantics and implements native helpers; OPL owns generated/hosted StageRun surfaces, catalog resolution, Python environment selection, process lifecycle, timeout, and the JSON execution receipt envelope.",
   "framework_execution_envelope": {
     "owner": "opl",
     "surface": "opl pack native-helper run",
@@ -57,7 +58,7 @@
   },
   "bypass_policy": {
     "generic_bypass_allowed": false,
-    "required_entry_surface": "RedCube product-entry or runtime-family route",
+    "required_entry_surface": "OPL-hosted RCA StageRun action with RCA authority receipt boundary",
     "required_review_export_gates": [
       "visual_director_review",
       "screenshot_review",
@@ -67,13 +68,9 @@
   "helpers": [
     {
       "helper_id": "ppt_deck_review",
+      "source_ref": "python/redcube_ai/native_helpers/ppt_deck/review.py",
+      "probe_descriptor_ref": "python/redcube_ai/native_helpers/ppt_deck/review.native-helper-probe.json",
       "package_module": "redcube_ai.native_helpers.ppt_deck.review",
-      "package_entrypoint": {
-        "console_script": "redcube-ppt-deck-review",
-        "module": "redcube_ai.native_helpers.ppt_deck.review",
-        "callable": "main",
-        "module_command": "python -m redcube_ai.native_helpers.ppt_deck.review"
-      },
       "preferred_invocation": {
         "kind": "package_module",
         "argv": [
@@ -96,20 +93,17 @@
         "quality_gate.json"
       ],
       "contract_refs": [
-        "contracts/runtime-program/current-program.index.json",
-        "contracts/runtime-program/current-program-parts/",
+        "contracts/action_catalog.json",
+        "agent/stages/manifest.json",
+        "contracts/owner_receipt_contract.json",
         "contracts/runtime-program/ppt-native-authoring-proof-lane.json"
       ]
     },
     {
       "helper_id": "ppt_deck_export",
+      "source_ref": "python/redcube_ai/native_helpers/ppt_deck/export.py",
+      "probe_descriptor_ref": "python/redcube_ai/native_helpers/ppt_deck/export.native-helper-probe.json",
       "package_module": "redcube_ai.native_helpers.ppt_deck.export",
-      "package_entrypoint": {
-        "console_script": "redcube-ppt-deck-export",
-        "module": "redcube_ai.native_helpers.ppt_deck.export",
-        "callable": "main",
-        "module_command": "python -m redcube_ai.native_helpers.ppt_deck.export"
-      },
       "preferred_invocation": {
         "kind": "package_module",
         "argv": [
@@ -136,19 +130,16 @@
         "publish_bundle.pdf"
       ],
       "contract_refs": [
-        "contracts/runtime-program/current-program.index.json",
-        "contracts/runtime-program/current-program-parts/"
+        "contracts/action_catalog.json",
+        "agent/stages/manifest.json",
+        "contracts/owner_receipt_contract.json"
       ]
     },
     {
       "helper_id": "ppt_deck_native",
+      "source_ref": "python/redcube_ai/native_helpers/ppt_deck/native.py",
+      "probe_descriptor_ref": "python/redcube_ai/native_helpers/ppt_deck/native.native-helper-probe.json",
       "package_module": "redcube_ai.native_helpers.ppt_deck.native",
-      "package_entrypoint": {
-        "console_script": "redcube-ppt-deck-native",
-        "module": "redcube_ai.native_helpers.ppt_deck.native",
-        "callable": "main",
-        "module_command": "python -m redcube_ai.native_helpers.ppt_deck.native"
-      },
       "preferred_invocation": {
         "kind": "package_module",
         "argv": [
@@ -208,7 +199,7 @@
       "true_render_proof": {
         "required": true,
         "source_surface_kind": "native_pptx",
-        "renderer_selection_policy": "capability_probe_auto_bootstrap",
+        "renderer_selection_policy": "opl_probe_then_helper_capability_bind",
         "user_preinstalled_libreoffice_required": false,
         "renderer_kind": "libreoffice_headless",
         "renderer_pipeline": "libreoffice_headless_pdf_png_v1",
@@ -234,10 +225,11 @@
           }
         ],
         "bootstrap_policy": {
-          "capability_probe": "native_ppt_renderer_capability_probe",
-          "automatic_bootstrap_allowed": true,
+          "capability_probe": "opl pack native-helper probe",
+          "automatic_bootstrap_allowed": false,
           "user_preinstall_required": false,
-          "repo_owned_installer": "tools/native-ppt-proof/install-deps.sh",
+          "dependency_provisioning_owner": "opl_connect_or_operator",
+          "developer_proof_installer": "tools/native-ppt-proof/install-deps.sh",
           "proof_container": "tools/native-ppt-proof/Dockerfile"
         },
         "cross_platform_render_required": true,
@@ -269,17 +261,20 @@
         "chart/table/metric-grid manifest metrics",
         "native_ppt_repair_evidence_v1"
       ],
-      "proof_runner": {
+      "developer_proof_runner": {
         "repo_owned_runner": "tools/native-ppt-proof/run.sh",
-        "controlled_cli_command": "redcube native-ppt proof",
+        "hosted_action_id": "run_native_ppt_proof",
+        "hosted_action_catalog_ref": "contracts/action_catalog.json",
         "artifact_index": "artifacts/native-ppt-proof/artifact-index.json",
-        "public_skill_policy": "do_not_register_as_second_public_skill"
+        "authority": "developer_evidence_only",
+        "public_skill_policy": "do_not_register_as_second_public_skill_or_runtime"
       },
       "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",
       "proof_lane_contract": "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
       "contract_refs": [
-        "contracts/runtime-program/current-program.index.json",
-        "contracts/runtime-program/current-program-parts/",
+        "contracts/action_catalog.json",
+        "agent/stages/manifest.json",
+        "contracts/owner_receipt_contract.json",
         "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
         "contracts/runtime-program/ppt-native-python-engine-contract.json"
       ]

@@ -26,11 +26,8 @@
   "physical_morphology": {
     "scan_roots": [
       "agent/",
-      "apps/",
       "contracts/",
-      "packages/",
-      "python/",
-      "runtime/authority_functions/"
+      "python/"
     ],
     "allowed_residue_prefixes": [
       "contracts/",
@@ -39,8 +36,7 @@
     ],
     "required_surface_ids": [
       "declarative_visual_pack",
-      "service_safe_domain_entry",
-      "visual_authority_functions",
+      "visual_authority_contracts",
       "native_helper_implementation"
     ],
     "surface_classifications": [
@@ -50,14 +46,13 @@
         "source_refs": ["agent/"]
       },
       {
-        "surface_id": "service_safe_domain_entry",
-        "classification": "domain_handler_target",
-        "source_refs": ["packages/redcube-domain-entry/"]
-      },
-      {
-        "surface_id": "visual_authority_functions",
-        "classification": "minimal_authority_function",
-        "source_refs": ["runtime/authority_functions/"]
+        "surface_id": "visual_authority_contracts",
+        "classification": "declarative_domain_pack",
+        "source_refs": [
+          "contracts/owner_receipt_contract.json",
+          "contracts/artifact_locator_contract.json",
+          "contracts/stage_quality_cycle_policy.json"
+        ]
       },
       {
         "surface_id": "native_helper_implementation",

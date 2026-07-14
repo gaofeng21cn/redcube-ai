@@ -145,7 +145,6 @@
     "readback_refs": [
       "contracts/live_stage_run_progress_evidence.json",
       "contracts/owner_chain_live_progress_evidence.json",
-      "contracts/production_acceptance/rca-production-acceptance.json",
       "contracts/stage_run_canary_evidence.json"
     ],
     "readback_claim_boundary": {

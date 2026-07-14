@@ -3,13 +3,7 @@
   "version": "0.2.2",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
-    "redcube": "node apps/redcube-cli/dist/cli.js",
-    "rca": "node apps/redcube-cli/dist/cli.js",
     "test": "npm run test:smoke",
     "test:smoke": "node scripts/verify-lane.ts smoke",
     "test:fast": "node scripts/verify-lane.ts fast",
@@ -21,21 +15,13 @@
     "test:private-platform:strict": "node scripts/verify-lane.ts private-platform:strict",
     "repo:hygiene": "scripts/repo-hygiene.sh",
     "repo:hygiene:fix": "scripts/repo-hygiene.sh --fix",
-    "contracts:current-program:write": "node scripts/sync-current-program-leaf-index.ts --write",
-    "contracts:current-program:check": "node scripts/sync-current-program-leaf-index.ts --check",
     "typecheck": "npm run --silent build && tsc --noEmit --project tsconfig.typecheck.json --pretty false",
     "typecheck:ci": "npm run --silent build:ci && tsc --noEmit --project tsconfig.typecheck.json --pretty false",
-    "build": "tsc --build tsconfig.json --pretty false",
-    "build:ci": "tsc --build tsconfig.json --pretty false --force",
+    "build": "tsc --noEmit --project tsconfig.json --pretty false",
+    "build:ci": "tsc --noEmit --project tsconfig.json --pretty false",
     "audit:fallow:production": "npx --yes fallow@3.3.0 dead-code --root . --no-cache --production --summary --fail-on-issues",
-    "audit:typescript-closeout": "node scripts/run-typescript-closeout-audit.ts",
     "line-budget": "node scripts/line-budget.ts",
     "line-budget:strict": "node scripts/line-budget.ts --strict"
-  },
-  "dependencies": {
-    "@redcube/domain-entry": "0.1.0",
-    "@redcube/runtime": "0.1.0",
-    "@redcube/runtime-protocol": "0.1.0"
   },
   "devDependencies": {
     "@types/node": "^24.7.0",

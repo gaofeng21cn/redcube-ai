@@ -1,239 +1,60 @@
 # RedCube AI 当前状态
 
-Owner: `RedCube AI`
-Purpose: `current_status_and_gap_readout`
-State: `current_truth`
-Machine boundary: 人读状态面。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
+Owner: RedCube AI
+Purpose: 给出当前 admitted source、结构收口与验证口径。
+State: candidate_validation_pending
+Machine boundary: exact 状态以 Git SHA、root contracts、OPL admission JSON 与 test output 为准。
 
-Last reviewed: `2026-07-12`
+Date anchor: 2026-07-14
 
-Progress-first 已进入 route runtime、candidate race、native shape-plan、PPT/XHS image pages、review/repair continuation 与 export：可消费 artifact 以 `completed` / `completed_with_quality_debt` 推进；默认 native shape-plan 4 轮及 review repair 轮数是质量预算，不再是 pass-or-stop 门。Native PPT 在 editable PPTX 已物化但 template/manifest/render proof 未达标时继续交付 PPTX；Image route 单页失败继续其他页，至少一张可读 PNG 即推进，零 PNG 才硬失败。普通质量债务不生成 execution typed blocker，但会阻止 ready claim。Authoring lane lock 防止 image/native/HTML 静默切换。
+## 当前结论
 
-Stage 质量治理当前由 `contracts/stage_quality_cycle_policy.json` 声明：正式 Review/Repair/Re-review 使用独立 OPL StageAttempt 和全新 Codex thread，默认三轮修订预算；同 thread 自检仅为 `in_thread_refinement`。OPL execution plan 只投影六个 canonical Stage，family route 作为 Stage 内 handler；`review_and_revision` 是独立跨 Stage Meta Review。
+RCA 已按标准 OPL Agent 目标完成私有平台源码的结构性退役，候选正在执行最终验证。最终吸收前不把本文件状态解读为 production-ready。
 
-Plugin native profile pointer: `contracts/opl-native-profile.json` 只声明 OPL Flow / OPL Doc 插件同步与 drift 检查所需的 repo-native profile；它不是 visual truth、runtime truth、artifact authority、review/export verdict、owner receipt 或 production-ready 证据。
+## 保留的 active source
 
-Live Evidence 后置 / 功能结构优先是 RCA 日常开发读法。repo-local session / domain_action_adapter / runtimeWatch / operator projection / route-run record adapter 的收薄或退役、generated/default caller cutover、strict source-purity、Stage Folder / artifact locator / review-repair transport 的功能边界和 no-resurrection guard，可以作为功能/结构 lane 先推进。Temporal controlled visual-stage long-soak、production-like repeated no-regression、真实 visual memory lifecycle receipt、human review success receipt、App/operator sustained consumption 和 production visual-stage evidence 属于后置 Live Evidence / production evidence lane；它们不反向阻塞可独立完成的结构清理，也不能由 conformance、mock route chain、provider completion、refs-only ledger 或 dated sample proof 替代为 visual ready、exportable、handoffable、domain ready 或 production ready。
+- `agent/`：declarative visual pack；
+- `contracts/`：package/pack/interface/authority/policy/schema/evidence refs；
+- `python/redcube_ai/native_helpers/`：RCA native helper；
+- `runtime/authority_functions/`：最小 authority 声明；
+- `plugins/redcube-ai/`：Codex carrier mirror；
+- `tools/`、`scripts/`、`tests/`：developer proof、边界校验和 native-helper 回归，不是 runtime。
 
-Codex Developer Mode source pointer: canonical plugin scaffold 与 source locator 统一在 `plugins/redcube-ai/`；`plugins/redcube-ai/.codex-plugin/plugin.json` 的 plugin name 与 `plugins/redcube-ai/skills/redcube-ai/SKILL.md` 的 skill name 都使用 repo slug `redcube-ai`。仓库根层 `.codex-plugin/plugin.json`、repo-local `scripts/install-codex-plugin.ts`、legacy `plugins/rca` 与 `plugins/redcube-ai/skills/rca` symlink alias 已退役，不再作为安装、测试或 skill 发现路径。Codex marketplace registration 由 OPL/plugin Flow owner 写入外部 state；RCA repo 只维护 canonical scaffold/source。该入口只解决 Codex plugin metadata/source channel 路径，不声明 visual ready、exportable、handoffable、domain ready 或 production ready。
+## 已退役的 private control plane
 
-## 当前角色
+- `apps/redcube-cli`；
+- `packages/redcube-domain-entry`；
+- `packages/redcube-runtime` 与 `packages/redcube-runtime-protocol`；
+- `packages/redcube-governance`；
+- `packages/redcube-overlay-core`；
+- repo-local current-program baton、私有 product-entry/session/runtime contracts；
+- 对应 CLI/runtime/product-entry tests、mock executor、case helper 与 compatibility aliases。
 
-`RedCube AI` 是视觉交付 domain agent，也是 OPL-compatible Foundry Agent package。Direct route 仍是 `redcube-ai` app skill / CLI / Product Entry / service-safe domain entry；MCP 不再是 RCA repo-local production API app，只作为 OPL generated protocol descriptor 指向 RCA domain handler targets。OPL-hosted route 可以发现、托管、唤醒和投影 RCA，但必须回到同一套 RCA-owned visual truth、communication strategy、visual direction、review/export verdict、artifact authority、visual memory accept/reject、owner receipt 和 typed blocker。
+## 当前机器入口
 
-RCA repo-local `redcube` CLI 不再暴露 OPL Foundry Agent generic first-layer grammar：`redcube status|inspect|interfaces|validate|doctor|peers`、`redcube foundry <operation>`、`redcube work <operation>` 和 `redcube deck <operation>` 已从 RCA active routing / help 中退役。根层 `npm run rca -- ...` 仍是指向同一 CLI 的 repo-native shorthand script，默认用于 direct RCA workflow，例如 `npm run rca -- help`、`redcube workspace doctor`、`redcube deliverable run`、`redcube product invoke` 和 `redcube domain-handler export|dispatch`。Foundry generic policy body 由 OPL owned/generated/hosted surfaces 持有；RCA `contracts/foundry_agent_series.json` 只作为 canonical policy/skeleton 的 OPL-managed Framework consumer，并保留 declarative visual pack、standard action metadata、minimal authority 与 visual delta refs。
-
-OPL Framework 持有通用 stage attempt、provider-backed runtime、typed queue、wakeup、retry/dead-letter、human gate、receipt ledger、operator projection、workspace/source locator、artifact gallery/handoff shell、review/repair transport、generated wrapper 和 App/workbench shell。RCA 当前口径已收敛为 OPL generated/hosted wrapper/session/workbench/generic shell consumer；RCA 只保留 domain handler target、direct entry、refs-only adapter、minimal visual authority function 和 native helper implementation。旧 repo-local managed runtime 物理实现已删除，active source/package/test surface 不再保留内部 managed runtime fixture。
-
-当前 `runDeliverableRoute` / route-local helper 只能作为 RCA visual route handler 和 artifact authority target 运行。默认执行必须携带 OPL-owned `cross_provider_attempt_index`，同时包含 `provider_attempt_owner=one-person-lab`、provider attempt ref、provider attempt ledger ref，以及 stage attempt / lease / receipt ref；缺失时返回 RCA typed blocker `missing_opl_stage_attempt`，且不创建 repo-local run/event state。RCA-local diagnostic route-run record bypass 已删除；`loadRouteRun` / runtime `loadRun` lookup public surface 与 `getRun` / `redcube runs get` 已物理退役。`runtimeWatch` 已拒绝全部 `run` / `runId` generic input，只返回 visual review/artifact/blocker/owner evidence refs；通用 status/attempt/telemetry/lifecycle/resumable 由 OPL Console / Runway / Ledger 消费。`readRouteRunEvents` / runtime `readEvents` local event-log read surface 与 public append event helper均已退役，runtime 内部只返回 OPL attempt refs materialization。
-
-RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/stages/manifest.json` 是 stage graph 的 canonical repo source，stage-level prompt policy 位于 `agent/prompts/*.md`；OPL compiler 将 source manifest 投影为 `opl-generated:family_stage_control_plane`。RCA 不再维护 root stage-control mirror。
-
-当前 skill model 读法是三层：stage prompt 管 stage 怎么运行和返回哪些 receipts / refs；professional specialist skill 管跨 stage 可复用专业方法，例如 story architecture、visual direction、page authoring、review、visual memory curation、native PPT design 和 template profiling；tool/helper 管 imagegen、screenshot/render、Office/PPT materialization、manifest、validation 和 export refs。RCA professional skills 先 repo-local 化，不新建外部 repo 或外部产品；工具和 helper 只提供 materialization / validation / export evidence，不能变成 skill，也不能替代 RCA visual truth、review/export verdict 或 owner receipt。
-Template profiling 已小幅收敛：`contracts/capability_map.json#/feedback_token_index/template_profile` 与 `placeholder_capacity` 现在只把 canonical capability 指向 `rca-template-profiler`。`rca-ppt-visual-director` 和 `rca-native-ppt-designer` 保留为 profile 消费方，分别负责 visual language / rhythm / density 与显式 native PPTX shape-plan binding；不再读作共同 profiling owner。
-
-2026-07-10 professional method landing 已把 pinned `ppt-master@b0beba5b` 的 5 个 communication modes、18 个 style source ids 和 76 个 visualization source ids 全量映射到 RCA 本地 communication/style/20-pattern registries，并由 Story Architect、Visual Director、Template Profiler、Native PPT Designer 和 Reviewer 的 canonical skill/resource pack 消费；17 个 upstream workflow 也已逐项记录 inspected provenance 与 adopt/adapt/watch/reject/no-code-needed 分类。`ppt-master-learning-landing.json` 只做 provenance/coverage audit：render-backed preview/review/calibration/re-export 采用本地现有 owner，交互式 browser editor/annotation UI 与 reusable template authoring 保持未导入/watch-only；合同不导入上游 runtime、模板资产、icon/SVG body，也不声明 live evidence、visual ready 或 owner receipt。
-
-Capability map 只以 `capabilities` 维护 professional resolver 的 canonical capability body、skill/resource refs、authority boundary 与 verification refs；`feedback_token_index` 只承担反向 feedback routing，`skill_local_resource_pack` 只维护共享 resource 规则。旧 `professional_capabilities` id index、`capability_resource_refs` projection、`failure_tokens` 与 `target_repo_file_hints` 重复字段均已删除；AgentLab/OMA 继续回到同一个 capability map 解析，不复制 per-token mapping、dry-run tokens / flags 或 patch-target authority。本项不声明 visual ready、exportable、handoffable、domain ready 或 production ready。
-
-RCA rich primary skill 的标准 OPL repo source 是 `agent/primary_skill/SKILL.md`，登记在 `contracts/capability_map.json#/capabilities?surface_role=primary_skill`。`plugins/redcube-ai/skills/redcube-ai/SKILL.md` 保留为 Codex plugin carrier mirror / 安装发现面；它与 repo-local primary skill 不是两套业务能力，也不持有 visual truth、artifact body、review/export verdict、owner receipt、typed blocker 或 runtime data。职责区别读 [Primary Skill 与 Plugin Carrier 边界](./references/primary-skill-plugin-carrier-boundary.md)。
-
-`agent/skills/visual_memory_policy.md` 当前只读为 Declarative Visual Pack 的 stage skill policy ref，不是 standalone professional skill。Visual memory proposal、accept/reject review 和 writeback lifecycle 的可复用方法入口是 `agent/professional_skills/rca-visual-memory-curator/SKILL.md`；`contracts/capability_map.json` 只把 `visual_memory`、`memory_writeback`、`review_export_memory` 等反馈 token 路由到该 refs-only 方法层，不授权 OPL 写 memory body、artifact body、review/export verdict、owner receipt 或 runtime data。
-
-OPL family `Foundry Agent OS` 目标下，RCA 的 target delta 读 [RCA Foundry Agent OS 目标差异页](./active/foundry-agent-os-target-delta.md)：generic runtime、workspace/source intake shell、artifact gallery/handoff shell、review/repair transport、native-helper envelope、generated surfaces、Console/workbench 和 capability registry ABI 上收到 OPL；visual truth、layout / review / export verdict、artifact mutation/export authority、visual memory accept/reject、owner receipt、typed blocker 和 visual-native helper authority 保留为 RCA authority kernel。该 target delta 只冻结架构方向，不声明 visual ready、exportable、handoffable、domain ready、long-soak complete 或 production ready。
-
-`contracts/foundry-agent-os-domain-kernel-manifest.json` 是 W4 `domain-kernel-manifest` 的 RCA machine-readable 落点。它把 retained Visual Authority Kernel、OPL upcollect surfaces、`current_owner_delta` 默认读根、owner receipt / typed blocker / review-export signer 归属和 OPL/Vault/Console/Runway/Pack/Capability Registry/gallery-handoff shell false-authority flags 固定为可测试合同；它不声明 visual ready、exportable、handoffable、domain-ready、production visual-stage long-soak complete、production-ready、App release-ready 或 physical delete authority。
-
-`Codex CLI` 是 RCA 当前唯一物化的 executor。generic executor selection、hosted adapter、attempt ledger 与 receipt residency 归 OPL owner surface；RCA 只消费 `opl-generated:family_stage_control_plane#/stages/*/selected_executor` 等 opaque refs，不保留本地 routing config、Hermes adapter/proof、fallback 或第二 executor pass。
-
-2026-07-11 的结构收口以 `agent/stages/manifest.json` source 和 `opl-generated:family_stage_control_plane` projection 为 stage-control 边界。RCA product-entry/status/domain-handler adapter 只返回 action-handler、domain-authority、domain-evidence、typed-blocker、receipt与artifact-locator refs；generic product/workbench/session、Agent Lab、monitor、ledger 与 workorder shell 归 OPL。最终状态只以 current-program completion audit 和 fresh command evidence 为准，结构收薄不构成 visual/domain/production ready claim。
-
-当前 acceptance / readiness 口径是 AI-first / executor-first：OPL 搭建 stage-led runtime、queue、receipt ledger、replay / recovery shell 与 operator projection；Codex/default executor 执行视觉阶段；RCA 持有 visual truth、review/export verdict、artifact authority、visual memory accept/reject 和 owner receipt。合同只固定边界、安全、receipt、replay 和恢复语义，不能把机械 conformance 或 provider completion 升级成视觉判断。
-
-从 Kami 高层实践吸收的长期规则只进入 RCA 自己的可执行约束语言：brand profile precedence、source/material pass transparency、素材/品牌状态、density/sparse-page evidence、route/template contract、Markdown/Marp 显式可选 refs-only route、package distribution consistency、rendered evidence、review/export gate 和 owner refs。RCA 不采用 Kami 的固定审美、模板口味、运行面或外部 skill authority；可复用内容必须折回 `agent/` Declarative Visual Pack、`contracts/pack_compiler_input.json`、product-entry / manifest refs、RCA review/export gates 和测试/验证面，不能停留为聊天结论或 docs-only checklist。
-
-Cognitive Kernel 已落为 RCA stage 内部结构。`contracts/cognitive_kernel_adoption.json`、`contracts/golden_path_profile.json`、`agent/tools/domain_affordances.md` 与 `agent/stages/manifest.json` 提供 RCA repo-source refs；完整 generic stage-control body 只存在于 `opl-generated:family_stage_control_plane`。独立 gate 仍回 RCA review/export、owner receipt 与 typed blocker authority。
-
-## 当前运行与文档事实
-
-- Direct route 已落地：`RedCube Product Entry -> service-safe domain entry -> executor adapter -> visual-domain truth surfaces`。
-- OPL-hosted route 已有合同和 projection：stage control projection、family action catalog、RCA `domain-handler export|dispatch` target 与 OPL-generated `domain_action_adapter` descriptor refs。`domain-handler export` 只返回 action-handler、domain-authority、domain-evidence、typed-blocker、receipt 与 artifact-locator refs；不再构建 scheduler、session/workbench、stability、operator-evidence、substrate、readiness、guarded-action 或 blocked-action shell。
-- Active Agent Lab / production acceptance 合同不再把 `domain-handler export` 当成 suite、workorder 或 operator projection 容器。Goal/PPT suite 由 `contracts/agent_lab_handoff.json` 注册并直接指向 RCA-owned suite contract；efficiency handoff 与 production tail 直接指向对应 RCA acceptance contract；owner closeout 等领域 authority 使用可解引用的 `opl_generated:product_entry_manifest#/domain_authority_refs/...` locator。handler export 自身只返回这些带明确 product-entry 基座的 authority locators，不保留 `mapped_surfaces` / `source_manifest_refs` alias。
-- `ai_route_policy` 只向 Codex CLI 暴露 declared stage、artifact refs、质量债和 route-back hints；它不是 transition table，不由 OPL Atlas 或 RCA helper 执行，也不能阻止任意 declared stage 启动。
-- RCA route runtime 消费 OPL Stage Folder Contract 作为物理 artifact truth。成功 / 阻塞只由 required output roles、valid role manifest、RCA owner receipt 或 RCA typed blocker refs 推导；裸文件、缺 manifest / receipt / evidence 的输出仍是 orphan。物理路径、文件名、current pointer 与重建细节归 Stage Folder contracts、artifact locator contract、source/tests 和 runtime artifact root；status 只保留 owner/readout 边界。
-- RCA 对 OPL Ledger 的 artifact registration 只通过 product-entry / domain-handler 的 `artifact_locator_refs` 与 `receipt_refs` 交付 locator；RCA 不再生成 repo-local Ledger projection body。OPL Ledger 只能登记 refs，不复制真实 visual deliverable artifact body、review/export verdict、owner receipt body、typed blocker body或runtime queue state。
-- Purpose-first owner-delta 口径已固定：RCA 默认下一步只承认 artifact-producing owner receipt、visual review/export receipt、visual memory accept/reject receipt、workspace receipt scaleout、production-like no-regression ref、Temporal controlled visual-stage long-soak ref、human review receipt 或 RCA typed blocker；OPL/App/operator 只消费 refs、owner route 和 next forced delta，不能把 refs-only accounting、provider completion、session currentness 或 workbench projection 写成视觉进展。
-- `contracts/temporal_stage_run_consumption_policy.json` 是 RCA repo-local machine policy source；它不再由 domain-handler重新物化为 runtime/readiness projection。Temporal runtime、provider attempt ledger、queue 和 OPL stage attempt 写入归 `one-person-lab/OPL`；RCA repo 只消费 StageRun / provider / ledger / lease / receipt refs，不能自持 Temporal runtime，也不能写 OPL stage attempts。Provider completion或generated surface ready不能claim RCA domain completion；domain closeout只能来自RCA owner receipt、typed blocker、human gate、route-back、review/export receipt、artifact authority receipt或no-regression refs。
-- RCA live stage-run progress evidence 已落地为 OPL 标准消费入口 `contracts/live_stage_run_progress_evidence.json`，并由 `contracts/stage_run_kernel_profile.json` 指向；旧 `contracts/owner_chain_live_progress_evidence.json` 继续作为 owner-chain 输入/引用。两个 evidence contract 现在都通过 `owner_chain_completion_audit` 指回 `contracts/temporal_stage_run_consumption_policy.json#/owner_chain_completion_audit`。当前读法：已有 mock-safe `ppt_deck` image-first owner-chain canary 和 human ready/export handoff refs 可被 OPL 消费，但 completion audit 仍是 `blocked_requires_real_visual_stage_owner_acceptance`，不授权 owner-chain complete、visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long soak complete。该 lane 不调用真实图片 API，不把 workspace artifact 写入 repo，不携带 visual truth/artifact body/owner receipt body/typed blocker body/review-export verdict body/memory body；真实 Temporal controlled visual-stage long-soak、真实 visual-stage owner acceptance、review-export acceptance、real memory lifecycle receipt instances 与 production-like no-regression 仍是 open evidence gates，当前执行顺序和 open gate 读法由 [RCA 理想目标态差距与完善计划](./active/rca-ideal-state-gap-plan.md) 维护。
-- RCA 现在暴露最小 `/goal` AgentLab suite / handoff：`contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json` 是 OPL `agent-lab run --suite ... --json` 可直接消费的顶层 external suite；`contracts/agent_lab_handoff.json` 是 OMA `agent:evidence` / `improve:external-suite` 的标准 refs-only handoff，但 feedback token / capability / dry-run token case 映射单源是 `contracts/capability_map.json`。handoff 只保留 suite entry、fixture/context、external refs、dry-run check refs 与 forbidden-authority boundary，不再复制 per-token mapping 或 patch-target authority。该 suite 用 `xiaohongshu` / `standard_note` 作为低成本目标 workflow，验证一次 `opl_hosted` product-entry 从单一 goal 进入 `auto_to_terminal` stage execution plan，不要求外层 Codex App 逐阶段监视；同一 focused test 还跑 mock-provider artifact-producing route chain 到 `export_bundle`，确认 PNG、publish bundle、caption、publication-state 和 series reports 都能落盘。AgentLab / OPL Meta Agent 只能作为 refs-only、control-plane、takeover 与 handoff 证据读取；artifact-producing 主链路证据必须回到 RCA product-entry route handler，即 `npm run --prefix /Users/gaofeng/workspace/redcube-ai redcube -- product invoke ... --task-intent run_deliverable_route`。真实图片生成由 Codex executor 原生 imagegen task 承接，RCA 不直接读取 Base URL、API key 或 provider token；手写脚本、独立 HTML 或 Python 样片只能作为 rejected provenance、diagnostic 或 helper proof，不能写成主链路证据。
-- RCA 已有 `ppt_deck` 与 `xiaohongshu` image-first 默认路线；HTML/native PPTX 是显式可选路线。`poster_onepager` 仍保持 guarded knowledge poster 边界。
-- Route prompt currentness 已收口：PPT/XHS/poster 的真实 runtime prompt 均由 declarative Stage prompt 提供 locator；poster artifacts 记录 repo source 与正文 digest。Production prompt 已移除重复 output JSON、sample geometry、历史缺陷和固定 retry 配方；8 个 professional skill 各自持有并注入 concise `Runtime Summary`，代码不维护 remit 第二真相。Blueprint/visual direction 可迭代收敛，repair 必须基于当前 feedback，最终 bytes 仍遵循 render -> review -> targeted repair -> rerender -> fresh review -> export。
-- `ppt_deck` 三技术路线 AgentLab 质量测试按 refs-only 标准 suite input 读取：image-first 默认线由 `contracts/runtime-program/ppt-image-first-quality-nonregression.json` 与 `tests/ppt-image-first-quality-nonregression.test.js` 覆盖，HTML 显式可选线由 `contracts/runtime-program/ppt-html-route-quality-nonregression.json` 与 `tests/ppt-html-route-quality-nonregression.test.js` 覆盖，native editable PPTX 显式可选线由 `contracts/runtime-program/ppt-native-pptx-quality-nonregression.json` 与 `tests/ppt-native-pptx-quality-nonregression.test.js` 覆盖。顶层 suite `contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json` 由 `tests/rca-ppt-three-route-agent-lab-suite.test.js` 验证：AgentLab 读取 refs-only suite，同时 RCA runtime 用 mock provider 跑 image-first、HTML、native PPTX 三条 route chain 到 `export_pptx`，确认 PNG/HTML/native PPTX、review screenshots、最终 PPTX/PDF 与 artifact gallery 能落盘。该 suite 不改变默认 `author_image_pages` 路线，不写入 RCA visual truth、artifact body、memory body、owner receipt body，也不替代 RCA-owned review/export verdict。
-- Native PPT 非 Live能力已新增真实 editability round trip 与 blind parity harness：chart 数据、标题文字、shape fill/位置、speaker notes 可在 save 后由 OOXML package readback 复核，并经 LibreOffice->PDF->PNG 真渲染；notes、transition、timing、optional animation 也已有真实 package materialization 和 animation target/effect/trigger/duration readback。Parity evaluator 固定 same-source lock、anonymous output/review allowlist、exact review-set hash、5-reviewer Student-t lower bound、critical defect 与 edit-task fail-closed。当前没有真实同源双跑盲评、fresh PowerPoint/LibreOffice/Keynote 或 Google Slides cross-viewer human readback或 parity owner receipt，因此只能写 `pass_candidate/route_back_candidate/blocked`，不能写 parity passed 或 visual ready。
-- Native editable PPTX 显式可选线现在固定为 `RCA AI-first design pack -> editable_shape_plan -> officecli writer / validator -> true render QA -> RCA review/export gates`。`contracts/runtime-program/ppt-native-ai-first-design-pack.json` 持有设计纪律；TypeScript route guard、Python materializer/preflight 与 officecli writer/validator 只做诊断、物化、true render proof 和 refs 签出，不选择模板、不补设计、不拥有视觉判断，也不因普通 schema/shape/QA 缺口阻断后续 stage；这些缺口携带最佳可读产物作为质量债继续推进。
-- Native live materialization / review / export proof lane 已有 dated evidence；具体 run id、workspace path、attempt id、截图路径和 no-regression refs 流水折回 [RCA dated production evidence foldback](./history/process/2026-06-03-rca-dated-production-evidence-foldback.md)。当前状态只读为：native sample proof 已补强，Temporal controlled visual-stage long soak、production-like repeated no-regression、domain ready、handoffable 和 production ready 仍未关闭。
-- Temporal controlled visual-stage long-soak 的 RCA refs-only intake 能力已经落地为 guarded action 和 source contract。2026-07-10 fresh OPL transport probe 已完成 6/9 检查：Temporal service、managed worker、真实 worker restart、restart 后 history requery、signal history 与 domain boundary 均成立；Codex completed attempt、raw-readable-output progress projection 和 retry/dead-letter transport boundary 仍未形成 live proof。Typed closeout 不再是 stage progression 前提。该 probe 没有执行真实 RCA visual-stage，也没有 artifact-producing owner receipt 或 review/export acceptance，因此真实 visual-stage long-soak 与 production-like repeated no-regression 未关闭。
-- `contracts/`、runtime-program contracts、product-entry manifest、CLI/MCP 行为、workspace/runtime receipt、artifact locator、review/export gate 与真实交付物证据是机器真相；`docs/**` 只做解释、导航、治理和 provenance。
-- Stage Artifact Kernel adoption 和 Stage control plane 已可被 OPL family conformance / replay / readiness surfaces 消费；RCA 只引用 shared policy release ref / bundle fingerprint，不复制 shared policy body 或把 domain contract 升级为 policy authority。Conformance、replay refs、stage readiness、human-gate typed blocker refs 和 evidence-worklist counts 的字段级读法归 OPL read-model、Stage control plane、production acceptance、Stage Artifact Kernel adoption contract 和 runtime ledger；status 只保留当前结论：RCA replay missing-ref 已有 domain-owned answer / typed blocker 结构，human-gate success receipt 仍未关闭，不能声明 human approval、visual ready、exportable、handoffable、production visual-stage long soak、domain ready 或 production ready。
-- `contracts/foundry_agent_series.json` 现在是 OPL Foundry policy consumer，不再复制或维护 OPL generic `series_design_profile`、workspace topology profile、public series spine 或 feedback policy body：`rca` 是 consumer identity，`redcube_ai` 是 authority owner 与 generated stage control plane target domain。OPL 持有 generated descriptors、refs/projection、provider-backed runtime、stage attempts、queue/wakeup、retry/human gate、receipt ledger 与 App/workbench shell；RCA 的 visual materials/source 输入、PPT/PDF/PNG/export bundle/handoff refs 输出和视觉 authority 差异写在 `visual_domain_delta_refs`、`contracts/domain_descriptor.json`、`agent/`、stage/action refs 与 authority refs 中。RCA 继续持有 visual truth、route truth、review/export verdict、artifact authority、visual memory accept/reject 和 owner receipt；OPL 不能写 RCA visual truth、授权 review/export、变更 canonical artifacts、接受/拒绝 visual memory 或签发 RCA owner receipt。
-- Workspace/file lifecycle 当前按 `contracts/workspace_lifecycle_policy.json` 将 repo-source 与 live/runtime 写集分层：`agent/`、`contracts/`、`runtime/authority_functions/`、`packages/`、`docs/` 只承载 semantic pack、机器合同、authority-function descriptor/receipt refs、domain handler/native helper 和人读治理；真实 workspace state、runtime artifact、receipt instance、PNG/PPTX/PDF/export bundle、临时 build/cache/venv/pycache/pytest cache/install sync 副产物进入 workspace/runtime artifact root 或 `/Users/gaofeng/workspace/projects/redcube-ai/runtime-state/`，不写回开发 checkout。`/Users/gaofeng/.codex/projects` 是指向 `/Users/gaofeng/workspace/projects` 的 symlink；文档和运行说明按同一物理 runtime-state 根读取，不把它写成两套状态根或双写策略。
-- RCA OPL pack compiler descriptor 输入现在有 repo-tracked registration contract：`contracts/opl_domain_manifest_registration.json` 指向 `@redcube/domain-entry#getProductEntryManifest` generated materializer，并声明 live OPL workspace registry 仍必须通过 `opl workspace bind --project redcube --path <redcube-ai-repo>` 持有非空 `manifest_command`。`workspace.yaml`、`workspace_*.json` 与 `shared/` 是 OPL workspace topology / resource manifest 生成物；当 repo checkout 被用作 workspace root 时它们保持 ignored，不进入 repo source、contract source 或 visual truth。
-- RCA repo source 当前只持有 locator、index、schema、receipt ref、restore/retention policy 和 refs-only lifecycle proof；visual truth、review/export verdict、artifact mutation authority、visual memory body accept/reject 与 owner receipt 继续由 RCA owner chain 授权。OPL 上收通用 lifecycle primitive、scheduler/runner/session store/workbench shell，RCA 私有 runtime adapter 不能反向定义长期结构。
-- 过程性 dated follow-through、closeout tranche 和 proof 命令摘要进入 `docs/history/`；当前目标态与 gap 只读 [RedCube AI 理想目标态](./references/rca-visual-deliverable-agent-ideal-state.md) 和 [RCA 理想目标态差距与完善计划](./active/rca-ideal-state-gap-plan.md)。
-
-## 当前功能/结构闭合状态
-
-当前功能/结构差距按 active plan 维护。历史 read-model 中的 `functional_structure_gap_count=0` 只说明旧 repo-local managed runtime / generic owner 问题已经分类并删除了核心实现，不表示 strict source-purity 已物理完成：
-
-`functional_structure_gap_count=0` = legacy managed runtime owner closed, strict wrapper/source-purity cutover still pending
-
-已闭合为标准 OPL consumer 口径的 8 项：`opl_generated_surface_production_consumption`、`repo_local_wrapper_active_caller_migration`、`focused_hosted_attempt_real_path_cutover`、`artifact_gallery_handoff_shell`、`review_repair_transport`、`opl_app_operator_drilldown`、`workspace_source_lifecycle_receipt_shell`、`legacy_physical_cleanup`。这些闭合表示 RCA 不再声明对应 generic shell/runtime owner，且旧 managed runtime 物理实现已删除。`runtimeWatch` generic body 现已独立收薄完成；active CLI/MCP/product-entry/session/domain_action_adapter/operator projection/neutral route-run record adapter 仍不等于最终标准智能体源码。Strict purity 的完成口径是 OPL generated/default caller 接管后删除或收薄 repo-local generic wrapper，只保留 visual handler、authority function、native helper 和 machine-readable contracts。Production visual-stage long soak、visual ready、exportable 或 handoffable 仍属于证据门。
-
-当前结构闭合依赖 machine surfaces，而不是 docs receipt 流水。Status 只保留 current-read 摘要，字段、payload、path 和测试细节回到各自 SSOT：
-
-| Surface | Status read | Detail owner |
+| Surface | Source | Owner |
 | --- | --- | --- |
-| Declarative Visual Pack / stage control | `agent/stages/manifest.json` 是 repo source；`opl-generated:family_stage_control_plane` 是 OPL compiler projection，RCA 无 root stage-control mirror。 | `agent/stages/manifest.json`、`contracts/pack_compiler_input.json`、focused stage/control tests |
-| Product-entry / generated surface boundary | product-entry manifest、domain handler target、标准 OPL `family_action_catalog`、minimal authority refs 和 generated descriptor refs 只暴露 descriptor、domain handler target、refs-only projection、owner receipt shape 与 typed blocker；repo-local product/session/status/foundry generic shell 不再是 RCA active surface。 | product-entry manifest、`contracts/action_catalog.json`、OPL generated descriptor refs、source/tests |
-| Product-entry currentness | Session / continuation 按 OPL family Progress-First shared contract 读取 visual deliverable delta、platform repair delta、raw/typed closeout或 diagnostic、provider attempt / ledger refs 和 next forced delta；缺 typed closeout或 provider ledger只形成质量债并继续，只有冲突、伪装或 stale identity/currentness 返回 typed blocker。 | runtime-program current-program parts、product-entry source/tests、OPL read-model |
-| Runtime-program and acceptance surfaces | current-program parts 是 canonical source；`current-program.index.json` 是最薄 locator / check 输入；`current-program.json` 已退役，不再生成、保留或参与 canonical check。大型机器 surface 只保留 refs-only projection，不复制完整 body。status 只说明这些 surfaces 记录 body-free owner receipt refs、artifact/review/export refs、memory/lifecycle refs、typed blocker refs 和 next verification refs。 | `contracts/runtime-program/current-program-parts/**`、`contracts/runtime-program/current-program.index.json`、`contracts/runtime-program/opl-family-contract-adoption.json`、`contracts/production_acceptance/rca-production-acceptance.json`、runtime evidence |
-| RuntimeWatch thin visual refs projection | `runtimeWatch` 只接受 workspace/topic/deliverable visual locator，返回 visual review semantics 与 canonical review/artifact/blocker/owner evidence refs；`run` / `runId` generic input fail closed 到 OPL Console / Runway / Ledger。通用 status/current stage/resumable/telemetry/error/rerun/cost/publication/gate/operator/lifecycle/governance body 已从 RCA projection 物理删除。 | functional privatization audit、physical morphology policy、source/tests |
+| Package identity/lifecycle sidecar | `contracts/opl_agent_package_manifest.json` | RCA 声明，OPL Connect 管理 lifecycle |
+| Domain descriptor | `contracts/domain_descriptor.json` | RCA |
+| Hosted actions | `contracts/action_catalog.json` | RCA 语义，OPL 生成/托管 |
+| Stage graph | `agent/stages/manifest.json` | RCA 语义，OPL StageRun 执行 |
+| Standard interface | `contracts/standard_agent_interface.json` | RCA 声明，OPL compiler 消费 |
+| Native helpers | `contracts/runtime-program/python-native-helper-catalog.json` | RCA 实现，OPL envelope 执行 |
+| Private-platform guard | `scripts/check-private-platform-retirement.ts` | repo verification only |
 
-当前标准 OPL Agent 结构目标口径保持不变：RCA package surface 是 Declarative Visual Pack、service-safe domain entry、domain handler target、visual authority functions、native helper implementation 和必要 body-free receipt / typed blocker refs；OPL-owned/generated surface 是 CLI/MCP/Skill/product-entry/status/session/domain_action_adapter/workbench wrapper、provider-backed stage runtime、attempt ledger、artifact gallery/handoff shell、review/repair transport 和 App/operator shell。
+## 验证门
 
-Native helper generic envelope 已完成结构上收：RCA runtime-family 不再解析 helper catalog、选择 Python 环境、拼 `PYTHONPATH`、直接 spawn package module 或自行定义 JSON execution receipt；默认调用改为 `opl pack native-helper run`，RCA 只保留 catalog declaration、helper implementation、视觉 route 参数与 OPL receipt 消费。该 closure 只证明 A7 功能/结构边界，不声明真实视觉产物、review/export acceptance 或 production readiness。
+候选必须同时满足：
 
-`contracts/standard_agent_conformance_profile.json` 是 RCA 自有的标准 Agent golden-path / physical-morphology 声明。OPL conformance engine 只执行该 profile，不再内置 RCA stage 名称、visual surface 分类或 residue 常量。
+1. `npm run typecheck`；
+2. `npm run test:smoke`、`npm run test:fast`、`npm run test:full`；
+3. `npm run test:private-platform:strict`；
+4. `git diff --check` 与 repo hygiene；
+5. OPL `agents interfaces --repo-dir ...`；
+6. OPL `agents conformance --agent rca=...`；
+7. source-closure 0 unresolved / 0 private-generic / 0 unreachable / 0 audit mismatch；
+8. default callers closed、residue decisions verified zero。
 
-Purpose-first domain-thinning 和 source morphology 的字段级判断不在 status 展开；SSOT 是 `contracts/private_functional_surface_policy.json`、`contracts/physical_source_morphology_policy.json`、私有实现迁移台账、source/tests 和 runtime evidence。RCA repo-local wrapper、session、runtimeWatch、operator projection、neutral route-run record、executor adapter 或 `domain_action_adapter` residue 在 default caller parity、no-active-caller、RCA owner receipt / typed blocker roundtrip、no-forbidden-write proof 和 tombstone/provenance pointer 同时成立前，只能作为 refs-only adapter、domain handler target、native helper implementation、diagnostic、package boundary 或 migration input；成立后直接删除或 tombstone，不新增 alias、facade、default dispatch、旧 public path 或 compatibility-only test。
+## 后置证据
 
-当前 source-morphology / default-caller tail 的字段级 guard 不再由 status 承载。当前 SSOT 是 `docs/active/rca-ideal-state-gap-plan.md#结构卫生尾项`、`docs/active/opl-private-implementation-migration-inventory.md`、`contracts/physical_source_morphology_policy.json`、`contracts/functional_privatization_audit.json`、runtime-program leaf contracts、`npm run private-platform:readback` 和 focused guard tests。Status 只保留当前读法：retained tail 只能作为 refs-only read model、domain handler target、service-safe domain entry、minimal authority function、native helper implementation、repo-native verification wrapper 或 tombstone/provenance；进一步删除或收薄仍需要 OPL generated/default-caller parity、no-active repo-local caller、RCA owner receipt / typed blocker roundtrip、no-forbidden-write proof、retired-alias no-resurrection proof 和 tombstone/provenance pointer。JSON 合同是 physical source morphology 与 functional privatization audit 的字段级机器真相；TS builder / readback 只读取合同并执行 schema/scan/false-claim guard，不再维护逐字段文案副本。cleanup/readback、compact summary、owner-delta pack、source-ref integrity、policy source structure 和 generated-surface false-ready guard 都是非 Live、非 authority、非第二真相源的结构 guard；它们不授权 physical delete、default-caller cutover、visual ready、exportable、handoffable、domain ready 或 production ready。
-retained-boundary static guard 只能证明本地 active-caller matrix、false-delete guard、no-resurrection / forbidden-write guard 与合同读法一致；它不能证明 OPL generated default-caller parity、owner/live acceptance，也不能授权 physical delete 或 default-caller cutover。
-
-Executor runtime protocol 当前只物化 Codex descriptor / topology；非 Codex executor 的 hosted selection、attempt ledger 与 receipt 归 OPL。历史 Hermes 材料不是 RCA active backend、runtime owner 或 production visual evidence。
-
-## 当前测试/证据差距
-
-以下是结构闭合后的 production evidence tail，不再计入功能/结构差距。Status 只保留 owner-delta 读法，proof-by-proof receipt 数量、payload path 和 dated ref list 回到 active plan、production acceptance、runtime evidence 与 history/process：
-
-| Evidence tail | Current status read | SSOT detail |
-| --- | --- | --- |
-| Artifact-producing owner receipt | body-free receipt refs 已关闭为 RCA-owned receipt / artifact / review-export refs；不声明 visual ready、exportable、handoffable 或 production soak complete。 | `contracts/production_acceptance/rca-production-acceptance.json` |
-| Visual memory / lifecycle receipts | accepted/rejected visual memory、cleanup/restore/retention lifecycle、domain owner receipt 和 workspace-scaleout no-regression refs 已可写出并聚合；它们仍是 body-free refs-only receipt instances，不写 memory body、artifact blob 或 review/export verdict。 | production acceptance、runtime evidence、domain-handler export/dispatch surfaces |
-| Workspace receipt scaleout | 多 workspace body-free receipt 聚合能力可用，但 scaleout / production-soak claim 仍为 false。 | active plan、runtime evidence、workspace receipt inventory projection |
-| Repeated no-regression | RCA-owned body-free refs 已有历史证据；当前只证明 RCA owner surface 能跨 route/window 向 OPL 投影 no-regression refs，不声明 repeated route soak、visual ready、exportable 或 production ready。 | `docs/history/process/2026-06-03-rca-dated-production-evidence-foldback.md`、production acceptance |
-| Temporal controlled visual-stage long soak | RCA refs-only intake / inventory / operator projection 和顶层 `temporal_stage_run_consumption_policy` 已落地；owner-chain completion audit 当前为 `blocked_requires_real_visual_stage_owner_acceptance`。真实 provider restart/re-query/retry/dead-letter、OPL/Temporal residency、独立 stage execution / quality AI task receipts、真实 visual-stage owner acceptance 和 review-export acceptance 仍未产出。 | `contracts/temporal_stage_run_consumption_policy.json`、production acceptance、long-soak source contract、runtime evidence |
-
-`contracts/owner_chain_live_progress_evidence.json#/domain_owner_chain_scaleout`
-是 RCA 给 OPL `domain_owner_chain_scaleout` gate 的当前 refs-only
-backfill：它聚合 RCA-owned owner receipt、review/export receipt、typed
-blocker 与 no-regression refs。该 ref 只说明 owner-chain evidence lane 可被
-OPL 消费，不声明 visual ready、exportable、handoffable、domain ready、
-production ready 或 production visual-stage long-soak complete。
-
-RCA 只向 OPL 返回 domain evidence、typed blocker、receipt 与 artifact locator refs。OPL/App 的 evidence accounting、workbench、monitor、ledger、scaleout 和 workorder 由 OPL generated/hosted surface 构造；RCA 不再本地投影这些 generic shell。任何 refs 可见性或 OPL conformance 都不能升级为 RCA visual/export/domain ready。
-
-Product-entry session currentness 与 runtime loop projection 现在都暴露 OPL shared `next_forced_delta`。Continuation 缺 typed closeout时保留 raw/partial/no-output diagnostic并记录质量债；缺 provider attempt ledger binding时继续 direct Codex domain-handler progress，但关闭 runtime-current claim。Provider attempt/ledger refs 若被提供，则必须是有效且互相一致的 OPL refs，不能等于或伪装成本地 `product-entry-session:*` ref；冲突、伪装或 stale identity才 fail closed为 currentness typed blocker。该 hardening只改变 RCA session/read-model currentness，不写 visual truth、artifact body、memory body、review/export verdict或 production-ready claim。
-
-AgentLab suite 只证明 OPL/AgentLab 可读取 refs、route plumbing、mock artifact 落盘和 forbidden-authority boundary。最小 `/goal` suite 与 PPT 三路线 suite 的 task / observation / artifact sample 细节归 `contracts/production_acceptance/*agent-lab-suite.json` 和 focused tests；status 只保留：mock proof 不是视觉样片或路线质量证明，live 视觉样片必须通过 Codex-native imagegen、live integrated sample 或 native PPT proof lane 生成，并继续经过 RCA product-entry、visual director review、screenshot review 与 export gate。
-
-OPL expected receipt / monitor freshness handoff 的字段级 payload detail 归 `contracts/production_acceptance/rca-production-acceptance.json`、Stage control plane、physical morphology policy 和 focused guard tests。Status 只保留 current read：该 handoff 只承载 body-free receipt / monitor refs，不写 stage body、不生成 receipt、不关闭 owner-chain 或 production readiness，也不能成为 active public alias、success payload、readiness claim 或 runtime owner。
-
-当前 naming / contract hygiene tail 只按 SSOT 摘要读取，不在 status
-继续保存字段级 guard 清单。当前 owner 是
-`docs/active/rca-ideal-state-gap-plan.md#结构卫生尾项`、
-`docs/active/opl-private-implementation-migration-inventory.md`、
-`contracts/physical_source_morphology_policy.json`、
-`contracts/functional_privatization_audit.json`、runtime-program leaf
-contracts 和 focused guard tests。`managed`、`gateway`、`runtime`、
-`session`、`domain_action_adapter`、`bridge` 和 Hermes gateway 命令值只能在
-semantic-id、tombstone/provenance、negative guard、refs-only adapter、domain
-handler target、package/protocol boundary 或 upstream launch provenance 中出现；
-它们不能恢复成 public identity、callable alias、compatibility surface、generic
-runtime owner、success payload 或 production readiness claim。
-
-Reader-facing active fields 已收敛到当前口径：session continuity、domain-entry
-protocol boundary、service-safe domain entry、`redcube-ai` package / skill
-identity 和 framework-side handoff contract。具体允许字段、retired legacy
-surface id pointer、compatibility payload field policy、source-ref integrity
-gate、legacy-name allowance、active source scan 和 no-resurrection guard 均归
-machine contracts 与 tests；status 只保留 current read。该 hygiene tail 证明
-命名和源码形态边界受 guard 约束，不声明 source purity、visual ready、
-exportable、handoffable、domain ready、production ready 或 production evidence
-complete。
-
-## 当前物理源码形态收口与尾项
-
-RCA repo-local product / session / `domain_action_adapter` / operator projection /
-route-run append-only event refs / route-run refs surfaces 只按 service-safe domain entry、
-domain handler target、operator help projection、refs-only adapter、native helper
-implementation 或 migration input 分类；OPL generated/hosted shell 是 default
-caller 目标。Path-level active caller、source split、large-surface scan、line
-budget posture、legacy-name allowance 和 per-surface cutover gate 的 SSOT 是
-私有实现迁移台账、`contracts/private_functional_surface_policy.json`、
-`contracts/physical_source_morphology_policy.json`、source/tests 和 runtime
-evidence。`runtimeWatch` 已是独立的 RCA visual refs projection，不再属于 generic wrapper tail。静态 / 本地代码分析只能证明 retained boundary 当前仍被分类和 guard 约束，不能证明 OPL generated default-caller parity、owner/live acceptance、default-caller cutover 或 physical delete authority。Default caller parity、no-active-caller、RCA owner receipt / typed
-blocker roundtrip、no-forbidden-write proof 与 tombstone/provenance pointer
-同时成立后，repo-local wrapper、facade、alias、lookup surface、compatibility path 和只保护旧
-public path 的测试直接删除或 tombstone，不新增兼容面。
-
-2026-07-09 retained helper / thin adapter deletion gate fresh readback 结论是 `no_safe_delete`：`npm run private-platform:readback` 只证明 repo source guard 通过，`cleanup_candidate_count=0`、`active_source_no_resurrection_violation_count=0`，但 readback 仍明确 `readback_can_authorize_physical_delete=false`、`readback_can_create_typed_blocker_instance=false`、`readback_can_claim_default_caller_cutover=false`。因此本轮没有 source physical delete；保留项继续按 refs-only / authority adapter 读取，下一次删除必须新增 explicit physical-delete authorization、no-active repo-local default caller、owner receipt 或 typed blocker roundtrip instance，以及 tombstone/provenance pointer。
-
-2026-07-06 line-budget strict closure 曾只做源码结构拆分：`family-stage-control-plane.ts`
-把 user-stage-log contract 移入 `family-stage-control-plane-parts/`。后续 guard
-SSOT 收缩已把 `physical-source-morphology-policy.ts` 改为 JSON readback adapter，
-并退役 source-ref integrity / tail-gate TS 派生模块；physical morphology 的机器
-正文回到 `contracts/physical_source_morphology_policy.json`。这些都是结构卫生，不声明
-visual ready、exportable、handoffable、domain ready、production ready、
-default-caller cutover 或 physical delete authority。
-
-## 当前保留的 visual authority surfaces
-
-RCA 长期只保留无法声明化的 visual authority surfaces；active machine contract 只使用 `authority_surface_id`。source readiness verdict、communication / visual direction decision、review/export verdict 与 visual memory accept/reject 是 AI-first judgment surface；artifact mutation authorization、owner receipt signer 与 native helper implementation 是 programmatic authority/helper surface，只能依 owner receipt、blocked item、repair target、helper catalog、typed blocker 和 refs 工作。
-
-这些 surfaces 必须遵守 AI-first stage output 边界：故事、视觉方向、页面判断、review verdict 和 repair judgment 由 AI-authored stage artifact 持有；代码只做 validator、materializer、receipt signer、guard 和 refs-only projection。比例、空白、重复、裁切、字段泄漏、导出失败等机械检查只能表达 blocker 与 rerun target，不能替代 visual ready / exportable / handoffable verdict。
-
-## 当前入口与路线
-
-- Public identity：`RedCube AI` Foundry Agent / OPL-compatible visual-deliverable package。
-- Direct route：`redcube-ai` app skill、repo-local CLI、`invokeProductEntry`、`getProductEntrySession`、`invokeDomainEntry`；MCP 只作为 OPL generated protocol descriptor 指向 RCA domain handler target，不再是 repo-local production API app。
-- OPL-hosted route：OPL discovery 读取 RCA descriptor、family action catalog、stage control projection、memory descriptor 和 domain_action_adapter refs，再进入 RCA service-safe domain entry。
-- Standard Agent interface：`contracts/standard_agent_interface.json` 是 RCA-owned、OPL generic consumer 读取的 workspace/direct-entry/runtime/progress/routing machine surface；其中 `workspace_binding` 同时声明 `series / visual_theme_workspace / slide_deck / deliverables / visual-workspace / deck-001` 默认 profile，替代 OPL registry 内的 RCA workspace profile 硬编码。`getProductEntryManifest` 原样投影 `standard_agent_interface`，OPL 负责模板展开、安全引用与校验。RCA action refs、visual truth、review/export verdict、artifact authority、visual memory accept/reject 与 owner receipt signer 不进入该接口。
-- CLI/MCP/session/source/workbench/supervision：repo-local CLI 只保留 direct handler target；MCP/session/source/workbench/supervision 默认由 OPL generated/hosted caller 持有通用 wrapper、session shell、source shell、supervision 和 workbench；RCA 侧只暴露 domain handler target、refs-only adapter 或 minimal authority function，旧 repo-local supervision/runtime 只保留在 history/provenance 语境。
-- Default visual routes：`ppt_deck` 和 `xiaohongshu` 默认 image-first；native editable PPTX 与 HTML lane 必须通过 product-entry / route policy 显式选择。
-- Runtime file boundary：真实 PPT/图片/PDF、receipt 实例、中间产物和导出包属于 workspace / runtime artifact root，不属于开发仓源码目录。
-
-## 当前不能声明
-
-- 不能声明 RCA 已完成 production visual-stage long soak。
-- 不能把 OPL provider completion、no-regression evidence、focused receipt proof、stage evidence receipt 或 domain-dispatch receipt 写成 RCA visual ready、exportable、handoffable 或 production soak complete；artifact-producing owner receipt 只能按 RCA production acceptance surface 中的 body-free receipt refs 读取。
-- 不能把 OPL generated/hosted surface consumption 写成 production visual-stage long soak、visual ready、exportable、handoffable 或新的 artifact-producing owner receipt。
-- 不能把 OPL legacy cleanup dry-run / apply / verify ready 写成 production evidence tail 已完成；它只证明 cleanup proof refs 可被 OPL gate / refs-only ledger 消费。
-- 不能写成 OPL 持有 RCA visual truth、canonical artifact、review/export verdict、artifact mutation permission 或 visual memory body。
-- 不能把 RCA 当前 artifact-heavy 物理目录写成可直接复制的新 Agent 通用 scaffold。
-- 不能恢复 gateway、retired public entry、federation、旧 Hermes 优先口径、local-manager 或 bridge residue 为 active public entry、runtime owner 或兼容别名。
-
-## 当前验证口径
-
-- 测试分组唯一机器可读入口是 `scripts/test-registry.ts`；`scripts/run-test-group.ts` 从注册表推导 smoke、fast、meta、integration、full 等执行组、live Codex 预检分组和 route-heavy 串行文件，并 fail-closed 拒绝未登记的根级测试文件。`scripts/verify-lane.ts` 只解释同一 registry 的 verify lane plan；`package.json` 与 `scripts/verify.sh` 只把 lane 名称代理到该 dispatcher。Framework carrier 的安装与 link currentness 只归 OPL canonical `packages link-framework` 和 CI/bootstrap owner；repo temp wrapper 与 test runner 不再重复执行第二套 link check，而是通过真实 package resolution/build 直接 fail closed。Runner 继续负责 Python native helper 仓外 cache、repo hygiene、live Codex preflight 与 route-heavy 串行，不能退回裸 `node --test`。注册表已删除 `size`、`layer`、`coverage_id`、`state`、`ci_default` 这类非执行元数据，只保留 `file` / `lane`。`package.json` 只保留常用或 contract-bound 测试脚本；`meta`、`integration`、`e2e`、`integration:remaining` / `full:remaining` 等 registry-only lane 由 `scripts/verify.sh` 通过 registry alias 调 runner，不再额外暴露 npm alias。
-- 默认开发测试入口是 `npm test` / `npm run test:smoke` / `scripts/verify.sh`，只覆盖 smoke group。`npm run test:fast` 是显式标准本地入口，继续覆盖 route/runtime/visual-authority core regression；CI、meta、integration、e2e、historical 与 full 仍由各自显式 lane 触发。该分层只降低普通开发路径成本，不把 smoke 通过写成 visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long-soak evidence。
-- Stage Folder Contract 的 focused gate 是 `tests/stage-folder-contract.test.js`，覆盖 manifest/receipt/current pointer、role manifest 与 stage receipts、helper output refs、review/repair/export role 映射、orphan output 不完成 stage、同一 canonical stage 内 route-aware 读取、workspace-derived `program_id` 隔离，以及 route execution 写入物理 Stage Folder。
-- `scripts/verify.sh` 与 `scripts/run-test-group.ts` 先执行 `scripts/repo-hygiene.sh`；`scripts/verify.sh` 在 lane dispatch 前运行一次 canonical line-budget gate，strict / structure-strict lane 使用 strict 模式，其余 lane 使用 advisory 模式。普通开发入口不因 line budget / Sentrux advisory 阻断，显式 strict lane 才把预算或结构治理问题转成退出失败。tracked 主线不得包含 `dist/`、`build/`、`out/`、`__pycache__`、`*.egg-info`、`.DS_Store`、项目级 `.codex/`、`.omx/`、`.runtime-program/`、`runtime-state/` 或 `.agent-contract-baseline.json`。
-- 本地 `npm run build` 使用 TypeScript project-reference 增量图；CI 的 `npm run typecheck:ci` 先调用 `build:ci --force`，因此 clean-clone/hosted baseline 保持完整强制重建。Python negative matrix 以单进程 batch 返回稳定 `case_id`、typed reason 与 zero-write readback；不合并 authority 断言或模糊失败原因。
-- 2026-07-11 structure-strict 基线按 conversion 后 `1d4310a1` 刷新为显式 debt ratchet：当前仍有 `3` 个 cycle、`2` 个 god file 和 `148` 个 complex function，三条环来自未改动的 overlay type-import 边；OPL Framework hosting candidate 与 clean conversion main 的三项计数完全相同，因此本轮 hosting 新增均为 `0`。该基线只让后续增加继续 fail-closed，不表示现有结构债务已消失。
-- Fallow production dead-code / dependency hygiene 的当前可复现入口是 `npm run audit:fallow:production`；该入口固定 analyzer 版本并启用 production fail-on-issues。需要先有当前 checkout 的 workspace `node_modules`，否则依赖解析结果不能作为 closeout evidence。
-- 2026-07-08 source hygiene pass 继续关闭高信号过度设计：repo-local MCP production API app 已退役，MCP 只保留为 OPL generated descriptor；三个 `runtime-family-*` workspace package 已并入 `@redcube/runtime/src/families/*`，runtime-local default registry 直接指向内部 runner，不再通过 package dependency / dynamic package loader 间接加载，runtime-family catalog 也不再暴露未使用的 `export_name`。overlay catalog 的 `runtime_family` package 字段已改为 `runtime.runner_id`。此前的 overlay/runtime-family registry 默认 module list、`redcube-pack-*` type-only package、Codex plugin repo-local legacy alias、CLI option parser、domain-entry helper、runtime helper、runtime-protocol helper 与 PPT family helper 收薄仍保持有效；`.fallowrc.json` 已移除不存在的旧 Codex/plugin、real-route probe 和 runtime-family package suppression。剩余 `safeText` / `readJson` / `ensureDir` raw 命中只按 package-local owner、nullable/readback 语义和净删减收益判断，不上升成全仓 util，也不以 grep 归零为目标；product-entry retained tail 只做静态 export thinning，不声明 default-caller cutover 或 live evidence closure。Route-run lifecycle surface 已继续收薄：`startRouteRun` / `completeRouteRun` / `failRouteRun` / `appendRouteRunEvent` public API 与 `readRouteRunEvents` / runtime `readEvents` 本地读面均退役，runtime 内部只保留 `route-execution-refs.ts` 的 OPL attempt refs materialization。
-- 2026-07-09 overlay package ABI contraction 已落地：`packages/redcube-overlay-{ppt,xiaohongshu,poster-onepager}` 三个 standalone workspace package 物理退役，原 overlay source 移入 `@redcube/runtime/src/families/{ppt,xiaohongshu,poster-onepager}/overlay/`，`@redcube/runtime` 重新导出原 family overlay public API。Root tsconfig references、runtime package dependencies、package-lock、compiled export contract、package-surface tests、registry tests、family onboarding tests、CLI isolated install fixture 与 PPT focused tests 均已改到 runtime-owned family overlay。`@redcube/overlay-core` 保留为 active shared registry/contract primitive，由 runtime、domain-entry 和 governance 共享消费。该变更只关闭 package-boundary overdesign，不声明 visual ready、exportable、handoffable、domain ready、production ready、default-caller cutover 或 OPL physical delete authority。
-- 2026-07-11 Ponytail 22 项 implementation 已完成：proof index、Python helper envelope、Codex transport、run/event lifecycle、Stage Artifact persistence 与 source materialization/fingerprint 已先进入 OPL Framework，再迁移 RCA caller；RCA 删除 public domain-action-adapter facade、手写 CLI router、私有 proof indexer 与 OOXML readback。Native PPT schema v2 由 OfficeCLI structured `get/query/save` 提供，保留 RCA visual verdict、native mutation helper 与 owner receipt；不再暴露 OOXML part path，chart category 分隔歧义显式保留为 raw evidence，不伪造无损数组。
-- 2026-07-08 `functional_privatization_audit` contract body 继续收薄：top-level `generated_interface_consumption` duplicate body 已删除，保留 `generated_interface_consumption_ref=/opl_generated_interface_consumption` 与 canonical `opl_generated_interface_consumption` body。该变更只减少重复机器合同正文，不声明 default-caller cutover、OPL live owner acceptance、visual ready、domain ready 或 production ready。
-- 2026-07-09 OPL default-caller read model 已把 RCA generated interface、generated wrapper bundle 和 active-caller cutover proof 读为 ready；这只证明 OPL generated/default caller 结构替代证据存在，不是 domain repo physical-delete authority。Fresh OPL readback 当前为 `owner_decision_result_shape=keep_as_authority_adapter_ref`、`owner_decision_closeout_status=keep_as_authority_adapter_observed_no_further_opl_delete_work`、`no_further_opl_default_caller_delete_work=true`，同时 `physical_delete_authorized=false`、`default_caller_delete_ready=false`。因此后续不是继续等待 OPL delete work，而是按 domain owner keep decision 保留 RCA authority adapter；只有 owner 另行给出 `physical_delete_authorization_ref` 时，才进入 physical-delete lane。
-- 当前 fallow production 的 unused file / unused runtime export / unused dependency residual 为 0；`@redcube/domain-entry` 已把 CLI 消费的类型移到 CLI 本地结构类型，并收窄 root index 的 public type re-export；types-parts 中无 active importer 的 request/response helper types 只保留为 file-local 定义，不再作为 public type export。private-platform retirement 已压成一个 top-level machine guard 和一个 contract-backed no-resurrection readback：per-module owner-evidence/delete body、空 owner-delta pack、duplicate retained gate 和 per-surface false-guard copies 已删除，AST import-closure 与 OPL default-caller 实际消费的 bridge refs 保留。test runner inspect helpers 已收回为 file-local；contract-anchor builder 与 JS residue lock path 不再作为 production public export 暴露。`build-fixture-input.ts` 作为 native PPT proof shell entry 显式登记；必要 namespace-barrel wrapper、跨文件 route helper 和 declaration-emit type helper 通过 `.fallowrc.json` 记录为保留出口，不再被读成可删除死代码。
-- RCA canonical agent id 固定为 `rca`，authority/domain id 固定为 `redcube_ai`。OPL repo-contract descriptor 与 generated interface 已按该分工消费，fresh owner readback 为 `rca/redcube_ai`；RCA 只保留 canonical contract/manifest，不复制或覆盖 OPL 生成器。
-- 旧 gateway、retired public entry、Hermes-default 等污染 guard 只覆盖源码、contracts、plugins、scripts、tests、tools 与 Python helper 等机器 / 源码面；`README*` 与 `docs/**` 是人读 prose，不作为测试断言对象。
-
-## 下一跳
-
-- 目标态：[RedCube AI 理想目标态](./references/rca-visual-deliverable-agent-ideal-state.md)
-- 差距与顺序：[RCA 理想目标态差距与完善计划](./active/rca-ideal-state-gap-plan.md)
-- 文档治理：[RCA 文档组合治理](./docs_portfolio_consolidation.md)
-- 历史归档：[历史索引](./history/README.md)
+真实 visual StageRun、真实 image generation、真实 native PPT export、review/export acceptance、owner receipt、provider restart/resume 与 long-soak 不由本次结构迁移虚构。它们继续记录为 evidence gap，不能阻塞可独立完成的源码标准化，也不能被测试结果替代。

@@ -39,7 +39,7 @@
     "version": "opl_standard_agent_interface.v1",
     "ref_kind": "repo_json_pointer",
     "ref": "contracts/standard_agent_interface.json#/standard_agent_interface",
-    "projection_ref": "getProductEntryManifest#/standard_agent_interface"
+    "projection_ref": "opl_generated:standard_agent_interface"
   },
   "authority_boundary": {
     "redcube_ai_owns_visual_truth": true,

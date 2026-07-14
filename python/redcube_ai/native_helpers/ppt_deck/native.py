@@ -2,7 +2,6 @@
 import argparse
 import hashlib
 import json
-import os
 import platform
 import shutil
 import subprocess
@@ -12,10 +11,7 @@ from pathlib import Path
 from PIL import Image
 
 from redcube_ai.native_helpers.renderer_dependencies import (
-    NATIVE_PPT_DEPENDENCY_INSTALL_COMMAND,
-    install_commands,
     libreoffice_probe,
-    platform_install_hint,
     poppler_probe,
 )
 from redcube_ai.native_helpers.ppt_deck.native_layout_grammar import (
@@ -23,7 +19,8 @@ from redcube_ai.native_helpers.ppt_deck.native_layout_grammar import (
     archetype_contracts,
     validate_template_layout_grammar,
 )
-from redcube_ai.native_helpers.ppt_deck.native_layouts import build_deck, safe_list, safe_text
+from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.common import safe_list, safe_text
+from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import build_deck
 from redcube_ai.native_helpers.ppt_deck.native_quality import evaluate_native_slide_quality
 from redcube_ai.native_helpers.ppt_deck.native_sample_layout import sample_layout_profile_failures
 
@@ -503,12 +500,11 @@ def renderer_dependency_blocker(
     message: str,
     *,
     probes: list[dict] | None = None,
-    bootstrap: dict | None = None,
 ) -> str:
     payload = {
         'error_kind': 'missing_renderer_dependency',
         'typed_blocker_kind': 'missing_renderer_dependency',
-        'renderer_selection': 'capability_probe_auto',
+        'renderer_selection': 'opl_probe_then_helper_capability_bind',
         'required_surface': 'native_pptx_true_render_proof',
         'supported_renderers': [
             {
@@ -520,11 +516,11 @@ def renderer_dependency_blocker(
         ],
         'synthetic_preview_allowed': False,
         'fail_closed_when_missing': True,
-        'bootstrap_policy': 'auto_install_then_probe',
-        'dependency_install_commands': install_commands(),
+        'dependency_provisioning_owner': 'opl_connect_or_operator',
+        'required_commands': ['officecli', 'soffice', 'pdftoppm'],
+        'probe_surface': 'opl pack native-helper probe',
         'message': message,
         'probes': probes or [],
-        'bootstrap': bootstrap or {},
     }
     return json.dumps(payload, ensure_ascii=False, sort_keys=True)
 
@@ -548,31 +544,7 @@ def renderer_probe() -> dict:
     }
 
 
-def should_bootstrap_renderer(requested: str) -> bool:
-    if requested != 'auto':
-        return False
-    return safe_text(os.environ.get('REDCUBE_NATIVE_PPT_RENDERER_AUTO_INSTALL'), '1') != '0'
-
-
-def run_renderer_dependency_bootstrap() -> dict:
-    installer = NATIVE_PPT_DEPENDENCY_INSTALL_COMMAND
-    completed = subprocess.run(
-        [installer],
-        text=True,
-        capture_output=True,
-        check=False,
-        cwd=str(REPO_ROOT),
-    )
-    return {
-        'attempted': True,
-        'command': installer,
-        'returncode': completed.returncode,
-        'stdout': safe_text(completed.stdout),
-        'stderr': safe_text(completed.stderr),
-    }
-
-
-def resolve_probed_renderer(probe: dict, bootstrap: dict | None = None) -> dict | None:
+def resolve_probed_renderer(probe: dict) -> dict | None:
     soffice = safe_text(probe.get('soffice'))
     pdftoppm = safe_text(probe.get('pdftoppm'))
     if not soffice or not pdftoppm:
@@ -581,13 +553,10 @@ def resolve_probed_renderer(probe: dict, bootstrap: dict | None = None) -> dict 
         'kind': RENDERER_KIND,
         'pipeline': RENDERER_PIPELINE,
         'runtime': RENDERER_KIND,
-        'selection_policy': 'capability_probe_auto',
-        'bootstrap_policy': 'auto_install_then_probe',
-        'bootstrap_attempted': bool(bootstrap and bootstrap.get('attempted')),
-        'bootstrap_command': safe_text((bootstrap or {}).get('command')),
+        'selection_policy': 'opl_probe_then_helper_capability_bind',
+        'dependency_provisioning_owner': 'opl_connect_or_operator',
         'soffice': soffice,
         'pdftoppm': pdftoppm,
-        'dependency_install_commands': install_commands(),
         'libreoffice_version': command_version([soffice, '--version']),
         'poppler_version': command_version([pdftoppm, '-v']),
     }
@@ -601,36 +570,18 @@ def resolve_renderer(renderer_name: str) -> dict:
     renderer = resolve_probed_renderer(initial_probe)
     if renderer:
         return renderer
-
-    bootstrap = None
-    if should_bootstrap_renderer(requested):
-        bootstrap = run_renderer_dependency_bootstrap()
-        reprobe = renderer_probe()
-        renderer = resolve_probed_renderer(reprobe, bootstrap)
-        if renderer:
-            return renderer
-        probes = [reprobe['soffice_probe'], reprobe['pdftoppm_probe']]
-    else:
-        probes = [initial_probe['soffice_probe'], initial_probe['pdftoppm_probe']]
-
+    probes = [initial_probe['soffice_probe'], initial_probe['pdftoppm_probe']]
     reasons = missing_renderer_reasons(*probes)
-    if bootstrap and bootstrap.get('returncode') != 0:
-        reasons.append(
-            safe_text(bootstrap.get('stderr'))
-            or safe_text(bootstrap.get('stdout'))
-            or f"installer exited {bootstrap.get('returncode')}"
-        )
-    install_hint = platform_install_hint()
     fail(renderer_dependency_blocker(
         'native PPT true render proof requires a supported renderer capability; '
-        f'current supported pipeline is {RENDERER_PIPELINE}; run {install_hint} or use Docker',
+        f'current supported pipeline is {RENDERER_PIPELINE}; resolve the OPL native-helper '
+        f'probe/provisioning blocker before execution: {"; ".join(reasons)}',
         probes=probes,
-        bootstrap=bootstrap or {'attempted': False, 'command': NATIVE_PPT_DEPENDENCY_INSTALL_COMMAND},
     ) if requested == 'auto' else renderer_dependency_blocker(
         'native PPT true render proof requires LibreOffice headless and Poppler for '
-        f'{RENDERER_PIPELINE}: {"; ".join(reasons)}; run {install_hint} or use Docker',
+        f'{RENDERER_PIPELINE}: {"; ".join(reasons)}; resolve the OPL native-helper '
+        'probe/provisioning blocker before execution',
         probes=probes,
-        bootstrap=bootstrap or {'attempted': False, 'command': NATIVE_PPT_DEPENDENCY_INSTALL_COMMAND},
     ))
 
 

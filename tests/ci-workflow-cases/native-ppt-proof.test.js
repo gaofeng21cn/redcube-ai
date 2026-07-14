@@ -36,6 +36,9 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   assert.match(runner, /tools\/native-ppt-proof\/install-deps\.sh/);
   assert.match(runner, /redcube_ai\.native_helpers\.doctor/);
   assert.match(runner, /redcube_ai\.native_helpers\.ppt_deck\.native/);
+  assert.match(runner, /opl_agent_package_manifest\.json/);
+  assert.match(runner, /python-native-helper-catalog\.json/);
+  assert.doesNotMatch(runner, /redcube-domain-entry|product-manifest\.json|product-status\.json/);
   assert.match(runner, /native-helper-output\.json/);
   assert.match(runner, /native-package-readback\.json/);
   assert.match(runner, /native-quality-verdict\.json/);

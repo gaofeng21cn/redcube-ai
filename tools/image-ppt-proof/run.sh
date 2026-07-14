@@ -13,17 +13,17 @@ proof_python=""
 
 usage() {
   printf '%s\n' \
-    'Usage: tools/image-ppt-proof/run.sh [--output-dir <dir>] [--fixture <file>] [--style-reference-dir <dir>] [--mock-image-generation|--live-image-generation] [--skip-system-deps]' \
+    'Usage: tools/image-ppt-proof/run.sh [--output-dir <dir>] [--fixture <file>] [--style-reference-dir <dir>] [--mock-image-generation] [--skip-system-deps]' \
     '' \
     'Runs the repo-owned image-first PPT proof lane:' \
     '  1. optional native PPT proof dependency install' \
     '  2. deterministic prompt manifest creation' \
-    '  3. mock image generation or Codex-native live imagegen task execution' \
+    '  3. deterministic mock image generation' \
     '  4. PPTX/PDF/export bundle/gallery/final delivery manifest emission' \
     '  5. artifact-index.json retention contract build' \
     '' \
-    'Default mode is --mock-image-generation and never calls a real API.' \
-    'Live mode delegates raster generation to the Codex executor native imagegen skill; RCA does not read provider Base URL or API tokens.'
+    'This developer proof never invokes an executor or a real image API.' \
+    'Real image generation is owned by the OPL-hosted run_image_ppt_proof StageRun action.'
 }
 
 while [ "$#" -gt 0 ]; do
@@ -56,10 +56,6 @@ while [ "$#" -gt 0 ]; do
       image_generation_mode="mock"
       shift
       ;;
-    --live-image-generation)
-      image_generation_mode="live"
-      shift
-      ;;
     --skip-system-deps)
       skip_system_deps=1
       shift
@@ -76,8 +72,8 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-if [ "$image_generation_mode" != "mock" ] && [ "$image_generation_mode" != "live" ]; then
-  echo "Image generation mode must be mock or live." >&2
+if [ "$image_generation_mode" != "mock" ]; then
+  echo "Image generation mode must be mock." >&2
   exit 2
 fi
 

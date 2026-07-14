@@ -1,4 +1,4 @@
 interface:
   display_name: "RedCube AI"
-  short_description: "Visual deliverable runtime for Codex"
-  default_prompt: "Use $redcube-ai to inspect the current RedCube AI product entry and continue the active deliverable loop. Treat implementation work as TypeScript orchestration plus Python native helpers; repo-tracked JavaScript is retired and blocked by closeout audit."
+  short_description: "Declarative visual-deliverable Agent for OPL"
+  default_prompt: "Use $redcube-ai through installed OPL-generated interfaces and hosted StageRun. Treat RCA as a declarative visual pack with Python native helpers and RCA-owned authority decisions; do not invoke or recreate a repo-local runtime."

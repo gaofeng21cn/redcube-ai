@@ -196,7 +196,7 @@
       "classification": "no_code_needed",
       "reason": "shared Source Readiness already owns research triggers, augmentation, source audit, and planning readiness",
       "local_owner_surface": "OPL shared Source Readiness; RCA consumes the canonical source readiness pack",
-      "acceptance_evidence": ["test:source-readiness-deep-research-gate", "test:source-augmentation-provider"],
+      "acceptance_evidence": ["contracts/source_closure_audit.json", "tests/opl-agent-pack-contracts-semantic-pack.test.js"],
       "authority_boundary": "research cannot move into Storyline or create an RCA-private acquisition workflow"
     },
     {
@@ -204,7 +204,7 @@
       "classification": "adapt",
       "reason": "consume source-backed brand constraints in the professional design brief without claiming reusable brand-package authoring",
       "local_owner_surface": "rca-ppt-visual-director + rca-template-profiler",
-      "acceptance_evidence": ["test:ppt-native-quality-package-gates", "skill_resource_pack_readback"],
+      "acceptance_evidence": ["tests/ppt-native-quality-package-gates.test.js", "skill_resource_pack_readback"],
       "authority_boundary": "the adaptation consumes supplied brand constraints only; it does not extract or publish a reusable identity package",
       "stop_condition": "current source-backed brand constraints are missing or cannot be bound to the design brief",
       "excluded_watch_only_capability": {
@@ -231,7 +231,7 @@
       "classification": "no_code_needed",
       "reason": "explicit user revisions already update Stage artifacts; a second blocking confirmation plane is unnecessary",
       "local_owner_surface": "existing Storyline, outline, blueprint, and visual Stage artifacts",
-      "acceptance_evidence": ["test:ppt-generation-claim-lock", "test:product-entry-session-checkpoint"],
+      "acceptance_evidence": ["tests/opl-agent-pack-contracts-semantic-pack.test.js", "contracts/stage_run_kernel_profile.json"],
       "authority_boundary": "progress-first execution stops only for a real source, scope, approval, or authority decision"
     },
     {
@@ -239,14 +239,14 @@
       "classification": "adapt",
       "candidate_ref": "template_profile_and_fill",
       "local_owner_surface": "rca-template-profiler + native helper",
-      "acceptance_evidence": ["test:ppt-native-template-preservation"]
+      "acceptance_evidence": ["tests/ppt-native-template-preservation.test.js"]
     },
     {
       "workflow_refs": ["skills/ppt-master/workflows/beautify-pptx.md"],
       "classification": "adapt",
       "reason": "adapt only page-scoped targeted repair for an RCA-generated native deck, with blocked-page scope and preserved-slide hashes",
       "local_owner_surface": "existing repair_pptx_native Stage route",
-      "acceptance_evidence": ["test:ppt-native-ppt-repair-runtime"],
+      "acceptance_evidence": ["tests/ppt-native-editability-regression.test.js", "tests/ppt-native-quality-package-gates.test.js"],
       "authority_boundary": "this does not cover arbitrary imported PPTX, verbatim 1:1 content preservation, or full-deck re-layout",
       "stop_condition": "a current RCA native artifact, blocked slide ids, review evidence, or preserved-slide hash proof is missing",
       "excluded_watch_only_capability": {
@@ -267,30 +267,30 @@
       "classification": "adapt",
       "candidate_ref": "notes_transition_timing_animation",
       "local_owner_surface": "rca-native-ppt-designer + native helper",
-      "acceptance_evidence": ["test:ppt-native-object-package", "test:ppt-native-ppt-engine-contract"]
+      "acceptance_evidence": ["tests/ppt-native-benchmark-fixture-preservation.test.js", "tests/ppt-native-quality-package-readback.test.js"]
     },
     {
       "workflow_refs": ["skills/ppt-master/workflows/failure-recovery.md"],
       "classification": "no_code_needed",
       "reason": "typed blockers, route-back receipts, and page-scoped repair already resume from the owning failed Stage",
       "local_owner_surface": "existing Stage route-back, repair, and artifact refs",
-      "acceptance_evidence": ["test:ppt-native-ppt-repair-runtime", "test:ppt-native-quality-package-gates"],
+      "acceptance_evidence": ["tests/ppt-native-editability-regression.test.js", "tests/ppt-native-quality-package-gates.test.js"],
       "authority_boundary": "required evidence never silently downgrades to a convenience path"
     },
     {
       "workflow_refs": ["skills/ppt-master/workflows/resume-execute.md"],
       "classification": "no_code_needed",
-      "reason": "Stage Folder artifacts, current stage pointers, and product-session checkpoints already provide continuation",
-      "local_owner_surface": "OPL Stage Folder and product-entry session continuity",
-      "acceptance_evidence": ["test:stage-folder-contract", "test:product-entry-session-checkpoint"],
+      "reason": "OPL-hosted StageRun artifacts, durable invocation identity, and current stage pointers provide continuation",
+      "local_owner_surface": "OPL-hosted StageRun invocation and pointer lifecycle",
+      "acceptance_evidence": ["contracts/stage_run_kernel_profile.json", "contracts/temporal_stage_run_consumption_policy.json"],
       "authority_boundary": "no custom baton, project-local session runtime, or duplicate progress ledger"
     },
     {
       "workflow_refs": ["skills/ppt-master/workflows/routing.md"],
       "classification": "reject",
-      "reason": "the upstream route matrix would duplicate the admitted domain-entry, family, profile, and Stage chain",
-      "local_owner_surface": "OPL domain entry + existing RCA PPT family profile",
-      "acceptance_evidence": ["test:ppt-native-ppt-engine-contract", "test:product-entry-route-integration"],
+      "reason": "the upstream route matrix would duplicate the admitted OPL-generated action, family profile, and Stage chain",
+      "local_owner_surface": "OPL-generated action + existing RCA PPT family profile",
+      "acceptance_evidence": ["tests/opl-agent-pack-contracts-semantic-pack.test.js", "contracts/action_catalog.json"],
       "authority_boundary": "external workflow routing remains provenance only"
     },
     {
@@ -298,7 +298,7 @@
       "classification": "adapt",
       "reason": "Office native chart geometry remains engine-owned while RCA validates chart type, categories, series, relationships, package readback, and true render fail-closed",
       "local_owner_surface": "native helper + RCA PPT quality evaluator",
-      "acceptance_evidence": ["test:ppt-native-object-package", "test:ppt-native-quality-package-readback"],
+      "acceptance_evidence": ["tests/ppt-native-benchmark-fixture-preservation.test.js", "tests/ppt-native-quality-package-readback.test.js"],
       "authority_boundary": "do not copy the upstream SVG coordinate calculator or manual receipt workflow, and do not claim coverage of hand-authored data-driven SVG geometry",
       "stop_condition": "chart type, categories, series, relationship binding, package readback, or true-render evidence is missing or drifts"
     },
@@ -307,7 +307,7 @@
       "classification": "adapt",
       "candidate_ref": "existing_preview_review_calibration_reexport",
       "local_owner_surface": "true-render proof + rca-ppt-reviewer + export Stage artifacts",
-      "acceptance_evidence": ["test:ppt-native-python-render-preview", "test:ppt-native-quality-package-gates", "test:deliverable-review-loop"],
+      "acceptance_evidence": ["tests/ppt-native-python-render-preview.test.js", "tests/ppt-native-quality-package-gates.test.js", "tests/opl-agent-pack-contracts-semantic-pack.test.js"],
       "authority_boundary": "adopt render-backed preview and review evidence only; do not copy the interactive private editor or annotation UI"
     },
     {
@@ -370,7 +370,7 @@
       "reason": "stable design choices and page rhythm resist long-deck drift",
       "local_owner_surface": "rca-ppt-story-architect + rca-ppt-visual-director",
       "consumer_fields": ["communication_mode_id", "rhythm_curve", "style_profile_id"],
-      "acceptance_evidence": ["test:ppt-native-ppt-engine-contract", "skill_resource_pack_readback"],
+      "acceptance_evidence": ["tests/ppt-native-quality-package-readback.test.js", "skill_resource_pack_readback"],
       "authority_boundary": "stage artifacts remain canonical and RCA keeps visual verdict authority",
       "stop_condition": "the user changes source, outline, brand, or page constraints"
     },
@@ -392,7 +392,7 @@
       "reason": "selection by content shape prevents card-grid substitution",
       "local_owner_surface": "rca-ppt-visual-director",
       "consumer_fields": ["visualization_pattern_id", "visualization_selection_rationale"],
-      "acceptance_evidence": ["contract:76_source_ids_to_local_patterns", "test:ppt-native-ppt-engine-contract"],
+      "acceptance_evidence": ["contract:76_source_ids_to_local_patterns", "tests/ppt-native-quality-package-readback.test.js"],
       "authority_boundary": "RCA uses local semantic families and does not copy upstream SVG bodies",
       "stop_condition": "no local pattern fits; author a bespoke composition and record why"
     },
@@ -403,7 +403,7 @@
       "reason": "stable DrawingML and native data objects serve different editability needs",
       "local_owner_surface": "rca-native-ppt-designer + native helper",
       "consumer_fields": ["materialization_mode", "editable_payload", "package_readback_expectation"],
-      "acceptance_evidence": ["test:ppt-native-object-package", "test:ppt-native-ppt-engine-contract"],
+      "acceptance_evidence": ["tests/ppt-native-benchmark-fixture-preservation.test.js", "tests/ppt-native-quality-package-readback.test.js"],
       "authority_boundary": "helper materializes selected typed objects; it does not choose the visual pattern",
       "stop_condition": "an object kind is unsupported or package readback disagrees with the plan"
     },
@@ -414,7 +414,7 @@
       "reason": "masters, layouts, placeholders, and capacity are layout intelligence",
       "local_owner_surface": "rca-template-profiler + native helper",
       "consumer_fields": ["pattern_compatibility", "semantic_zones", "placeholder_capacity"],
-      "acceptance_evidence": ["test:ppt-native-template-preservation"],
+      "acceptance_evidence": ["tests/ppt-native-template-preservation.test.js"],
       "authority_boundary": "source package structure is preserved without making the template visual authority",
       "stop_condition": "the selected pattern exceeds real placeholder or inherited object capacity"
     },
@@ -425,7 +425,7 @@
       "reason": "presentation semantics belong to stable slide and object ids",
       "local_owner_surface": "rca-native-ppt-designer + native helper",
       "consumer_fields": ["speaker_notes", "transition", "timing", "animation_timeline"],
-      "acceptance_evidence": ["test:ppt-native-object-package", "test:ppt-native-ppt-engine-contract"],
+      "acceptance_evidence": ["tests/ppt-native-benchmark-fixture-preservation.test.js", "tests/ppt-native-quality-package-readback.test.js"],
       "authority_boundary": "optional motion cannot make a statically unreadable slide acceptable",
       "stop_condition": "the animation target is unstable, unsupported, or missing from package readback"
     },
@@ -436,7 +436,7 @@
       "reason": "pixels and semantic relations must be inspected before any visual claim",
       "local_owner_surface": "rca-ppt-reviewer",
       "consumer_fields": ["semantic_composition_review", "repair_target_row", "draft_label_check"],
-      "acceptance_evidence": ["test:ppt-native-quality-semantic-gates", "skill_resource_pack_readback"],
+      "acceptance_evidence": ["tests/ppt-native-quality-semantic-gates.test.js", "skill_resource_pack_readback"],
       "authority_boundary": "only RCA review/export authority may issue fresh verdict receipts",
       "stop_condition": "screenshots, package readback, or source truth is missing or stale"
     },
@@ -447,7 +447,7 @@
       "reason": "adapt the useful render-backed preview, per-page review, coordinate calibration, SHA-bound repair/export, and backup-slide behavior without copying the interactive browser editor",
       "local_owner_surface": "native helper + rca-ppt-reviewer + repair/export Stage artifacts",
       "consumer_fields": ["preview_screenshot_sha256", "coordinate_determinism_hash", "source_pptx_sha256", "export_artifact_refs", "include_backup_slides"],
-      "acceptance_evidence": ["test:ppt-native-python-render-preview", "test:ppt-native-quality-package-gates", "test:ppt-native-ppt-repair-runtime", "test:deliverable-review-loop"],
+      "acceptance_evidence": ["tests/ppt-native-python-render-preview.test.js", "tests/ppt-native-quality-package-gates.test.js", "tests/ppt-native-editability-regression.test.js", "tests/opl-agent-pack-contracts-semantic-pack.test.js"],
       "authority_boundary": "the interactive private editor and annotation UI are rejected; these executable surfaces do not claim fresh cross-viewer parity, visual_ready, or owner receipt",
       "stop_condition": "a current source SHA, rendered preview, package readback, or review/export artifact ref is missing"
     },
@@ -458,7 +458,7 @@
       "reason": "preserve claim and design continuity without forcing a human stop or banning safe parallel work",
       "local_owner_surface": "existing Stage chain",
       "consumer_fields": ["claim_spine_lock", "accepted_upstream_artifact_refs", "current_stage_artifact"],
-      "acceptance_evidence": ["test:ppt-generation-claim-lock"],
+      "acceptance_evidence": ["tests/opl-agent-pack-contracts-semantic-pack.test.js"],
       "authority_boundary": "progress-first Stage execution continues automatically when prerequisites are met",
       "stop_condition": "a real source, scope, approval, or authority decision is required"
     },

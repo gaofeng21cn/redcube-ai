@@ -82,10 +82,10 @@
       "authority": "carrier_only_not_domain_truth"
     },
     {
-      "entrypoint_id": "domain_product_manifest",
-      "entrypoint_kind": "repo_contract_ref",
-      "source_ref": "contracts/opl_domain_manifest_registration.json#/domain_manifest/manifest_builder_export",
-      "authority": "rca_domain_manifest_builder_not_package_manager"
+      "entrypoint_id": "hosted_stage_actions",
+      "entrypoint_kind": "opl_hosted_action_catalog",
+      "source_ref": "contracts/action_catalog.json",
+      "authority": "opl_hosted_runtime_rca_domain_semantics"
     }
   ],
   "health_check": {

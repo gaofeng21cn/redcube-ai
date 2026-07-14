@@ -103,14 +103,16 @@ test('verify runs exactly one line budget gate before lane dispatch and keeps ex
   assert.doesNotMatch(verifyScript, /test:line-budget/);
 });
 
-test('OPL module healthcheck stays on product-entry smoke instead of proof-heavy fast lane', () => {
+test('OPL module healthcheck validates the standard Agent pack without invoking a private runtime', () => {
   const healthcheck = fs.readFileSync(path.join(repoRoot, 'scripts/opl-module-healthcheck.sh'), 'utf8');
 
   assert.match(healthcheck, /npm run --silent line-budget/);
   assert.match(healthcheck, /npm run --silent build/);
-  assert.match(healthcheck, /tests\/product-entry\.test\.js/);
-  assert.match(healthcheck, /tests\/product-entry-runtime-manager-registration\.test\.js/);
-  assert.match(healthcheck, /tests\/product-entry-session-checkpoint\.test\.js/);
+  assert.match(healthcheck, /tests\/opl-agent-pack-contracts-semantic-pack\.test\.js/);
+  assert.match(healthcheck, /tests\/opl-agent-package-manifest\.test\.js/);
+  assert.match(healthcheck, /tests\/rca-functional-audit-retirement\.test\.js/);
+  assert.match(healthcheck, /tests\/rca-private-platform-retirement-readback\.test\.js/);
+  assert.doesNotMatch(healthcheck, /product-entry|domain-handler|redcube-runtime/);
   assert.doesNotMatch(healthcheck, /test:fast|scripts\/verify\.sh fast|run-test-group\.ts fast/);
 });
 
@@ -121,11 +123,12 @@ test('OPL module bootstrap uses reproducible npm install without mutating lockfi
   assert.doesNotMatch(bootstrap, /npm install/);
 });
 
-test('RedCube AI skill prefers repo-local launcher over PATH global CLI', () => {
+test('RedCube AI skill requires OPL-generated interfaces and rejects repo-local runtime launchers', () => {
   const skill = fs.readFileSync(path.join(repoRoot, 'plugins/redcube-ai/skills/redcube-ai/SKILL.md'), 'utf8');
 
-  assert.match(skill, /npm run --prefix <redcube-ai-repo> redcube --/);
-  assert.match(skill, /用户 PATH 上的裸 `redcube`/);
+  assert.match(skill, /只使用已安装 RCA Package 的 OPL-generated interface/);
+  assert.match(skill, /不得调用 repo-local `redcube`/);
+  assert.doesNotMatch(skill, /npm run --prefix <redcube-ai-repo> redcube --/);
 });
 
 function makeLines(lineCount) {

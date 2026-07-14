@@ -29,11 +29,11 @@ usage() {
   cat <<'USAGE'
 Usage: tools/native-ppt-proof/run.sh [--output-dir <dir>] [--skip-system-deps]
 
-Runs the repo-owned native PPT proof lane:
-  1. optional native proof dependency install
-  2. Python native helper doctor
-  3. product-entry manifest/status smoke
-  4. true LibreOffice/Poppler native PPT fixture proof
+	Runs the repo-owned native PPT proof lane:
+	  1. optional native proof dependency install
+	  2. Python native helper doctor
+	  3. standard Agent package and native-helper contract readback
+	  4. true LibreOffice/Poppler native PPT fixture proof
 
 Set REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS=1 to skip tools/native-ppt-proof/install-deps.sh.
 Set REDCUBE_NATIVE_PPT_PROOF_PYTHON, REDCUBE_TEST_PYTHON, or REDCUBE_PYTHON_COMMAND
@@ -73,8 +73,8 @@ output_root="$("$proof_python" -c 'import pathlib,sys; print(pathlib.Path(sys.ar
 workspace_root="$output_root/workspace"
 fixture_input="$output_root/native-helper-input.json"
 doctor_report="$output_root/doctor.json"
-manifest_report="$output_root/product-manifest.json"
-status_report="$output_root/product-status.json"
+package_manifest_report="$output_root/agent-package-manifest.json"
+helper_catalog_report="$output_root/native-helper-catalog.json"
 helper_report="$output_root/native-helper-output.json"
 package_readback_report="$output_root/native-package-readback.json"
 quality_verdict_report="$output_root/native-quality-verdict.json"
@@ -100,22 +100,8 @@ npm run --silent build
 PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
   "$proof_python" -m redcube_ai.native_helpers.doctor > "$doctor_report"
 
-node --input-type=module - "$workspace_root" "$manifest_report" "$status_report" <<'NODE'
-import fs from 'node:fs';
-
-import {
-  getProductEntryManifest,
-  getProductStatus,
-} from './packages/redcube-domain-entry/dist/index.js';
-
-const [, , workspaceRoot, manifestReport, statusReport] = process.argv;
-const request = { workspace_root: workspaceRoot };
-const manifest = await getProductEntryManifest(request);
-const status = await getProductStatus(request);
-
-fs.writeFileSync(manifestReport, `${JSON.stringify(manifest, null, 2)}\n`);
-fs.writeFileSync(statusReport, `${JSON.stringify(status, null, 2)}\n`);
-NODE
+cp contracts/opl_agent_package_manifest.json "$package_manifest_report"
+cp contracts/runtime-program/python-native-helper-catalog.json "$helper_catalog_report"
 
 node tools/native-ppt-proof/build-fixture-input.ts \
   "$repo_root/tests/fixtures/ppt-native-visual-benchmark/benchmark.json" \
@@ -153,14 +139,14 @@ else
   quality_gate_failed=0
 fi
 
-"$proof_python" - "$doctor_report" "$manifest_report" "$status_report" "$helper_report" "$package_readback_report" "$quality_verdict_report" "$summary_report" "$proof_lane_contract" <<'PY'
+"$proof_python" - "$doctor_report" "$package_manifest_report" "$helper_catalog_report" "$helper_report" "$package_readback_report" "$quality_verdict_report" "$summary_report" "$proof_lane_contract" <<'PY'
 import json
 import sys
 from pathlib import Path
 
 doctor = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-manifest = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
-status = json.loads(Path(sys.argv[3]).read_text(encoding="utf-8"))
+package_manifest = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+helper_catalog = json.loads(Path(sys.argv[3]).read_text(encoding="utf-8"))
 helper = json.loads(Path(sys.argv[4]).read_text(encoding="utf-8"))
 package_readback = json.loads(Path(sys.argv[5]).read_text(encoding="utf-8"))
 quality_verdict = json.loads(Path(sys.argv[6]).read_text(encoding="utf-8"))
@@ -175,10 +161,16 @@ if doctor.get("status") != "ok":
     failures.append(f"doctor status is {doctor.get('status')!r}")
 if not doctor.get("renderer_availability", {}).get("linux_native_proof", {}).get("available"):
     failures.append("doctor linux_native_proof is not available")
+if package_manifest.get("package_id") != "rca" or package_manifest.get("agent_id") != "rca":
+    failures.append("RCA package manifest identity mismatch")
+if helper_catalog.get("framework_execution_envelope", {}).get("owner") != "opl":
+    failures.append("native helper execution envelope must be OPL-owned")
+if helper_catalog.get("bypass_policy", {}).get("required_entry_surface") != "OPL-hosted RCA StageRun action with RCA authority receipt boundary":
+    failures.append("native helper required entry surface mismatch")
 if proof_lane.get("default_enabled") is not False:
-    failures.append("product-entry native proof lane must remain default_enabled=false")
+    failures.append("native proof lane must remain default_enabled=false")
 if proof_lane.get("runnable_routes") != ["author_pptx_native", "repair_pptx_native"]:
-    failures.append("product-entry native proof lane runnable routes mismatch")
+    failures.append("native proof lane runnable routes mismatch")
 if helper.get("status") != "completed":
     failures.append(f"native helper status is {helper.get('status')!r}")
 if render_proof.get("renderer_kind") != "libreoffice_headless":
@@ -205,7 +197,16 @@ summary = {
     "failures": failures,
     "doctor_status": doctor.get("status"),
     "renderer_available": doctor.get("renderer_availability", {}).get("linux_native_proof", {}).get("available"),
-    "product_entry_native_lane": {
+    "agent_package_contract": {
+        "package_id": package_manifest.get("package_id"),
+        "agent_id": package_manifest.get("agent_id"),
+        "version": package_manifest.get("version"),
+    },
+    "native_helper_contract": {
+        "execution_envelope_owner": helper_catalog.get("framework_execution_envelope", {}).get("owner"),
+        "required_entry_surface": helper_catalog.get("bypass_policy", {}).get("required_entry_surface"),
+    },
+    "native_proof_lane": {
         "status": proof_lane.get("status"),
         "default_enabled": proof_lane.get("default_enabled"),
         "runnable_routes": proof_lane.get("runnable_routes"),

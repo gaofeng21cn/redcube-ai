@@ -3,7 +3,7 @@
 Owner: `RedCube AI`
 Purpose: `native_ppt_open_source_design_discipline_reference`
 State: `active_support`
-Machine boundary: 人读参考文档。本文不定义 RCA 机器接口、route 合同、测试断言或完成状态；机器真相仍以 `contracts/runtime-program/*`、runtime-family source、native helper 输出、shape manifest、render proof、review/export receipts 为准。
+Machine boundary: 人读参考文档。本文不定义 RCA 机器接口、route 合同、测试断言或完成状态；机器真相仍以 `contracts/runtime-program/*`、declarative pack、OPL-hosted StageRun artifacts、native-helper 输出、shape manifest、render proof 和 review/export receipts 为准。
 
 ## 结论
 
@@ -154,7 +154,7 @@ RCA native PPTX 约束：
 10. native sample claim 必须有 live Codex executor shape plan、true render screenshots、RCA review/export evidence。
 11. mock Codex helper、template fixture、refs-only AgentLab score、provider completion、Codex invocation diagnostic ref 和 route timeout blocker ref 不能展示成视觉质量证明。
 12. 最终完成口径必须落到 `visual_director_review`、`screenshot_review`、`export_pptx`、artifact inventory、hash/ZIP/render proof 和 owner receipt。
-13. 样片模式必须由正式 product-entry input 激活：`delivery_request.constraints.native_visual_sample=true` 写入 hydrated contract，route cache 纳入 constraints，`author_pptx_native` 才能切到 compact sample prompt / output contract；不能通过手工 patch deliverable、mock helper 或 helper template 代替。
+13. 样片模式必须由安装后的 `run_native_ppt_proof` hosted action 或 `artifact_creation` StageRun 的显式 task intent 激活；decisive Attempt 必须产出完整 `editable_shape_plan`，不能通过手工 patch、mock helper 或 hidden helper template 代替。
 
 ## 使用建议
 

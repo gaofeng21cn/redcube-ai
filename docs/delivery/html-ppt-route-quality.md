@@ -3,7 +3,7 @@
 Owner: `RedCube AI`
 Purpose: `html_ppt_route_quality_support`
 State: `active_support`
-Machine boundary: 人读 route support。机器真相继续归 `contracts/runtime-program/ppt-html-route-quality-nonregression.json`、runtime-family source、workspace artifacts、review/export gates、owner receipts 与 canonical artifacts。
+Machine boundary: 人读 route support。机器真相继续归 `contracts/runtime-program/ppt-html-route-quality-nonregression.json`、declarative pack、OPL-hosted StageRun artifacts、review/export gates、owner receipts 与 canonical artifacts。
 
 ## Status
 
@@ -41,7 +41,7 @@ HTML quality non-regression surface 只给 OPL Agent Lab 标准 suite 输入 ref
 
 Agent Lab 可以比较 non-regression refs 和编排可观察性。Agent Lab score 不是 RCA visual verdict，不能写 visual truth、artifact blob、memory body，也不能授权 quality verdict、exportable、visual ready 或 handoffable。
 
-## Runtime Read Model
+## Hosted Read Model
 
 HTML artifact 会暴露 `html_route_quality_companion` refs-only companion，位于 route artifact 顶层和 `html_bundle` 内：
 
@@ -57,13 +57,11 @@ HTML artifact 会暴露 `html_route_quality_companion` refs-only companion，位
 
 ## Verification
 
-HTML route quality surface 的最小验证：
+HTML route policy 与标准 Agent 边界的最小验证：
 
 ```bash
-npm run --silent build
-node tests/ppt-html-route-quality-nonregression.test.js
-node tests/render-html-guardrails.test.js
-node tests/ppt-creative-ownership-cases/targeted-rerender-operator-context.test.js
+node --test tests/opl-agent-pack-contracts-semantic-pack.test.js
+npm run test:fast
 ```
 
-这些验证只证明 HTML route policy、runtime refs 和 targeted repair non-regression。最终 visual ready/exportable/handoffable 仍回到 RCA-owned review/export gates。
+这些验证只证明 declarative route policy、hosted refs 和标准 Agent 边界。最终 visual ready/exportable/handoffable 仍回到 RCA-owned review/export gates 与真实 rendered artifact evidence。

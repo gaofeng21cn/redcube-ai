@@ -8,7 +8,6 @@
   "projection_model": "refs_only_quality_route_suite_input",
   "refs_only": true,
   "read_only": true,
-  "extends_efficiency_projection": "contracts/production_acceptance/rca-efficiency-handoff-projection.json",
   "source_route_contract": "contracts/runtime-program/ppt-image-first-production-route.json",
   "default_route_policy": {
     "default_visual_route": "author_image_pages",

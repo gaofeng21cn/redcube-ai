@@ -6,7 +6,7 @@
   "agent_id": "rca",
   "owner": "redcube_ai",
   "registry_owner": "one-person-lab",
-  "registration_status": "repo_contract_ready_rebind_required_for_live_opl_registry",
+  "registration_status": "declarative_pack_ready_for_opl_registry_consumption",
   "role": "domain_registration_metadata_refs_only",
   "domain_manifest": {
     "domain_label": "RedCube AI",
@@ -23,25 +23,7 @@
     "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json",
     "domain_memory_descriptor_ref": "contracts/memory_descriptor.json",
     "artifact_locator_contract_ref": "contracts/artifact_locator_contract.json",
-    "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
-    "manifest_builder_export": "@redcube/domain-entry#getProductEntryManifest",
-    "manifest_builder_source_ref": "packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts"
-  },
-  "workspace_binding_manifest_command": {
-    "surface_kind": "opl_workspace_binding_manifest_command_contract",
-    "project_id": "redcube",
-    "workspace_locator_surface_kind": "redcube_workspace",
-    "expected_binding_command": "opl workspace bind --project redcube --path <redcube-ai-repo> [--workspace-root <workspace-root>]",
-    "expected_derived_manifest_command_template": "node -e <redcube_generated_product_entry_manifest_materializer>",
-    "expected_derived_status_command_template": "node -e <redcube_generated_product_status_materializer>",
-    "expected_module_path": "packages/redcube-domain-entry/dist/index.js",
-    "expected_export": "getProductEntryManifest",
-    "status_export": "getProductStatus",
-    "requires_build_artifact": true,
-    "requires_opl_workspace_binding_registry_entry": true,
-    "repo_contract_alone_updates_live_binding": false,
-    "blocked_if_manifest_command_null": true,
-    "pack_compiler_blocker_when_null": "domain_manifest_not_resolved"
+    "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json"
   },
   "workspace_generated_artifact_policy": {
     "surface_kind": "rca_workspace_generated_artifact_policy",
@@ -75,7 +57,6 @@
     "pack_compiler_input_ref",
     "generated_surface_handoff_ref",
     "functional_privatization_audit_ref",
-    "workspace_binding_manifest_command_contract",
     "workspace_generated_artifact_policy"
   ],
   "authority_boundary": {

@@ -3,13 +3,13 @@
 Owner: `RedCube AI`
 Purpose: `canonical_repo_source_semantic_pack_for_opl_standard_domain_agent_compiler`
 State: `active_declarative_visual_pack`
-Machine boundary: `agent/` 持有 stage semantics、prompt policy refs、stage skill policy refs、quality gates 与 knowledge policy。Executable handlers、minimal authority functions 与 native helpers 继续归 `packages/`、`apps/`、runtime contracts 和 Python helper modules。
+Machine boundary: `agent/` 持有 stage semantics、prompt policy refs、stage skill policy refs、quality gates 与 knowledge policy。最小 authority function 只通过 root contracts/refs 暴露，确定性 native-helper 实现归 `python/redcube_ai/native_helpers/`；RCA 不保留 repo-local runtime、wrapper 或 handler package。
 
 本目录是 RCA 的 canonical Declarative Visual Pack。OPL generated surfaces 消费这些 refs 来生成 CLI、MCP、Skill、product-entry、status、session、domain_action_adapter 和 workbench descriptors；它们不写 RedCube visual truth、artifact body、review/export verdict、visual memory body 或 owner receipt。
 
 `contracts/foundry_agent_series.json` 是 RCA 对 OPL Foundry policy 的 refs-only consumer：它只 pin OPL canonical series/skeleton contract 与 shared policy release，使用 canonical `rca` agent identity，并把 generated stage control plane 的 target domain 保持为 `redcube_ai`。通用 lifecycle、workspace topology、closeout 和 public-series policy body 全部由 OPL 持有；RCA 只在 `visual_domain_delta_refs`、`contracts/domain_descriptor.json` 与本 pack 中保留 visual-material input、visual-deliverable stage semantics，以及 PPT/PDF/PNG/export handoff 的 domain refs。
 
-product-entry 以 `{ref_kind: "generated_surface", ref: "opl-generated:family_stage_control_plane", source_ref: "agent/stages/manifest.json"}` 指向 OPL 生成的 stage plane，并投影 `ai_route_policy`。该 policy 不执行或校验 semantic route；Codex CLI 是唯一 route owner。`domain-handler export` 只公开 action-handler、domain-authority、evidence、typed-blocker、receipt 与 artifact-locator refs，不复制通用 runtime、workbench、operator 或 readiness projection。
+`contracts/action_catalog.json` 与 `agent/stages/manifest.json` 是 OPL-generated/hosted surfaces 的唯一 repo source。它们投影 stage/action/authority/artifact refs，但不执行 semantic route，也不复制通用 runtime、workbench、operator 或 readiness projection；Codex Attempt 给出语义 route recommendation，OPL StageRun controller 校验并物化 transition。
 
 ## Stage Prompt / Skill / Tool 分工
 

@@ -1,0 +1,168 @@
+{
+  "surface_kind": "opl_pack_native_helper_probe_descriptor",
+  "schema_version": 1,
+  "helper_id": "ppt_deck_native",
+  "owner": "rca",
+  "entrypoint_ref": "native.py",
+  "runtime_command": "python3",
+  "required_commands": [
+    "officecli",
+    "soffice",
+    "pdftoppm"
+  ],
+  "source_closure": {
+    "surface_kind": "opl_native_helper_source_closure",
+    "version": "opl-native-helper-source-closure.v1",
+    "effect_slots": [
+      {
+        "slot_id": "renderer_version_process",
+        "source_ref": "native.py",
+        "symbol": "command_version",
+        "source_digest": "sha256:1c52891b90d7e4ada313e30d1ebefcccc1f7ca1fa5ce9752f108904ff056b81b",
+        "effect_kind": "process_spawn",
+        "target_policy": "declared_command_set",
+        "allowed_targets": [
+          "soffice",
+          "pdftoppm"
+        ]
+      },
+      {
+        "slot_id": "render_cleanup_artifact_write",
+        "source_ref": "native.py",
+        "symbol": "clean_render_outputs",
+        "source_digest": "sha256:1c52891b90d7e4ada313e30d1ebefcccc1f7ca1fa5ce9752f108904ff056b81b",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "render_pdf_artifact_write",
+        "source_ref": "native.py",
+        "symbol": "render_pptx_to_pdf",
+        "source_digest": "sha256:1c52891b90d7e4ada313e30d1ebefcccc1f7ca1fa5ce9752f108904ff056b81b",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "render_pdf_process",
+        "source_ref": "native.py",
+        "symbol": "render_pptx_to_pdf",
+        "source_digest": "sha256:1c52891b90d7e4ada313e30d1ebefcccc1f7ca1fa5ce9752f108904ff056b81b",
+        "effect_kind": "process_spawn",
+        "target_policy": "declared_command_set",
+        "allowed_targets": [
+          "soffice"
+        ]
+      },
+      {
+        "slot_id": "render_png_process",
+        "source_ref": "native.py",
+        "symbol": "render_png_from_pdf",
+        "source_digest": "sha256:1c52891b90d7e4ada313e30d1ebefcccc1f7ca1fa5ce9752f108904ff056b81b",
+        "effect_kind": "process_spawn",
+        "target_policy": "declared_command_set",
+        "allowed_targets": [
+          "pdftoppm"
+        ]
+      },
+      {
+        "slot_id": "native_result_artifact_write",
+        "source_ref": "native.py",
+        "symbol": "main",
+        "source_digest": "sha256:1c52891b90d7e4ada313e30d1ebefcccc1f7ca1fa5ce9752f108904ff056b81b",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "officecli_materializer_process",
+        "source_ref": "native_layouts_parts/materializer.py",
+        "symbol": "_run_officecli",
+        "source_digest": "sha256:ff11fa11c416364759506556e111427677e4999772bff50d721c2ca132ff6ccd",
+        "effect_kind": "process_spawn",
+        "target_policy": "declared_command_set",
+        "allowed_targets": [
+          "officecli"
+        ]
+      },
+      {
+        "slot_id": "officecli_materializer_artifact_write",
+        "source_ref": "native_layouts_parts/materializer.py",
+        "symbol": "materialize_native_pptx",
+        "source_digest": "sha256:ff11fa11c416364759506556e111427677e4999772bff50d721c2ca132ff6ccd",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "svg_ir_artifact_write",
+        "source_ref": "native_layouts_parts/svg_ir.py",
+        "symbol": "render_slide_svg_ir",
+        "source_digest": "sha256:82705e58455ee2db2fe316e15cd9dc2f95d197358e0b6d42c60e52cbdf280636",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "template_copy_artifact_write",
+        "source_ref": "native_package.py",
+        "symbol": "copy_template_source",
+        "source_digest": "sha256:d46b2d7a01df5bbb7150811e9686d80f542ead001f93135fc82bb1fecf4f08a7",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "chart_patch_artifact_write",
+        "source_ref": "native_package.py",
+        "symbol": "patch_chart_data",
+        "source_digest": "sha256:d46b2d7a01df5bbb7150811e9686d80f542ead001f93135fc82bb1fecf4f08a7",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "custom_path_patch_artifact_write",
+        "source_ref": "native_package.py",
+        "symbol": "patch_custom_paths",
+        "source_digest": "sha256:d46b2d7a01df5bbb7150811e9686d80f542ead001f93135fc82bb1fecf4f08a7",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "officecli_picture_readback_process",
+        "source_ref": "officecli_readback.py",
+        "symbol": "_picture_payload",
+        "source_digest": "sha256:39044d5c21a5036e21e68ab25611c93a5cc865ac3320f4729b89c0f531704020",
+        "effect_kind": "process_spawn",
+        "target_policy": "declared_command_set",
+        "allowed_targets": [
+          "officecli"
+        ]
+      },
+      {
+        "slot_id": "officecli_readback_process",
+        "source_ref": "officecli_readback.py",
+        "symbol": "_run",
+        "source_digest": "sha256:39044d5c21a5036e21e68ab25611c93a5cc865ac3320f4729b89c0f531704020",
+        "effect_kind": "process_spawn",
+        "target_policy": "declared_command_set",
+        "allowed_targets": [
+          "officecli"
+        ]
+      }
+    ]
+  },
+  "authority_boundary": {
+    "can_write_domain_truth": false,
+    "can_mutate_artifact_body": false,
+    "can_sign_owner_receipt": false,
+    "can_create_typed_blocker": false,
+    "can_authorize_quality_verdict": false,
+    "can_authorize_export_readiness": false,
+    "can_claim_domain_ready": false,
+    "can_claim_production_ready": false
+  }
+}

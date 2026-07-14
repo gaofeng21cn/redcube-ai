@@ -30,7 +30,7 @@
     "route_helper_can_issue_owner_receipt": false,
     "stage_folder_writer_can_issue_owner_receipt": false,
     "formal_review_receipt_owner": "one-person-lab",
-    "domain_owner_receipt_signer": "domain-handler:dispatch#emit_domain_owner_receipt",
+    "domain_owner_receipt_signer": "authority-function-ref:rca/owner-receipt-signer",
     "exact_artifact_identity_binding_required": true,
     "required_owner_authority_inputs": [
       "formal_review_receipt",
@@ -52,11 +52,11 @@
     "writes_memory_body": false,
     "authorizes_quality_or_export": false
   },
-  "goal_workflow_agent_lab_suite_owner_projection": {
-    "suite_id": "redcube-ai.goal-workflow.minimal-autonomous-visual-delivery.v1",
-    "suite_ref": "contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json",
+  "controlled_agent_lab_evaluation_fixture_owner_projection": {
+    "suite_id": "rca.standard-agent.controlled-evaluation.v1",
+    "suite_ref": "contracts/stage_run_canary_evidence.json",
     "handoff_ref": "contracts/agent_lab_handoff.json",
-    "projection_ref": "opl_generated:product_entry_manifest#/goal_workflow_agent_lab_suite",
+    "projection_ref": "opl_generated:agent_lab#/domain_evaluation_fixture",
     "allowed_return_shapes_ref": "opl_generated:product_entry_manifest#/domain_owner_receipt_contract/allowed_return_shapes",
     "refs_only": true,
     "projects_receipt_body": false,

@@ -11,8 +11,8 @@
   "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
   "conformance_validator": {
     "surface_kind": "rca_stage_artifact_kernel_adoption_conformance_validator",
-    "validator_ref": "tests/opl-family-contract-adoption.test.js",
-    "test_name": "RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint",
+    "validator_ref": "tests/opl-agent-pack-contracts-semantic-pack.test.js",
+    "test_name": "RCA semantic pack exposes OPL-hosted StageRun artifact and authority refs",
     "validates": [
       "root_contract_discoverability",
       "stage_folder_manifest_receipt_current_pointer_unit",
@@ -20,7 +20,7 @@
       "review_repair_export_receipts",
       "native_helper_manifest",
       "artifact_gallery_handoff_shell",
-      "current_program_pointer_visibility",
+      "hosted_stage_run_pointer_visibility",
       "false_domain_readiness_and_false_visual_export_authority_claims"
     ]
   },
@@ -126,20 +126,20 @@
     "completion_interpretation_owner": "redcube_ai"
   },
   "stage_folder_writer_closeout_authority": {
-    "closeout_ref_signer": "redcube_ai_domain_family_runtime",
-    "domain_family_runtime_may_issue_owner_receipt_refs": true,
-    "domain_family_runtime_may_issue_typed_blocker_refs": true,
-    "writer_role": "consume_explicit_owner_receipt_or_typed_blocker_refs",
+    "closeout_ref_signer": "authority-function-ref:rca/owner-receipt-signer",
+    "rca_authority_function_may_issue_owner_receipt_refs": true,
+    "rca_authority_function_may_issue_typed_blocker_refs": true,
+    "writer_role": "opl_stage_run_controller_consumes_explicit_owner_receipt_or_typed_blocker_refs",
     "status_success_requires_non_empty_owner_receipt_refs": true,
     "status_blocked_requires_non_empty_typed_blocker_refs": true,
     "writer_may_synthesize_owner_receipt_refs": false,
     "writer_may_synthesize_typed_blocker_refs": false,
-    "route_helper_may_synthesize_owner_receipt_refs": false,
-    "route_helper_may_synthesize_typed_blocker_refs": false,
+    "opl_stage_run_controller_may_synthesize_owner_receipt_refs": false,
+    "opl_stage_run_controller_may_synthesize_typed_blocker_refs": false,
     "missing_terminal_refs_policy": "fail_closed_without_current_or_latest_pointer",
     "readable_output_progress_without_terminal_refs": true,
     "route_run_completed_or_current_stage_is_terminal_acceptance": false,
-    "current_owner_delta_writer_is_terminal_acceptance": false
+    "projection_writer_is_terminal_acceptance": false
   },
   "native_helper_manifest": {
     "required_for_canonical_current_or_ready_claim": true,
@@ -250,7 +250,7 @@
     "accepted_source_refs": [
       "opl-generated:family_stage_control_plane",
       "contracts/foundry_agent_series.json",
-      "docs/decisions.md#decision-rca-route-handler-writes-opl-stage-folder-contract"
+      "docs/architecture.md"
     ],
     "domain_output_roles_are_interface": true,
     "file_name_is_not_interface": true,
@@ -260,7 +260,8 @@
     "derived_projection_refs": [
       "stage_artifact_index",
       "artifact_locator_contract",
-      "domain_handler_projection",
+      "opl_generated_stage_artifact_projection",
+      "opl_generated_hosted_action_readback",
       "app_workbench_artifact_drilldown"
     ],
     "file_presence_only_counts_as": "orphan_or_historical",
@@ -292,7 +293,7 @@
     "typed_blocker"
   ],
   "notes": [
-    "RCA route handlers materialize OPL Stage Folder Contract attempts under the shared runtime-state root.",
+    "The OPL-hosted StageRun controller materializes Stage Folder Contract attempts; RCA authority functions return only domain receipt, blocker, artifact, and review/export refs.",
     "Required outputs plus valid manifest and pointers make an RCA visual stage canonical/current. Any readable output remains Codex progress input even when structure is incomplete; structure debt only blocks canonical, quality, export, or ready claims."
   ],
   "visual_ready_claimed": false,

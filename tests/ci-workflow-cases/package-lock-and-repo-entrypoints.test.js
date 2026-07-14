@@ -8,10 +8,14 @@ import {
   readRepoJson,
 } from './shared.js';
 
-test('package-lock tracks every declared workspace package', () => {
+test('package metadata has no repo-local runtime workspace or dependency graph', () => {
+  const rootPackage = readRepoJson('package.json');
   const lockfile = readRepoJson('package-lock.json');
   const lockPackages = lockfile.packages ?? {};
 
+  assert.equal(rootPackage.workspaces, undefined);
+  assert.equal(rootPackage.dependencies, undefined);
+  assert.deepEqual(listWorkspacePackageDirs(), []);
   for (const relativeDir of listWorkspacePackageDirs()) {
     const manifest = readRepoJson(path.join(relativeDir, 'package.json'));
     assert.equal(
@@ -23,12 +27,14 @@ test('package-lock tracks every declared workspace package', () => {
   }
 });
 
-test('CI constructs and links the OPL Framework before running consumers', () => {
+test('CI validates the repo with the latest OPL Framework without mutating package installation state', () => {
   const workflow = readRepoFile('.github/workflows/ci.yml');
 
   assert.match(workflow, /npm ci --prefix \..\/one-person-lab --ignore-scripts/);
   assert.match(workflow, /npm run --prefix \..\/one-person-lab build/);
-  assert.match(workflow, /packages link-framework --agent-root "\$GITHUB_WORKSPACE" --json/);
+  assert.match(workflow, /agents interfaces --repo-dir "\$GITHUB_WORKSPACE" --json/);
+  assert.match(workflow, /agents conformance --agent "rca=\$GITHUB_WORKSPACE" --json/);
+  assert.doesNotMatch(workflow, /packages link-framework|packages install|packages update/);
   assert.match(workflow, /npm run typecheck:ci/);
   assert.doesNotMatch(workflow, /scripts\/run-test-group\.ts family/);
 });

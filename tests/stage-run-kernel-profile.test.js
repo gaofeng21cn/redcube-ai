@@ -52,6 +52,23 @@ function assertAuthorityBoundaryFalse(boundary, label) {
   }
 }
 
+function assertRouteAuthoritySplit(contract, label) {
+  const serialized = JSON.stringify(contract);
+  const retiredOwnerFields = [
+    ['route', 'selection', 'owner'].join('_'),
+    ['route', 'back', 'selection', 'owner'].join('_'),
+    ['cross', 'stage', 'decision', 'owner'].join('_'),
+  ];
+  for (const field of retiredOwnerFields) {
+    assert.equal(serialized.includes(`"${field}"`), false, `${label}.${field}`);
+  }
+  assert.equal(contract.semantic_route_decision_owner, 'decisive_codex_attempt');
+  assert.equal(
+    contract.stage_transition_materialization_owner,
+    'opl_stage_run_controller',
+  );
+}
+
 test('StageRun kernel profile preserves RCA authority and rejects runtime overclaim', () => {
   const profile = readJson('contracts/stage_run_kernel_profile.json');
 
@@ -86,7 +103,7 @@ test('StageRun kernel profile preserves RCA authority and rejects runtime overcl
   );
   assert.equal(profile.stage_run_state_machine.codex_can_route_to_any_declared_stage, true);
   assert.equal(profile.stage_run_state_machine.quality_debt_counts_as_quality_acceptance, false);
-  assert.equal(profile.codex_semantic_route_policy.semantic_owner, 'codex_cli');
+  assertRouteAuthoritySplit(profile.codex_semantic_route_policy, 'profile.codex_semantic_route_policy');
   assert.equal(profile.codex_semantic_route_policy.readable_artifact_allows_any_declared_stage, true);
   assert.equal(profile.codex_semantic_route_policy.quality_budget_exhaustion_blocks_route, false);
   assert.equal(profile.codex_semantic_route_policy.framework_can_accept_reject_rank_or_override_route, false);
@@ -116,6 +133,28 @@ test('StageRun kernel profile preserves RCA authority and rejects runtime overcl
   ]);
   assert.equal(profile.visual_stage_run_canary.required_role_artifacts.includes('strategy_retrospective_ref'), true);
   assert.equal(profile.visual_stage_run_canary.required_role_artifacts.includes('meta_review_ref'), false);
+});
+
+test('RCA contracts split semantic route decisions from controller transition materialization', () => {
+  const operatingPrinciples = readJson('contracts/stage_operating_principles.json');
+  const stageManifest = readJson('agent/stages/manifest.json');
+
+  assertRouteAuthoritySplit(operatingPrinciples.speed_policy, 'operatingPrinciples.speed_policy');
+  assertRouteAuthoritySplit(stageManifest.progress_first_policy, 'stageManifest.progress_first_policy');
+  assert.equal(operatingPrinciples.speed_policy.primary_only_decisive_attempt_role, 'producer');
+  assert.deepEqual(operatingPrinciples.speed_policy.formal_review_decisive_attempt_roles, [
+    'reviewer',
+    're_reviewer',
+  ]);
+  assert.equal(
+    operatingPrinciples.speed_policy.non_decisive_attempt_output,
+    'route_impact.stage_route_recommendation',
+  );
+  assert.equal(
+    operatingPrinciples.speed_policy.decisive_attempt_output,
+    'route_impact.stage_route_decision',
+  );
+  assert.equal(stageManifest.progress_first_policy.route_execution_grants_stage_transition_authority, false);
 });
 
 test('controlled StageRun canary is followable refs-only evidence, not live progress', () => {
@@ -156,7 +195,7 @@ test('controlled StageRun canary is followable refs-only evidence, not live prog
   assertNoForbiddenBodyFields(evidence);
 });
 
-test('owner-chain live progress refs keep open evidence gates explicit', () => {
+test('post-standardization live progress remains a typed blocker until fresh hosted evidence exists', () => {
   const profile = readJson('contracts/stage_run_kernel_profile.json');
   const temporalPolicy = readJson('contracts/temporal_stage_run_consumption_policy.json');
   const evidence = readJson('contracts/owner_chain_live_progress_evidence.json');
@@ -175,24 +214,26 @@ test('owner-chain live progress refs keep open evidence gates explicit', () => {
     'artifact_authority_receipt_ref',
     'no_regression_evidence_ref',
   ]);
-  assert.equal(evidence.evidence_scope, 'live_owner_chain_progress_refs_only');
+  assert.equal(evidence.evidence_scope, 'post_standardization_owner_chain_refs_only');
   assert.equal(evidence.controlled_fixture_is_live_progress, false);
   assert.equal(liveProgress.status, 'owner_typed_blocker_recorded_not_ready_claim');
-  for (const entryId of [
-    'temporal_controlled_visual_stage_long_soak',
-    'memory_lifecycle_receipt_scaleout',
-    'cross_family_repeated_no_regression',
-  ]) {
-    const entry = liveProgress.progress_entries.find((candidate) => candidate.entry_id === entryId);
-    assert.ok(entry, entryId);
-    assert.equal(entry.status, 'blocked_by_domain_owned_typed_blocker', entryId);
-    assert.equal(entry.ready_claim_allowed, false, entryId);
-    assertNonEmptyRefs(entry.refs.typed_blocker_refs, `${entryId}.typed_blocker_refs`);
-  }
+  assert.deepEqual(liveProgress.refs.owner_receipt_refs, []);
+  assert.deepEqual(liveProgress.refs.quality_or_export_receipt_refs, []);
+  assert.deepEqual(liveProgress.refs.no_regression_refs, []);
+  assert.deepEqual(liveProgress.refs.long_soak_refs, []);
+  assert.deepEqual(liveProgress.refs.typed_blocker_refs, [
+    'rca-typed-blocker:post-standardization-live-stage-evidence-required',
+  ]);
+  assert.equal(
+    evidence.live_visual_owner_chain_canary.status,
+    'blocked_requires_fresh_opl_hosted_stage_run',
+  );
+  assert.deepEqual(
+    evidence.live_visual_owner_chain_canary.observed_typed_blocker_refs,
+    liveProgress.refs.typed_blocker_refs,
+  );
   assertAuthorityBoundaryFalse(liveProgress.authority_boundary, 'liveProgress.authority_boundary');
-  assert.equal(liveProgress.authority_boundary.declares_visual_ready, false);
-  assert.equal(liveProgress.authority_boundary.declares_exportable, false);
-  assert.equal(liveProgress.authority_boundary.declares_handoffable, false);
-  assert.equal(liveProgress.authority_boundary.declares_production_visual_stage_long_soak_complete, false);
+  assert.equal(liveProgress.non_claims.domain_ready, false);
+  assert.equal(liveProgress.non_claims.production_ready, false);
   assertNoForbiddenBodyFields({ evidence, liveProgress });
 });

@@ -120,9 +120,8 @@
   },
   "progress_first_policy": {
     "contract_id": "rca.progress_first_stage_admission.v1",
-    "route_selection_owner": "codex_cli",
-    "route_selection_owner_scope": "intra_stage_domain_route_only",
-    "cross_stage_decision_owner": "stage_run_decisive_codex_attempt",
+    "semantic_route_decision_owner": "decisive_codex_attempt",
+    "stage_transition_materialization_owner": "opl_stage_run_controller",
     "route_execution_grants_stage_transition_authority": false,
     "codex_may_advance_skip_repeat_reverse_or_route_back": true,
     "any_declared_stage_may_start_from_any_prior_stage_result": true,

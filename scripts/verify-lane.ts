@@ -16,13 +16,26 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function run(command: string, args: readonly string[] = [], options: SpawnSyncOptions = {}): void {
-  const result = spawnSync(command, args, {
+type VerifyCommand =
+  | 'node'
+  | 'npm'
+  | 'scripts/repo-hygiene.sh'
+  | 'scripts/run-structural-quality-gate.sh';
+
+function run(command: VerifyCommand, args: readonly string[] = [], options: SpawnSyncOptions = {}): void {
+  const spawnOptions: SpawnSyncOptions = {
     cwd: process.cwd(),
     env: process.env,
     stdio: 'inherit',
     ...options,
-  });
+  };
+  const result = command === 'node'
+    ? spawnSync('node', args, spawnOptions)
+    : command === 'npm'
+      ? spawnSync('npm', args, spawnOptions)
+      : command === 'scripts/repo-hygiene.sh'
+        ? spawnSync('scripts/repo-hygiene.sh', args, spawnOptions)
+        : spawnSync('scripts/run-structural-quality-gate.sh', args, spawnOptions);
   if (result.error) throw result.error;
   if ((result.status ?? 1) !== 0) {
     process.exit(result.status ?? 1);
@@ -84,7 +97,7 @@ async function runStep(step: VerifyStep, forwardedArgs: readonly string[]): Prom
     return;
   }
   if (step.kind === 'test-group') {
-    run(process.execPath, [
+    run('node', [
       'scripts/run-test-group.ts',
       step.group,
       ...forwardedArgs,

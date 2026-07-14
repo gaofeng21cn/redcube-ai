@@ -9,9 +9,9 @@ from redcube_ai.native_helpers.ppt_deck.native import render_pptx
 from redcube_ai.native_helpers.ppt_deck.native_package import patch_chart_data, read_pptx_package
 
 
-def run_officecli(officecli: str, *args: str) -> None:
+def run_officecli(*args: str) -> None:
     completed = subprocess.run(
-        [officecli, *args],
+        ['officecli', *args],
         text=True,
         capture_output=True,
         check=False,
@@ -19,7 +19,7 @@ def run_officecli(officecli: str, *args: str) -> None:
     if completed.returncode != 0:
         raise RuntimeError(json.dumps({
             'error_kind': 'native_ppt_edit_task_failed',
-            'command': [officecli, *args],
+            'command': ['officecli', *args],
             'returncode': completed.returncode,
             'stdout': completed.stdout,
             'stderr': completed.stderr,
@@ -49,23 +49,23 @@ def main() -> None:
             'series': [{'name': 'Reforecast', 'values': [5, 9, 12]}],
         },
     }])
-    run_officecli(officecli, 'open', str(pptx_file))
+    run_officecli('open', str(pptx_file))
     try:
         run_officecli(
-            officecli, 'set', str(pptx_file), '/slide[1]/shape[@name=S01-title]',
+            'set', str(pptx_file), '/slide[1]/shape[@name=S01-title]',
             '--prop', 'text=Updated operating result',
         )
         run_officecli(
-            officecli, 'set', str(pptx_file), '/slide[1]/shape[@name=S01-node-a]',
+            'set', str(pptx_file), '/slide[1]/shape[@name=S01-node-a]',
             '--prop', 'fill=#0F766E', '--prop', 'x=1.5in', '--prop', 'y=2.2in',
         )
         run_officecli(
-            officecli, 'set', str(pptx_file), '/slide[1]/notes',
+            'set', str(pptx_file), '/slide[1]/notes',
             '--prop', 'text=Updated speaker notes for the reforecast.',
         )
-        run_officecli(officecli, 'save', str(pptx_file))
+        run_officecli('save', str(pptx_file))
     finally:
-        run_officecli(officecli, 'close', str(pptx_file))
+        run_officecli('close', str(pptx_file))
 
     output_dir.mkdir(parents=True, exist_ok=True)
     package_readback = read_pptx_package(pptx_file)

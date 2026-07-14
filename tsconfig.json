@@ -1,23 +1,10 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "./packages/redcube-runtime-protocol"
-    },
-    {
-      "path": "./packages/redcube-overlay-core"
-    },
-    {
-      "path": "./packages/redcube-governance"
-    },
-    {
-      "path": "./packages/redcube-runtime"
-    },
-    {
-      "path": "./packages/redcube-domain-entry"
-    },
-    {
-      "path": "./apps/redcube-cli"
-    }
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true
+  },
+  "include": [
+    "scripts/**/*.ts",
+    "tools/**/*.ts"
   ]
 }

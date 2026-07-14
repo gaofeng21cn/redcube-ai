@@ -3,9 +3,9 @@
 Owner: `RedCube AI`
 Purpose: `domain_memory_descriptor_locator_support`
 State: `active_support`
-Machine boundary: 人读 contract-linked reference。机器真相继续归 OPL generated/default product manifest surface、RCA `redcube domain-handler export` source refs、`/domain_memory_descriptor_locator`、`/controlled_memory_apply_proof`、`/controlled_memory_apply_proof/runtime_receipt_instances`、`/workspace_receipt_inventory_projection`、`contracts/runtime-program/current-program.index.json`、`contracts/runtime-program/current-program-parts/**`、source/tests、workspace runtime memory state 和 RCA-owned receipts。
+Machine boundary: 人读 contract-linked reference。机器真相继续归 `contracts/memory_descriptor.json`、OPL-generated memory descriptor projection、RCA-owned locator/receipt refs、hosted StageRun artifacts、source/tests、external domain-memory state 和 RCA-owned receipts。
 
-Lifecycle note: 本文只解释 RCA-owned visual pattern memory descriptor、migration plan、seed fixture locator、writeback proposal、accept/reject command、writeback receipt locator、controlled apply proof、runtime receipt refs 和 operator receipt projection 边界。当前 readout 分两层读取：`visual_pattern_memory_writeback.status=descriptor_proof_contract_landed_runtime_writeback_pending` 仍表示 descriptor / proposal / accept-reject 合同已落地但不声明 memory body migration 完成；`controlled_memory_apply_proof/runtime_receipt_instances` 与 `workspace_receipt_inventory_projection` 已能显示 accepted / rejected visual memory receipt refs 和 lifecycle receipt refs。它们都是 body-free refs-only runtime receipts，不写 memory body、artifact blob、review/export verdict 或 production soak completion。本文不承担 active plan；下一步顺序和 evidence tail 回到 [RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md)。
+Lifecycle note: 本文只解释 RCA-owned visual pattern memory descriptor、migration plan、seed fixture locator、writeback proposal、accept/reject authority、writeback receipt locator 和 operator receipt projection 边界。`descriptor_proof_contract_landed_runtime_writeback_pending` 表示 descriptor/proposal/receipt 合同已落地，但不声明 memory body migration、live writeback 或 production soak 完成。本文不承担 active plan；下一步顺序和 evidence tail 回到 [RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md)。
 
 ## 边界
 
@@ -37,7 +37,7 @@ The landed repo-source migration surface is `rca.visual_pattern_memory.migration
 
 It expresses the flow for reusable visual lessons without storing lesson bodies, receipt instances, or artifact blobs in the repo:
 
-- discover candidate lessons from workspace/runtime root, product-entry session, `visual_director_review`, `screenshot_review`, export closeout, or a human reference;
+- discover candidate lessons from hosted StageRun artifacts, `visual_director_review`, `screenshot_review`, export closeout, or a human reference;
 - extract a reusable pattern-card candidate outside repo-tracked artifact blobs;
 - record a seed fixture locator ref;
 - generate a locator-only writeback proposal;
@@ -64,11 +64,11 @@ Forbidden seed fields include memory content bodies, generated slide/page conten
 
 ## Controlled Stage Attempt Proof
 
-`rca.controlled_visual_stage_attempt.fixture.v1` proves the review/revision/export portion of a visual stage attempt through descriptor refs only. The direct RedCube skill path and OPL-hosted path share the same descriptor refs, product domain_handler refs, and quality refs. OPL consumes those refs for queue/projection/receipt behavior; RCA keeps the visual truth, review/export verdicts, and artifact authority.
+`rca.controlled_visual_stage_attempt.fixture.v1` describes the review/revision/export portion of a visual stage attempt through descriptor refs only. The direct RCA skill path and OPL-hosted path share the same descriptor and quality refs. OPL transports and projects those refs; RCA keeps visual truth, review/export verdicts, and artifact authority.
 
 `rca.visual_pattern_memory.controlled_apply_proof.v1` is the landed controlled apply proof. It exposes consumed visual pattern memory refs, a locator-only writeback proposal projection, accepted/rejected receipt projection cases, accepted/rejected runtime receipt refs, and a no-forbidden-write audit. It intentionally excludes memory content bodies, slide/page content, review/export verdicts, visual truth, canonical artifact blobs, and live receipt bodies from repo source.
 
-This proof closes the repo-source/audit and receipt-ref part of the memory apply lane. Runtime receipt refs are now visible through `redcube domain-handler export` and the workspace receipt inventory projection, while real reusable visual lesson body migration, receipt body storage, and domain-owned memory body writeback remain runtime/domain-memory responsibilities outside repo-tracked source. Receipt refs and 6-workspace / 36-receipt scaleout evidence do not declare production visual-stage soak complete, visual ready, exportable, handoffable, domain ready, or artifact authority.
+This contract closes only the repo-source descriptor and forbidden-write boundary. Real reusable visual lesson body migration, receipt body storage, live writeback and scaleout remain external domain-memory/hosted-runtime responsibilities. No current live receipt instance or scaleout claim is repo-tracked, so this surface cannot declare production visual-stage soak complete, visual ready, exportable, handoffable, domain ready, or artifact authority.
 
 ## Authority
 

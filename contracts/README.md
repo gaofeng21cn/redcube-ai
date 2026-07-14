@@ -1,45 +1,38 @@
-# 合同目录说明
+# RCA Contracts
 
-Owner: `RedCube AI`
-Purpose: `machine_contract_index`
-State: `active_support`
-Machine boundary: 本文是人读合同索引。机器真相继续归本目录下的 JSON contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts 和验证命令输出；本文不作为机器接口。
+Owner: RedCube AI
+Purpose: 索引标准 Agent 的机器合同。
+State: active
+Machine boundary: JSON body 和 schema 是机器面；本文只解释 owner 和用途。
 
-这个目录只保留 machine-readable contract surface。
+## Standard Agent canonical inputs
 
-- narrative 协作规则看仓库根 `AGENTS.md`
-- 默认人类/AI 入口看 `README*` 与 `docs/README*`，其中 `RedCube AI Foundry Agent`、direct route 与单一 `redcube-ai` app skill 是第一公开主语
-- 稳定运行边界看 `docs/policies/runtime_operating_model.md`
+- `opl_agent_package_manifest.json`：`rca` package sidecar；安装、lock、currentness、update、rollback 和 lifecycle receipt 归 OPL Connect。
+- `domain_descriptor.json`：RCA domain identity 与标准 pack refs。
+- `pack_compiler_input.json`：declarative visual pack source refs。
+- `standard_agent_interface.json`：OPL compiler 可消费的标准接口声明，不含 repo-local command template。
+- `standard_agent_conformance_profile.json`：结构 admission profile。
+- `generated_surface_handoff.json`：OPL generated/hosted surface ownership；repo-local handler targets 必须为空。
+- `action_catalog.json`：RCA hosted action semantics。
+- `../agent/stages/manifest.json`：stage graph canonical source。
 
-当前保留的 repo-tracked machine-readable mainline truth：
+## RCA authority and artifact contracts
 
-- `domain_descriptor.json`、`standard_agent_interface.json`、`opl_domain_manifest_registration.json`、`pack_compiler_input.json`、`generated_surface_handoff.json`、`action_catalog.json`、`stage_artifact_kernel_adoption.json`、`memory_descriptor.json`、`artifact_locator_contract.json`、`owner_receipt_contract.json`、`functional_privatization_audit.json`、`private_functional_surface_policy.json` 与 `../agent/stages/manifest.json`：OPL standard domain-agent pack compiler / generated interfaces 的 root inputs。`standard_agent_interface.json` 由 RCA 声明、OPL generic consumer 消费，只提供 workspace locator/direct entry 模板与默认 workspace profile、runtime dispatch/registration ref、progress delta aliases 与 routing hints；这些 workspace defaults 替代 OPL registry 内的 RCA `workspace_profile` 硬编码，模板展开、参数引用和校验归 OPL，视觉 action、review/export、artifact/memory authority 不进入该通用接口。`action_catalog.json` 是 RCA action 正文，`../agent/stages/manifest.json` 是 stage graph 的 canonical repo source，OPL compiler 生成 `opl-generated:family_stage_control_plane`。`getProductEntryManifest` 与 domain-handler export 只返回 domain evidence、typed blocker、receipt/artifact locator 及上述 source/projection refs，不构造 generic product/workbench/session、Agent Lab、monitor、ledger 或 workorder shell。RCA visual truth、review/export verdict、artifact authority、visual memory body 和 owner receipt 仍归 RCA。
-- `opl_ledger_artifact_registration.json`：RCA 给 OPL Ledger 的轻量 artifact registration 合同。它只登记长期 visual deliverable 的 `artifact_ref`、`sha256`、artifact index ref、review ref 与 receipt ref；不复制 MAS per-figure provenance bundle，不写 artifact body、review/export verdict、owner receipt body、typed blocker body 或 runtime queue state。`getProductEntryManifest` 与 `domain-handler export` 只投影该 refs-only contract/ref，实际 OPL Ledger registration/readback 命令归 OPL Ledger 持有。
-- `stage_quality_cycle_policy.json`：RCA 对 OPL shared Stage quality-cycle ABI 的 domain profile，冻结独立 producer/reviewer/repairer/re_reviewer Attempt、无上下文继承、三轮修订预算、finding/repair-map/re-review closure，以及 `review_and_revision` 跨 Stage Meta Review 边界。
-- `stage_run_kernel_profile.json`、`stage_run_canary_evidence.json`、`live_stage_run_progress_evidence.json` 与 `owner_chain_live_progress_evidence.json`：RCA 对 OPL StageRun Kernel 的 domain profile、controlled canary fixture、OPL 标准 live stage-run progress evidence surface 与 owner-chain 输入 lane。profile 只声明 StageRun state shell、旧 sidecar/session supervision/runner/session store/status/workbench wrapper 的退役或迁移输入角色、legacy runtime residue guard、controlled canary operator summary、visual StageRun canary 的必需 trace，以及 live progress / owner-chain evidence refs；controlled evidence 固定为 `controlled_fixture_not_live_domain_progress`，覆盖视觉方向候选、grounded reflection、comparative selection、revision/evolution、meta-review、independent quality gate 与 owner receipt / typed blocker closeout，并用 `asset_follow_audit` 锁住可跟随的 stage / manifest / current pointer / role artifact / receipt refs。`live_stage_run_progress_evidence.json` 是 OPL 标准消费入口，使用 `surface_kind=domain_live_stage_run_progress_evidence` 与 `status=owner_typed_blocker_recorded_not_ready_claim`，记录 RCA-owned `refs.owner_receipt_refs`、`refs.typed_blocker_refs`、`refs.human_gate_refs`、`refs.quality_or_export_receipt_refs`、`refs.memory_lifecycle_refs`、`refs.no_regression_refs`、`refs.long_soak_refs`、`doc_refs` 和 `next_verification_command_refs`；human ready/export handoff 已记录 owner follow-through ref 并关闭同一子项 pending typed blocker，Temporal long soak、real memory lifecycle receipt instances 与 cross-family repeated no-regression tail 仍写成 RCA-owned typed blocker progress entry，不声明 visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long soak complete。`owner_chain_live_progress_evidence.json` 继续作为该标准入口的输入/引用，记录 mock-safe artifact-producing visual owner-chain canary refs，并声明 memory lifecycle / no-regression 的 success ref 或 typed blocker shape；该 canary 可写测试 workspace artifact 并观察 RCA-owned review/export receipt refs，但不调用真实图片 API、不把 workspace artifact 写入 repo、不携带 visual truth/artifact body/review-export verdict body/memory body。工具和渲染只作为 affordance/evidence refs，不成为 workflow script、transition authority、visual verdict owner 或 production progress 证据；operator summary、README、docs、mock-safe canary 或 conformance pass 都不能升级成 visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long soak complete。
-- `agent_lab_handoff.json`、`capability_map.json`、`production_acceptance/rca-goal-workflow-agent-lab-suite.json` 与 `production_acceptance/rca-ppt-three-route-agent-lab-suite.json`：最小 `/goal`、PPT 三技术路线与 PPT 专业能力映射的 AgentLab / OMA handoff surface。`capability_map.json` 是 `storyline` / `outline`、`visual_direction` / `style`、`page_authoring`、`visual_review`、`native_pptx_editability`、`template_profile` / `placeholder_capacity`、`visual_density`、`layout_quality`、`ppt_review` 与 dry-run 方法 token 到 `agent/professional_skills/*/SKILL.md` 的单一映射源；`agent_lab_handoff.json` 只保留 suite entry、fixture/context、external refs、dry-run check refs 和 no-forbidden-write boundary，不复制 per-token mapping 或 patch-target authority。两个 production acceptance suite 是 OPL `agent-lab run --suite ... --json` 可直接消费的顶层 external suite。它们都只投递 refs、receipt shape、typed blocker candidate、artifact sample refs 和 no-forbidden-write proof；RCA 继续持有 visual truth、review/export verdict、artifact authority、owner receipt 与 typed blocker closeout。
-- `agent_lab_cost_profile.json`：RCA-owned declarative workload profile，持有 `rca-ppt-40` stage workload/token 假设，不持有 pricing snapshot、通用估价算法、预算授权或真实账单结论。语义 route 只由 Codex CLI 根据 `ai_route_policy` context 选择。
-- `production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json`：RCA workspace receipt scaleout 的 repo-tracked evidence snapshot。workspace/receipt 计数、receipt-kind coverage、scaleout claim flags、source export provenance 和 authority boundary 以该合同的 `scaleout_projection` 与 authority fields 为准；合同索引只记录它是 body-free refs-only production-acceptance evidence surface，本机 runtime export 路径只作为 provenance，不是 portable contract input，不声明 visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long soak complete。
-- `runtime-program/ppt-image-first-quality-nonregression.json`、`runtime-program/ppt-html-route-quality-nonregression.json`、`runtime-program/ppt-native-pptx-quality-nonregression.json`：`ppt_deck` 三技术路线 AgentLab 质量输入合同。三者都是 standard suite input / refs-only / read-only surface，只允许 OPL AgentLab 存储和比较 route policy、runtime read-model、quality gate 与 forbidden-authority refs；AgentLab score 不是 RCA visual verdict，也不能声明 visual ready、exportable、handoffable、production soak complete，不能写 artifact body、memory body、owner receipt body 或切换默认 route。
-- `runtime-program/current-program.index.json` 与 `runtime-program/current-program-parts/**`：当前 active mainline pointer 的 canonical source bundle。`current-program-parts/**` 是编辑真相；`current-program.index.json` 是最薄 source locator / check 输入，包含 source part refs、digest 和 false-authority flags。`runtime-program/current-program.json` 已退役并不得重新生成、保留或作为 check input；维护时优先编辑 `current-program-parts/**`，运行 `npm run contracts:current-program:write` 重建 index，运行 `npm run contracts:current-program:check` 校验 source parts 与 index 一致，并拒绝退役 aggregate 复活。
-- `runtime-program/opl-family-contract-adoption.json`：OPL family adoption 的 compact aggregate。大型 surface（functional audit、physical source morphology、standard domain-agent skeleton、visual pack compiler handoff、operator evidence readiness）只记录 canonical contract refs 或 generated product-entry readback refs；完整 body 分别归 `functional_privatization_audit.json`、`physical_source_morphology_policy.json`、`pack_compiler_input.json` / `generated_surface_handoff.json` 和 `getProductEntryManifest` readback。
-- `runtime-program/current-program-parts/product_release_metadata.json`：`RedCube AI Foundry Agent` 的产品层发布 metadata，声明它是 built on `OPL Framework` 的 OPL-compatible package，并把 single app skill、service-safe domain entry、RCA domain handler target、OPL-generated `domain_action_adapter` descriptor/projection 与 stage control projection 归入同一发布形态；该 metadata 不持有 visual truth、review/export verdict 或 artifact authority
-- `runtime-program/current-program-parts/product_release_metadata.json#/opl_substrate_adapter_export` 与 `runtime-program/opl-family-contract-adoption.json#/opl_substrate_adapter_export`：RCA domain-owned OPL substrate adapter/export 合同；只导出 opaque/index-only workspace/source/artifact/memory refs 与 lifecycle/operator projection refs，不导出 visual truth、layout/review/export verdict、deliverable artifact body、visual memory body 或 owner receipt authority
-- `runtime-program/upstream-hermes-agent-final-target-shape.json`：独立 RCA domain-agent 在显式 hosted runtime carrier 语境下的目标形态冻结件（direct route 与 OPL-hosted handoff 共用同一下游 domain entry）
-- `runtime-program/redcube-product-entry-mvp.json`：当前 direct product-entry service surface 冻结件
-- `runtime-program/opl-framework-hosted-product-entry.json`：当前 OPL-hosted stage runtime handoff / integration 冻结件
-- `runtime-program/product-entry-session-continuity.json`：当前 product-entry session continuity 冻结件
-- `runtime-program/managed-product-entry-hardening.json`：旧 `managed` contract tombstone；只保留 provenance / semantic-id，不提供 callable alias 或 compatibility wrapper
-- `product_status` 等 product-entry command keys 只作为单一 `redcube-ai` app skill 下的 machine-readable overview / intake / entry-shell contract 保留；它们不表示成熟 GUI、WebUI 或最终用户前台壳已经落地。
-- `runtime-program/rca-one-shot-production-hardening-closeout.json`：2026-05-20 一步到位落地计划的 closeout 机器面，显式记录 `planned`、`done`、`deferred`、`skipped`、`verification` 与 `commit_push_state`。它只声明 A/B/C/D 的结构、executor policy、evidence refs 与 wrapper classification 已落地；production visual-stage long soak、真实 memory lifecycle scaleout 与 cross-family repeated no-regression 仍保留为 RCA-owned typed blocker/backlog，不升级为 visual ready、exportable 或 handoffable。
-- `runtime-program/ppt-image-first-production-route.json`：`ppt_deck` 当前默认 image-first visual route 冻结件；`author_image_pages / repair_image_pages` 通过 Codex executor 原生 imagegen 任务生成整页 16:9 PNG，并继续走 review/export gate；默认 lightweight proof 不调用真实 imagegen 且不把完整“肠癌AI”长 PPT 纳入常规回归
-- `runtime-program/ppt-html-route-quality-nonregression.json`：`ppt_deck` HTML authoring / fix route 的质量非回归合同；`render_html / fix_html` 保持 production-selectable optional，必须显式选择，且不得绕过 RCA review/export gates 或把 HTML lane 写回默认路线
-- `runtime-program/ppt-native-authoring-proof-lane.json`：`ppt_deck` native PPT authoring / repair 生产可选、默认关闭路线冻结件；用户明确要求可编辑 / 原生 PPTX / DrawingML 时替代当前 image-first author/repair stages，但仍必须经 RCA product-entry 与 review/export gate
-- `runtime-program/ppt-native-python-engine-contract.json`：RedCube-owned clean-room SVG IR / DrawingML writer / true render proof engine 合同
-- Python native helper contract 必须挂在 RedCube route/selectable lane、review/export gate 与 repo-tracked contract 下；不得作为绕过 visual-domain truth 的通用 Office/PPT 脚本入口。
-- `runtime-program/ppt-mainline-quality-closeout.json`：`ppt_deck` 历史 HTML 默认路线视觉质量债核查 closeout，记录历史 OPL-series 问题已由后续 review / repair hardening 覆盖；当前默认路线已由 `ppt-image-first-production-route.json` 接管
-- `runtime-program/upstream-hermes-agent-live-verification-closeout.json`：当前 F4 live closeout 证明件
-- `runtime-program/upstream-hermes-agent-live-verification-blocker.json`：历史 F4 live blocker 冻结件
-- `runtime-program/*.json`：absorbed tranche、prefrozen follow-on board 与 provenance contract
+- `owner_receipt_contract.json`：owner receipt / typed blocker / no-regression 领域边界。
+- `artifact_locator_contract.json`、`memory_descriptor.json`：body-free locator vocabulary。
+- `stage_quality_cycle_policy.json`、`stage_artifact_kernel_adoption.json`、`stage_run_kernel_profile.json`：RCA 对 OPL StageRun 的消费约束。
+- `foundry-agent-os-domain-kernel-manifest.json`、`capability_map.json`：领域能力与 carrier projection。
 
-这里不再保留 narrative 的 `project-truth/AGENTS.md` 层。
+## Native helper and proof contracts
+
+`runtime-program/` 只保留 RCA domain quality、PPT/native-helper 和 developer-proof contracts，例如 `python-native-helper-catalog.json`、`ppt-native-python-engine-contract.json` 与路线质量合同。它不再保存 current-program baton、product-entry、session、domain-entry、runtime package 或 Hermes adapter control plane。
+
+迁移前 `production_acceptance/` snapshot 已物理退役；历史来源只在 `docs/history/` 与 Git history 读取。当前 readiness 必须由 fresh hosted evidence 与 RCA owner receipt 证明。
+
+## Retired machine surfaces
+
+下列合同类别不得恢复：repo-local CLI manifest、TypeScript runtime package build graph、product-entry/session continuity、domain-handler adapter、current-program index/parts、private scheduler/runner、generic workspace/source/review/repair transport 与 package manager。
+
+## Validation
+
+最终字节必须通过 repo tests、private-platform guard、OPL interfaces/conformance、source-closure、default-callers 与 residue readback。任何 pass 都不自动授权 visual-ready 或 production-ready claim。

@@ -79,8 +79,8 @@ function createProofOutput({
 
   for (const report of [
     'doctor.json',
-    'product-manifest.json',
-    'product-status.json',
+    'agent-package-manifest.json',
+    'native-helper-catalog.json',
     'native-helper-input.json',
     'native-package-readback.json',
     'native-quality-verdict.json',

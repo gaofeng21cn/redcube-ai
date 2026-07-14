@@ -1,29 +1,12 @@
-# Source 文档
+# Source
 
-Owner: `RedCube AI`
-Purpose: `source_docs_index`
-State: `active_support`
-Machine boundary: 人读 source 索引。机器真相继续归 workspace artifacts、runtime-family contracts、schemas、generated reports、owner receipts 和 source readiness runtime surfaces。
+Owner: OPL Framework（intake transport）/ RedCube AI（source-readiness semantics）
+Purpose: 说明 source input 的 transport 与 domain decision 边界。
+State: active
+Machine boundary: workspace/source locator 归 OPL；RCA source-readiness prompt、gate 与 returned refs 归 declarative pack。
 
-`docs/source/` 保存人读 source lifecycle 材料：source readiness、source augmentation、deep research trigger/gate 行为、source truth consumption 和 external research executor expectations。
+OPL 负责 workspace binding、source locator、materialization、hash/currentness 与 input artifact transport。RCA 不维护 source-intake service、workspace store 或 augmentation executor。
 
-本层只解释 source 职责。Canonical source truth 继续归 workspace artifacts、runtime-family contracts、schemas 和 generated reports。
+RCA 负责判断视觉交付所需信息是否足够、哪些 claim/asset/brand constraint 可用、哪些缺口需要 human gate 或 quality debt，并把判断作为当前 StageRun 的 artifact/decision refs 返回。
 
-Source readiness / augmentation 的 `planning_ready` 只说明 source truth 可以被后续 Storyline / Plan 消费；它不授权 visual ready、exportable、handoffable、artifact authority、review/export verdict、domain ready 或 production ready。
-
-## 当前角色
-
-Source docs 解释当前 source readiness、augmentation、deep research trigger/gate 行为和 source truth consumption。已完成的 source-readiness plans 进入 history；仍生效的 source contracts 留在本目录或 contracts/source surfaces，并写清 machine boundary。
-
-当前材料：
-
-- [Source augmentation executor contract](./source_augmentation_executor_contract.md)
-
-历史 source 产品语义与 longrun target freeze 已归入 `../history/plans/`：
-
-- [Deep Research / auto-first product contract](../history/plans/2026-04-08-deep-research-auto-first-product-contract.md)
-- [Source readiness deep research longrun target state](../history/plans/2026-04-09-source-readiness-deep-research-longrun-target-state.md)
-
-这些历史文档只保留 provenance，不再作为当前 source contract 或 active checklist。当前 source 执行合同以本目录的 `source_augmentation_executor_contract.md` 和 machine-readable contracts 为准。
-
-机器可读 surface 应使用 canonical artifact/contract paths 或 `human_doc:*` semantic IDs，不应把本文 prose path 当稳定接口。
+真实 source body 不进入 repo contracts；contracts 只保存 vocabulary、schema、policy 与 body-free refs。

@@ -1,7 +1,7 @@
 {
   "contract_id": "ppt-native-authoring-proof-lane",
   "date_anchor": "2026-04-25",
-  "status": "production_hardening_landed",
+  "status": "developer_proof_contract_landed",
   "owner": "redcube_ai",
   "deliverable_family": "ppt_deck",
   "professional_design_pack_contract_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
@@ -31,7 +31,7 @@
     ],
     "out_of_scope": [
       "new public skill",
-      "new product-entry semantics",
+      "new repo-local runtime or generated-surface wrapper semantics",
       "bypassing RedCube review/export gates",
       "replacing source truth, storyline, blueprint, or visual direction"
     ]
@@ -161,7 +161,7 @@
     "true_render_proof": {
       "required": true,
       "source_surface_kind": "native_pptx",
-      "renderer_selection_policy": "capability_probe_auto_bootstrap",
+      "renderer_selection_policy": "opl_probe_then_helper_capability_bind",
       "user_preinstalled_libreoffice_required": false,
       "renderer_kind": "libreoffice_headless",
       "renderer_pipeline": "libreoffice_headless_pdf_png_v1",
@@ -187,10 +187,11 @@
         }
       ],
       "bootstrap_policy": {
-        "capability_probe": "native_ppt_renderer_capability_probe",
-        "automatic_bootstrap_allowed": true,
+        "capability_probe": "opl pack native-helper probe",
+        "automatic_bootstrap_allowed": false,
         "user_preinstall_required": false,
-        "repo_owned_installer": "tools/native-ppt-proof/install-deps.sh",
+        "dependency_provisioning_owner": "opl_connect_or_operator",
+        "developer_proof_installer": "tools/native-ppt-proof/install-deps.sh",
         "proof_container": "tools/native-ppt-proof/Dockerfile"
       },
       "cross_platform_render_required": true,
@@ -266,12 +267,15 @@
       "review_behavior": "screenshot_review consumes native shape manifest metrics; missing or failing quality checks record non-blocking quality debt and block ready claims",
       "chart_table_metric_grid_review_behavior": "missing editable chart/table/metric-grid metrics record page quality debt and repair targets while a readable PPTX continues"
     },
-    "runtime_executor_proof": {
-      "author_executor": "packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/native-ppt.ts",
+    "hosted_stage_native_helper_proof": {
+      "hosted_action_id": "run_native_ppt_proof",
+      "hosted_action_catalog_ref": "contracts/action_catalog.json",
+      "author_helper_source": "python/redcube_ai/native_helpers/ppt_deck/native.py",
+      "author_helper_probe_descriptor": "python/redcube_ai/native_helpers/ppt_deck/native.native-helper-probe.json",
       "native_writer_package_module": "redcube_ai.native_helpers.ppt_deck.native",
       "native_writer_module_command": "python -m redcube_ai.native_helpers.ppt_deck.native",
       "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",
-      "route_surface": "runDeliverableRoute",
+      "route_surface": "opl_hosted_stage_run_action",
       "stage_sequence_model": "explicit_selectable_alternate_stages",
       "default_stage_sequence_changed": false,
       "engine_capabilities": {
@@ -289,9 +293,10 @@
       "officecli_validate_substitutes_true_render_proof": false,
       "export_behavior": "export_pptx copies the editable native source PPTX when the latest reviewed visual artifact is native PPTX and records operator-facing proof summary, source/final hashes, renderer provenance, shape manifest, repair log, and PNG proof refs"
     },
-    "production_hardening": {
-      "live_product_entry_proof": "tests/product-entry-native-ppt-live-proof.test.js",
-      "live_product_entry_proof_scope": "product_entry_route_review_export_and_true_render_proof",
+    "developer_proof": {
+      "native_helper_contract_test": "tests/python-native-helper-catalog.test.js",
+      "native_fixture_contract_test": "tests/native-ppt-proof-fixture-contract.test.js",
+      "proof_scope": "exact_helper_contract_fixture_materialization_and_true_render_proof",
       "mock_codex_test_double_policy": {
         "allowed": true,
         "purpose": "deterministic_contract_route_plumbing_and_fail_closed_tests",
@@ -318,7 +323,7 @@
       "repair_evidence_surface": "native_ppt_repair_evidence_v1",
       "export_operator_proof_summary": "native_export_bundle_operator_proof_summary_v1",
       "export_operator_artifact_gallery": "native_export_operator_artifact_gallery_v1",
-      "operator_helper_command": "redcube native-ppt proof"
+      "hosted_action_id": "run_native_ppt_proof"
     },
     "required_export_fields": [
       "export_bundle.source_pptx",
@@ -344,8 +349,8 @@
     "native PPTX produces editable slides rather than screenshot-only wrappers",
     "screenshot_review judges rendered PPTX screenshots as the final visible artifact",
     "repair route consumes review feedback and updates only the blocked PPTX pages when possible",
-    "getReviewState and getPublicationProjection remain authoritative",
-    "runManagedDeliverable and product-entry route gates remain fail-closed"
+    "RCA review/export authority refs remain authoritative",
+    "OPL-hosted StageRun currentness, identity, and route gates remain fail-closed"
   ],
   "rollback_policy": {
     "default_mainline_impact": "none; native remains explicit selectable while image-first stays the default visual route",

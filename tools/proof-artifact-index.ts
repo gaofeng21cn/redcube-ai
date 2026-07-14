@@ -1,7 +1,49 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { parseArgs } from 'node:util';
-import { buildDirectoryArtifactIndex } from 'opl-framework/domain-artifact-runtime';
+
+type DirectoryArtifactEntry = {
+  relative_path: string;
+  bytes: number;
+  sha256: string;
+};
+
+function buildDeveloperProofDirectoryIndex(root: string, excludePaths: string[]) {
+  const excluded = new Set(excludePaths);
+  const entries: DirectoryArtifactEntry[] = [];
+  const visit = (directory: string) => {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const absolutePath = path.join(directory, entry.name);
+      const relativePath = path.relative(root, absolutePath).split(path.sep).join('/');
+      if (excluded.has(relativePath)) continue;
+      if (entry.isDirectory()) {
+        visit(absolutePath);
+        continue;
+      }
+      if (!entry.isFile()) continue;
+      const bytes = fs.readFileSync(absolutePath);
+      entries.push({
+        relative_path: relativePath,
+        bytes: bytes.byteLength,
+        sha256: crypto.createHash('sha256').update(bytes).digest('hex'),
+      });
+    }
+  };
+  visit(root);
+  entries.sort((left, right) => left.relative_path.localeCompare(right.relative_path));
+  return {
+    surface_kind: 'rca_developer_proof_directory_index',
+    status: 'developer_evidence_only',
+    entries,
+    authority_boundary: {
+      index_can_write_visual_truth: false,
+      index_can_authorize_review_or_export: false,
+      index_can_sign_owner_receipt: false,
+      index_can_claim_domain_ready: false,
+    },
+  };
+}
 
 const { values } = parseArgs({
   options: {
@@ -24,7 +66,7 @@ const mediaType = (file: string) => ({
   '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation', '.md': 'text/markdown',
 }[path.extname(file).toLowerCase()] || 'application/octet-stream');
 
-const generic = buildDirectoryArtifactIndex({ root: outputRoot, exclude_paths: [relative(indexFile)] });
+const generic = buildDeveloperProofDirectoryIndex(outputRoot, [relative(indexFile)]);
 const indexed = new Map(generic.entries.map((entry) => [entry.relative_path, entry]));
 function artifact(artifactId: string, file: string, category: string, required = true, sourceRefPresent = true) {
   const relativePath = relative(file);
@@ -46,8 +88,8 @@ function nativeIndex() {
   const renderProof = helper.render_proof || {};
   const required = [
     ['doctor_json', 'doctor.json', 'runtime_doctor'],
-    ['product_manifest_json', 'product-manifest.json', 'product_entry'],
-    ['product_status_json', 'product-status.json', 'product_entry'],
+    ['agent_package_manifest_json', 'agent-package-manifest.json', 'agent_package_contract'],
+    ['native_helper_catalog_json', 'native-helper-catalog.json', 'native_helper_contract'],
     ['native_helper_input_json', 'native-helper-input.json', 'native_helper'],
     ['native_helper_output_json', 'native-helper-output.json', 'native_helper'],
     ['native_package_readback_json', 'native-package-readback.json', 'native_quality'],
@@ -95,7 +137,7 @@ function nativeIndex() {
       native_quality_verdict_status: summary.native_quality_verdict?.status,
     },
     artifacts: required,
-    opl_directory_index: generic,
+    developer_proof_directory_index: generic,
   };
 }
 
@@ -135,7 +177,7 @@ function imageIndex() {
       artifact_categories: [...new Set(artifacts.map((entry) => entry.category))].sort(),
     },
     artifacts,
-    opl_directory_index: generic,
+    developer_proof_directory_index: generic,
   };
 }
 

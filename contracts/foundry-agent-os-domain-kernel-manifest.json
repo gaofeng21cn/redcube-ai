@@ -7,7 +7,8 @@
   "state": "active_contract",
   "role": "w4_domain_kernel_manifest",
   "source_of_truth_refs": [
-    "docs/active/foundry-agent-os-target-delta.md",
+    "docs/architecture.md",
+    "docs/status.md",
     "contracts/foundry_agent_series.json",
     "contracts/private_functional_surface_policy.json",
     "contracts/physical_source_morphology_policy.json",
@@ -131,6 +132,6 @@
     "focused_tests": [
       "tests/rca-foundry-agent-os-domain-kernel-manifest.test.ts"
     ],
-    "docs_ref": "docs/active/foundry-agent-os-target-delta.md"
+    "docs_ref": "docs/status.md"
   }
 }
