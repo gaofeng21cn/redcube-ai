@@ -55,6 +55,20 @@ test('RCA canonical semantic pack remains concrete while root stage/pack contrac
   assert.equal(packRefs.source_refs.stage_graph_source_ref, 'agent/stages/manifest.json');
 });
 
+test('package handoff prompt keeps the quality loop under the StageRun controller', () => {
+  const prompt = fs.readFileSync(
+    path.join(repoRoot, 'agent/prompts/package_and_handoff.md'),
+    'utf8',
+  );
+
+  assert.doesNotMatch(prompt, /Run the focused formal quality loop/);
+  assert.match(prompt, /controller-managed formal quality loop/);
+  assert.match(prompt, /current executor call performs only its injected Attempt role/);
+  assert.match(prompt, /must not run the whole sequence or create the next StageAttempt/);
+  assert.match(prompt, /Only the OPL StageRunController creates each fresh role Attempt/);
+  assert.match(prompt, /producer -> reviewer -> repairer -> re_reviewer/);
+});
+
 test('RCA capability map routes visual feedback fixtures through declarative professional skills', () => {
   const capabilityMap = readJson('contracts/capability_map.json');
   const handoff = readJson('contracts/agent_lab_handoff.json');
