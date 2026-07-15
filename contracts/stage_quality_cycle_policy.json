@@ -325,7 +325,7 @@
       "attempt_boundary": {"inherits_stage_goal_scope_authority": true, "role_overlay_may_only_narrow": true, "controller_creates_next_attempt": true, "attempt_is_not_sub_stage": true}
     }
   },
-  "meta_review": {
+  "meta_review_policy": {
     "stage_id": "review_and_revision",
     "stage_role": "cross_stage_meta_review",
     "independent_stage_run_required": true,

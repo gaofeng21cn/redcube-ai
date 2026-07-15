@@ -88,6 +88,56 @@ test('RCA canonical semantic pack remains concrete while root stage/pack contrac
   assert.equal(packRefs.source_refs.stage_graph_source_ref, 'agent/stages/manifest.json');
 });
 
+test('RCA opts into the canonical quality profile with one independent primary-only Meta Review', () => {
+  const stageManifest = readJson('agent/stages/manifest.json');
+  const qualityPolicy = readJson('contracts/stage_quality_cycle_policy.json');
+  const metaReviewStage = stageManifest.stages.find(
+    (stage) => stage.stage_role === 'cross_stage_meta_review',
+  );
+
+  assert.equal(
+    stageManifest.quality_governance_profile_ref,
+    'contracts/opl-framework/official-knowledge-deliverable-quality-profile.json',
+  );
+  assert.equal(
+    stageManifest.meta_review_policy_ref,
+    'contracts/stage_quality_cycle_policy.json#/meta_review_policy',
+  );
+  assert.equal('stage_quality_cycle_profile_ref' in stageManifest, false);
+  assert.equal('meta_review_stage_ref' in stageManifest, false);
+  assert.equal('meta_review' in qualityPolicy, false);
+  assert.deepEqual(qualityPolicy.meta_review_policy, {
+    stage_id: 'review_and_revision',
+    stage_role: 'cross_stage_meta_review',
+    independent_stage_run_required: true,
+    primary_attempt_role: 'producer',
+    no_context_inheritance: true,
+    max_route_back_rounds: 3,
+    terminal_route_output: 'route_impact.stage_route_decision',
+    terminal_route_owner: 'producer',
+    allowed_verdicts: [
+      'pass',
+      'route_back',
+      'completed_with_quality_debt',
+      'human_gate',
+      'typed_blocker',
+    ],
+    route_back_targets: [
+      'source_intake',
+      'communication_strategy',
+      'visual_direction',
+      'artifact_creation',
+    ],
+    multiple_defect_policy: 'route_to_earliest_stage_that_can_close_root_cause',
+    invalidates_downstream_review_and_export_refs: true,
+  });
+  assert.equal(metaReviewStage?.stage_id, 'review_and_revision');
+  assert.equal(
+    qualityPolicy.stage_policies[metaReviewStage.stage_id].formal_review.required,
+    false,
+  );
+});
+
 test('package handoff prompt keeps the quality loop under the StageRun controller', () => {
   const prompt = fs.readFileSync(
     path.join(repoRoot, 'agent/prompts/package_and_handoff.md'),

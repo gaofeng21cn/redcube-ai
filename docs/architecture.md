@@ -18,13 +18,13 @@ User / Codex App
   -> OPL controller validates and materializes transition / receipt
 ```
 
-只有 decisive Attempt 决定领域语义 route recommendation；OPL controller 校验并物化 transition。RCA 仓不保存 current pointer、Attempt ledger、session store 或 runtime queue。
+只有终局 decisive Attempt 返回领域语义 `stage_route_decision`；非终局 Attempt 最多返回 `stage_route_recommendation`。OPL controller 只校验并物化 transition。RCA 仓不保存 current pointer、Attempt ledger、session store 或 runtime queue。
 
 ## 四层边界
 
 ### 1. Declarative visual pack
 
-`agent/stages/manifest.json` 是 stage graph source，`agent/prompts/`、`agent/skills/`、`agent/professional_skills/`、`agent/quality_gates/`、`agent/knowledge/` 和 `agent/tools/` 提供阶段语义、专业能力与 tool affordance boundary。
+`agent/stages/manifest.json` 是 stage graph source，`agent/prompts/`、`agent/skills/`、`agent/professional_skills/`、`agent/quality_gates/`、`agent/knowledge/` 和 `agent/tools/` 提供阶段语义、专业能力与 tool affordance boundary。Manifest 通过 `quality_governance_profile_ref` 和 `meta_review_policy_ref` 接入 OPL 官方质量治理；`review_and_revision` 是独立、primary-only 的 Meta Review StageRun，不递归启动 Stage 内正式 Review。
 
 ### 2. OPL generated/hosted surfaces
 

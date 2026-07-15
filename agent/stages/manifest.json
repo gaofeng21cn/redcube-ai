@@ -3,8 +3,8 @@
   "version": "opl-standard-agent-declarative-stage-manifest.v1",
   "target_domain_id": "redcube_ai",
   "owner": "redcube_ai",
-  "stage_quality_cycle_profile_ref": "contracts/stage_quality_cycle_policy.json",
-  "meta_review_stage_ref": "review_and_revision",
+  "quality_governance_profile_ref": "contracts/opl-framework/official-knowledge-deliverable-quality-profile.json",
+  "meta_review_policy_ref": "contracts/stage_quality_cycle_policy.json#/meta_review_policy",
   "stages": [
     {
       "stage_id": "source_intake",
