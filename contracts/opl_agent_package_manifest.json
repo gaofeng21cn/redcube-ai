@@ -39,6 +39,7 @@
   },
   "codex_surface": {
     "plugin_id": "redcube-ai",
+    "carrier_source_commit": "566fd793cb91860146bf81a104945b76f85ce7e5",
     "codex_visible_entry": "redcube-ai",
     "standalone_distribution": "repo_carrier_source",
     "required_skill_ids": [
