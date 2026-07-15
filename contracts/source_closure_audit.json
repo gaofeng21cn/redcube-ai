@@ -5,7 +5,7 @@
     {
       "file": "scripts/line-budget.ts",
       "symbol": "main",
-      "source_digest": "sha256:e231f17a1b3cf4e9b7a135354e97cc96c6da8c1f617f24c873b509de9ad0ff2f",
+      "source_digest": "sha256:7f94188c96dd86b0477476057f20f9931bdec8150e6c504f5da416d26a524d9a",
       "allowed_effects": ["process_spawn"],
       "role": "developer_tool",
       "allowed_targets": ["git"]
@@ -13,7 +13,7 @@
     {
       "file": "scripts/run-test-group.ts",
       "symbol": "<module>",
-      "source_digest": "sha256:dcfae92d1055c09f07d36574f50cd0a7b6528a9ddaf9d8ec6244379d699b3c4b",
+      "source_digest": "sha256:c423bd3fa74ae1f6e76081746f959dcd30f1cf1533e7a102bc5e0a6cbcda4a19",
       "allowed_effects": ["filesystem_write"],
       "role": "developer_tool",
       "allowed_targets": []
@@ -21,7 +21,7 @@
     {
       "file": "scripts/run-test-group.ts",
       "symbol": "<module>",
-      "source_digest": "sha256:dcfae92d1055c09f07d36574f50cd0a7b6528a9ddaf9d8ec6244379d699b3c4b",
+      "source_digest": "sha256:c423bd3fa74ae1f6e76081746f959dcd30f1cf1533e7a102bc5e0a6cbcda4a19",
       "allowed_effects": ["process_spawn"],
       "role": "developer_tool",
       "allowed_targets": ["scripts/repo-hygiene.sh"]
@@ -29,7 +29,7 @@
     {
       "file": "scripts/run-test-group.ts",
       "symbol": "runNodeTestBatch",
-      "source_digest": "sha256:dcfae92d1055c09f07d36574f50cd0a7b6528a9ddaf9d8ec6244379d699b3c4b",
+      "source_digest": "sha256:c423bd3fa74ae1f6e76081746f959dcd30f1cf1533e7a102bc5e0a6cbcda4a19",
       "allowed_effects": ["process_spawn"],
       "role": "developer_tool",
       "allowed_targets": ["node"]
@@ -58,7 +58,7 @@
     {
       "file": "tools/image-ppt-proof/run-proof.py",
       "symbol": "main",
-      "source_digest": "sha256:119bba848119e1157ca06c32f9f75c2dc2b460905bf5820bce13638136e85bfc",
+      "source_digest": "sha256:548ffdf74d14b667f4746adf2ce2d7ccc84c0dcd2c5bedbdeaa557ac72406cec",
       "allowed_effects": ["filesystem_write"],
       "role": "developer_tool",
       "allowed_targets": []
@@ -66,7 +66,7 @@
     {
       "file": "tools/image-ppt-proof/run-proof.py",
       "symbol": "write_delivery",
-      "source_digest": "sha256:119bba848119e1157ca06c32f9f75c2dc2b460905bf5820bce13638136e85bfc",
+      "source_digest": "sha256:548ffdf74d14b667f4746adf2ce2d7ccc84c0dcd2c5bedbdeaa557ac72406cec",
       "allowed_effects": ["filesystem_write"],
       "role": "developer_tool",
       "allowed_targets": []
@@ -74,7 +74,7 @@
     {
       "file": "tools/image-ppt-proof/run-proof.py",
       "symbol": "write_images",
-      "source_digest": "sha256:119bba848119e1157ca06c32f9f75c2dc2b460905bf5820bce13638136e85bfc",
+      "source_digest": "sha256:548ffdf74d14b667f4746adf2ce2d7ccc84c0dcd2c5bedbdeaa557ac72406cec",
       "allowed_effects": ["filesystem_write"],
       "role": "developer_tool",
       "allowed_targets": []
@@ -82,7 +82,7 @@
     {
       "file": "tools/image-ppt-proof/run-proof.py",
       "symbol": "write_json",
-      "source_digest": "sha256:119bba848119e1157ca06c32f9f75c2dc2b460905bf5820bce13638136e85bfc",
+      "source_digest": "sha256:548ffdf74d14b667f4746adf2ce2d7ccc84c0dcd2c5bedbdeaa557ac72406cec",
       "allowed_effects": ["filesystem_write"],
       "role": "developer_tool",
       "allowed_targets": []
@@ -90,7 +90,7 @@
     {
       "file": "tools/image-ppt-proof/run-proof.py",
       "symbol": "write_style_manifest",
-      "source_digest": "sha256:119bba848119e1157ca06c32f9f75c2dc2b460905bf5820bce13638136e85bfc",
+      "source_digest": "sha256:548ffdf74d14b667f4746adf2ce2d7ccc84c0dcd2c5bedbdeaa557ac72406cec",
       "allowed_effects": ["filesystem_write"],
       "role": "developer_tool",
       "allowed_targets": []
@@ -106,7 +106,7 @@
     {
       "file": "tools/native-ppt-proof/evaluate-quality.ts",
       "symbol": "runCli",
-      "source_digest": "sha256:c40dc5b53a508266818cc80ed780a9017d1c04add3c69aa2b07260bfeb875397",
+      "source_digest": "sha256:b36b61e1abd67586be1f8054a08d0f742355f56fdc7ac9977176305c718b0b29",
       "allowed_effects": ["filesystem_write"],
       "role": "developer_tool",
       "allowed_targets": []

@@ -28,7 +28,7 @@
       },
       {
         "id": "uv",
-        "uses": "actions/cache",
+        "uses": "astral-sh/setup-uv",
         "key_source": "uv.lock"
       },
       {

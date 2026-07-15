@@ -2,10 +2,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 
-const scriptPath = fileURLToPath(import.meta.url);
-const repoRoot = path.resolve(path.dirname(scriptPath), '..');
+const repoRoot = path.resolve(import.meta.dirname, '..');
 
 export const DEFAULT_LIMIT = 1000;
 export const BASELINE_ENTRIES = {};
@@ -134,6 +132,6 @@ export function lineBudgetExitCode({ failures, strict }) {
   return failures.length > 0 && strict ? 1 : 0;
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === scriptPath) {
+if (import.meta.main) {
   main();
 }

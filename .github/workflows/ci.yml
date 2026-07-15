@@ -46,6 +46,8 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           version: '0.9.5'
+          enable-cache: true
+          cache-dependency-glob: 'uv.lock'
 
       - name: Install Python test dependencies
         env:
@@ -101,12 +103,8 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           version: '0.9.5'
-
-      - name: Cache uv
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/uv
-          key: native-ppt-proof-uv-${{ runner.os }}-${{ hashFiles('uv.lock') }}
+          enable-cache: true
+          cache-dependency-glob: 'uv.lock'
 
       - name: Cache Playwright browsers
         uses: actions/cache@v5
@@ -166,12 +164,8 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           version: '0.9.5'
-
-      - name: Cache uv
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/uv
-          key: image-ppt-proof-uv-${{ runner.os }}-${{ hashFiles('uv.lock') }}
+          enable-cache: true
+          cache-dependency-glob: 'uv.lock'
 
       - name: Cache Playwright browsers
         uses: actions/cache@v5

@@ -3,7 +3,6 @@ import process from 'node:process';
 import { existsSync, readdirSync } from 'node:fs';
 type BuildNodeTestArgsOptions = Readonly<{
   forwardedArgs?: readonly string[];
-  serialized?: boolean;
 }>;
 
 export function resolveRedCubePythonCommand(
@@ -29,15 +28,8 @@ export function resolveRedCubePythonCommand(
 
 export function buildNodeTestArgs({
   forwardedArgs = [],
-  serialized = false,
 }: BuildNodeTestArgsOptions = {}): string[] {
-  const args = ['--test'];
-  if (serialized) {
-    // Browser / screenshot / local-exec heavy files can still oversubscribe the host;
-    // keep only that explicit subset at file-level concurrency 1.
-    args.push('--test-concurrency=1');
-  }
-  return [...args, ...forwardedArgs];
+  return ['--test', ...forwardedArgs];
 }
 
 export function discoverRootTestFiles({
@@ -57,7 +49,7 @@ export function discoverRootTestFiles({
 export function assertRootTestPartition({
   discoveredFiles = [],
   partitionFiles = [],
-  partitionName = 'meta/integration/e2e/historical',
+  partitionName = 'meta/integration',
 }: {
   discoveredFiles?: readonly string[];
   partitionFiles?: readonly string[];

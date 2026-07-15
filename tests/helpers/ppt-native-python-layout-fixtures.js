@@ -222,11 +222,6 @@ function slidePoints(slide, count = null) {
   return normalized.slice(0, wanted).map((text, index) => qualityPointText(text, index));
 }
 
-function requestedSlotCount(slide) {
-  const rawPointCount = Array.isArray(slide?.page_core_content) ? slide.page_core_content.length : 0;
-  return Math.max(3, Math.min(Math.max(rawPointCount, slidePoints(slide).length), 4));
-}
-
 function panelRole(layoutFamily) {
   return {
     cover_signal: 'signal_panel',

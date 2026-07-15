@@ -18,7 +18,7 @@
         "slot_id": "renderer_version_process",
         "source_ref": "native.py",
         "symbol": "command_version",
-        "source_digest": "sha256:1c52891b90d7e4ada313e30d1ebefcccc1f7ca1fa5ce9752f108904ff056b81b",
+        "source_digest": "sha256:3a0ad4ec8d16e246f7a6689ddd747bfe83d5bdae73e3b28230dd781f3ccb6f01",
         "effect_kind": "process_spawn",
         "target_policy": "declared_command_set",
         "allowed_targets": [
@@ -30,7 +30,7 @@
         "slot_id": "render_cleanup_artifact_write",
         "source_ref": "native.py",
         "symbol": "clean_render_outputs",
-        "source_digest": "sha256:1c52891b90d7e4ada313e30d1ebefcccc1f7ca1fa5ce9752f108904ff056b81b",
+        "source_digest": "sha256:3a0ad4ec8d16e246f7a6689ddd747bfe83d5bdae73e3b28230dd781f3ccb6f01",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
@@ -39,7 +39,7 @@
         "slot_id": "render_pdf_artifact_write",
         "source_ref": "native.py",
         "symbol": "render_pptx_to_pdf",
-        "source_digest": "sha256:1c52891b90d7e4ada313e30d1ebefcccc1f7ca1fa5ce9752f108904ff056b81b",
+        "source_digest": "sha256:3a0ad4ec8d16e246f7a6689ddd747bfe83d5bdae73e3b28230dd781f3ccb6f01",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
@@ -48,7 +48,7 @@
         "slot_id": "render_pdf_process",
         "source_ref": "native.py",
         "symbol": "render_pptx_to_pdf",
-        "source_digest": "sha256:1c52891b90d7e4ada313e30d1ebefcccc1f7ca1fa5ce9752f108904ff056b81b",
+        "source_digest": "sha256:3a0ad4ec8d16e246f7a6689ddd747bfe83d5bdae73e3b28230dd781f3ccb6f01",
         "effect_kind": "process_spawn",
         "target_policy": "declared_command_set",
         "allowed_targets": [
@@ -59,7 +59,7 @@
         "slot_id": "render_png_process",
         "source_ref": "native.py",
         "symbol": "render_png_from_pdf",
-        "source_digest": "sha256:1c52891b90d7e4ada313e30d1ebefcccc1f7ca1fa5ce9752f108904ff056b81b",
+        "source_digest": "sha256:3a0ad4ec8d16e246f7a6689ddd747bfe83d5bdae73e3b28230dd781f3ccb6f01",
         "effect_kind": "process_spawn",
         "target_policy": "declared_command_set",
         "allowed_targets": [
@@ -70,7 +70,7 @@
         "slot_id": "native_result_artifact_write",
         "source_ref": "native.py",
         "symbol": "main",
-        "source_digest": "sha256:1c52891b90d7e4ada313e30d1ebefcccc1f7ca1fa5ce9752f108904ff056b81b",
+        "source_digest": "sha256:3a0ad4ec8d16e246f7a6689ddd747bfe83d5bdae73e3b28230dd781f3ccb6f01",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
@@ -99,7 +99,7 @@
         "slot_id": "svg_ir_artifact_write",
         "source_ref": "native_layouts_parts/svg_ir.py",
         "symbol": "render_slide_svg_ir",
-        "source_digest": "sha256:82705e58455ee2db2fe316e15cd9dc2f95d197358e0b6d42c60e52cbdf280636",
+        "source_digest": "sha256:162855fbbc43566b6da34d5c09b2cb7cac44563e175d533d804f371399eabafb",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
@@ -108,7 +108,7 @@
         "slot_id": "template_copy_artifact_write",
         "source_ref": "native_package.py",
         "symbol": "copy_template_source",
-        "source_digest": "sha256:d46b2d7a01df5bbb7150811e9686d80f542ead001f93135fc82bb1fecf4f08a7",
+        "source_digest": "sha256:654d83239c53f47db50c5c466ff919954b58ee4cf80b20f1aa59cc2f04b618e6",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
@@ -117,7 +117,7 @@
         "slot_id": "chart_patch_artifact_write",
         "source_ref": "native_package.py",
         "symbol": "patch_chart_data",
-        "source_digest": "sha256:d46b2d7a01df5bbb7150811e9686d80f542ead001f93135fc82bb1fecf4f08a7",
+        "source_digest": "sha256:654d83239c53f47db50c5c466ff919954b58ee4cf80b20f1aa59cc2f04b618e6",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
@@ -126,7 +126,7 @@
         "slot_id": "custom_path_patch_artifact_write",
         "source_ref": "native_package.py",
         "symbol": "patch_custom_paths",
-        "source_digest": "sha256:d46b2d7a01df5bbb7150811e9686d80f542ead001f93135fc82bb1fecf4f08a7",
+        "source_digest": "sha256:654d83239c53f47db50c5c466ff919954b58ee4cf80b20f1aa59cc2f04b618e6",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
@@ -135,7 +135,7 @@
         "slot_id": "officecli_picture_readback_process",
         "source_ref": "officecli_readback.py",
         "symbol": "_picture_payload",
-        "source_digest": "sha256:39044d5c21a5036e21e68ab25611c93a5cc865ac3320f4729b89c0f531704020",
+        "source_digest": "sha256:e36eb059a90a985e71dd9da2d18f414ff74969e5684de80f1e22e275fbdde4b3",
         "effect_kind": "process_spawn",
         "target_policy": "declared_command_set",
         "allowed_targets": [
@@ -146,7 +146,7 @@
         "slot_id": "officecli_readback_process",
         "source_ref": "officecli_readback.py",
         "symbol": "_run",
-        "source_digest": "sha256:39044d5c21a5036e21e68ab25611c93a5cc865ac3320f4729b89c0f531704020",
+        "source_digest": "sha256:e36eb059a90a985e71dd9da2d18f414ff74969e5684de80f1e22e275fbdde4b3",
         "effect_kind": "process_spawn",
         "target_policy": "declared_command_set",
         "allowed_targets": [

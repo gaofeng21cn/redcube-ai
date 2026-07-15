@@ -51,8 +51,6 @@ RedCube AI.app/
 runtime-state/
 
 # OPL workspace-local topology projections; source truth stays in contracts/docs/runtime.
-/shared/
-/workspace.yaml
 /workspace_index.json
 /workspace_map.json
 /workspace_health.json

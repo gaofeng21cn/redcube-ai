@@ -12,7 +12,6 @@ import {
 import {
   assertValidTestRegistry,
   buildTestGroups,
-  partitionTestFilesForExecution,
   rootPartitionFiles,
 } from './test-registry.ts';
 
@@ -129,22 +128,15 @@ if (missingRequestedFiles.length > 0) {
   throw new Error(`${groupName} 分组不包含请求的测试文件: ${missingRequestedFiles.join(', ')}`);
 }
 const selectedFiles = requestedFiles.length > 0 ? requestedFiles : GROUPS[groupName];
-const executionPlan = partitionTestFilesForExecution({
-  groupName,
-  files: selectedFiles,
-});
 
-function runNodeTestBatch({ label, files, serialized }) {
+function runNodeTestBatch(files) {
   if (files.length === 0) {
     return 0;
   }
 
-  process.stdout.write([
-    `[run-test-group] ${groupName} ${label}: ${files.length} files`,
-    serialized ? '(file concurrency = 1)' : '(runner default concurrency)',
-  ].join(' ') + '\n');
+  process.stdout.write(`[run-test-group] ${groupName}: ${files.length} files (runner default concurrency)\n`);
 
-  const result = spawnSync('node', [...buildNodeTestArgs({ forwardedArgs, serialized }), ...files], {
+  const result = spawnSync('node', [...buildNodeTestArgs({ forwardedArgs }), ...files], {
     stdio: 'inherit',
     cwd: repoRoot,
     env: process.env,
@@ -157,18 +149,4 @@ function runNodeTestBatch({ label, files, serialized }) {
   return result.status ?? 1;
 }
 
-const parallelStatus = runNodeTestBatch({
-  label: 'parallel batch',
-  files: executionPlan.parallel_files,
-  serialized: false,
-});
-if (parallelStatus !== 0) {
-  process.exit(parallelStatus);
-}
-
-const serializedStatus = runNodeTestBatch({
-  label: 'serialized route-heavy batch',
-  files: executionPlan.serialized_files,
-  serialized: true,
-});
-process.exit(serializedStatus);
+process.exit(runNodeTestBatch(selectedFiles));

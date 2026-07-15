@@ -17,61 +17,6 @@ function runPython(script, args = []) {
   });
 }
 
-export function packageBindingResult(plannedShape, materializedObject) {
-  const python = resolveTestPythonCommand();
-  return spawnSync(python.command, [...(python.args || []), '-c', `
-import json
-import sys
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import _bind_manifest_to_package
-
-fixture = json.loads(sys.argv[1])
-manifest_slides = [{'native_shapes': [fixture['planned']]}]
-package_readback = {'slides': [{'slide_index': 1, 'objects': [fixture['materialized']]}]}
-_bind_manifest_to_package(manifest_slides, package_readback, [1])
-`, JSON.stringify({ planned: plannedShape, materialized: materializedObject })], {
-    cwd: process.cwd(),
-    env: pythonTestEnv(),
-    encoding: 'utf-8',
-  });
-}
-
-export function packageBindingResults(cases) {
-  return JSON.parse(runPython(`
-import json
-import sys
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import _bind_manifest_to_package
-
-results = []
-for fixture in json.loads(sys.argv[1]):
-    try:
-        _bind_manifest_to_package(
-            [{'native_shapes': [fixture['planned']]}],
-            {'slides': [{'slide_index': 1, 'objects': [fixture['materialized']]}]},
-            [1],
-        )
-        results.append({'case_id': fixture['case_id'], 'rejected': False, 'reason': None})
-    except Exception as exc:
-        results.append({'case_id': fixture['case_id'], 'rejected': True, 'reason': str(exc)})
-print(json.dumps(results))
-`, [JSON.stringify(cases)]));
-}
-
-export function pythonAnimationFailures(shapes) {
-  return JSON.parse(runPython(`
-import json
-import sys
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import _animation_target_failures
-
-shapes = json.loads(sys.argv[1])
-slides = [{
-    'slide_id': f'S{index:02d}',
-    '_editable_native_shapes': [shape],
-    'animation_timeline': [{'target_shape_id': shape['shape_id'], 'effect': 'fade'}],
-} for index, shape in enumerate(shapes, 1)]
-print(json.dumps(_animation_target_failures(slides)))
-`, [JSON.stringify(shapes)]));
-}
-
 export function createNativeObjectWorkspace(prefix = 'redcube-native-object-package-') {
   const workspaceRoot = mkUserScopedTestWorkspace(prefix);
   const pictureFile = path.join(workspaceRoot, 'picture.png');
@@ -131,126 +76,6 @@ materialize_native_pptx(
   });
 }
 
-export function runNativeObjectMaterializerFailureCases({ workspaceRoot, cases }) {
-  const inputFile = writeObjectPayload(workspaceRoot, { cases });
-  return JSON.parse(runPython(`
-import json
-import sys
-from pathlib import Path
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import materialize_native_pptx
-
-payload = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
-workspace_root = Path(sys.argv[2])
-results = []
-for fixture in payload['cases']:
-    output_path = workspace_root / f"{fixture['case_id']}.pptx"
-    try:
-        materialize_native_pptx(fixture['slides'], output_path)
-        reason = None
-        rejected = False
-    except Exception as exc:
-        reason = str(exc)
-        rejected = True
-    results.append({
-        'case_id': fixture['case_id'],
-        'rejected': rejected,
-        'reason': reason,
-        'output_exists': output_path.exists(),
-    })
-print(json.dumps(results))
-`, [inputFile, workspaceRoot]));
-}
-
-export function relocateRelationshipBackedParts(pptxFile) {
-  const script = String.raw`
-import posixpath
-import sys
-import tempfile
-import zipfile
-from pathlib import Path
-from xml.etree import ElementTree as ET
-
-REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships'
-CT_NS = 'http://schemas.openxmlformats.org/package/2006/content-types'
-
-def relationship_part(source):
-    directory, filename = posixpath.split(source)
-    return posixpath.join(directory, '_rels', filename + '.rels')
-
-def resolve_target(source, target):
-    if target.startswith('/'):
-        return target.lstrip('/')
-    return posixpath.normpath(posixpath.join(posixpath.dirname(source), target))
-
-def relationships(payloads, source):
-    part = relationship_part(source)
-    if part not in payloads:
-        return []
-    return list(ET.fromstring(payloads[part]))
-
-pptx = Path(sys.argv[1])
-with zipfile.ZipFile(pptx, 'r') as archive:
-    payloads = {name: archive.read(name) for name in archive.namelist()}
-
-presentation = 'ppt/presentation.xml'
-slide_rel = next(rel for rel in relationships(payloads, presentation) if rel.get('Type', '').endswith('/slide'))
-slide_part = resolve_target(presentation, slide_rel.get('Target', ''))
-slide_rels = relationships(payloads, slide_part)
-
-def related_part(suffix):
-    rel = next(item for item in slide_rels if item.get('Type', '').endswith(suffix))
-    return resolve_target(slide_part, rel.get('Target', ''))
-
-chart_part = related_part('/chart')
-picture_part = related_part('/image')
-notes_part = related_part('/notesSlide')
-mapping = {
-    slide_part: 'ppt/scenes/semantic-slide.xml',
-    chart_part: 'ppt/dataObjects/semantic-chart.xml',
-    picture_part: 'ppt/assets/semantic-picture' + posixpath.splitext(picture_part)[1],
-    notes_part: 'ppt/speakerNotes/semantic-notes.xml',
-}
-for source, target in list(mapping.items()):
-    source_rels = relationship_part(source)
-    if source_rels in payloads:
-        mapping[source_rels] = relationship_part(target)
-
-for source in [presentation, slide_part, chart_part, notes_part]:
-    rel_part = relationship_part(source)
-    if rel_part not in payloads:
-        continue
-    root = ET.fromstring(payloads[rel_part])
-    target_source = mapping.get(source, source)
-    for rel in list(root):
-        if rel.get('TargetMode') == 'External':
-            continue
-        old_target = resolve_target(source, rel.get('Target', ''))
-        new_target = mapping.get(old_target, old_target)
-        rel.set('Target', posixpath.relpath(new_target, posixpath.dirname(target_source)))
-    ET.register_namespace('', REL_NS)
-    payloads[rel_part] = ET.tostring(root, encoding='utf-8', xml_declaration=True)
-
-content_types = ET.fromstring(payloads['[Content_Types].xml'])
-for override in content_types.findall(f'{{{CT_NS}}}Override'):
-    old_part = override.get('PartName', '').lstrip('/')
-    if old_part in mapping:
-        override.set('PartName', '/' + mapping[old_part])
-ET.register_namespace('', CT_NS)
-payloads['[Content_Types].xml'] = ET.tostring(content_types, encoding='utf-8', xml_declaration=True)
-
-with tempfile.NamedTemporaryFile(dir=pptx.parent, suffix='.pptx', delete=False) as handle:
-    temp_file = Path(handle.name)
-try:
-    with zipfile.ZipFile(temp_file, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
-        for name, payload in payloads.items():
-            archive.writestr(mapping.get(name, name), payload)
-    temp_file.replace(pptx)
-finally:
-    temp_file.unlink(missing_ok=True)
-`;
-  runPython(script, [pptxFile]);
-}
-
 export function runPackageReadback(pptxFile) {
   const python = resolveTestPythonCommand();
   const stdout = execFileSync(python.command, [
@@ -264,11 +89,6 @@ export function runPackageReadback(pptxFile) {
     encoding: 'utf-8',
   });
   return JSON.parse(stdout);
-}
-
-export function validatePptx(pptxFile) {
-  const officecli = process.env.OFFICECLI || 'officecli';
-  return JSON.parse(execFileSync(officecli, ['validate', pptxFile, '--json'], { encoding: 'utf-8' }));
 }
 
 export function createTemplatePptx(workspaceRoot, slideCount = 1) {

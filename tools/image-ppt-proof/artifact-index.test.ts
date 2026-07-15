@@ -12,7 +12,7 @@ test('image PPT proof runner mock mode emits every retained artifact without a r
   const outputDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-image-ppt-proof-'));
   const result = spawnSync(
     'tools/image-ppt-proof/run.sh',
-    ['--output-dir', outputDir, '--mock-image-generation', '--skip-system-deps'],
+    ['--output-dir', outputDir, '--mock-image-generation'],
     {
       cwd: repoRoot,
       encoding: 'utf-8',

@@ -89,6 +89,7 @@ test('native PPT proof V2 contract is ready for opt-in CI triggers and cache pol
     contract.proof_job.required_cache_layers.map((layer) => layer.id),
     ['npm', 'uv', 'playwright'],
   );
+  assert.equal(contract.proof_job.required_cache_layers[1].uses, 'astral-sh/setup-uv');
   assert.equal(contract.proof_job.artifact_index.path, 'artifacts/native-ppt-proof/artifact-index.json');
   assert.equal(contract.proof_job.artifact_index.schema_version, 'native_ppt_proof_artifact_index.v2');
   assert.equal(laneContract.candidate_route_model.default_enabled, false);
@@ -97,7 +98,7 @@ test('native PPT proof V2 contract is ready for opt-in CI triggers and cache pol
   assert.match(runner, /candidate_route_model/);
   assert.match(workflow, /github\.event_name == 'schedule'/);
   assert.match(workflow, /contains\(github\.event\.pull_request\.labels\.\*\.name, 'native-ppt-proof'\)/);
-  assert.match(workflow, /native-ppt-proof-uv-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('uv\.lock'\) \}\}/);
+  assert.match(workflow, /native-ppt-proof:\n[\s\S]*?uses:\s*astral-sh\/setup-uv@v7[\s\S]*?enable-cache:\s*true[\s\S]*?cache-dependency-glob:\s*['"]uv\.lock['"]/);
   assert.match(workflow, /native-ppt-proof-playwright-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('uv\.lock'\) \}\}/);
   assert.match(runner, /artifact-index\.json/);
   assert.match(runner, /proof-artifact-index\.ts --profile native-ppt/);

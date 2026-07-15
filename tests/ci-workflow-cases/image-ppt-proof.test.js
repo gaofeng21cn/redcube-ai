@@ -28,6 +28,7 @@ test('image PPT proof optional CI lane never runs live image generation by defau
     ['npm', 'uv', 'playwright'],
   );
   assert.equal(contract.proof_job.required_cache_layers[1].key_source, 'uv.lock');
+  assert.equal(contract.proof_job.required_cache_layers[1].uses, 'astral-sh/setup-uv');
   assert.deepEqual(
     contract.proof_job.required_artifact_refs,
     [
@@ -43,12 +44,14 @@ test('image PPT proof optional CI lane never runs live image generation by defau
     ],
   );
   assert.match(workflow, /image-ppt-proof:\n[\s\S]*?github\.event_name == 'schedule'/);
+  assert.match(workflow, /image-ppt-proof:\n[\s\S]*?uses:\s*astral-sh\/setup-uv@v7[\s\S]*?enable-cache:\s*true[\s\S]*?cache-dependency-glob:\s*['"]uv\.lock['"]/);
   assert.match(workflow, /contains\(github\.event\.pull_request\.labels\.\*\.name, 'image-ppt-proof'\)/);
   assert.match(workflow, /tools\/image-ppt-proof\/run\.sh --output-dir artifacts\/image-ppt-proof --mock-image-generation/);
   assert.doesNotMatch(workflow, /tools\/image-ppt-proof\/run\.sh[^\n]*--live-image-generation/);
   assert.match(workflow, /name:\s*image-ppt-proof[\s\S]*?artifacts\/image-ppt-proof\/artifact-index\.json/);
   assert.match(runner, /--mock-image-generation/);
   assert.doesNotMatch(runner, /--live-image-generation/);
+  assert.doesNotMatch(runner, /skip-system-deps|native-ppt-proof\/install-deps/);
   assert.match(runner, /never invokes an executor or a real image API/);
   assert.match(runner, /OPL-hosted run_image_ppt_proof StageRun action/);
   assert.doesNotMatch(proofImplementation, /codex_native_imagegen_skill|OPENAI_API_KEY|experimental_bearer_token/);

@@ -126,7 +126,7 @@ function parseArgs(argv: string[]) {
   return { format: parsed.values.format };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.main) {
   try {
     const { format } = parseArgs(process.argv.slice(2));
     const payload = buildPrivatePlatformSourceGuardReadback();

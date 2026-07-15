@@ -11,7 +11,6 @@ from typing import Any
 from .catalog import CATALOG_FILE, load_helper_catalog, repo_root
 from .renderer_dependencies import (
     NATIVE_PPT_DOCKER_COMMAND,
-    command_probe,
     install_commands,
     libreoffice_probe,
     platform_install_hint,
@@ -55,10 +54,6 @@ def _dependency_summary(requirements: list[str]) -> list[dict[str, Any]]:
             "available": available,
         })
     return summary
-
-
-def _command_probe(name: str, *candidates: str) -> dict[str, Any]:
-    return command_probe(name, *candidates)
 
 
 def _python_dependency_probe(name: str, import_name: str) -> dict[str, Any]:

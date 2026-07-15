@@ -1,13 +1,12 @@
 type TestFile = `tests/${string}.test.${'js' | 'ts'}`;
 
-const TEST_LANES = Object.freeze(['meta', 'integration', 'e2e', 'historical'] as const);
+const TEST_LANES = Object.freeze(['meta', 'integration'] as const);
 type TestLane = (typeof TEST_LANES)[number];
 type TestRegistryEntry = Readonly<{
   file: TestFile;
   lane: TestLane;
   smoke?: true;
   fast?: true;
-  routeHeavy?: true;
 }>;
 type TestGroups = Record<string, TestFile[]>;
 export type VerifyStep = Readonly<
@@ -23,26 +22,7 @@ export type VerifyLanePlan = Readonly<{
   steps: readonly VerifyStep[];
 }>;
 
-const LIVE_CODEX_PREFLIGHT_GROUPS = new Set([
-  'integration',
-  'integration:remaining',
-  'e2e',
-  'full',
-  'full:remaining',
-  'full:with-historical',
-]) satisfies ReadonlySet<string>;
-const ROUTE_HEAVY_GROUPS = new Set([
-  'smoke',
-  'fast',
-  'integration',
-  'integration:remaining',
-  'e2e',
-  'full',
-  'full:remaining',
-  'full:with-historical',
-]) satisfies ReadonlySet<string>;
-
-export const TEST_REGISTRY: readonly TestRegistryEntry[] = Object.freeze([
+const TEST_REGISTRY: readonly TestRegistryEntry[] = Object.freeze([
   { file: 'tests/ci-workflow.test.js', lane: 'meta' },
   { file: 'tests/codex-plugin.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/image-ppt-proof-runner.test.js', lane: 'meta' },
@@ -101,38 +81,21 @@ function excludeCoveredTestFiles(
 export function buildTestGroups(): TestGroups {
   const meta = primaryLaneFiles('meta');
   const integration = primaryLaneFiles('integration');
-  const e2e = primaryLaneFiles('e2e');
-  const historical = primaryLaneFiles('historical');
   const fast = taggedFiles('fast');
-  const full = [...meta, ...integration, ...e2e];
-  const metaCi = excludeCoveredTestFiles(meta, fast);
-  const integrationRemaining = excludeCoveredTestFiles(integration, fast);
 
   return {
     smoke: taggedFiles('smoke'),
     fast,
     meta,
-    'meta:ci': metaCi,
+    'meta:ci': excludeCoveredTestFiles(meta, fast),
     integration,
-    'integration:remaining': integrationRemaining,
-    e2e,
-    historical,
-    full,
-    'full:with-historical': [...full, ...historical],
-    'full:remaining': excludeCoveredTestFiles(full, [
-      ...fast,
-      ...metaCi,
-      ...integrationRemaining,
-    ]),
+    full: [...meta, ...integration],
   };
 }
 
 const VERIFY_LANE_ALIASES: Readonly<Record<string, string>> = Object.freeze({
   'private-platform': 'private-platform:strict',
   'private-platform-strict': 'private-platform:strict',
-  'integration-remaining': 'integration:remaining',
-  'full-remaining': 'full:remaining',
-  'full-with-historical': 'full:with-historical',
 });
 
 const SPECIAL_VERIFY_LANES = Object.freeze([
@@ -194,34 +157,6 @@ export function buildVerifyLanePlan(lane: string = 'smoke'): VerifyLanePlan {
   }
 
   throw new Error(`Unknown lane: ${lane}`);
-}
-
-export function groupRequiresLiveCodexPreflight(groupName: string): boolean {
-  return LIVE_CODEX_PREFLIGHT_GROUPS.has(groupName);
-}
-
-export function partitionTestFilesForExecution({
-  groupName,
-  files = [],
-}: {
-  groupName: string;
-  files?: readonly TestFile[];
-}): { parallel_files: TestFile[]; serialized_files: TestFile[] } {
-  const plannedFiles = [...files];
-  if (!ROUTE_HEAVY_GROUPS.has(groupName)) {
-    return {
-      parallel_files: plannedFiles,
-      serialized_files: [],
-    };
-  }
-
-  const routeHeavyFiles = new Set<TestFile>(
-    TEST_REGISTRY.filter((entry) => entry.routeHeavy).map((entry) => entry.file),
-  );
-  return {
-    parallel_files: plannedFiles.filter((file) => !routeHeavyFiles.has(file)),
-    serialized_files: plannedFiles.filter((file) => routeHeavyFiles.has(file)),
-  };
 }
 
 export function assertValidTestRegistry({

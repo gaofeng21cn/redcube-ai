@@ -47,11 +47,8 @@ def _part_sha256(data: bytes) -> str:
 
 
 def _file_sha256(file: Path) -> str:
-    digest = hashlib.sha256()
     with file.open('rb') as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b''):
-            digest.update(chunk)
-    return digest.hexdigest()
+        return hashlib.file_digest(handle, 'sha256').hexdigest()
 
 
 def source_payload_sha256(source: str) -> str:

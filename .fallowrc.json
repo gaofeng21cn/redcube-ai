@@ -1,19 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   "entry": [
-    "scripts/p19-creative-ownership-audit-lib.ts",
     "tools/proof-artifact-index.ts",
     "tools/resolve-proof-python.ts",
     "tools/native-ppt-proof/build-fixture-input.ts",
     "tools/native-ppt-proof/evaluate-quality.ts",
     "tools/native-ppt-proof/ppt-master-parity.ts"
-  ],
-  "ignoreExports": [
-    {
-      "file": "scripts/test-registry.ts",
-      "exports": [
-        "TEST_REGISTRY"
-      ]
-    }
   ]
 }
