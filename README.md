@@ -48,7 +48,7 @@ It does not reduce visual delivery to "generate one image." A usable deliverable
 </table>
 
 <p align="center">
-  <img src="assets/branding/redcube-ai-overview-v2.png" alt="RedCube AI overview" width="100%" />
+  <img src="assets/branding/redcube-ai-overview-v3.png" alt="RedCube AI journey from source material to visual handoff" width="100%" />
 </p>
 
 ## Core Highlights
