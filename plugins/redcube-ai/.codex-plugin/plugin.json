@@ -1,6 +1,6 @@
 {
   "name": "redcube-ai",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Codex plugin carrier for the RCA visual deliverable domain app; the canonical OPL package id is rca.",
   "author": {
     "name": "Gao Feng",
