@@ -21,7 +21,6 @@ Machine boundary: 人读 policy 索引。机器真相继续归 contracts、schem
 - [交付合同模型 Policy](deliverable_contract_model.md)
 - [AI-first 质量边界 Policy](ai_first_quality_boundary.md)
 - [视觉模式记忆 Policy](visual_pattern_memory_policy.md)
-- [TypeScript 迁移 Policy](typescript_migration_policy.md)
 - 文档生命周期规则集中在 `../docs_portfolio_consolidation.md`；`../references/governance/series-doc-governance-checklist.md` 只作为 OPL series 跨仓巡检支撑清单。公开入口先写 RCA 视觉交付身份，OPL 只作为托管运行框架路径；合同引用的旧 program brief 原位降级，无合同引用的旧计划进入 history / tombstone。
 
 当前统一口径：

@@ -1,60 +1,54 @@
 # RedCube AI 当前状态
 
 Owner: RedCube AI
-Purpose: 给出当前 admitted source、结构收口与验证口径。
-State: candidate_validation_pending
-Machine boundary: exact 状态以 Git SHA、root contracts、OPL admission JSON 与 test output 为准。
-
-Date anchor: 2026-07-14
+Purpose: 汇总当前 RCA source shape、机器 owner 与尚未闭合的 evidence gate。
+State: active_current_summary
+Machine boundary: 结构事实以 root contracts、`agent/`、保留源码和 fresh repo readback 为准；package currentness、真实 StageRun、visual/review/export verdict 与 owner receipt 由各自 owner surface 证明。
 
 ## 当前结论
 
-RCA 已按标准 OPL Agent 目标完成私有平台源码的结构性退役，候选正在执行最终验证。最终吸收前不把本文件状态解读为 production-ready。
+RCA 当前是 OPL 标准 visual-deliverable domain pack：canonical agent/package id 为 `rca`，repo/package version 为 `0.2.7`。仓内保留 declarative visual pack、RCA authority contracts、Python native helpers、最小 authority functions 与 developer verification；通用 package lifecycle、generated interfaces、StageRun/Attempt、session/workspace/status/workbench 等控制面归 OPL。
 
-## 保留的 active source
+Repo source 与 contracts 已表达私有控制面的结构退役，但这只关闭 RCA checkout 内的 source-shape 边界。它不证明已安装 package current、真实 visual StageRun 成功、review/export accepted、owner accepted、release ready 或 production ready。
 
-- `agent/`：declarative visual pack；
-- `contracts/`：package/pack/interface/authority/policy/schema/evidence refs；
-- `python/redcube_ai/native_helpers/`：RCA native helper；
-- `runtime/authority_functions/`：最小 authority 声明；
-- `plugins/redcube-ai/`：Codex carrier mirror；
-- `tools/`、`scripts/`、`tests/`：developer proof、边界校验和 native-helper 回归，不是 runtime。
+## 当前 owner 与 source shape
 
-## 已退役的 private control plane
-
-- `apps/redcube-cli`；
-- `packages/redcube-domain-entry`；
-- `packages/redcube-runtime` 与 `packages/redcube-runtime-protocol`；
-- `packages/redcube-governance`；
-- `packages/redcube-overlay-core`；
-- repo-local current-program baton、私有 product-entry/session/runtime contracts；
-- 对应 CLI/runtime/product-entry tests、mock executor、case helper 与 compatibility aliases。
-
-## 当前机器入口
-
-| Surface | Source | Owner |
+| Surface | Current owner | Machine source |
 | --- | --- | --- |
-| Package identity/lifecycle sidecar | `contracts/opl_agent_package_manifest.json` | RCA 声明，OPL Connect 管理 lifecycle |
-| Domain descriptor | `contracts/domain_descriptor.json` | RCA |
-| Hosted actions | `contracts/action_catalog.json` | RCA 语义，OPL 生成/托管 |
-| Stage graph | `agent/stages/manifest.json` | RCA 语义，OPL StageRun 执行 |
-| Standard interface | `contracts/standard_agent_interface.json` | RCA 声明，OPL compiler 消费 |
-| Native helpers | `contracts/runtime-program/python-native-helper-catalog.json` | RCA 实现，OPL envelope 执行 |
-| Private-platform guard | `scripts/check-private-platform-retirement.ts` | repo verification only |
+| Package identity/version | RCA 声明；lifecycle owner 为 `opl_packages` | `contracts/opl_agent_package_manifest.json` |
+| Domain identity与 routing | RCA | `contracts/domain_descriptor.json`、`contracts/standard_agent_interface.json` |
+| Declarative visual pack / stage semantics | RCA | `agent/`、`agent/stages/manifest.json` |
+| Hosted actions | RCA 声明 action semantics；OPL 生成并托管 execution surface | `contracts/action_catalog.json`、`contracts/generated_surface_handoff.json` |
+| Generated CLI/MCP/skill/status/workbench | OPL | `contracts/pack_compiler_input.json`、`contracts/generated_surface_handoff.json` |
+| Visual truth、review/export verdict、artifact/memory mutation、typed blocker、owner receipt | RCA | `contracts/pack_compiler_input.json`、`contracts/functional_privatization_audit.json`、RCA authority contracts |
+| Native helper implementation | RCA；process/currentness/receipt envelope 归 OPL | `python/redcube_ai/native_helpers/`、`contracts/runtime-program/python-native-helper-catalog.json` |
+| Repo verification与 deterministic proof | RCA developer surface，不是 runtime 或 live evidence | `scripts/`、`tests/`、`tools/` |
 
-## 验证门
+## 已关闭的 repo 结构面
 
-候选必须同时满足：
+- `contracts/functional_privatization_audit.json` 将当前形态标记为 `standard_domain_pack_and_authority_functions_only`，并把 repo-local default surface 标记为物理不存在。
+- `contracts/private_functional_surface_policy.json` 默认禁止 repo-local CLI、domain entry、runtime、runtime protocol、governance runtime、overlay runtime、旧入口别名与 fallback runtime。
+- `contracts/generated_surface_handoff.json` 的 repo-local handler target 为空，generated surface owner 为 `one-person-lab`，结构 cutover 为完成状态，同时明确 production evidence 尚未完成。
+- 当前 checkout 不含旧 `apps/redcube-cli`、`packages/redcube-domain-entry`、`packages/redcube-runtime*`、`packages/redcube-governance` 或 `packages/redcube-overlay-core`。
 
-1. `npm run typecheck`；
-2. `npm run test:smoke`、`npm run test:fast`、`npm run test:full`；
-3. `npm run test:private-platform:strict`；
-4. `git diff --check` 与 repo hygiene；
-5. OPL `agents interfaces --repo-dir ...`；
-6. OPL `agents conformance --agent rca=...`；
-7. source-closure 0 unresolved / 0 private-generic / 0 unreachable / 0 audit mismatch；
-8. default callers closed、residue decisions verified zero。
+这些条目是 source/contracts readback，不是 live、release 或 owner acceptance 证明。
 
-## 后置证据
+## 未闭合的 evidence gate
 
-真实 visual StageRun、真实 image generation、真实 native PPT export、review/export acceptance、owner receipt、provider restart/resume 与 long-soak 不由本次结构迁移虚构。它们继续记录为 evidence gap，不能阻塞可独立完成的源码标准化，也不能被测试结果替代。
+`contracts/live_stage_run_progress_evidence.json` 当前记录 owner typed blocker `post_standardization_live_stage_evidence_required`，并明确 `domain_ready=false`、`production_ready=false`。当前仍缺：
+
+- fresh OPL package currentness / installed payload readback；
+- 真实 OPL-hosted RCA StageRun 与 artifact lineage；
+- RCA review/export/quality receipt 与 owner acceptance；
+- provider restart/resume/retry、long-soak 与 repeated cross-family no-regression evidence。
+
+在这些 owner evidence 到位前，不得从 contracts、doctor、conformance、focused tests、source-closure 或 queue clean 推导 visual ready、export ready、release ready、domain ready 或 production ready。
+
+## 验证入口
+
+- Repo structure/source guard：`npm run private-platform:readback`、`npm run test:private-platform:strict`、`scripts/verify.sh`、`npm run typecheck`。
+- OPL structural projection：`opl agents conformance --family-defaults --json`。
+- Live owner lane：`opl agents run --domain redcube_ai --action invoke_product_entry --workspace <workspace>`。
+- Package lifecycle/currentness：`opl packages status --package-id rca --json`，以及 manifest 声明的 `opl packages install|update|uninstall rca`。
+
+验证结果必须按各命令实际证明的边界表述；repo 测试和结构 conformance 不能替代 live artifact、owner receipt 或 production evidence。
