@@ -29,6 +29,32 @@ const EXPECTED_STAGE_CATALOG = {
   },
 };
 
+function dependencyClosure(scope) {
+  const sourcesByDependent = new Map();
+  for (const edge of scope.dependency_edges) {
+    const sources = sourcesByDependent.get(edge.dependent_ref) ?? [];
+    sourcesByDependent.set(edge.dependent_ref, [...sources, edge.source_ref]);
+  }
+  const closure = new Set(scope.reviewed_node_refs);
+  const pending = [...scope.reviewed_node_refs];
+  while (pending.length > 0) {
+    const dependentRef = pending.pop();
+    for (const sourceRef of sourcesByDependent.get(dependentRef) ?? []) {
+      if (closure.has(sourceRef)) continue;
+      closure.add(sourceRef);
+      pending.push(sourceRef);
+    }
+  }
+  return closure;
+}
+
+function invalidatedScopeIds(adoption, change) {
+  if (!change.semantic_changed || change.change_class === 'locator_only') return [];
+  return adoption.review_scopes
+    .filter((scope) => dependencyClosure(scope).has(change.node_ref))
+    .map((scope) => scope.scope_id);
+}
+
 test('RCA canonical semantic pack remains concrete while root stage/pack contracts are refs-only', () => {
   const packRefs = readJson('contracts/pack_compiler_input.json');
   const domainDescriptor = readJson('contracts/domain_descriptor.json');
@@ -129,7 +155,8 @@ test('RCA opts into the canonical quality profile with one independent primary-o
       'artifact_creation',
     ],
     multiple_defect_policy: 'route_to_earliest_stage_that_can_close_root_cause',
-    invalidates_downstream_review_and_export_refs: true,
+    downstream_review_currentness_policy: 'declared_epistemic_dependency_closure_only',
+    downstream_release_integrity_policy: 'separate_exact_byte_contract',
   });
   assert.equal(metaReviewStage?.stage_id, 'review_and_revision');
   assert.equal(
@@ -223,6 +250,160 @@ test('RCA Review routes cross-Stage repairs early without bypassing local repair
     'rerender',
     'fresh_re_review',
   ]);
+});
+
+test('RCA adopts OPL epistemic currentness without replacing StageAttempt or repair-loop ownership', () => {
+  const policy = readJson('contracts/stage_quality_cycle_policy.json');
+  const receipt = readJson('contracts/owner_receipt_contract.json');
+  const adoption = policy.epistemic_review_currentness;
+  const epistemicRef = 'contracts/stage_quality_cycle_policy.json#/epistemic_review_currentness';
+
+  assert.equal(
+    adoption.framework_canonical_sha,
+    '367738244273664452e6b7ebfb86d5de5bb36c30',
+  );
+  assert.equal(
+    adoption.framework_contract_ref,
+    'opl-framework:contracts/opl-framework/epistemic-review-currentness-contract.json',
+  );
+  assert.equal(adoption.evidence_profile, 'epistemic_provenance');
+  assert.equal(adoption.trust_model, 'trusted_local_workspace');
+  assert.deepEqual(adoption.stage_attempt_reuse, {
+    formal_review_uses_existing_opl_stage_attempt_roles: true,
+    fresh_re_review_uses_opl_stage_attempt: true,
+    currentness_evaluation_creates_stage_attempt: false,
+    rca_parallel_attempt_runtime_allowed: false,
+    quality_budget_ref: '#/quality_budget',
+    finding_and_repair_contract_ref: '#/finding_and_repair_contract',
+  });
+  assert.equal(policy.quality_budget.max_repair_rounds, 3);
+  assert.equal(
+    Object.values(policy.stage_policies)
+      .filter((stagePolicy) => stagePolicy.formal_review.required)
+      .every((stagePolicy) => stagePolicy.formal_review.max_repair_rounds === 3),
+    true,
+  );
+  assert.equal(
+    policy.finding_and_repair_contract.ordinary_new_suggestion_policy,
+    'optional_observation_without_reopening_loop',
+  );
+  assert.equal(policy.finding_and_repair_contract.pass_with_optional_observations_allowed, true);
+  for (const stageId of ['artifact_creation', 'review_and_revision', 'package_and_handoff']) {
+    assert.ok(policy.stage_policies[stageId].quality_rubric_refs.includes(epistemicRef), stageId);
+  }
+  assert.equal(
+    receipt.formal_stage_review_handoff_policy.exact_artifact_identity_binding_role,
+    'transport_identity_and_release_integrity_not_epistemic_content_authority',
+  );
+  assert.equal(
+    receipt.formal_stage_review_handoff_policy.release_integrity_is_separate_from_epistemic_review,
+    true,
+  );
+
+  assert.deepEqual(adoption.review_scopes.map((scope) => scope.scope_id), [
+    'rca.slide_content',
+    'rca.slide_references',
+    'rca.visual_layout_and_render',
+    'rca.export_artifact',
+    'rca.delivery_package',
+  ]);
+  for (const scope of adoption.review_scopes) {
+    const nodeRefs = new Set(scope.nodes.map((node) => node.node_ref));
+    assert.equal(scope.surface_kind, 'opl_epistemic_review_scope', scope.scope_id);
+    assert.equal(scope.version, 'opl-epistemic-review-scope.v2', scope.scope_id);
+    assert.equal(scope.evidence_profile, 'epistemic_provenance', scope.scope_id);
+    assert.equal(scope.trust_model, 'trusted_local_workspace', scope.scope_id);
+    assert.equal(nodeRefs.size, scope.nodes.length, scope.scope_id);
+    assert.equal(
+      scope.dependency_edges.every(
+        (edge) => nodeRefs.has(edge.source_ref) && nodeRefs.has(edge.dependent_ref),
+      ),
+      true,
+      scope.scope_id,
+    );
+    assert.deepEqual(scope.authority_boundary, {
+      hash_is_locator_or_stale_hint_only: true,
+      hash_is_content_authority: false,
+      release_integrity_is_separate: true,
+      framework_can_issue_domain_verdict: false,
+    });
+  }
+});
+
+test('layout render export and package-only deltas preserve content and reference Review', () => {
+  const adoption = readJson('contracts/stage_quality_cycle_policy.json').epistemic_review_currentness;
+  const displayAndDownstream = [
+    'rca.visual_layout_and_render',
+    'rca.export_artifact',
+    'rca.delivery_package',
+  ];
+
+  for (const [nodeRef, changeClass] of [
+    ['rca:visual_layout', 'layout'],
+    ['rca:render_template', 'render_template'],
+    ['rca:rendered_slide', 'visual_content'],
+  ]) {
+    assert.deepEqual(invalidatedScopeIds(adoption, {
+      node_ref: nodeRef,
+      change_class: changeClass,
+      semantic_changed: true,
+    }), displayAndDownstream, nodeRef);
+  }
+  assert.deepEqual(invalidatedScopeIds(adoption, {
+    node_ref: 'rca:export_artifact',
+    change_class: 'package_composition',
+    semantic_changed: true,
+  }), ['rca.export_artifact', 'rca.delivery_package']);
+  assert.deepEqual(invalidatedScopeIds(adoption, {
+    node_ref: 'rca:delivery_package',
+    change_class: 'package_wrapper',
+    semantic_changed: true,
+  }), ['rca.delivery_package']);
+});
+
+test('content claim and reference deltas invalidate only their declared dependents', () => {
+  const adoption = readJson('contracts/stage_quality_cycle_policy.json').epistemic_review_currentness;
+
+  assert.deepEqual(invalidatedScopeIds(adoption, {
+    node_ref: 'rca:slide_content',
+    change_class: 'context',
+    semantic_changed: true,
+  }), [
+    'rca.slide_content',
+    'rca.visual_layout_and_render',
+    'rca.export_artifact',
+    'rca.delivery_package',
+  ]);
+  for (const [nodeRef, changeClass] of [
+    ['rca:slide_claim', 'claim'],
+    ['rca:citation_linkage', 'citation_linkage'],
+    ['rca:reference_source', 'reference_source'],
+  ]) {
+    assert.deepEqual(
+      invalidatedScopeIds(adoption, {
+        node_ref: nodeRef,
+        change_class: changeClass,
+        semantic_changed: true,
+      }),
+      adoption.review_scopes.map((scope) => scope.scope_id),
+      nodeRef,
+    );
+  }
+});
+
+test('hash-only locator drift is not epistemic authority or release-integrity substitution', () => {
+  const adoption = readJson('contracts/stage_quality_cycle_policy.json').epistemic_review_currentness;
+
+  assert.deepEqual(invalidatedScopeIds(adoption, {
+    node_ref: 'rca:slide_claim',
+    change_class: 'locator_only',
+    semantic_changed: true,
+  }), []);
+  assert.equal(adoption.currentness_policy.hash_change_alone_invalidates_review, false);
+  assert.equal(adoption.integrity_separation.exact_hash_is_content_claim_or_reference_authority, false);
+  assert.equal(adoption.integrity_separation.release_integrity_is_separate_contract, true);
+  assert.equal(adoption.integrity_separation.release_integrity_can_replace_epistemic_review, false);
+  assert.equal(adoption.integrity_separation.epistemic_review_can_replace_release_integrity, false);
 });
 
 test('RCA capability map routes visual feedback fixtures through declarative professional skills', () => {

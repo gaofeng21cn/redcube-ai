@@ -48,6 +48,7 @@
     "allowed_reviewer_context": [
       "stage_goal_ref",
       "exact_artifact_refs_and_hashes",
+      "epistemic_review_scope_refs_and_declared_dependencies",
       "source_refs_and_fingerprint",
       "quality_rubric_refs",
       "required_artifact_lineage",
@@ -58,6 +59,192 @@
       "producer_thread_resume",
       "producer_reasoning_trace",
       "undeclared_transient_context"
+    ]
+  },
+  "epistemic_review_currentness": {
+    "surface_kind": "rca_epistemic_review_currentness_adoption",
+    "version": "rca-epistemic-review-currentness-adoption.v1",
+    "framework_contract_ref": "opl-framework:contracts/opl-framework/epistemic-review-currentness-contract.json",
+    "framework_scope_schema_ref": "opl-framework:contracts/opl-framework/epistemic-review-scope-v2.schema.json",
+    "framework_canonical_sha": "367738244273664452e6b7ebfb86d5de5bb36c30",
+    "evidence_profile": "epistemic_provenance",
+    "trust_model": "trusted_local_workspace",
+    "stage_attempt_reuse": {
+      "formal_review_uses_existing_opl_stage_attempt_roles": true,
+      "fresh_re_review_uses_opl_stage_attempt": true,
+      "currentness_evaluation_creates_stage_attempt": false,
+      "rca_parallel_attempt_runtime_allowed": false,
+      "quality_budget_ref": "#/quality_budget",
+      "finding_and_repair_contract_ref": "#/finding_and_repair_contract"
+    },
+    "currentness_policy": {
+      "unit": "reviewed_node_and_transitive_declared_dependencies",
+      "semantic_change_required_for_invalidation": true,
+      "hash_change_alone_invalidates_review": false,
+      "hash_role": "optional_locator_stale_hint_and_deduplication_only",
+      "layout_render_export_or_package_only_delta_invalidates_content_or_reference": false,
+      "content_claim_or_reference_change_invalidates_only_declared_dependents": true
+    },
+    "integrity_separation": {
+      "release_integrity_is_separate_contract": true,
+      "exact_hash_is_transport_identity": true,
+      "exact_hash_is_content_claim_or_reference_authority": false,
+      "release_integrity_can_replace_epistemic_review": false,
+      "epistemic_review_can_replace_release_integrity": false
+    },
+    "review_scopes": [
+      {
+        "surface_kind": "opl_epistemic_review_scope",
+        "version": "opl-epistemic-review-scope.v2",
+        "scope_id": "rca.slide_content",
+        "scope_kind": "content",
+        "evidence_profile": "epistemic_provenance",
+        "trust_model": "trusted_local_workspace",
+        "reviewed_node_refs": ["rca:slide_content"],
+        "nodes": [
+          {"node_ref": "rca:reference_source", "node_kind": "artifact", "role": "reference_source"},
+          {"node_ref": "rca:citation_linkage", "node_kind": "provenance", "role": "citation_linkage"},
+          {"node_ref": "rca:slide_claim", "node_kind": "claim", "role": "claim"},
+          {"node_ref": "rca:slide_content", "node_kind": "artifact", "role": "context"}
+        ],
+        "dependency_edges": [
+          {"source_ref": "rca:reference_source", "dependent_ref": "rca:citation_linkage", "relation": "cites"},
+          {"source_ref": "rca:citation_linkage", "dependent_ref": "rca:slide_claim", "relation": "supports"},
+          {"source_ref": "rca:slide_claim", "dependent_ref": "rca:slide_content", "relation": "supports"}
+        ],
+        "authority_boundary": {
+          "hash_is_locator_or_stale_hint_only": true,
+          "hash_is_content_authority": false,
+          "release_integrity_is_separate": true,
+          "framework_can_issue_domain_verdict": false
+        }
+      },
+      {
+        "surface_kind": "opl_epistemic_review_scope",
+        "version": "opl-epistemic-review-scope.v2",
+        "scope_id": "rca.slide_references",
+        "scope_kind": "reference",
+        "evidence_profile": "epistemic_provenance",
+        "trust_model": "trusted_local_workspace",
+        "reviewed_node_refs": ["rca:slide_claim"],
+        "nodes": [
+          {"node_ref": "rca:reference_source", "node_kind": "artifact", "role": "reference_source"},
+          {"node_ref": "rca:citation_linkage", "node_kind": "provenance", "role": "citation_linkage"},
+          {"node_ref": "rca:slide_claim", "node_kind": "claim", "role": "claim"}
+        ],
+        "dependency_edges": [
+          {"source_ref": "rca:reference_source", "dependent_ref": "rca:citation_linkage", "relation": "cites"},
+          {"source_ref": "rca:citation_linkage", "dependent_ref": "rca:slide_claim", "relation": "supports"}
+        ],
+        "authority_boundary": {
+          "hash_is_locator_or_stale_hint_only": true,
+          "hash_is_content_authority": false,
+          "release_integrity_is_separate": true,
+          "framework_can_issue_domain_verdict": false
+        }
+      },
+      {
+        "surface_kind": "opl_epistemic_review_scope",
+        "version": "opl-epistemic-review-scope.v2",
+        "scope_id": "rca.visual_layout_and_render",
+        "scope_kind": "display",
+        "evidence_profile": "epistemic_provenance",
+        "trust_model": "trusted_local_workspace",
+        "reviewed_node_refs": ["rca:rendered_slide"],
+        "nodes": [
+          {"node_ref": "rca:reference_source", "node_kind": "artifact", "role": "reference_source"},
+          {"node_ref": "rca:citation_linkage", "node_kind": "provenance", "role": "citation_linkage"},
+          {"node_ref": "rca:slide_claim", "node_kind": "claim", "role": "claim"},
+          {"node_ref": "rca:slide_content", "node_kind": "artifact", "role": "context"},
+          {"node_ref": "rca:visual_layout", "node_kind": "provenance", "role": "layout"},
+          {"node_ref": "rca:render_template", "node_kind": "provenance", "role": "render_template"},
+          {"node_ref": "rca:rendered_slide", "node_kind": "artifact", "role": "visual_content"}
+        ],
+        "dependency_edges": [
+          {"source_ref": "rca:reference_source", "dependent_ref": "rca:citation_linkage", "relation": "cites"},
+          {"source_ref": "rca:citation_linkage", "dependent_ref": "rca:slide_claim", "relation": "supports"},
+          {"source_ref": "rca:slide_claim", "dependent_ref": "rca:slide_content", "relation": "supports"},
+          {"source_ref": "rca:slide_content", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:visual_layout", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:render_template", "dependent_ref": "rca:rendered_slide", "relation": "renders"}
+        ],
+        "authority_boundary": {
+          "hash_is_locator_or_stale_hint_only": true,
+          "hash_is_content_authority": false,
+          "release_integrity_is_separate": true,
+          "framework_can_issue_domain_verdict": false
+        }
+      },
+      {
+        "surface_kind": "opl_epistemic_review_scope",
+        "version": "opl-epistemic-review-scope.v2",
+        "scope_id": "rca.export_artifact",
+        "scope_kind": "package",
+        "evidence_profile": "epistemic_provenance",
+        "trust_model": "trusted_local_workspace",
+        "reviewed_node_refs": ["rca:export_artifact"],
+        "nodes": [
+          {"node_ref": "rca:reference_source", "node_kind": "artifact", "role": "reference_source"},
+          {"node_ref": "rca:citation_linkage", "node_kind": "provenance", "role": "citation_linkage"},
+          {"node_ref": "rca:slide_claim", "node_kind": "claim", "role": "claim"},
+          {"node_ref": "rca:slide_content", "node_kind": "artifact", "role": "context"},
+          {"node_ref": "rca:visual_layout", "node_kind": "provenance", "role": "layout"},
+          {"node_ref": "rca:render_template", "node_kind": "provenance", "role": "render_template"},
+          {"node_ref": "rca:rendered_slide", "node_kind": "artifact", "role": "visual_content"},
+          {"node_ref": "rca:export_artifact", "node_kind": "artifact", "role": "package_content"}
+        ],
+        "dependency_edges": [
+          {"source_ref": "rca:reference_source", "dependent_ref": "rca:citation_linkage", "relation": "cites"},
+          {"source_ref": "rca:citation_linkage", "dependent_ref": "rca:slide_claim", "relation": "supports"},
+          {"source_ref": "rca:slide_claim", "dependent_ref": "rca:slide_content", "relation": "supports"},
+          {"source_ref": "rca:slide_content", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:visual_layout", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:render_template", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:rendered_slide", "dependent_ref": "rca:export_artifact", "relation": "packages"}
+        ],
+        "authority_boundary": {
+          "hash_is_locator_or_stale_hint_only": true,
+          "hash_is_content_authority": false,
+          "release_integrity_is_separate": true,
+          "framework_can_issue_domain_verdict": false
+        }
+      },
+      {
+        "surface_kind": "opl_epistemic_review_scope",
+        "version": "opl-epistemic-review-scope.v2",
+        "scope_id": "rca.delivery_package",
+        "scope_kind": "package",
+        "evidence_profile": "epistemic_provenance",
+        "trust_model": "trusted_local_workspace",
+        "reviewed_node_refs": ["rca:delivery_package"],
+        "nodes": [
+          {"node_ref": "rca:reference_source", "node_kind": "artifact", "role": "reference_source"},
+          {"node_ref": "rca:citation_linkage", "node_kind": "provenance", "role": "citation_linkage"},
+          {"node_ref": "rca:slide_claim", "node_kind": "claim", "role": "claim"},
+          {"node_ref": "rca:slide_content", "node_kind": "artifact", "role": "context"},
+          {"node_ref": "rca:visual_layout", "node_kind": "provenance", "role": "layout"},
+          {"node_ref": "rca:render_template", "node_kind": "provenance", "role": "render_template"},
+          {"node_ref": "rca:rendered_slide", "node_kind": "artifact", "role": "visual_content"},
+          {"node_ref": "rca:export_artifact", "node_kind": "artifact", "role": "package_content"},
+          {"node_ref": "rca:delivery_package", "node_kind": "artifact", "role": "package_wrapper"}
+        ],
+        "dependency_edges": [
+          {"source_ref": "rca:reference_source", "dependent_ref": "rca:citation_linkage", "relation": "cites"},
+          {"source_ref": "rca:citation_linkage", "dependent_ref": "rca:slide_claim", "relation": "supports"},
+          {"source_ref": "rca:slide_claim", "dependent_ref": "rca:slide_content", "relation": "supports"},
+          {"source_ref": "rca:slide_content", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:visual_layout", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:render_template", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:rendered_slide", "dependent_ref": "rca:export_artifact", "relation": "packages"},
+          {"source_ref": "rca:export_artifact", "dependent_ref": "rca:delivery_package", "relation": "packages"}
+        ],
+        "authority_boundary": {
+          "hash_is_locator_or_stale_hint_only": true,
+          "hash_is_content_authority": false,
+          "release_integrity_is_separate": true,
+          "framework_can_issue_domain_verdict": false
+        }
+      }
     ]
   },
   "attempt_route_execution_policy": {
@@ -275,7 +462,8 @@
       "quality_rubric_refs": [
         "agent/quality_gates/artifact_authority.md",
         "agent/quality_gates/review_export_memory.md",
-        "agent/quality_gates/visual_authority_boundaries.md"
+        "agent/quality_gates/visual_authority_boundaries.md",
+        "contracts/stage_quality_cycle_policy.json#/epistemic_review_currentness"
       ],
       "in_thread_refinement": {"allowed": true, "authoritative": false},
       "formal_review": {"required": true, "risk_tier": "high", "review_depth": "multi_axis", "context_isolation_required": true, "max_repair_rounds": 3},
@@ -297,7 +485,8 @@
         "agent/quality_gates/review_export_memory.md",
         "agent/quality_gates/source_and_truth.md",
         "agent/quality_gates/communication_and_direction.md",
-        "agent/quality_gates/artifact_authority.md"
+        "agent/quality_gates/artifact_authority.md",
+        "contracts/stage_quality_cycle_policy.json#/epistemic_review_currentness"
       ],
       "in_thread_refinement": {"allowed": true, "authoritative": false},
       "formal_review": {"required": false, "risk_tier": "high", "review_depth": "multi_axis", "context_isolation_required": true, "max_repair_rounds": 0},
@@ -317,7 +506,8 @@
       },
       "quality_rubric_refs": [
         "agent/quality_gates/artifact_authority.md",
-        "agent/quality_gates/review_export_memory.md"
+        "agent/quality_gates/review_export_memory.md",
+        "contracts/stage_quality_cycle_policy.json#/epistemic_review_currentness"
       ],
       "in_thread_refinement": {"allowed": true, "authoritative": false},
       "formal_review": {"required": true, "risk_tier": "high", "review_depth": "multi_axis", "context_isolation_required": true, "max_repair_rounds": 3},
@@ -348,6 +538,7 @@
       "artifact_creation"
     ],
     "multiple_defect_policy": "route_to_earliest_stage_that_can_close_root_cause",
-    "invalidates_downstream_review_and_export_refs": true
+    "downstream_review_currentness_policy": "declared_epistemic_dependency_closure_only",
+    "downstream_release_integrity_policy": "separate_exact_byte_contract"
   }
 }

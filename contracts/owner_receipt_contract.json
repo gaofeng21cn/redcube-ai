@@ -32,6 +32,9 @@
     "formal_review_receipt_owner": "one-person-lab",
     "domain_owner_receipt_signer": "authority-function-ref:rca/owner-receipt-signer",
     "exact_artifact_identity_binding_required": true,
+    "exact_artifact_identity_binding_role": "transport_identity_and_release_integrity_not_epistemic_content_authority",
+    "epistemic_review_currentness_ref": "contracts/stage_quality_cycle_policy.json#/epistemic_review_currentness",
+    "release_integrity_is_separate_from_epistemic_review": true,
     "required_owner_authority_inputs": [
       "formal_review_receipt",
       "artifact_identity_receipt"
