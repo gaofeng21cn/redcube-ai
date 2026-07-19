@@ -259,10 +259,6 @@ test('RCA adopts OPL epistemic currentness without replacing StageAttempt or rep
   const epistemicRef = 'contracts/stage_quality_cycle_policy.json#/epistemic_review_currentness';
 
   assert.equal(
-    adoption.framework_canonical_sha,
-    '367738244273664452e6b7ebfb86d5de5bb36c30',
-  );
-  assert.equal(
     adoption.framework_contract_ref,
     'opl-framework:contracts/opl-framework/epistemic-review-currentness-contract.json',
   );

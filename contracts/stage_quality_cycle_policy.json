@@ -66,7 +66,6 @@
     "version": "rca-epistemic-review-currentness-adoption.v1",
     "framework_contract_ref": "opl-framework:contracts/opl-framework/epistemic-review-currentness-contract.json",
     "framework_scope_schema_ref": "opl-framework:contracts/opl-framework/epistemic-review-scope-v2.schema.json",
-    "framework_canonical_sha": "367738244273664452e6b7ebfb86d5de5bb36c30",
     "evidence_profile": "epistemic_provenance",
     "trust_model": "trusted_local_workspace",
     "stage_attempt_reuse": {
