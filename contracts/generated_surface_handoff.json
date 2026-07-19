@@ -1,6 +1,8 @@
 {
-  "surface_kind": "opl_generated_surface_handoff",
-  "schema_version": 2,
+  "surface_kind": "opl_generated_surface_handoff_delta",
+  "schema_version": 1,
+  "defaults_profile": "opl.standard-generated-surface-handoff.v1",
+  "agent_id": "rca",
   "domain_id": "redcube_ai",
   "generated_surface_owner": "one-person-lab",
   "domain_repo_can_own_generated_surface": false,
@@ -12,170 +14,6 @@
     "stage_prompt_ref_policy": "consume_agent_prompts_repo_paths_only",
     "opl_generated_surfaces_write_policy": "refs_only_no_visual_truth_body_verdict_artifact_or_memory_writes"
   },
-  "generated_surfaces": [
-    {
-      "surface_id": "cli",
-      "owner": "one-person-lab",
-      "target_role": "opl_generated_surface",
-      "status": "descriptor_source_available",
-      "source_contract": "contracts/pack_compiler_input.json",
-      "domain_policy": "domain_repo_declares_actions_stages_and_authority_receipts_only"
-    },
-    {
-      "surface_id": "mcp",
-      "owner": "one-person-lab",
-      "target_role": "opl_generated_surface",
-      "status": "descriptor_source_available",
-      "source_contract": "contracts/pack_compiler_input.json",
-      "domain_policy": "domain_repo_does_not_handwrite_generic_tool_shell"
-    },
-    {
-      "surface_id": "skill",
-      "owner": "one-person-lab",
-      "target_role": "opl_generated_surface",
-      "status": "descriptor_source_available",
-      "source_contract": "contracts/pack_compiler_input.json",
-      "domain_policy": "domain_repo_declares_skill_policy_refs_and_direct_path_parity"
-    },
-    {
-      "surface_id": "product_entry_manifest",
-      "owner": "one-person-lab",
-      "target_role": "opl_generated_surface",
-      "status": "descriptor_source_available",
-      "source_contract": "contracts/opl_domain_manifest_registration.json",
-      "domain_policy": "domain_repo_declares_registration_product_entry_refs_and_domain_authority_refs"
-    },
-    {
-      "surface_id": "domain_handler",
-      "owner": "one-person-lab",
-      "target_role": "opl_generated_surface",
-      "status": "descriptor_source_available",
-      "source_contract": "contracts/pack_compiler_input.json",
-      "domain_policy": "domain_repo_implements_only_domain_authority_function_targets"
-    },
-    {
-      "surface_id": "status_read_model",
-      "owner": "one-person-lab",
-      "target_role": "opl_generated_surface",
-      "status": "descriptor_source_available",
-      "source_contract": "contracts/generated_surface_handoff.json",
-      "domain_policy": "domain_repo_returns_receipt_artifact_and_typed_blocker_refs_only"
-    },
-    {
-      "surface_id": "workbench_drilldown",
-      "owner": "one-person-lab",
-      "target_role": "opl_hosted_surface",
-      "status": "descriptor_source_available",
-      "source_contract": "contracts/artifact_locator_contract.json",
-      "domain_policy": "domain_repo_supplies_visual_artifact_and_owner_receipt_refs_only"
-    }
-  ],
-  "handoff_surfaces": [
-    {
-      "surface_id": "cli",
-      "owner": "one-person-lab",
-      "target_role": "opl_generated_surface",
-      "status": "descriptor_source_available_without_repo_local_default_surface",
-      "source_contract": "contracts/pack_compiler_input.json",
-      "current_paths": [],
-      "current_surface_refs": [
-        "opl-generated-default-caller:rca/cli"
-      ],
-      "domain_policy": "domain_repo_has_no_default_surface_and_supplies_domain_contracts_only",
-      "retired_default_surface_id": "cli"
-    },
-    {
-      "surface_id": "mcp",
-      "owner": "one-person-lab",
-      "target_role": "opl_generated_surface",
-      "status": "descriptor_source_available_without_repo_local_default_surface",
-      "source_contract": "contracts/pack_compiler_input.json",
-      "current_paths": [],
-      "current_surface_refs": [
-        "opl-generated-default-caller:rca/mcp"
-      ],
-      "domain_policy": "domain_repo_has_no_default_surface_and_supplies_domain_contracts_only",
-      "retired_default_surface_id": "mcp"
-    },
-    {
-      "surface_id": "skill",
-      "owner": "one-person-lab",
-      "target_role": "opl_generated_surface",
-      "status": "descriptor_source_available_without_repo_local_default_surface",
-      "source_contract": "contracts/pack_compiler_input.json",
-      "current_paths": [],
-      "current_surface_refs": [
-        "opl-generated-default-caller:rca/skill"
-      ],
-      "domain_policy": "domain_repo_has_no_default_surface_and_supplies_domain_contracts_only",
-      "retired_default_surface_id": "skill"
-    },
-    {
-      "surface_id": "product_entry",
-      "owner": "one-person-lab",
-      "target_role": "opl_generated_surface",
-      "status": "descriptor_source_available_without_repo_local_default_surface",
-      "source_contract": "contracts/opl_domain_manifest_registration.json",
-      "current_paths": [],
-      "current_surface_refs": [
-        "opl-generated-default-caller:rca/product_entry"
-      ],
-      "domain_policy": "domain_repo_has_no_default_surface_and_supplies_domain_contracts_only",
-      "retired_default_surface_id": "product_entry"
-    },
-    {
-      "surface_id": "product_status",
-      "owner": "one-person-lab",
-      "target_role": "opl_generated_surface",
-      "status": "descriptor_source_available_without_repo_local_default_surface",
-      "source_contract": "contracts/generated_surface_handoff.json",
-      "current_paths": [],
-      "current_surface_refs": [
-        "opl-generated-default-caller:rca/product_status"
-      ],
-      "domain_policy": "domain_repo_has_no_default_surface_and_supplies_domain_contracts_only",
-      "retired_default_surface_id": "product_status"
-    },
-    {
-      "surface_id": "product_session",
-      "owner": "one-person-lab",
-      "target_role": "opl_generated_surface",
-      "status": "descriptor_source_available_without_repo_local_default_surface",
-      "source_contract": "agent/stages/manifest.json",
-      "current_paths": [],
-      "current_surface_refs": [
-        "opl-generated-default-caller:rca/product_session"
-      ],
-      "domain_policy": "domain_repo_has_no_default_surface_and_supplies_domain_contracts_only",
-      "retired_default_surface_id": "product_session"
-    },
-    {
-      "surface_id": "domain_handler",
-      "owner": "one-person-lab",
-      "target_role": "opl_generated_surface",
-      "status": "descriptor_source_available_without_repo_local_default_surface",
-      "source_contract": "contracts/pack_compiler_input.json",
-      "current_paths": [],
-      "current_surface_refs": [
-        "opl-generated-default-caller:rca/domain_handler"
-      ],
-      "domain_policy": "domain_repo_has_no_default_surface_and_supplies_domain_contracts_only",
-      "retired_default_surface_id": "domain_handler"
-    },
-    {
-      "surface_id": "workbench",
-      "owner": "one-person-lab",
-      "target_role": "opl_hosted_surface",
-      "status": "descriptor_source_available_without_repo_local_default_surface",
-      "source_contract": "contracts/artifact_locator_contract.json",
-      "current_paths": [],
-      "current_surface_refs": [
-        "opl-generated-default-caller:rca/workbench"
-      ],
-      "domain_policy": "domain_repo_has_no_default_surface_and_supplies_domain_contracts_only",
-      "retired_default_surface_id": "workbench"
-    }
-  ],
   "repo_local_handler_targets": [],
   "repo_local_launcher_policy": {
     "repo_local_cli_allowed": false,
@@ -198,6 +36,49 @@
     "structural_cutover_complete": true,
     "production_evidence_complete": false
   },
+  "generated_surface_overrides": [
+    {
+      "surface_id": "product_entry_manifest",
+      "source_contract": "contracts/opl_domain_manifest_registration.json",
+      "domain_policy": "domain_repo_declares_registration_product_entry_refs_and_domain_authority_refs"
+    },
+    {
+      "surface_id": "status_read_model",
+      "domain_policy": "domain_repo_returns_receipt_artifact_and_typed_blocker_refs_only"
+    },
+    {
+      "surface_id": "workbench_drilldown",
+      "source_contract": "contracts/artifact_locator_contract.json",
+      "domain_policy": "domain_repo_supplies_visual_artifact_and_owner_receipt_refs_only"
+    }
+  ],
+  "retired_default_surfaces": [
+    {
+      "surface_id": "cli"
+    },
+    {
+      "surface_id": "mcp"
+    },
+    {
+      "surface_id": "skill"
+    },
+    {
+      "surface_id": "product_entry",
+      "source_contract": "contracts/opl_domain_manifest_registration.json"
+    },
+    {
+      "surface_id": "product_status"
+    },
+    {
+      "surface_id": "product_session"
+    },
+    {
+      "surface_id": "domain_handler"
+    },
+    {
+      "surface_id": "workbench"
+    }
+  ],
   "required_domain_handoff": [
     "owner_receipt_schema",
     "typed_blocker_schema",

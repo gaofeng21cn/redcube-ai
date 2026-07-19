@@ -15,12 +15,11 @@ test('RCA functional audit is canonical and contains only authority-function inv
 
   assert.equal(audit.surface_kind, 'functional_privatization_audit');
   assert.equal(audit.schema_version, 1);
+  assert.equal(audit.defaults_profile, 'opl.standard-functional-privatization-audit.v1');
   assert.equal(audit.domain_id, 'redcube_ai');
   assert.equal(audit.target_domain_id, 'redcube_ai');
-  assert.equal(
-    audit.private_functional_surface_admission_policy_ref,
-    'contracts/opl-framework/standard-domain-agent-skeleton-contract.json#/new_agent_scaffold/private_functional_surface_admission_policy',
-  );
+  assert.equal('private_functional_surface_admission_policy_ref' in audit, false);
+  assert.equal('forbidden_generic_owner_roles' in audit, false);
   assert.equal(audit.physical_source_morphology_policy.source_ref, 'contracts/physical_source_morphology_policy.json');
   assert.equal(audit.physical_source_morphology_policy.authority_boundary.domain_can_claim_generic_runtime_owner, false);
   assert.equal(audit.physical_source_morphology_policy.authority_boundary.domain_repo_can_own_generated_surface, false);
@@ -30,7 +29,7 @@ test('RCA functional audit is canonical and contains only authority-function inv
   );
   for (const entry of audit.modules) {
     assert.equal(entry.classification, 'minimal_authority_function');
-    assert.equal(entry.standardization_layer, 'authority_function_inventory');
+    assert.equal('standardization_layer' in entry, false);
     assert.notDeepEqual(entry.active_callers, []);
     assert.equal(entry.semantic_equivalence_status, 'cleared_by_boundary');
     for (const sourceRef of entry.code_paths) {

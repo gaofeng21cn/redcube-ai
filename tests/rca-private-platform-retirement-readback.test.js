@@ -29,6 +29,24 @@ test('RCA package and generated handoff expose no repo-local runtime or handler'
 
   assert.equal(packageJson.workspaces, undefined);
   assert.equal(packageJson.dependencies, undefined);
+  assert.equal(handoff.surface_kind, 'opl_generated_surface_handoff_delta');
+  assert.equal(handoff.defaults_profile, 'opl.standard-generated-surface-handoff.v1');
+  assert.equal(handoff.agent_id, 'rca');
+  assert.equal('generated_surfaces' in handoff, false);
+  assert.equal('handoff_surfaces' in handoff, false);
+  assert.deepEqual(
+    handoff.retired_default_surfaces.map((surface) => surface.surface_id),
+    [
+      'cli',
+      'mcp',
+      'skill',
+      'product_entry',
+      'product_status',
+      'product_session',
+      'domain_handler',
+      'workbench',
+    ],
+  );
   assert.deepEqual(handoff.repo_local_handler_targets, []);
   assert.equal(handoff.bridge_exit_gate.status, 'repo_local_wrappers_physically_retired');
   assert.equal(handoff.bridge_exit_gate.structural_cutover_complete, true);
@@ -36,7 +54,8 @@ test('RCA package and generated handoff expose no repo-local runtime or handler'
   assert.equal(handoff.repo_local_launcher_policy.repo_local_domain_handler_allowed, false);
   assert.equal(handoff.repo_local_launcher_policy.repo_local_product_entry_allowed, false);
   assert.equal(fs.existsSync(path.join(repoRoot, 'contracts/private_functional_surface_policy.json')), false);
-  assert.match(audit.private_functional_surface_admission_policy_ref, /standard-domain-agent-skeleton-contract\.json#/);
+  assert.equal(audit.defaults_profile, 'opl.standard-functional-privatization-audit.v1');
+  assert.equal('private_functional_surface_admission_policy_ref' in audit, false);
   assert.equal(audit.physical_source_morphology_policy.authority_boundary.domain_can_claim_generic_runtime_owner, false);
   assert.equal(audit.physical_source_morphology_policy.authority_boundary.domain_repo_can_own_generated_surface, false);
 });

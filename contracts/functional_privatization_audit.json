@@ -1,6 +1,7 @@
 {
   "surface_kind": "functional_privatization_audit",
   "schema_version": 1,
+  "defaults_profile": "opl.standard-functional-privatization-audit.v1",
   "domain_id": "redcube_ai",
   "target_domain_id": "redcube_ai",
   "owner": "redcube_ai",
@@ -11,7 +12,6 @@
       "minimal_authority_function"
     ]
   },
-  "private_functional_surface_admission_policy_ref": "contracts/opl-framework/standard-domain-agent-skeleton-contract.json#/new_agent_scaffold/private_functional_surface_admission_policy",
   "physical_source_morphology_policy": {
     "policy_id": "redcube_ai.physical-source-morphology.v2",
     "source_ref": "contracts/physical_source_morphology_policy.json",
@@ -25,7 +25,6 @@
     {
       "module_id": "rca.visual_authority_decisions",
       "classification": "minimal_authority_function",
-      "standardization_layer": "authority_function_inventory",
       "code_paths": [
         "agent/quality_gates/visual_authority_boundaries.md",
         "agent/quality_gates/review_export_memory.md",
@@ -54,7 +53,6 @@
     {
       "module_id": "rca.python_native_helpers",
       "classification": "minimal_authority_function",
-      "standardization_layer": "authority_function_inventory",
       "code_paths": [
         "python/redcube_ai/native_helpers/ppt_deck/review.py",
         "python/redcube_ai/native_helpers/ppt_deck/review.native-helper-probe.json",
@@ -132,28 +130,6 @@
       "docs/history/process/retired-surface-provenance.md"
     ]
   },
-  "forbidden_generic_owner_roles": [
-    "generic_scheduler_owner",
-    "generic_daemon_owner",
-    "generic_lifecycle_owner",
-    "generic_queue_owner",
-    "generic_attempt_ledger_owner",
-    "generic_state_machine_runner_owner",
-    "generic_cli_mcp_product_wrapper_owner",
-    "generic_sidecar_owner",
-    "generic_session_store_owner",
-    "generic_status_workbench_owner",
-    "generic_workspace_source_intake_owner",
-    "generic_memory_transport_owner",
-    "generic_artifact_gallery_owner",
-    "generic_operator_workbench_owner",
-    "generic_observability_slo_owner",
-    "generic_persistence_engine_owner",
-    "generic_sqlite_lifecycle_owner",
-    "generic_native_helper_envelope_owner",
-    "generic_review_repair_transport_owner",
-    "generated_surface_owner_in_domain_repo"
-  ],
   "default_surface_boundary": {
     "state": "physically_absent",
     "owner": "one-person-lab",
