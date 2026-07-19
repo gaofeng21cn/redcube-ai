@@ -25,7 +25,6 @@
   "standard_contract_refs": {
     "domain_manifest_registration": "contracts/opl_domain_manifest_registration.json",
     "action_target_refs": "contracts/action_catalog.json",
-    "domain_handler_registry": "contracts/domain_handler_registry.json",
     "source_closure_audit": "contracts/source_closure_audit.json",
     "stage_refs": "agent/stages/manifest.json",
     "pack_refs": "contracts/pack_compiler_input.json",

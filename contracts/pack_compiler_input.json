@@ -93,7 +93,6 @@
     "executor_policy_source_ref": "opl-generated:family_stage_control_plane#/stages/*/selected_executor",
     "owner_receipt_schema_source_ref": "contracts/owner_receipt_contract.json",
     "authority_functions_source_ref": "runtime/authority_functions/README.md",
-    "domain_handler_registry_source_ref": "contracts/domain_handler_registry.json",
     "source_closure_audit_source_ref": "contracts/source_closure_audit.json",
     "agent_lab_cost_profile_source_ref": "contracts/agent_lab_cost_profile.json",
     "functional_privatization_audit_source_ref": "contracts/functional_privatization_audit.json",
