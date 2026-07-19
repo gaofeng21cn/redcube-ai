@@ -11,6 +11,16 @@
       "minimal_authority_function"
     ]
   },
+  "private_functional_surface_admission_policy_ref": "contracts/opl-framework/standard-domain-agent-skeleton-contract.json#/new_agent_scaffold/private_functional_surface_admission_policy",
+  "physical_source_morphology_policy": {
+    "policy_id": "redcube_ai.physical-source-morphology.v2",
+    "source_ref": "contracts/physical_source_morphology_policy.json",
+    "state": "domain_morphology_declared_by_ref",
+    "authority_boundary": {
+      "domain_can_claim_generic_runtime_owner": false,
+      "domain_repo_can_own_generated_surface": false
+    }
+  },
   "modules": [
     {
       "module_id": "rca.visual_authority_decisions",

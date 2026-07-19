@@ -27,7 +27,7 @@ Repo source 与 contracts 已表达私有控制面的结构退役，但这只关
 ## 已关闭的 repo 结构面
 
 - `contracts/functional_privatization_audit.json` 将当前形态标记为 `standard_domain_pack_and_authority_functions_only`，并把 repo-local default surface 标记为物理不存在。
-- `contracts/private_functional_surface_policy.json` 默认禁止 repo-local CLI、domain entry、runtime、runtime protocol、governance runtime、overlay runtime、旧入口别名与 fallback runtime。
+- `contracts/functional_privatization_audit.json#/private_functional_surface_admission_policy_ref` 采用 Framework canonical private-surface policy；RCA 只在同一合同中声明本领域 physical morphology，并继续禁止第二套 control plane。
 - `contracts/generated_surface_handoff.json` 的 repo-local handler target 为空，generated surface owner 为 `one-person-lab`，结构 cutover 为完成状态，同时明确 production evidence 尚未完成。
 - 当前 checkout 不含旧 `apps/redcube-cli`、`packages/redcube-domain-entry`、`packages/redcube-runtime*`、`packages/redcube-governance` 或 `packages/redcube-overlay-core`。
 

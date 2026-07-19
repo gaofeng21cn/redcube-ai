@@ -35,6 +35,7 @@ test('CI validates the repo with the latest OPL Framework without mutating packa
   assert.match(workflow, /agents interfaces --repo-dir "\$GITHUB_WORKSPACE" --json/);
   assert.match(workflow, /agents conformance --agent "rca=\$GITHUB_WORKSPACE" --json/);
   assert.doesNotMatch(workflow, /packages link-framework|packages install|packages update/);
-  assert.match(workflow, /npm run typecheck:ci/);
+  assert.match(workflow, /scripts\/verify\.sh ci/);
+  assert.doesNotMatch(workflow, /npm run typecheck:ci|node scripts\/run-test-group\.ts/);
   assert.doesNotMatch(workflow, /scripts\/run-test-group\.ts family/);
 });

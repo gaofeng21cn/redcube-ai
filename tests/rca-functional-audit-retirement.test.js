@@ -17,6 +17,13 @@ test('RCA functional audit is canonical and contains only authority-function inv
   assert.equal(audit.schema_version, 1);
   assert.equal(audit.domain_id, 'redcube_ai');
   assert.equal(audit.target_domain_id, 'redcube_ai');
+  assert.equal(
+    audit.private_functional_surface_admission_policy_ref,
+    'contracts/opl-framework/standard-domain-agent-skeleton-contract.json#/new_agent_scaffold/private_functional_surface_admission_policy',
+  );
+  assert.equal(audit.physical_source_morphology_policy.source_ref, 'contracts/physical_source_morphology_policy.json');
+  assert.equal(audit.physical_source_morphology_policy.authority_boundary.domain_can_claim_generic_runtime_owner, false);
+  assert.equal(audit.physical_source_morphology_policy.authority_boundary.domain_repo_can_own_generated_surface, false);
   assert.deepEqual(
     audit.modules.map((entry) => entry.module_id),
     ['rca.visual_authority_decisions', 'rca.python_native_helpers'],

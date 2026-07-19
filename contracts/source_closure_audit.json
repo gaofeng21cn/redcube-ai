@@ -12,32 +12,24 @@
     },
     {
       "file": "scripts/run-test-group.ts",
-      "symbol": "<module>",
-      "source_digest": "sha256:c423bd3fa74ae1f6e76081746f959dcd30f1cf1533e7a102bc5e0a6cbcda4a19",
-      "allowed_effects": ["filesystem_write"],
-      "role": "developer_tool",
-      "allowed_targets": []
-    },
-    {
-      "file": "scripts/run-test-group.ts",
-      "symbol": "<module>",
-      "source_digest": "sha256:c423bd3fa74ae1f6e76081746f959dcd30f1cf1533e7a102bc5e0a6cbcda4a19",
-      "allowed_effects": ["process_spawn"],
-      "role": "developer_tool",
-      "allowed_targets": ["scripts/repo-hygiene.sh"]
-    },
-    {
-      "file": "scripts/run-test-group.ts",
       "symbol": "runNodeTestBatch",
-      "source_digest": "sha256:c423bd3fa74ae1f6e76081746f959dcd30f1cf1533e7a102bc5e0a6cbcda4a19",
+      "source_digest": "sha256:71f7d1c6ed1b35ccea9d5392a4882433decd952abf0b997cb40de36027be3e6e",
       "allowed_effects": ["process_spawn"],
       "role": "developer_tool",
       "allowed_targets": ["node"]
     },
     {
+      "file": "scripts/verification-runtime.ts",
+      "symbol": "ensureRepoTempEnvironment",
+      "source_digest": "sha256:e1f14cee6042758034c9d2aa6c3207618d1abe08b43b641d3975fb5a96e003e4",
+      "allowed_effects": ["process_spawn"],
+      "role": "developer_tool",
+      "allowed_targets": ["scripts/run-with-repo-temp-env.sh"]
+    },
+    {
       "file": "scripts/verify-lane.ts",
       "symbol": "run",
-      "source_digest": "sha256:fcf2c485a2d458e1ead47ff57789591300aad94eb69e7ab4d0e06f93d8eee04e",
+      "source_digest": "sha256:be947e1acb731f055c0b2089254bd63d39126f65ef3e76ee0cad18c5af3e2b3a",
       "allowed_effects": ["process_spawn"],
       "role": "developer_tool",
       "allowed_targets": [
@@ -50,7 +42,7 @@
     {
       "file": "scripts/verify-lane.ts",
       "symbol": "runPrivatePlatformReadback",
-      "source_digest": "sha256:fcf2c485a2d458e1ead47ff57789591300aad94eb69e7ab4d0e06f93d8eee04e",
+      "source_digest": "sha256:be947e1acb731f055c0b2089254bd63d39126f65ef3e76ee0cad18c5af3e2b3a",
       "allowed_effects": ["filesystem_write"],
       "role": "developer_tool",
       "allowed_targets": []

@@ -30,7 +30,7 @@ test('Sentrux advisory publishes OPL quality details without changing the defaul
   assert.match(verify, /scripts\/verify-lane\.ts "\$lane" --verify-wrapper "\$@"/);
   assert.doesNotMatch(verify, /case "\$lane" in/);
   assert.match(verifyLane, /runLineBudget\(lane === 'line-budget-strict' \|\| lane === 'structure-strict'\)/);
-  assert.match(verifyLane, /run\('scripts\/repo-hygiene\.sh', \['--fix'\]\)/);
+  assert.doesNotMatch(verifyLane, /repo-hygiene\.sh', \['--fix'\]/);
   assert.match(verifyLane, /run\('scripts\/repo-hygiene\.sh'\)/);
   assert.match(verifyLane, /buildVerifyLanePlan/);
   assert.match(verifyLane, /runStructure/);

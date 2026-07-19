@@ -89,15 +89,22 @@ test('retired check-line-budget script does not remain as a second gate implemen
 test('verify runs exactly one line budget gate before lane dispatch and keeps explicit strict lanes', () => {
   const verifyScript = fs.readFileSync(path.join(repoRoot, 'scripts/verify.sh'), 'utf8');
   const verifyLane = fs.readFileSync(path.join(repoRoot, 'scripts/verify-lane.ts'), 'utf8');
+  const testGroup = fs.readFileSync(path.join(repoRoot, 'scripts/run-test-group.ts'), 'utf8');
+  const tempEnv = fs.readFileSync(path.join(repoRoot, 'scripts/run-with-repo-temp-env.sh'), 'utf8');
 
   assert.match(verifyScript, /scripts\/verify-lane\.ts "\$lane" --verify-wrapper "\$@"/);
   assert.equal((verifyLane.match(/runLineBudget\(/g) || []).length, 3);
   assert.match(verifyLane, /runLineBudget\(lane === 'line-budget-strict' \|\| lane === 'structure-strict'\)/);
-  assert.match(verifyLane, /run\('scripts\/repo-hygiene\.sh', \['--fix'\]\)/);
+  assert.doesNotMatch(verifyLane, /repo-hygiene\.sh', \['--fix'\]/);
   assert.match(verifyLane, /run\('scripts\/repo-hygiene\.sh'\)/);
   assert.ok(
-    verifyLane.indexOf('runLineBudget(lane ===') < verifyLane.indexOf("run('scripts/repo-hygiene.sh', ['--fix'])"),
+    verifyLane.indexOf('runLineBudget(lane ===') < verifyLane.indexOf("run('scripts/repo-hygiene.sh')"),
   );
+  assert.match(verifyLane, /ensureRepoTempEnvironment\('scripts\/verify-lane\.ts'/);
+  assert.match(testGroup, /ensureRepoTempEnvironment\('scripts\/run-test-group\.ts'/);
+  assert.doesNotMatch(testGroup, /repo-hygiene|PYTHONPYCACHEPREFIX|NPM_CONFIG_CACHE/);
+  assert.match(tempEnv, /external_env_value UV_PROJECT_ENVIRONMENT/);
+  assert.match(tempEnv, /external_env_value NPM_CONFIG_CACHE/);
   assert.match(verifyLane, /lane === 'line-budget' \|\| lane === 'line-budget-strict'/);
   assert.match(verifyLane, /OPL_LINE_BUDGET_STRICT: '1'/);
   assert.doesNotMatch(verifyScript, /test:line-budget/);
@@ -126,8 +133,8 @@ test('OPL module bootstrap uses reproducible npm install without mutating lockfi
 test('RedCube AI skill requires OPL-generated interfaces and rejects repo-local runtime launchers', () => {
   const skill = fs.readFileSync(path.join(repoRoot, 'plugins/redcube-ai/skills/redcube-ai/SKILL.md'), 'utf8');
 
-  assert.match(skill, /只使用已安装 RCA Package 的 OPL-generated interface/);
-  assert.match(skill, /不得调用 repo-local `redcube`/);
+  assert.match(skill, /Operate RCA only through its installed OPL-generated interfaces and hosted StageRun\./);
+  assert.match(skill, /Do not bypass RCA with .*ad-hoc scripts, or direct checkout edits/);
   assert.doesNotMatch(skill, /npm run --prefix <redcube-ai-repo> redcube --/);
 });
 

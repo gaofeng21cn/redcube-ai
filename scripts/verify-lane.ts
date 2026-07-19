@@ -9,6 +9,9 @@ import {
   listVerifyLanes,
   normalizeVerifyLane,
 } from './test-registry.ts';
+import { ensureRepoTempEnvironment } from './verification-runtime.ts';
+
+ensureRepoTempEnvironment('scripts/verify-lane.ts', process.argv.slice(2));
 
 type PrivatePlatformReadbackStep = Extract<VerifyStep, { kind: 'private-platform-readback' }>;
 
@@ -135,11 +138,10 @@ const lane = normalizeVerifyLane(rawLane);
 try {
   if (verifyWrapper) {
     runLineBudget(lane === 'line-budget-strict' || lane === 'structure-strict');
-    run('scripts/repo-hygiene.sh', ['--fix']);
-    run('scripts/repo-hygiene.sh');
-    if (lane === 'line-budget' || lane === 'line-budget-strict') {
-      process.exit(0);
-    }
+  }
+  run('scripts/repo-hygiene.sh');
+  if (verifyWrapper && (lane === 'line-budget' || lane === 'line-budget-strict')) {
+    process.exit(0);
   }
 
   const plan = buildVerifyLanePlan(lane);

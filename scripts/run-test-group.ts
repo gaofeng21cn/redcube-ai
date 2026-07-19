@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -14,75 +14,11 @@ import {
   buildTestGroups,
   rootPartitionFiles,
 } from './test-registry.ts';
+import { ensureRepoTempEnvironment, repoRoot } from './verification-runtime.ts';
 
-const scriptDir = import.meta.dirname;
-const repoRoot = path.resolve(scriptDir, '..');
+ensureRepoTempEnvironment('scripts/run-test-group.ts', process.argv.slice(2));
 
 process.chdir(repoRoot);
-
-function pathIsInsideRepo(value) {
-  if (!value) {
-    return false;
-  }
-  const resolved = path.resolve(value);
-  return resolved === repoRoot || resolved.startsWith(`${repoRoot}${path.sep}`);
-}
-
-const repoTempRoot =
-  process.env.OPL_REPO_TEMP_ROOT && !pathIsInsideRepo(process.env.OPL_REPO_TEMP_ROOT)
-    ? process.env.OPL_REPO_TEMP_ROOT
-    : mkdtempSync(path.join(
-        process.env.OPL_SHORT_TMPDIR && !pathIsInsideRepo(process.env.OPL_SHORT_TMPDIR)
-          ? process.env.OPL_SHORT_TMPDIR
-          : '/tmp',
-        'redcube-repo-temp-',
-      ));
-const pythonCacheRoot = path.join(repoTempRoot, 'python-test-cache');
-mkdirSync(path.join(repoTempRoot, 'tmp'), { recursive: true });
-mkdirSync(pythonCacheRoot, { recursive: true });
-mkdirSync(path.join(repoTempRoot, 'uv', 'cache'), { recursive: true });
-mkdirSync(path.join(repoTempRoot, 'uv', 'project-venv'), { recursive: true });
-mkdirSync(path.join(repoTempRoot, 'npm', 'cache'), { recursive: true });
-mkdirSync(path.join(repoTempRoot, 'node', 'compile-cache'), { recursive: true });
-mkdirSync(path.join(repoTempRoot, 'xdg-cache'), { recursive: true });
-mkdirSync(path.join(repoTempRoot, 'opl-state'), { recursive: true });
-
-function externalEnvValue(name, fallback) {
-  const current = process.env[name];
-  return current && !pathIsInsideRepo(current) ? current : fallback;
-}
-
-process.env.OPL_REPO_TEMP_ROOT = repoTempRoot;
-process.env.TMPDIR = externalEnvValue('TMPDIR', `${path.join(repoTempRoot, 'tmp')}${path.sep}`);
-process.env.PYTHONDONTWRITEBYTECODE = process.env.PYTHONDONTWRITEBYTECODE || '1';
-process.env.PYTHONPYCACHEPREFIX = externalEnvValue('PYTHONPYCACHEPREFIX', path.join(pythonCacheRoot, 'pycache'));
-process.env.PYTEST_ADDOPTS = [
-  process.env.PYTEST_ADDOPTS || '',
-  '-p no:cacheprovider',
-  `-o cache_dir=${path.join(pythonCacheRoot, 'pytest-cache')}`,
-].filter(Boolean).join(' ');
-process.env.UV_CACHE_DIR = externalEnvValue('UV_CACHE_DIR', path.join(repoTempRoot, 'uv', 'cache'));
-process.env.UV_PROJECT_ENVIRONMENT = externalEnvValue(
-  'UV_PROJECT_ENVIRONMENT',
-  path.join(repoTempRoot, 'uv', 'project-venv'),
-);
-process.env.NPM_CONFIG_CACHE = externalEnvValue('NPM_CONFIG_CACHE', path.join(repoTempRoot, 'npm', 'cache'));
-process.env.npm_config_cache = externalEnvValue('npm_config_cache', process.env.NPM_CONFIG_CACHE);
-process.env.NODE_COMPILE_CACHE = externalEnvValue(
-  'NODE_COMPILE_CACHE',
-  path.join(repoTempRoot, 'node', 'compile-cache'),
-);
-process.env.XDG_CACHE_HOME = externalEnvValue('XDG_CACHE_HOME', path.join(repoTempRoot, 'xdg-cache'));
-process.env.OPL_STATE_DIR = path.join(repoTempRoot, 'opl-state');
-
-const hygieneResult = spawnSync('scripts/repo-hygiene.sh', {
-  cwd: repoRoot,
-  encoding: 'utf8',
-  stdio: 'inherit',
-});
-if (hygieneResult.status !== 0) {
-  process.exit(hygieneResult.status ?? 1);
-}
 assertValidTestRegistry();
 const GROUPS = buildTestGroups();
 function assertTrackedFiles(files, groupName) {

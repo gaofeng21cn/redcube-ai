@@ -60,14 +60,8 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Run build and typecheck
-        run: npm run typecheck:ci
-
-      - name: Run fast tests
-        run: node scripts/run-test-group.ts fast
-
-      - name: Run remaining meta tests
-        run: node scripts/run-test-group.ts meta:ci
+      - name: Run quality gate
+        run: scripts/verify.sh ci
 
       - name: Run OPL standard Agent admission
         run: |

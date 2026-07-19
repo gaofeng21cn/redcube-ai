@@ -18,10 +18,9 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(workflow, /node-version-file:\s*['"]?\.nvmrc['"]?/);
   assert.match(workflow, /cache:\s*['"]?npm['"]?/);
   assert.match(workflow, /\brun:\s*npm ci\b/);
-  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?uses:\s*astral-sh\/setup-uv@v7\b[\s\S]*?enable-cache:\s*true[\s\S]*?cache-dependency-glob:\s*['"]uv\.lock['"][\s\S]*?uv sync --locked --no-dev --extra native --no-install-project --python 3\.12[\s\S]*?REDCUBE_PYTHON_COMMAND=\$UV_PROJECT_ENVIRONMENT\/bin\/python[\s\S]*?npm run typecheck:ci[\s\S]*?node scripts\/run-test-group\.ts fast[\s\S]*?node scripts\/run-test-group\.ts meta:ci/);
-  assert.doesNotMatch(workflow, /quality:\n[\s\S]*?run:\s*npm run test:ci/);
+  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?uses:\s*astral-sh\/setup-uv@v7\b[\s\S]*?enable-cache:\s*true[\s\S]*?cache-dependency-glob:\s*['"]uv\.lock['"][\s\S]*?uv sync --locked --no-dev --extra native --no-install-project --python 3\.12[\s\S]*?REDCUBE_PYTHON_COMMAND=\$UV_PROJECT_ENVIRONMENT\/bin\/python[\s\S]*?scripts\/verify\.sh ci/);
+  assert.doesNotMatch(workflow, /quality:\n[\s\S]*?node scripts\/run-test-group\.ts/);
   assert.doesNotMatch(workflow, /quality:\n[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?Run build and typecheck/);
-  assert.doesNotMatch(workflow, /Run meta tests\n\s+run:\s*node scripts\/run-test-group\.ts meta\n/);
   assert.doesNotMatch(workflow, /quality:\n[\s\S]*?tools\/native-ppt-proof\/install-deps\.sh[\s\S]*?Run build and typecheck/);
   assert.match(workflow, /workflow_dispatch:/);
   assert.match(workflow, /schedule:\n\s+- cron:\s*['"]17 19 \* \* \*['"]/);

@@ -194,6 +194,15 @@
       "owner": "redcube_ai"
     }
   ],
+  "provider_hosted_task_stage_bindings": {
+    "emit_no_regression_evidence": {
+      "runtime_domain_id": "redcube",
+      "stage_id": "controlled_visual_stage_attempt",
+      "stage_semantics_ref": "contracts/owner_receipt_contract.json#/receipt_cases/5",
+      "provider_hosted_stage_attempt_required": true,
+      "domain_stage_semantics_owner": "redcube_ai"
+    }
+  },
   "opl_consumption_policy": {
     "opl_can_store_receipt_refs": true,
     "opl_can_store_typed_blocker": true,

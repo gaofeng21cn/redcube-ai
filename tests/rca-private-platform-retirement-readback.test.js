@@ -25,7 +25,7 @@ test('RCA no-resurrection readback proves private source roots and command templ
 test('RCA package and generated handoff expose no repo-local runtime or handler', () => {
   const packageJson = readJson('package.json');
   const handoff = readJson('contracts/generated_surface_handoff.json');
-  const policy = readJson('contracts/private_functional_surface_policy.json');
+  const audit = readJson('contracts/functional_privatization_audit.json');
 
   assert.equal(packageJson.workspaces, undefined);
   assert.equal(packageJson.dependencies, undefined);
@@ -35,7 +35,10 @@ test('RCA package and generated handoff expose no repo-local runtime or handler'
   assert.equal(handoff.repo_local_launcher_policy.repo_local_cli_allowed, false);
   assert.equal(handoff.repo_local_launcher_policy.repo_local_domain_handler_allowed, false);
   assert.equal(handoff.repo_local_launcher_policy.repo_local_product_entry_allowed, false);
-  assert.equal(policy.no_second_control_plane_gate.fallback_runtime_allowed, false);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'contracts/private_functional_surface_policy.json')), false);
+  assert.match(audit.private_functional_surface_admission_policy_ref, /standard-domain-agent-skeleton-contract\.json#/);
+  assert.equal(audit.physical_source_morphology_policy.authority_boundary.domain_can_claim_generic_runtime_owner, false);
+  assert.equal(audit.physical_source_morphology_policy.authority_boundary.domain_repo_can_own_generated_surface, false);
 });
 
 test('RCA no-resurrection command emits compact parseable JSON', () => {

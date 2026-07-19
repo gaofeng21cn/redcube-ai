@@ -231,9 +231,18 @@ test('RCA capability map routes visual feedback fixtures through declarative pro
   const capabilities = new Map(
     capabilityMap.capabilities.map((entry) => [entry.capability_id, entry]),
   );
+  const sharedPolicy = capabilityMap.capability_policy_profiles.rca_refs_only_router;
 
   assert.equal(handoff.agent_lab_owner, 'one-person-lab');
   assert.equal(handoff.authority_boundary.domain_repo_can_own_agent_lab_runtime, false);
+  assert.equal(sharedPolicy.authority_boundary.can_write_domain_truth, false);
+  assert.equal(sharedPolicy.authority_boundary.can_authorize_quality_or_export, false);
+  assert.equal(sharedPolicy.owner_closeout_boundary.can_write_owner_receipt_body, false);
+  assert.equal(sharedPolicy.owner_closeout_boundary.can_create_typed_blocker, false);
+  assert.equal(capabilityMap.capabilities.every(
+    (entry) => entry.capability_policy_profile_ref === '#/capability_policy_profiles/rca_refs_only_router',
+  ), true);
+  assert.equal(capabilityMap.capabilities.some((entry) => Object.hasOwn(entry, 'authority_boundary')), false);
   for (const token of handoff.visual_feedback_failure_fixture.tokens) {
     const mapping = capabilityMap.feedback_token_index[token];
     assert.ok(mapping, token);
@@ -249,6 +258,19 @@ test('RCA capability map routes visual feedback fixtures through declarative pro
       );
     }
   }
+});
+
+test('RCA provider-hosted evidence task declares its domain-owned stage binding', () => {
+  const receiptContract = readJson('contracts/owner_receipt_contract.json');
+  const binding = receiptContract.provider_hosted_task_stage_bindings.emit_no_regression_evidence;
+
+  assert.equal(binding.runtime_domain_id, 'redcube');
+  assert.equal(binding.stage_id, 'controlled_visual_stage_attempt');
+  assert.equal(binding.stage_semantics_ref, 'contracts/owner_receipt_contract.json#/receipt_cases/5');
+  assert.equal(binding.provider_hosted_stage_attempt_required, true);
+  assert.equal(binding.domain_stage_semantics_owner, 'redcube_ai');
+  assert.equal(receiptContract.receipt_cases[5].generator_action, 'emit_no_regression_evidence');
+  assert.equal(receiptContract.receipt_cases[5].attempt_ref, '/controlled_visual_stage_attempt');
 });
 
 test('RCA capability map dry-run tokens resolve without private runtime callers', () => {
