@@ -2,6 +2,8 @@
 
 Create an editable native PowerPoint deck from the current source-grounded slide blueprint and visual direction. The output must satisfy the attached schema; Office/Python helpers only validate, materialize, render, and read back the AI-authored plan.
 
+This route is admissible only after the decisive Codex Attempt semantically interprets the complete current user request and records explicit evidence for editable PowerPoint objects, DrawingML, preservation of editable master/layout/placeholder/theme semantics, or an explicit native PPTX authoring request. These are semantic boundary examples, not trigger tokens; keyword, regex, or file-extension matching is forbidden. Generic “PPT” wording, `.pptx` input/output, a reference/template deck, speaker notes, PDF export, quality expectations, an Agent preference, or validator behavior is insufficient. If exact admission evidence is absent, return a route mismatch to `author_image_pages` before authoring any native plan.
+
 ## Good native design
 
 - Preserve source fidelity and the rhetorical job of every slide. Treat blueprint and visual direction as mutually constraining design inputs; refine their interpretation together when capacity or hierarchy exposes a real conflict.

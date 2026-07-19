@@ -14,7 +14,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 ## AI-First / Contract-Light Boundary
 
 - Use AI judgment here for visual language, rhythm, density ceilings, proof-object choice, peak-page emphasis, style-boundary interpretation, and whether a blueprint can survive artifact creation.
-- Use AI judgment here for route arbitration: keep image-first when fast full-page visual quality is the right route, route to native PPTX only when editability/link/text requirements justify it, and route back when neither route can satisfy the current blueprint.
+- Use AI judgment here for route-local visual feasibility, not for native admission. Native admission is a whole-request semantic decision owned by the decisive Codex Attempt; this skill only verifies its recorded current-user evidence. Keep image-first unless that evidence explicitly requires editable PowerPoint objects, DrawingML, editable master semantics, or the native authoring route. A `.pptx` deliverable, attached/reference deck, template, notes, quality target, or Agent preference cannot justify native PPTX, and literal keyword matching is forbidden.
 - Use AI judgment here when repeated visual failures show a direction problem: contact-sheet sameness, overloaded density, weak peak pages, stale style refs, or a route choice that fights the content.
 - Treat contracts, quality gates, and `contracts/capability_map.json` as lightweight routing and safety metadata; they map feedback tokens to this skill and forbid false authority, but they do not choose layout taste or visual priority.
 - Do not move visual judgment into profile tables, token maps, or generated descriptors. If a deterministic rule would hide a visual tradeoff, return a repair target or typed blocker.
@@ -22,7 +22,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 ## Inputs
 
 - Approved `slide_blueprint` with real slide ids, page roles, visible claims, evidence points, and source boundaries.
-- Audience, brand or style constraints, route policy, page budget, and any reference deck or template profile.
+- Audience, brand or style constraints, route policy, page budget, any reference deck or template profile, and the current-request native admission evidence when native is selected.
 - Existing visual direction or review feedback when this is a repair.
 - RCA refs:
   - `agent/prompts/visual_direction.md`
@@ -39,7 +39,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 - Template/profile guidance: layout archetypes, semantic zones, placeholder capacity, and reference-deck discipline when native PPTX or template-aware authoring is selected.
 - `visual_proof_plan`: per-slide screenshot/contact-sheet checks, source-fidelity risks, density proof, and native QA evidence expected from downstream routes.
 - `semantic_composition_map`: bind each action-title promise and page role to an observable visual encoding such as dependency edges, time order, decision gates, quantitative axes, table hierarchy, or image evidence.
-- `visual_route_arbitration`: image-first, HTML, or native PPTX recommendation with evidence, route risks, required proof packet, and route-back owner.
+- `visual_route_feasibility`: locked image-first, HTML, or admitted native PPTX route; native admission evidence readback or `not_admitted`; route risks, required proof packet, and route-back owner. This output cannot admit native.
 - Typed blockers or repair targets for blueprint, density, template, or visual-risk problems.
 
 ## Execution Rules
@@ -54,18 +54,21 @@ Operate as the visual direction specialist between blueprint approval and page a
 8. Identify repair risk before artifact creation: overloaded pages, repeated card grids, weak peak pages, text-heavy proof pages, or missing structural visuals.
 9. Keep RCA authority clear. Adopt professional PPT discipline as RCA rules; do not cite external tools as the owner of visual decisions.
 10. If the task requires profiling a template or reference deck, consume `rca-template-profiler` output instead of re-profiling it here.
-11. Route back early when blueprint, source, template capacity, or route selection would make visual proof fail; name the owner stage and the smallest repair.
-12. For native PPTX, name the QA evidence expected later: editable shape manifest, rendered screenshots, hyperlink/text editability checks, and blocked-slide repair scope.
-13. Use contact sheets as direction evidence: repeated layout families, flat rhythm, title-safe-zone pressure, or density overload are visual-direction repairs, not page-helper failures.
-14. Do not convert image-first success into a native claim. A later native route must consume approved direction, contact-sheet findings, and explicit editability targets.
-15. Make title promises visible. A dependency map needs relationships, a timeline needs ordered events, a decision ladder needs gates or branches, and a data claim needs an honest chart/table encoding; decorative lines, dots, or equal cards do not satisfy these roles.
-16. Choose chart/table materialization intent with the native designer: use stable DrawingML when cross-render fidelity dominates, and native data objects when editable data semantics dominate. Record the tradeoff instead of letting the helper infer it.
-17. Keep review internal to the stage chain. Emit complete direction and route-specific proof expectations in one pass when inputs are sufficient; do not add user-by-user layout confirmations.
+11. Treat a template/reference deck as visual and structural guidance under image-first by default. It activates native only when the current user request explicitly requires editable native objects or preservation of editable master/layout/placeholder/theme semantics.
+12. If native was selected without explicit current-request admission evidence, reject that selection and restore image-first before page authoring; do not ask the user to choose between internal implementation routes.
+13. Route back early when blueprint, source, template capacity, or route selection would make visual proof fail; name the owner stage and the smallest repair.
+14. For admitted native PPTX, name the QA evidence expected later: editable shape manifest, rendered screenshots, hyperlink/text editability checks, and blocked-slide repair scope.
+15. Use contact sheets as direction evidence: repeated layout families, flat rhythm, title-safe-zone pressure, or density overload are visual-direction repairs, not page-helper failures.
+16. Do not convert image-first success into a native claim. A later native route must consume approved direction, contact-sheet findings, and explicit editability targets.
+17. Make title promises visible. A dependency map needs relationships, a timeline needs ordered events, a decision ladder needs gates or branches, and a data claim needs an honest chart/table encoding; decorative lines, dots, or equal cards do not satisfy these roles.
+18. Choose chart/table materialization intent with the native designer only after native admission: use stable DrawingML when cross-render fidelity dominates, and native data objects when editable data semantics dominate. Record the tradeoff instead of letting the helper infer it.
+19. Keep review internal to the stage chain. Emit complete direction and route-specific proof expectations in one pass when inputs are sufficient; do not add user-by-user layout confirmations.
 
 ## Workbench Lessons To Preserve
 
 - Visual direction for image-first decks must be page-by-page, not only deck-level. Each real slide id needs first-glance hook, composition, visible text budget, style reference, and image-prompt intent before image prompts are written.
 - A reference deck must be version-locked. Record the current source path/ref, representative pages, and what may be borrowed. Do not silently reuse stale archive pages just because they are visually familiar.
+- A `.pptx` reference or requested `.pptx` output does not imply editable authoring. Extract its approved visual/template signals for image-first unless explicit native admission evidence says otherwise.
 - When the user asks to reuse a current deck style, profile the latest approved visual line first, then bind each slide to that style boundary. Treat older decks as historical references unless explicitly approved.
 - Image-first density ceiling is stricter than editable PPTX: keep on-image text to a small number of short labels, and move explanation to speaker notes or the next page.
 - Contact sheets are a visual rhythm gate. The reviewer should be able to spot story order, repeated layouts, and overloaded pages from the sheet before opening individual slides.
@@ -86,7 +89,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 - `style_ref_lock`: approved reference deck/version, representative slide refs, allowed borrowings, forbidden stale refs, and owner approval state.
 - `route_back_decision`: owner stage, reason, evidence ref, affected slide ids, and whether to repair story, template profile, route policy, page payload, or native shape plan.
 - `visual_proof_plan`: required contact-sheet rhythm check, per-slide screenshot target, native QA refs when applicable, and proof that visible claims remain source-faithful.
-- `visual_route_arbitration`: selected route, rejected routes, editability need, pixel/contact-sheet evidence required, native QA required, and owner route-back if evidence is missing.
+- `visual_route_feasibility`: locked route, rejected alternatives, explicit native semantic admission evidence or `not_admitted`, pixel/contact-sheet evidence required, native QA required, and owner route-back if evidence is missing; this record cannot create native admission.
 - `semantic_composition_map`: action-title promise, page role, required visual relation, accepted object families, and evidence a reviewer can observe.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 

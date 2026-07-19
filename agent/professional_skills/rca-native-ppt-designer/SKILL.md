@@ -14,14 +14,14 @@ Use the accepted blueprint, visual direction, and template profile to author an 
 ## AI-First / Contract-Light Boundary
 
 - Use AI judgment here for editable design spec locks, shape grammar, zone binding, coordinate tradeoffs, native repair strategy, and when native editability is genuinely worth the route cost.
-- Use AI judgment here for native-vs-image-first arbitration: native route is justified by editable text/links/charts/shape control, not by a desire to relabel full-page image output.
+- Do not infer native-vs-image-first admission here. The decisive Codex Attempt must already have recorded a whole-request semantic decision based on explicit current-user intent for editable text/shapes/charts/tables, native PowerPoint/DrawingML objects, editable master/layout/placeholder/theme preservation, or the native authoring route. These are semantic classes, not trigger tokens; a `.pptx` attachment/output, template, notes, quality target, Agent preference, or literal keyword match is insufficient.
 - Use AI judgment here when repeated native failures show a design-plan problem rather than a helper problem: zone grammar, coordinates, shape roles, typography, template capacity, or selected slide scope.
 - Treat validators, helper manifests, and `contracts/capability_map.json` as bounds, refs, and failure-token metadata; they do not invent native design, choose which pages need editability, or convert image-first success into native authority.
 - Keep contracts light by making the `editable_shape_plan` explicit. Do not add helper defaults, inference fallbacks, or compatibility rules that hide missing native design decisions.
 
 ## Inputs
 
-- Approved source truth, slide blueprint, visual direction, route policy, and native PPTX selection.
+- Approved source truth, slide blueprint, visual direction, route policy, native PPTX selection, and the exact current-request native admission evidence.
 - Template profile or reference deck analysis when available.
 - Native sample constraints such as `native_visual_sample`.
 - Preflight, shape-plan validation feedback, render QA feedback, or blocked-slide review results for repair.
@@ -48,30 +48,31 @@ Use the accepted blueprint, visual direction, and template profile to author an 
 ## Execution Rules
 
 1. Native means editable objects. Do not wrap full-page PNGs and call the result native PPTX.
-2. Lock design before coordinates. A thin spec id, motif, or color palette is not enough.
-3. Treat reference decks and templates as layout intelligence: semantic zones, placeholder capacity, spacing rhythm, hierarchy, and action-title discipline.
-4. Every non-decorative visible shape must bind to a declared zone and remain inside it.
-5. Use canonical bounds only: `left_in`, `top_in`, `width_in`, and `height_in`.
-6. Do not rely on helper defaults. Text-bearing shapes need explicit font size; structural shapes need visible fill or line; every visible shape needs a valid quality role.
-7. Preserve layout variety. Do not repeat the same concrete composition three pages in a row; in normal decks keep most composition signatures distinct.
-8. Respect readability floors: title, body, labels, tables, captions, gaps, edge margins, and title hierarchy must be planned before materialization.
-9. Plan structural visuals as editable shapes: rail, connector, axis, proof band, gate stack, input hub, metric grid, table, chart, or map.
-10. Repair by changing the AI plan. Do not hide failures in notes, shrink text below floor, mark content decorative, or let helpers rebalance the page.
-11. If a template or reference deck has not been profiled, request `rca-template-profiler` output first; this skill only binds that profile into native editable shapes.
-12. Make native QA explicit before materialization: shape manifest, rendered screenshots, editable text/hyperlink checks, and screenshot-review repair targets must be expected outputs.
-13. Route back when a native failure belongs to source/story, visual direction, or template profile rather than coordinates; do not make helpers infer missing design decisions.
-14. When converting from image-first, consume approved director notes, contact-sheet findings, source refs, and explicit editable targets. Do not trace pixels blindly or claim native readiness without native QA evidence.
-15. For repeated native repair failure, preserve passing slides and classify the failing boundary before rerender: shape grammar, zone capacity, text fit, helper materialization, review expectation, or route mismatch.
-16. Declare object kind and materialization intent explicitly. Use `stable_drawingml` for shape-built visuals where viewer consistency dominates and `native_data_object` for charts/tables where editable data semantics dominate.
-17. Use real connectors, pictures, groups, paths, charts, and tables when declared. Never permit the helper to convert an unknown or unsupported kind into a rectangle; preserve the best plan plus a repair target or no-output diagnostic and continue without ready claims.
-18. Keep notes and motion authored, not inferred. Bind notes to slide ids, choose transitions deliberately, keep timing optional, and use animation only when it strengthens the spoken sequence without making the static page incomplete.
-19. Make targeted repair stable-id based. Preserve passing slide/object hashes and rerender only blocked objects or slides unless an upstream design lock changed.
+2. Verify native admission before designing. If exact current-request evidence is absent, return a route mismatch to image-first; do not treat a template/reference `.pptx` or requested `.pptx` output as admission.
+3. Lock design before coordinates. A thin spec id, motif, or color palette is not enough.
+4. Treat reference decks and templates as layout intelligence after route admission: semantic zones, placeholder capacity, spacing rhythm, hierarchy, and action-title discipline.
+5. Every non-decorative visible shape must bind to a declared zone and remain inside it.
+6. Use canonical bounds only: `left_in`, `top_in`, `width_in`, and `height_in`.
+7. Do not rely on helper defaults. Text-bearing shapes need explicit font size; structural shapes need visible fill or line; every visible shape needs a valid quality role.
+8. Preserve layout variety. Do not repeat the same concrete composition three pages in a row; in normal decks keep most composition signatures distinct.
+9. Respect readability floors: title, body, labels, tables, captions, gaps, edge margins, and title hierarchy must be planned before materialization.
+10. Plan structural visuals as editable shapes: rail, connector, axis, proof band, gate stack, input hub, metric grid, table, chart, or map.
+11. Repair by changing the AI plan. Do not hide failures in notes, shrink text below floor, mark content decorative, or let helpers rebalance the page.
+12. If a template or reference deck has not been profiled, request `rca-template-profiler` output first; this skill only binds that profile into native editable shapes.
+13. Make native QA explicit before materialization: shape manifest, rendered screenshots, editable text/hyperlink checks, and screenshot-review repair targets must be expected outputs.
+14. Route back when a native failure belongs to source/story, visual direction, or template profile rather than coordinates; do not make helpers infer missing design decisions.
+15. When converting from image-first, consume approved director notes, contact-sheet findings, source refs, and explicit editable targets. Do not trace pixels blindly or claim native readiness without native QA evidence.
+16. For repeated native repair failure, preserve passing slides and classify the failing boundary before rerender: shape grammar, zone capacity, text fit, helper materialization, review expectation, or route mismatch.
+17. Declare object kind and materialization intent explicitly. Use `stable_drawingml` for shape-built visuals where viewer consistency dominates and `native_data_object` for charts/tables where editable data semantics dominate.
+18. Use real connectors, pictures, groups, paths, charts, and tables when declared. Never permit the helper to convert an unknown or unsupported kind into a rectangle; preserve the best plan plus a repair target or no-output diagnostic and continue without ready claims.
+19. Keep notes and motion authored, not inferred. Bind notes to slide ids, choose transitions deliberately, keep timing optional, and use animation only when it strengthens the spoken sequence without making the static page incomplete.
+20. Make targeted repair stable-id based. Preserve passing slide/object hashes and rerender only blocked objects or slides unless an upstream design lock changed.
 
 ## Workbench Lessons To Preserve
 
 - If the current route is image-first, do not retrofit it into a native claim. Full-page PNG decks can be the right draft/export route, but they are not editable_shape_plan evidence.
 - When converting an image-first success into native PPTX later, start from the approved page-by-page director notes and contact-sheet findings, not from tracing pixels blindly.
-- Native follow-up should target the pages that need editability, links, charts, or live text most. Do not make the whole deck native unless the user or route contract requires it.
+- Native follow-up should target the pages that need editability, links, charts, or live text most. Do not make the whole deck native unless the current user explicitly requires it.
 - Public GitHub/source links are native-friendly candidates: keep them as editable text or hyperlink shapes when native PPTX is selected, not baked into a low-resolution image.
 
 ## Design Registry Consumption
@@ -88,7 +89,7 @@ Use the accepted blueprint, visual direction, and template profile to author an 
 - `native_repair_loop`: repair the plan, rerender, compare screenshots, update shape manifest refs, then return review/export refs, quality debt, or a no-output diagnostic; typed blocker remains reserved for the explicit hard-stop whitelist.
 - `image_to_native_followup`: consume approved director notes, source refs, contact-sheet findings, and selected editable targets before writing native shapes.
 - `native_ppt_qa_plan`: shape manifest refs, screenshot refs, editable-object checks, hyperlink/text checks, expected reviewer checks, and blocked-slide-only repair scope.
-- `native_vs_image_first_arbitration`: editability reason, selected slides, rejected image-first/native alternatives, contact-sheet evidence, required native QA refs, and route-back owner.
+- `native_admission_readback`: exact current-user semantic evidence, decision owner, selected slides, rejected image-first/native alternatives, contact-sheet evidence, required native QA refs, and route-back owner. This record verifies admission but cannot create it.
 - `repeated_native_failure_triage`: prior render refs, current screenshot/shape-manifest mismatch, owner boundary, preserved slides, and next repair route.
 - `native_route_back`: owner stage, affected slide ids, failed evidence, and whether the fix belongs to template profile, visual direction, page authoring, or native shape plan.
 - `typed_native_object`: stable id, object kind, semantic role, materialization intent, editable payload, relationships, bounds/z-order, and package readback expectation.
@@ -106,12 +107,14 @@ Use the accepted blueprint, visual direction, and template profile to author an 
 
 ## Blockers And Repair Targets
 
+Missing native admission is a route mismatch, not a hard stop: return `route_back_decision` to `artifact_creation` with `author_image_pages / repair_image_pages`, preserve the current source/blueprint/direction refs, and continue image-first without asking the user to choose an internal route.
+
 Return `typed_blocker` only when:
 
-- Native PPTX was not explicitly selected, which is an authoring-lane authority violation.
-- If no consumable blueprint, visual direction, editable shape plan, or PPTX artifact exists, return a no-output diagnostic and quality debt as the next stage input.
 - A template/reference requirement is impossible to read or legally use.
 - Permission, credential, explicit human approval, authority, or stage identity/currentness prevents legal continuation.
+
+If no consumable blueprint, visual direction, editable shape plan, or PPTX artifact exists, return a no-output diagnostic and quality debt as the next stage input. Do not turn ordinary missing authoring output into an authority blocker.
 
 Record `completed_with_quality_debt` and a repair target, not an execution blocker, when a consumable artifact exists but `design_spec_lock`, template grammar, zone binding, shape manifest, true render proof, artifact inventory, helper evidence, or visual quality is incomplete. Retry count is quality budget; after it is exhausted, preserve the best consumable plan/PPTX and continue without `visual_ready` or `export_ready` claims.
 

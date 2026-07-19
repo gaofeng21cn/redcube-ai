@@ -39,6 +39,8 @@ OPL 从 `contracts/action_catalog.json` 与 `agent/stages/manifest.json` 生成 
 ## Domain 执行护栏
 
 - 用户点名 `RCA` / `RedCube AI` 或任务属于 slide deck、视觉交付、讲稿、海报、小红书等 RCA 覆盖范围时，必须通过 OPL-generated RCA action 与 hosted StageRun 推进。
+- 用户在同一条交付请求中同时点名或 `@` OMA / OPL Meta Agent，只表示 composer 中出现了另一个 Agent，不构成设计、改进或修改 RCA Agent/skill/contracts 的工程授权。只有用户明确要求“创建、接管、改进或修改某个 Agent”时才进入 OMA；“帮我做 PPT”仍是 RCA 视觉交付任务。
+- 视觉交付运行中的 validator、render 或 QA 失败只能修复当前 deliverable artifact，不能触发修改 RCA 源码、主 skill、合同或正式校验映射。需要改 Agent 时必须结束当前交付语义，并由用户另行明确发起 Agent 工程任务。
 - 不得用通用 `Presentations`、`python-pptx`、artifact-tool 原生 deck、手写脚本或 checkout 内直接编辑来绕过 RCA stage、quality gate、artifact authority 与 review/export decision，除非用户明确要求探索替代技术路线。
 - 直接产出 HTML、截图、PPTX、PDF 或其他文件前，必须确认当前 declarative stage、输入 artifact refs、invocation identity 与 authority scope；产物必须回到同一 StageRun 的 exact artifact lineage。
 - RCA native helper 只能由当前 Codex Attempt 按 descriptor 调用；不得成为 repo-local executor、runtime、session、workspace 或 lifecycle owner。
@@ -49,6 +51,11 @@ OPL 从 `contracts/action_catalog.json` 与 `agent/stages/manifest.json` 生成 
 
 `storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_image_pages -> visual_director_review -> screenshot_review -> export_pptx`
 
+- 对普通用户，`PPT` / `ppt` / “幻灯片”首先表示交付类型，`.pptx` 表示最终容器格式；它们都不等于 native editable authoring。默认交付仍是每页完整 16:9 PNG，审核后封装为 `.pptx`。
+- 用户上传、引用或要求参考 `.pptx`，要求沿用医院/公司模板、视觉风格、版式、讲者备注或同时导出 PDF，都不能单独作为 native 路线证据；这些输入默认作为 source、style 或 package requirement 由 image-first 路线消费。
+- 只有当前用户请求在完整语境中明确要求“文字/形状/图表/表格可编辑”、原生 PowerPoint 对象、DrawingML、保留可编辑母版/版式/占位符/主题对象，或明确点名原生 PPTX 制作路线时，才允许选择 `author_pptx_native / repair_pptx_native`。Agent 自己认为 native 更专业、附件扩展名是 `.pptx`、已有模板或 validator 更熟悉 native 都不算授权。
+- native 准入由 decisive Codex Attempt 阅读当前用户完整请求后做语义判断；上述表达是准入边界示例，不是触发词表。不得用关键词、正则、文件扩展名或确定性脚本替代该判断。
+- 请求含糊或没有上述明确的 native 语义准入证据时，不询问路线偏好，直接锁定 `author_image_pages / repair_image_pages`；最终仍交付合法 `.pptx`，但不得宣称内部对象可编辑。
 - `author_image_pages` 是默认视觉实现路线，通过 Responses `image_generation` 生成完整 16:9 PPT 页面 PNG；HTML routes 与 native editable PPTX routes 只能作为显式选择路线，不能替代默认 `author_image_pages -> screenshot_review -> export_pptx`。
 - `author_image_pages` 可复用同 key 的 image artifact cache；真实 image generation 只在 cache miss、显式重绘或 blocked-slide repair target 时发生，artifact 不记录 token。
 - `screenshot_review` 优先消费可用 PNG 与 prompt/style/image manifest，并执行 16:9、非空、重复、低信息密度、裁切、碎片化、字段泄漏与可选 OCR 检查。普通视觉 QA、manifest/provenance 缺口只记录质量债务和 repair recommendation；没有可消费页面、文件损坏不可读或输入缺失时物化 no-output/failure diagnostic 并继续，只有 executor unavailable、authority/safety/permission、wrong-target identity/currentness、不可逆动作或显式 human decision 才硬停止。
@@ -82,7 +89,7 @@ OPL 从 `contracts/action_catalog.json` 与 `agent/stages/manifest.json` 生成 
 
 ## Progress-first stage policy
 
-- stage retry count 是质量预算，不是 transition gate；默认 4 轮 native shape-plan 也遵守这一规则。
+- stage retry count 是质量预算，不是 transition gate；初始生产后最多 3 轮 `repairer + re_reviewer`，包括 native shape-plan 在内都不得以 validator 未清零为由开启第 4 轮修复。
 - 只要当前 stage 产生可读取、可被下一 stage 消费的 artifact，就以 `completed` 或 `completed_with_quality_debt` 推进。
 - 质量债务可以触发 repair recommendation，但不能生成 execution blocker，也不能让同一 stage 无限循环。
 - 质量债务必须阻止 `visual_ready`、`export_ready`、production-ready 等声明。

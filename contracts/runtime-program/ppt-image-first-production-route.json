@@ -5,6 +5,91 @@
   "default_visual_route": "author_image_pages",
   "default_visual_policy": "image_first",
   "default_enabled": true,
+  "route_selection_contract": {
+    "contract_id": "ppt_deck_authoring_lane_admission_v1",
+    "decision_owner": "decisive_codex_attempt",
+    "decision_mode": "whole_current_user_request_semantic_judgment",
+    "deterministic_selector_implemented_here": false,
+    "forbidden_decision_mechanisms": [
+      "literal_keyword_matching",
+      "regular_expression_matching",
+      "file_extension_matching",
+      "validator_or_helper_driven_selection"
+    ],
+    "examples_are": "semantic_regression_cases_not_trigger_vocabulary",
+    "requested_output_semantics": {
+      "generic_ppt_or_slides_request": "deliverable_family_only",
+      "pptx_output": "container_format_only",
+      "pptx_input_or_reference": "source_or_visual_reference_only"
+    },
+    "default_decision": {
+      "author_route": "author_image_pages",
+      "repair_route": "repair_image_pages",
+      "export_route": "export_pptx",
+      "final_container": "pptx_with_full_slide_images",
+      "ambiguity_policy": "select_image_first_without_human_gate"
+    },
+    "native_route_admission": {
+      "policy": "explicit_current_user_native_editability_or_native_authoring_semantics_required",
+      "evidence_source": "current_user_request_not_agent_inference_attachment_extension_or_validator_result",
+      "evidence_interpretation": "semantic_judgment_over_complete_current_user_request",
+      "admitted_semantic_intents": [
+        "editable_text_shapes_charts_or_tables",
+        "native_powerpoint_objects_or_drawingml",
+        "preserve_editable_master_layout_placeholder_or_theme_objects",
+        "explicit_native_pptx_authoring_route"
+      ],
+      "non_admitting_context_alone": [
+        "generic_ppt_or_slides_wording",
+        "pptx_output_extension",
+        "attached_or_reference_pptx",
+        "reuse_or_follow_template_style",
+        "speaker_notes_or_pdf_export",
+        "professional_or_high_quality_wording",
+        "agent_route_preference",
+        "native_validator_or_materializer_availability"
+      ],
+      "missing_evidence_decision": "author_image_pages"
+    },
+    "lane_lock": {
+      "lock_after_selection": true,
+      "validator_or_repair_failure_may_switch_lane": false,
+      "agent_may_upgrade_image_first_to_native": false,
+      "new_explicit_user_invocation_required_to_change_lane": true
+    },
+    "semantic_regression_cases": [
+      {
+        "case_id": "generic_ppt_request",
+        "request_semantics": ["make_a_ppt"],
+        "expected_author_route": "author_image_pages"
+      },
+      {
+        "case_id": "reference_pptx_template_request",
+        "request_semantics": ["attached_pptx", "use_as_reference", "follow_hospital_or_company_template"],
+        "expected_author_route": "author_image_pages"
+      },
+      {
+        "case_id": "pptx_output_with_notes_and_pdf",
+        "request_semantics": ["pptx_output", "speaker_notes", "pdf_export"],
+        "expected_author_route": "author_image_pages"
+      },
+      {
+        "case_id": "explicit_editable_objects_request",
+        "request_semantics": ["editable_text_shapes_charts_or_tables"],
+        "expected_author_route": "author_pptx_native"
+      },
+      {
+        "case_id": "explicit_drawingml_request",
+        "request_semantics": ["native_powerpoint_objects_or_drawingml"],
+        "expected_author_route": "author_pptx_native"
+      },
+      {
+        "case_id": "explicit_native_authoring_request",
+        "request_semantics": ["explicit_native_pptx_authoring_route"],
+        "expected_author_route": "author_pptx_native"
+      }
+    ]
+  },
   "route_chain": [
     "storyline",
     "detailed_outline",
