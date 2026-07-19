@@ -1,4 +1,4 @@
 interface:
   display_name: "RedCube AI"
-  short_description: "Declarative visual-deliverable Agent for OPL"
-  default_prompt: "Use $redcube-ai through installed OPL-generated interfaces and hosted StageRun. Treat RCA as a declarative visual pack with Python native helpers and RCA-owned authority decisions; do not invoke or recreate a repo-local runtime."
+  short_description: "Image-first visual deliverables through OPL"
+  default_prompt: "Use $redcube-ai through installed OPL-generated interfaces and hosted StageRun. For ordinary PPT/PPTX requests, create complete slide images and package them in PPTX; choose native editable PowerPoint only when the user explicitly requires editable native objects."
