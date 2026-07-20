@@ -21,7 +21,7 @@ Machine boundary: 当前状态必须从 repo source/contracts 与 owner readback
 
 ## Current State Summary
 
-- canonical agent/package id 为 `rca`，repo/package version 为 `0.2.7`；仓内没有第二 package identity。
+- canonical agent/package id 为 `rca`，repo/package version 为 `0.2.8`；仓内没有第二 package identity。
 - `agent/` 是 declarative visual pack source，`contracts/action_catalog.json` 只声明 `invoke_product_entry`、`run_image_ppt_proof`、`run_native_ppt_proof` 三个 OPL-hosted stage actions。
 - `contracts/generated_surface_handoff.json` 声明 generated surfaces 归 OPL、repo-local handler targets 为空、结构 cutover 已闭合，并明确 production evidence 未闭合。
 - `contracts/functional_privatization_audit.json` 只保留 RCA visual authority decisions 与 Python native helpers；旧 repo-local default/control surfaces 已退役。

@@ -102,10 +102,80 @@
     "export_pptx"
   ],
   "api_contract": {
-    "endpoint": "codex_native_imagegen_skill",
-    "tool": "image_generation",
-    "model_selection": "inherited_from_codex_executor_native_imagegen",
-    "explicit_provider_token_required": false,
+    "contract_id": "rca_codex_image_generation_dual_route_v1",
+    "preferred_builtin_route": {
+      "skill_id": "imagegen",
+      "tool_namespace": "image_gen",
+      "tool_action": "imagegen",
+      "accepted_runtime_names": [
+        "image_gen.imagegen",
+        "image_gen__imagegen"
+      ],
+      "availability_authority": "active_executor_tool_inventory",
+      "skill_presence_is_not_tool_availability": true,
+      "model_selection": "inherited_from_codex_builtin_image_gen",
+      "explicit_provider_token_required": false,
+      "missing_openai_api_key_may_block": false
+    },
+    "automatic_api_fallback": {
+      "activation": [
+        "built_in_tool_absent_from_active_executor_inventory",
+        "built_in_tool_unavailable_before_any_image_artifact"
+      ],
+      "authorization": "selected_rca_image_first_route_authorizes_same_model_api_fallback_without_additional_user_confirmation",
+      "must_not_ask_user_to_confirm_fallback": true,
+      "must_not_request_new_openai_api_key_before_codex_config_resolution": true,
+      "config_path_precedence": [
+        "$CODEX_HOME/config.toml",
+        "~/.codex/config.toml"
+      ],
+      "config_parser": "toml",
+      "active_provider_resolution": "root.model_provider -> model_providers.<provider_id>",
+      "base_url_field": "base_url",
+      "credential_resolution_order": [
+        "model_providers.<provider_id>.experimental_bearer_token",
+        "model_providers.<provider_id>.api_key",
+        "environment value named by model_providers.<provider_id>.env_key"
+      ],
+      "preferred_client": "installed_imagegen_skill_scripts_image_gen_py",
+      "client_path_precedence": [
+        "active_imagegen_skill_root/scripts/image_gen.py",
+        "$CODEX_HOME/skills/.system/imagegen/scripts/image_gen.py",
+        "~/.codex/skills/.system/imagegen/scripts/image_gen.py"
+      ],
+      "client_dependency_policy": "use_active_openai_sdk_else_ephemeral_uv_run_with_openai_without_user_prompt",
+      "request": {
+        "api": "openai_compatible_images",
+        "path": "/images/generations",
+        "model": "gpt-image-2",
+        "final_slide_size": "2048x1152",
+        "output_format": "png"
+      },
+      "child_process_env_mapping": {
+        "OPENAI_BASE_URL": "resolved_base_url",
+        "OPENAI_API_KEY": "resolved_credential"
+      },
+      "credential_scope": "single_image_generation_child_process_only",
+      "forbidden": [
+        "parse_toml_with_shell_sourcing_or_ad_hoc_regex",
+        "write_token_to_shell_profile",
+        "persist_token_in_prompt_artifact_manifest_or_receipt",
+        "print_echo_or_return_token",
+        "require_OPENAI_API_KEY_to_already_exist",
+        "ask_user_to_install_openai_sdk_when_ephemeral_uv_is_available",
+        "ask_user_to_paste_or_configure_a_key_when_codex_provider_config_is_resolvable"
+      ]
+    },
+    "terminal_failure_policy": {
+      "when": [
+        "no_readable_codex_config",
+        "active_provider_missing_base_url_or_resolvable_credential",
+        "provider_rejects_auth_or_gpt_image_2_after_bounded_retry"
+      ],
+      "result": "redacted_typed_blocker_with_attempted_route_and_config_path_only",
+      "must_not_include_secret_values": true,
+      "must_not_offer_generic_openai_key_setup_as_first_remediation": true
+    },
     "token_persistence_allowed": false,
     "artifact_provenance_fields": [
       "provider",
@@ -329,7 +399,11 @@
     "full_colorectal_ai_long_deck_regression_allowed_by_default": false,
     "live_mode": "explicit",
     "live_mode_requires": [
-      "codex_executor_native_imagegen_available"
+      "codex_image_generation_dual_route_resolvable"
+    ],
+    "live_mode_requires_any": [
+      "codex_builtin_image_gen_tool_available",
+      "codex_config_gpt_image_2_fallback_resolvable"
     ]
   },
   "runtime_hardening": {

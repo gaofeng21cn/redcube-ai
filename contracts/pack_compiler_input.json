@@ -227,6 +227,16 @@
           "role": "credential_boundary_boundary"
         },
         {
+          "ref": "executor_must_resolve_active_codex_provider_config_before_missing_image_generation_credential_gate",
+          "ref_kind": "policy_ref",
+          "role": "credential_boundary_boundary"
+        },
+        {
+          "ref": "selected_rca_image_first_route_authorizes_config_backed_gpt_image_2_without_additional_human_gate",
+          "ref_kind": "policy_ref",
+          "role": "credential_boundary_boundary"
+        },
+        {
           "ref": "executor_must_request_human_gate_for_missing_credentials",
           "ref_kind": "policy_ref",
           "role": "credential_boundary_boundary"
@@ -245,6 +255,11 @@
         }
       ],
       "side_effect_risk_refs": [
+        {
+          "ref": "selected_rca_image_first_route_authorizes_bounded_image_generation_provider_call",
+          "ref_kind": "policy_ref",
+          "role": "side_effect_risk_boundary"
+        },
         {
           "ref": "external_network_or_portal_side_effect_requires_explicit_stage_permission",
           "ref_kind": "policy_ref",

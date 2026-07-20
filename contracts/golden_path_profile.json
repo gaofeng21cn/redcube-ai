@@ -31,6 +31,15 @@
     "independent_gate_receipt_ref_or_route_back_ref",
     "current_owner_delta_ref"
   ],
+  "image_generation_resolution_precedence": {
+    "contract_ref": "contracts/runtime-program/ppt-image-first-production-route.json#/api_contract",
+    "applies_before_generic_credential_stop_loss": true,
+    "missing_openai_api_key_alone_is_not_missing_credential": true,
+    "resolve_builtin_tool_then_active_codex_provider_config": true,
+    "selected_image_first_route_authorizes_same_model_api_fallback": true,
+    "additional_human_confirmation_for_fallback": "forbidden",
+    "terminal_unresolvable_result": "redacted_typed_blocker_ref"
+  },
   "stop_loss_policy": {
     "missing_domain_truth": "return_typed_blocker_ref",
     "missing_credential_or_human_authority": "return_human_gate_ref",

@@ -260,3 +260,121 @@ test('PPT authoring lane uses semantic prompt judgment and defaults to image-fir
   assert.match(visualGate, /Mentioning or `@`-ing OMA beside RCA[\s\S]*does not authorize Agent engineering/);
   assert.match(visualGate, /cannot become route authority or reopen a quality cycle after the three-round repair budget is exhausted/);
 });
+
+test('image-first generation prefers the real Codex tool and automatically falls back through active Codex provider config', () => {
+  const route = readJson(ROUTE_CONTRACT);
+  const api = route.api_contract;
+  const builtin = api.preferred_builtin_route;
+  const fallback = api.automatic_api_fallback;
+  const terminal = api.terminal_failure_policy;
+  const primarySkill = read('agent/primary_skill/SKILL.md');
+  const artifactPrompt = read('agent/prompts/artifact_creation.md');
+  const pageAuthor = read('agent/professional_skills/rca-ppt-page-author/SKILL.md');
+  const affordances = read('agent/tools/domain_affordances.md');
+  const routeDoc = read('docs/delivery/image-first-ppt-production-route.md');
+  const compiler = readJson('contracts/pack_compiler_input.json');
+  const cognitive = readJson('contracts/cognitive_kernel_adoption.json');
+  const goldenPath = readJson('contracts/golden_path_profile.json');
+
+  assert.equal(api.contract_id, 'rca_codex_image_generation_dual_route_v1');
+  assert.equal(builtin.skill_id, 'imagegen');
+  assert.equal(builtin.tool_namespace, 'image_gen');
+  assert.equal(builtin.tool_action, 'imagegen');
+  assert.deepEqual(builtin.accepted_runtime_names, ['image_gen.imagegen', 'image_gen__imagegen']);
+  assert.equal(builtin.availability_authority, 'active_executor_tool_inventory');
+  assert.equal(builtin.skill_presence_is_not_tool_availability, true);
+  assert.equal(builtin.explicit_provider_token_required, false);
+  assert.equal(builtin.missing_openai_api_key_may_block, false);
+
+  assert.deepEqual(fallback.activation, [
+    'built_in_tool_absent_from_active_executor_inventory',
+    'built_in_tool_unavailable_before_any_image_artifact',
+  ]);
+  assert.equal(
+    fallback.authorization,
+    'selected_rca_image_first_route_authorizes_same_model_api_fallback_without_additional_user_confirmation',
+  );
+  assert.equal(fallback.must_not_ask_user_to_confirm_fallback, true);
+  assert.equal(fallback.must_not_request_new_openai_api_key_before_codex_config_resolution, true);
+  assert.deepEqual(fallback.config_path_precedence, ['$CODEX_HOME/config.toml', '~/.codex/config.toml']);
+  assert.equal(fallback.config_parser, 'toml');
+  assert.equal(fallback.active_provider_resolution, 'root.model_provider -> model_providers.<provider_id>');
+  assert.equal(fallback.base_url_field, 'base_url');
+  assert.deepEqual(fallback.credential_resolution_order, [
+    'model_providers.<provider_id>.experimental_bearer_token',
+    'model_providers.<provider_id>.api_key',
+    'environment value named by model_providers.<provider_id>.env_key',
+  ]);
+  assert.equal(fallback.preferred_client, 'installed_imagegen_skill_scripts_image_gen_py');
+  assert.deepEqual(fallback.client_path_precedence, [
+    'active_imagegen_skill_root/scripts/image_gen.py',
+    '$CODEX_HOME/skills/.system/imagegen/scripts/image_gen.py',
+    '~/.codex/skills/.system/imagegen/scripts/image_gen.py',
+  ]);
+  assert.equal(
+    fallback.client_dependency_policy,
+    'use_active_openai_sdk_else_ephemeral_uv_run_with_openai_without_user_prompt',
+  );
+  assert.deepEqual(fallback.request, {
+    api: 'openai_compatible_images',
+    path: '/images/generations',
+    model: 'gpt-image-2',
+    final_slide_size: '2048x1152',
+    output_format: 'png',
+  });
+  assert.deepEqual(fallback.child_process_env_mapping, {
+    OPENAI_BASE_URL: 'resolved_base_url',
+    OPENAI_API_KEY: 'resolved_credential',
+  });
+  for (const forbidden of [
+    'parse_toml_with_shell_sourcing_or_ad_hoc_regex',
+    'persist_token_in_prompt_artifact_manifest_or_receipt',
+    'require_OPENAI_API_KEY_to_already_exist',
+    'ask_user_to_install_openai_sdk_when_ephemeral_uv_is_available',
+    'ask_user_to_paste_or_configure_a_key_when_codex_provider_config_is_resolvable',
+  ]) {
+    assert.equal(fallback.forbidden.includes(forbidden), true, forbidden);
+  }
+
+  assert.equal(terminal.result, 'redacted_typed_blocker_with_attempted_route_and_config_path_only');
+  assert.equal(terminal.must_not_include_secret_values, true);
+  assert.equal(terminal.must_not_offer_generic_openai_key_setup_as_first_remediation, true);
+  assert.deepEqual(route.proof_runner.live_mode_requires, [
+    'codex_image_generation_dual_route_resolvable',
+  ]);
+  assert.deepEqual(route.proof_runner.live_mode_requires_any, [
+    'codex_builtin_image_gen_tool_available',
+    'codex_config_gpt_image_2_fallback_resolvable',
+  ]);
+
+  assert.deepEqual(goldenPath.image_generation_resolution_precedence, {
+    contract_ref: 'contracts/runtime-program/ppt-image-first-production-route.json#/api_contract',
+    applies_before_generic_credential_stop_loss: true,
+    missing_openai_api_key_alone_is_not_missing_credential: true,
+    resolve_builtin_tool_then_active_codex_provider_config: true,
+    selected_image_first_route_authorizes_same_model_api_fallback: true,
+    additional_human_confirmation_for_fallback: 'forbidden',
+    terminal_unresolvable_result: 'redacted_typed_blocker_ref',
+  });
+
+  const requiredCredentialRefs = [
+    'executor_must_resolve_active_codex_provider_config_before_missing_image_generation_credential_gate',
+    'selected_rca_image_first_route_authorizes_config_backed_gpt_image_2_without_additional_human_gate',
+  ];
+  const requiredSideEffectRef = 'selected_rca_image_first_route_authorizes_bounded_image_generation_provider_call';
+  for (const contract of [compiler, cognitive]) {
+    const boundaries = contract.tool_affordance_boundary || contract.cognitive_stage_pack_contract.tool_affordance_boundary;
+    const credentialRefs = boundaries.credential_boundary_refs.map((entry) => entry.ref);
+    const sideEffectRefs = boundaries.side_effect_risk_refs.map((entry) => entry.ref);
+    for (const ref of requiredCredentialRefs) assert.equal(credentialRefs.includes(ref), true, ref);
+    assert.equal(sideEffectRefs.includes(requiredSideEffectRef), true, requiredSideEffectRef);
+  }
+
+  for (const surface of [primarySkill, artifactPrompt, pageAuthor, affordances, routeDoc]) {
+    assert.match(surface, /imagegen|image_gen/);
+    assert.match(surface, /Codex|config\.toml/);
+    assert.match(surface, /gpt-image-2/);
+    assert.match(surface, /do not ask|without another user confirmation|without checking `OPENAI_API_KEY`|不再向用户确认/i);
+  }
+  assert.doesNotMatch(routeDoc, /codex_native_imagegen_skill/);
+});

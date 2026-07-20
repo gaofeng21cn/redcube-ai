@@ -40,6 +40,14 @@ For a `ppt_deck`, decide the authoring lane from the complete current user reque
 5. Preserve user requests for plan review, approval, or staged continuation as a declared human-review intent. The hosted controller materializes the gate; RCA does not create a private pause/resume mechanism.
 6. Lock the selected image/native/HTML lane for the deliverable. Validator or repair failure cannot silently switch lanes.
 
+## Image Generation Execution
+
+- For `author_image_pages` and `repair_image_pages`, prefer the Codex system skill `imagegen` and the built-in `image_gen` tool. Determine tool availability only from the active executor tool inventory; the callable may be rendered as `image_gen.imagegen` or `image_gen__imagegen`. Skill installation alone is not proof that a hosted executor injected the tool.
+- The built-in route does not require `OPENAI_API_KEY`. Do not inspect, request, or block on that environment variable before calling an available built-in tool.
+- If the built-in tool is absent or becomes unavailable before producing any image artifact, immediately use the automatic API fallback in `contracts/runtime-program/ppt-image-first-production-route.json`. Selecting RCA's default image-first route already authorizes this same-model fallback; do not ask the user to confirm it and do not ask them to create, paste, or export another API key first.
+- Parse `$CODEX_HOME/config.toml`, falling back to `~/.codex/config.toml`, with a TOML parser. Resolve root `model_provider`, then that provider's `base_url` and credential from `experimental_bearer_token`, `api_key`, or the environment variable named by `env_key`. Use the installed `imagegen` skill's `scripts/image_gen.py` with `gpt-image-2`, passing the resolved values only as child-process `OPENAI_BASE_URL` and `OPENAI_API_KEY`; if the active Python lacks the `openai` SDK, run it through ephemeral `uv run --with openai` without asking the user to install anything. Never source TOML as shell, change the config, or persist or print the credential.
+- If both routes are genuinely unusable, return one redacted typed blocker naming the attempted routes and config path. Do not give generic `OPENAI_API_KEY` setup instructions when a configured provider was found, and never expose provider secrets in chat, logs, prompts, artifacts, manifests, or receipts.
+
 ## Quality And Hard Stops
 
 - Treat retry and repair counts as quality budgets, not transition gates. After initial production, allow at most three `repairer + re_reviewer` rounds, then continue with the best readable artifact and explicit quality debt.

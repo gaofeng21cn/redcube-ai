@@ -37,6 +37,7 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
     'Admission',
     'Action Routing',
     'Default Workflow',
+    'Image Generation Execution',
     'Quality And Hard Stops',
     'Output Expectations',
     'References',
@@ -58,6 +59,12 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.match(skillText, /Admit `author_pptx_native \/ repair_pptx_native` only when the user explicitly requires editable text, shapes, charts, tables/);
   assert.match(skillText, /semantic boundary examples, not trigger tokens[\s\S]*keyword, regex, extension, or deterministic-script selection is forbidden/);
   assert.match(skillText, /evidence is missing or ambiguous, select image-first without asking a route-preference question/);
+  assert.match(skillText, /Codex system skill `imagegen`[\s\S]*`image_gen\.imagegen` or `image_gen__imagegen`/);
+  assert.match(skillText, /built-in route does not require `OPENAI_API_KEY`/);
+  assert.match(skillText, /Selecting RCA's default image-first route already authorizes this same-model fallback[\s\S]*do not ask the user to confirm it/);
+  assert.match(skillText, /Parse `\$CODEX_HOME\/config\.toml`[\s\S]*`experimental_bearer_token`[\s\S]*`gpt-image-2`/);
+  assert.match(skillText, /`scripts\/image_gen\.py`[\s\S]*`uv run --with openai`[\s\S]*without asking the user to install anything/);
+  assert.match(skillText, /never source TOML as shell[\s\S]*persist or print the credential/i);
   assert.match(skillText, /selected or `@`-mentioned OMA[\s\S]*does not authorize Agent engineering/);
   assert.match(skillText, /Validator, render, screenshot, or QA failures authorize repair of the current deliverable only/);
   assert.match(skillText, /at most three `repairer \+ re_reviewer` rounds[\s\S]*continue with the best readable artifact and explicit quality debt/);

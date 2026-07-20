@@ -7,7 +7,7 @@ Machine boundary: 结构事实以 root contracts、`agent/`、保留源码和 fr
 
 ## 当前结论
 
-RCA 当前是 OPL 标准 visual-deliverable domain pack：canonical agent/package id 为 `rca`，repo/package version 为 `0.2.7`。仓内保留 declarative visual pack、RCA authority contracts、Python native helpers、最小 authority functions 与 developer verification；通用 package lifecycle、generated interfaces、StageRun/Attempt、session/workspace/status/workbench 等控制面归 OPL。
+RCA 当前是 OPL 标准 visual-deliverable domain pack：canonical agent/package id 为 `rca`，repo/package version 为 `0.2.8`。仓内保留 declarative visual pack、RCA authority contracts、Python native helpers、最小 authority functions 与 developer verification；通用 package lifecycle、generated interfaces、StageRun/Attempt、session/workspace/status/workbench 等控制面归 OPL。
 
 Repo source 与 contracts 已表达私有控制面的结构退役，但这只关闭 RCA checkout 内的 source-shape 边界。它不证明已安装 package current、真实 visual StageRun 成功、review/export accepted、owner accepted、release ready 或 production ready。
 
