@@ -74,629 +74,99 @@
     "map_is_resolver_index_only": true,
     "map_can_be_used_as_domain_truth": false
   },
-  "capabilities": [
-    {
-      "capability_id": "redcube-ai.primary_skill",
-      "surface_role": "primary_skill",
-      "capability_kind": "primary_skill",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "repo_path",
-        "ref": "agent/primary_skill/SKILL.md",
-        "role": "standard_opl_primary_skill_source"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "repo_path",
-          "ref": "plugins/redcube-ai/skills/redcube-ai/SKILL.md",
-          "role": "codex_plugin_carrier_compat_mirror"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "plugins/redcube-ai/.codex-plugin/plugin.json",
-          "role": "canonical_plugin_scaffold_source_locator"
+  "capability_inventory": {
+    "source_kind": "standard_agent_repo_scan.v1",
+    "policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
+    "professional_skill_order": [
+      "rca-xhs-content-strategist",
+      "rca-ppt-story-architect",
+      "rca-ppt-visual-director",
+      "rca-ppt-page-author",
+      "rca-ppt-reviewer",
+      "rca-visual-memory-curator",
+      "rca-native-ppt-designer",
+      "rca-template-profiler"
+    ],
+    "feedback_index_ref": "contracts/capability_map.json#/feedback_token_index",
+    "deltas": [
+      {
+        "capability_id": "redcube-ai.primary_skill",
+        "source_ref": "agent/primary_skill/SKILL.md",
+        "runtime_projection_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "plugins/redcube-ai/skills/redcube-ai/SKILL.md",
+            "role": "codex_plugin_carrier_compat_mirror"
+          },
+          {
+            "ref_kind": "contract_ref",
+            "ref": "plugins/redcube-ai/.codex-plugin/plugin.json",
+            "role": "canonical_plugin_scaffold_source_locator"
+          }
+        ],
+        "sync_policy": "repo_local_standard_primary_skill_with_plugin_carrier_compat",
+        "carrier_projection_contract": {
+          "canonical_source": "agent/primary_skill/SKILL.md",
+          "carrier_skill_ref": "plugins/redcube-ai/skills/redcube-ai/SKILL.md",
+          "carrier_materialization": "materialized_full_skill_copy",
+          "codex_install_requires_real_skill_md": true,
+          "plugin_skill_must_remain_real_file": true,
+          "carrier_role": "transport_install_detail_not_agent_membership_or_status",
+          "authority": false,
+          "carrier_can_override_canonical_source": false,
+          "carrier_can_claim_agent_membership_or_status": false,
+          "carrier_is_domain_truth_source": false
         }
-      ],
-      "sync_policy": "repo_local_standard_primary_skill_with_plugin_carrier_compat",
-      "externalization_reason": "Rich app skill is a required standard OPL primary skill source; plugin skill remains a Codex carrier mirror and does not own RCA visual truth.",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "agent/primary_skill/SKILL.md"
-      ],
-      "improvement_tokens": [
-        "primary_skill",
-        "redcube-ai.primary_skill",
-        "standard_agent_capability"
-      ],
-      "carrier_projection_contract": {
-        "canonical_source": "agent/primary_skill/SKILL.md",
-        "carrier_skill_ref": "plugins/redcube-ai/skills/redcube-ai/SKILL.md",
-        "carrier_materialization": "materialized_full_skill_copy",
-        "codex_install_requires_real_skill_md": true,
-        "plugin_skill_must_remain_real_file": true,
-        "carrier_role": "transport_install_detail_not_agent_membership_or_status",
-        "authority": false,
-        "carrier_can_override_canonical_source": false,
-        "carrier_can_claim_agent_membership_or_status": false,
-        "carrier_is_domain_truth_source": false
+      },
+      {
+        "capability_id": "rca-stage-prompts",
+        "source_ref": "agent/prompts/",
+        "projection_refs": [
+          "agent/stages/manifest.json"
+        ]
+      },
+      {
+        "capability_id": "rca-tool-connector-catalog",
+        "source_ref": "agent/tools/domain_affordances.md",
+        "projection_refs": [
+          "contracts/action_catalog.json"
+        ]
+      },
+      {
+        "capability_id": "rca-visual-knowledge-pack",
+        "source_ref": "agent/knowledge/",
+        "projection_refs": [
+          "contracts/domain_descriptor.json"
+        ]
+      },
+      {
+        "capability_id": "rca-review-quality-gates",
+        "source_ref": "agent/quality_gates/",
+        "projection_refs": [
+          "contracts/artifact_locator_contract.json"
+        ]
+      },
+      {
+        "capability_id": "rca-ppt-agent-lab-eval-suite",
+        "source_ref": "contracts/stage_run_canary_evidence.json",
+        "surface_role": "eval_suite",
+        "capability_kind": "contract_module",
+        "runtime_projection_refs": [
+          {
+            "ref_kind": "contract_ref",
+            "ref": "contracts/agent_lab_handoff.json",
+            "role": "agent_lab_handoff"
+          },
+          {
+            "ref_kind": "contract_ref",
+            "ref": "contracts/stage_run_canary_evidence.json",
+            "role": "controlled_stage_run_evaluation_fixture"
+          }
+        ],
+        "sync_policy": "domain_agent_builtin_refs_only"
       }
-    },
-    {
-      "capability_id": "rca-xhs-content-strategist",
-      "surface_role": "professional_skill",
-      "capability_kind": "professional_skill",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "repo_path",
-        "ref": "agent/professional_skills/rca-xhs-content-strategist/SKILL.md",
-        "role": "repo_local_professional_skill_source"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "repo_path",
-          "ref": "agent/professional_skills/rca-xhs-content-strategist/SKILL.md",
-          "role": "codex_skill_guidance_source"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/feedback_token_index",
-          "role": "rca_feedback_target_mapping"
-        }
-      ],
-      "sync_policy": "repo_local_default",
-      "externalization_reason": "rca_professional_method_source",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "agent/professional_skills/rca-xhs-content-strategist/SKILL.md"
-      ],
-      "improvement_tokens": [
-        "xhs_content_strategy",
-        "xhs_series_architecture",
-        "single_series_mode",
-        "note_responsibility",
-        "medical_content_framing",
-        "cross_note_continuity"
-      ],
-      "stage_refs": [
-        "communication_strategy"
-      ],
-      "resource_refs": [
-        "agent/professional_skills/rca-xhs-content-strategist/resources/minimal-resource-pack.md"
-      ]
-    },
-    {
-      "capability_id": "rca-ppt-story-architect",
-      "surface_role": "professional_skill",
-      "capability_kind": "professional_skill",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "repo_path",
-        "ref": "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
-        "role": "repo_local_professional_skill_source"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "repo_path",
-          "ref": "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
-          "role": "codex_skill_guidance_source"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/feedback_token_index",
-          "role": "rca_feedback_target_mapping"
-        }
-      ],
-      "sync_policy": "repo_local_default",
-      "externalization_reason": "rca_professional_method_source",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "agent/professional_skills/rca-ppt-story-architect/SKILL.md"
-      ],
-      "improvement_tokens": [
-        "storyline",
-        "outline",
-        "claim_spine",
-        "narrative_sequence",
-        "detailed_outline",
-        "slide_blueprint",
-        "page_role",
-        "evidence_placement",
-        "rca-ppt-story-architect",
-        "serial_pipeline",
-        "progressive_disclosure",
-        "story_spec_lock",
-        "claim_spine_lock"
-      ],
-      "stage_refs": [
-        "communication_strategy"
-      ],
-      "resource_refs": [
-        "agent/professional_skills/rca-ppt-story-architect/resources/minimal-resource-pack.md"
-      ]
-    },
-    {
-      "capability_id": "rca-ppt-visual-director",
-      "surface_role": "professional_skill",
-      "capability_kind": "professional_skill",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "repo_path",
-        "ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
-        "role": "repo_local_professional_skill_source"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "repo_path",
-          "ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
-          "role": "codex_skill_guidance_source"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/feedback_token_index",
-          "role": "rca_feedback_target_mapping"
-        }
-      ],
-      "sync_policy": "repo_local_default",
-      "externalization_reason": "rca_professional_method_source",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "agent/professional_skills/rca-ppt-visual-director/SKILL.md"
-      ],
-      "improvement_tokens": [
-        "visual_direction",
-        "style",
-        "visual_density",
-        "layout_quality",
-        "visual_language",
-        "layout_rhythm",
-        "density_controls",
-        "peak_pages",
-        "layout_variety",
-        "template_profile_consumption",
-        "rca-ppt-visual-director",
-        "ppt_visual_density",
-        "spec_lock",
-        "progressive_disclosure",
-        "style_boundary",
-        "visual_qa",
-        "semantic_composition"
-      ],
-      "stage_refs": [
-        "visual_direction",
-        "review_and_revision"
-      ],
-      "resource_refs": [
-        "agent/professional_skills/rca-ppt-visual-director/resources/minimal-resource-pack.md"
-      ]
-    },
-    {
-      "capability_id": "rca-ppt-page-author",
-      "surface_role": "professional_skill",
-      "capability_kind": "professional_skill",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "repo_path",
-        "ref": "agent/professional_skills/rca-ppt-page-author/SKILL.md",
-        "role": "repo_local_professional_skill_source"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "repo_path",
-          "ref": "agent/professional_skills/rca-ppt-page-author/SKILL.md",
-          "role": "codex_skill_guidance_source"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/feedback_token_index",
-          "role": "rca_feedback_target_mapping"
-        }
-      ],
-      "sync_policy": "repo_local_default",
-      "externalization_reason": "rca_professional_method_source",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "agent/professional_skills/rca-ppt-page-author/SKILL.md"
-      ],
-      "improvement_tokens": [
-        "page_authoring",
-        "layout_quality",
-        "visual_density",
-        "page_level_authoring",
-        "route_specific_page_payload",
-        "structural_visual",
-        "text_fit",
-        "blocked_slide_repair",
-        "visible_text_safety",
-        "rca-ppt-page-author",
-        "ppt_visual_density",
-        "serial_pipeline",
-        "progressive_disclosure",
-        "editable_pptx_grammar"
-      ],
-      "stage_refs": [
-        "artifact_creation"
-      ],
-      "resource_refs": [
-        "agent/professional_skills/rca-ppt-page-author/resources/minimal-resource-pack.md"
-      ]
-    },
-    {
-      "capability_id": "rca-ppt-reviewer",
-      "surface_role": "professional_skill",
-      "capability_kind": "professional_skill",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "repo_path",
-        "ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
-        "role": "repo_local_professional_skill_source"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "repo_path",
-          "ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
-          "role": "codex_skill_guidance_source"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/feedback_token_index",
-          "role": "rca_feedback_target_mapping"
-        }
-      ],
-      "sync_policy": "repo_local_default",
-      "externalization_reason": "rca_professional_method_source",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "agent/professional_skills/rca-ppt-reviewer/SKILL.md"
-      ],
-      "improvement_tokens": [
-        "visual_review",
-        "ppt_review",
-        "layout_quality",
-        "visual_density",
-        "rendered_page_review",
-        "screenshot_review",
-        "source_fidelity",
-        "repair_target_selection",
-        "weak_page_detection",
-        "review_export_gate_evidence",
-        "rca-ppt-reviewer",
-        "ppt_visual_density",
-        "visual_qa",
-        "semantic_composition",
-        "native_object_semantics",
-        "presentation_semantics",
-        "blind_comparison_review"
-      ],
-      "stage_refs": [
-        "review_and_revision",
-        "package_and_handoff"
-      ],
-      "resource_refs": [
-        "agent/professional_skills/rca-ppt-reviewer/resources/minimal-resource-pack.md"
-      ]
-    },
-    {
-      "capability_id": "rca-visual-memory-curator",
-      "surface_role": "professional_skill",
-      "capability_kind": "professional_skill",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "repo_path",
-        "ref": "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
-        "role": "repo_local_professional_skill_source"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "repo_path",
-          "ref": "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
-          "role": "codex_skill_guidance_source"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/feedback_token_index",
-          "role": "rca_feedback_target_mapping"
-        }
-      ],
-      "sync_policy": "repo_local_default",
-      "externalization_reason": "rca_professional_method_source",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "agent/professional_skills/rca-visual-memory-curator/SKILL.md"
-      ],
-      "improvement_tokens": [
-        "visual_memory",
-        "memory_writeback",
-        "review_export_memory",
-        "visual_pattern_memory",
-        "visual_memory_writeback_proposal",
-        "accept_reject_review",
-        "accepted_memory_receipt",
-        "rejected_memory_receipt",
-        "consumed_memory_refs",
-        "locator_projection_refs",
-        "rca-visual-memory-curator"
-      ],
-      "stage_refs": [
-        "review_and_revision",
-        "package_and_handoff"
-      ],
-      "resource_refs": [
-        "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
-      ]
-    },
-    {
-      "capability_id": "rca-native-ppt-designer",
-      "surface_role": "professional_skill",
-      "capability_kind": "professional_skill",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "repo_path",
-        "ref": "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
-        "role": "repo_local_professional_skill_source"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "repo_path",
-          "ref": "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
-          "role": "codex_skill_guidance_source"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/feedback_token_index",
-          "role": "rca_feedback_target_mapping"
-        }
-      ],
-      "sync_policy": "repo_local_default",
-      "externalization_reason": "rca_professional_method_source",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "agent/professional_skills/rca-native-ppt-designer/SKILL.md"
-      ],
-      "improvement_tokens": [
-        "native_pptx_editability",
-        "editable_shape_plan",
-        "native_pptx_design_spec_lock",
-        "template_layout_grammar",
-        "shape_coordinates",
-        "office_editability",
-        "native_repair_targets",
-        "rca-native-ppt-designer",
-        "spec_lock",
-        "editable_pptx_grammar",
-        "semantic_composition",
-        "template_package_intake",
-        "native_object_semantics",
-        "presentation_semantics"
-      ],
-      "stage_refs": [
-        "artifact_creation"
-      ],
-      "resource_refs": [
-        "agent/professional_skills/rca-native-ppt-designer/resources/minimal-resource-pack.md"
-      ]
-    },
-    {
-      "capability_id": "rca-template-profiler",
-      "surface_role": "professional_skill",
-      "capability_kind": "professional_skill",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "repo_path",
-        "ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
-        "role": "repo_local_professional_skill_source"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "repo_path",
-          "ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
-          "role": "codex_skill_guidance_source"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/feedback_token_index",
-          "role": "rca_feedback_target_mapping"
-        }
-      ],
-      "sync_policy": "repo_local_default",
-      "externalization_reason": "rca_professional_method_source",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "agent/professional_skills/rca-template-profiler/SKILL.md"
-      ],
-      "improvement_tokens": [
-        "template_profile",
-        "placeholder_capacity",
-        "reference_deck_analysis",
-        "semantic_layout_inventory",
-        "layout_grammar",
-        "title_safe_zone",
-        "rca-template-profiler",
-        "style_boundary",
-        "editable_pptx_grammar",
-        "template_package_intake"
-      ],
-      "stage_refs": [
-        "visual_direction",
-        "artifact_creation"
-      ],
-      "resource_refs": [
-        "agent/professional_skills/rca-template-profiler/resources/minimal-resource-pack.md"
-      ]
-    },
-    {
-      "capability_id": "rca-stage-prompts",
-      "surface_role": "stage_prompt",
-      "capability_kind": "stage_prompt",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "repo_path",
-        "ref": "agent/prompts/",
-        "role": "stage_operating_prompt_sources"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "repo_path",
-          "ref": "agent/prompts/",
-          "role": "stage_prompt_pack"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "agent/stages/manifest.json",
-          "role": "declarative_stage_manifest"
-        }
-      ],
-      "sync_policy": "repo_local_default",
-      "externalization_reason": "RCA stage prompts own stage goals and receipts while professional skills own reusable PPT methods.",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "agent/prompts/"
-      ],
-      "improvement_tokens": [
-        "stage_prompt",
-        "visual_stage_prompt",
-        "ppt_stage"
-      ]
-    },
-    {
-      "capability_id": "rca-tool-connector-catalog",
-      "surface_role": "tool_connector",
-      "capability_kind": "tool_connector",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "repo_path",
-        "ref": "agent/tools/domain_affordances.md",
-        "role": "domain_tool_connector_catalog"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "repo_path",
-          "ref": "agent/tools/domain_affordances.md",
-          "role": "tool_affordance_boundary"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "contracts/action_catalog.json",
-          "role": "action_catalog"
-        }
-      ],
-      "sync_policy": "repo_local_default",
-      "externalization_reason": "RCA tools materialize PPT, screenshots, and exports; they do not choose visual strategy.",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "agent/tools/domain_affordances.md"
-      ],
-      "improvement_tokens": [
-        "tool_connector",
-        "native_helper",
-        "officecli",
-        "render",
-        "export"
-      ]
-    },
-    {
-      "capability_id": "rca-visual-knowledge-pack",
-      "surface_role": "knowledge_pack",
-      "capability_kind": "reference_pack",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "repo_path",
-        "ref": "agent/knowledge/",
-        "role": "visual_knowledge_pack"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "repo_path",
-          "ref": "agent/knowledge/",
-          "role": "knowledge_pack"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "contracts/domain_descriptor.json",
-          "role": "domain_descriptor"
-        }
-      ],
-      "sync_policy": "repo_local_default",
-      "externalization_reason": "RCA visual truth, source, export, and review memory are declarative knowledge refs.",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "agent/knowledge/"
-      ],
-      "improvement_tokens": [
-        "knowledge_pack",
-        "visual_truth",
-        "review_export_memory"
-      ]
-    },
-    {
-      "capability_id": "rca-review-quality-gates",
-      "surface_role": "quality_gate",
-      "capability_kind": "contract_module",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "repo_path",
-        "ref": "agent/quality_gates/",
-        "role": "visual_quality_gate_pack"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "repo_path",
-          "ref": "agent/quality_gates/",
-          "role": "quality_gate_pack"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "contracts/artifact_locator_contract.json",
-          "role": "artifact_locator_contract"
-        }
-      ],
-      "sync_policy": "repo_local_default",
-      "externalization_reason": "RCA quality gates review refs and repair targets; review/export verdicts remain owner-gated.",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "agent/quality_gates/"
-      ],
-      "improvement_tokens": [
-        "quality_gate",
-        "screenshot_review",
-        "review_export_memory"
-      ]
-    },
-    {
-      "capability_id": "rca-ppt-agent-lab-eval-suite",
-      "surface_role": "eval_suite",
-      "capability_kind": "contract_module",
-      "canonical_owner": "redcube_ai",
-      "physical_source_ref": {
-        "ref_kind": "contract_ref",
-        "ref": "contracts/stage_run_canary_evidence.json",
-        "role": "controlled_stage_run_evaluation_fixture"
-      },
-      "runtime_projection_refs": [
-        {
-          "ref_kind": "contract_ref",
-          "ref": "contracts/agent_lab_handoff.json",
-          "role": "agent_lab_handoff"
-        },
-        {
-          "ref_kind": "contract_ref",
-          "ref": "contracts/stage_run_canary_evidence.json",
-          "role": "controlled_stage_run_evaluation_fixture"
-        }
-      ],
-      "sync_policy": "domain_agent_builtin_refs_only",
-      "externalization_reason": "OPL Agent Lab consumes RCA evaluation fixtures and feedback tokens without a repo-local suite runtime.",
-      "capability_policy_profile_ref": "#/capability_policy_profiles/rca_refs_only_router",
-      "canonical_target_paths": [
-        "contracts/stage_run_canary_evidence.json"
-      ],
-      "improvement_tokens": [
-        "agent_lab",
-        "eval_suite",
-        "ppt_three_route",
-        "visual_density"
-      ]
-    }
-  ],
+    ]
+  },
   "feedback_token_index": {
     "xhs_content_strategy": {
       "canonical_capability_ids": [

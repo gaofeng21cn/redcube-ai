@@ -405,10 +405,26 @@ test('hash-only locator drift is not epistemic authority or release-integrity su
 test('RCA capability map routes visual feedback fixtures through declarative professional skills', () => {
   const capabilityMap = readJson('contracts/capability_map.json');
   const handoff = readJson('contracts/agent_lab_handoff.json');
-  const capabilities = new Map(
-    capabilityMap.capabilities.map((entry) => [entry.capability_id, entry]),
-  );
+  const inventory = capabilityMap.capability_inventory;
+  const professionalSkillIds = new Set(inventory.professional_skill_order);
+  const capabilityIds = new Set([
+    ...professionalSkillIds,
+    ...inventory.deltas.map((entry) => entry.capability_id),
+  ]);
   const sharedPolicy = capabilityMap.capability_policy_profiles.rca_refs_only_router;
+  const scannedProfessionalSkillIds = fs.readdirSync(
+    path.join(repoRoot, 'agent', 'professional_skills'),
+    { withFileTypes: true },
+  ).filter((entry) => entry.isDirectory())
+    .filter((entry) => fs.existsSync(path.join(
+      repoRoot,
+      'agent',
+      'professional_skills',
+      entry.name,
+      'SKILL.md',
+    )))
+    .map((entry) => entry.name)
+    .sort();
 
   assert.equal(handoff.agent_lab_owner, 'one-person-lab');
   assert.equal(handoff.authority_boundary.domain_repo_can_own_agent_lab_runtime, false);
@@ -416,20 +432,27 @@ test('RCA capability map routes visual feedback fixtures through declarative pro
   assert.equal(sharedPolicy.authority_boundary.can_authorize_quality_or_export, false);
   assert.equal(sharedPolicy.owner_closeout_boundary.can_write_owner_receipt_body, false);
   assert.equal(sharedPolicy.owner_closeout_boundary.can_create_typed_blocker, false);
-  assert.equal(capabilityMap.capabilities.every(
-    (entry) => entry.capability_policy_profile_ref === '#/capability_policy_profiles/rca_refs_only_router',
-  ), true);
-  assert.equal(capabilityMap.capabilities.some((entry) => Object.hasOwn(entry, 'authority_boundary')), false);
+  assert.equal(inventory.source_kind, 'standard_agent_repo_scan.v1');
+  assert.equal(
+    inventory.policy_profile_ref,
+    '#/capability_policy_profiles/rca_refs_only_router',
+  );
+  assert.deepEqual([...professionalSkillIds].sort(), scannedProfessionalSkillIds);
+  assert.equal(inventory.deltas.some(
+    (entry) => Object.hasOwn(entry, 'authority_boundary') || Object.hasOwn(entry, 'canonical_owner'),
+  ), false);
   for (const token of handoff.visual_feedback_failure_fixture.tokens) {
     const mapping = capabilityMap.feedback_token_index[token];
     assert.ok(mapping, token);
     assert.notDeepEqual(mapping.canonical_capability_ids, [], token);
     for (const capabilityId of mapping.canonical_capability_ids) {
-      const capability = capabilities.get(capabilityId);
-      assert.ok(capability, `${token}:${capabilityId}`);
-      assert.equal(capability.surface_role, 'professional_skill');
+      assert.equal(capabilityIds.has(capabilityId), true, `${token}:${capabilityId}`);
+      assert.equal(professionalSkillIds.has(capabilityId), true, `${token}:${capabilityId}`);
       assertCleanAgentRepoPathRef(
-        capability.physical_source_ref,
+        {
+          ref_kind: 'repo_path',
+          ref: `agent/professional_skills/${capabilityId}/SKILL.md`,
+        },
         'agent/professional_skills/',
         `${token}:${capabilityId}`,
       );
