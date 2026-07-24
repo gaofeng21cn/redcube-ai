@@ -31,7 +31,7 @@ Machine boundary: 当前状态必须从 repo source/contracts 与 owner readback
 
 ## Current State Summary
 
-- canonical Package id 为 `rca`、`kind=agent`、repo/package version 为 `0.2.8`；仓内
+- canonical Package id 为 `rca`、`kind=agent`、repo/package version 为 `0.2.9`；仓内
   没有第二 Package identity。
 - Codex Plugin 是当前 carrier projection，Codex CLI 是当前首选 executor；RCA
   identity、capabilities、task 与 typed views 不以 Codex 私有字段定义。
@@ -49,7 +49,7 @@ Machine boundary: 当前状态必须从 repo source/contracts 与 owner readback
 | --- | --- | --- | --- |
 | Repo source morphology | declarative pack + native helpers + minimal authority functions；旧 private control plane 路径不存在 | 保持 no-resurrection guard；只需 repo-native regression | structurally closed |
 | Package descriptor | 当前 sidecar 混合 identity 与旧 lifecycle 字段 | Framework dual-read 后收缩为 executor-neutral identity/capability/task/view descriptor；旧字段无 active consumer | platform migration open |
-| Independent publication | 当前 owner manifest version 可读，但本仓未证明完整 Package owner publisher/current channel | 发布完整 RCA bytes，只推进自己的 GHCR `latest-stable`，取得匿名 exact-digest readback | publication proof open |
+| Independent publication | Framework 已有 protected single-Package publisher；RCA `0.2.9` 尚无 canonical owner tag、Framework projection 或 GHCR readback | exact owner commit/tag -> immutable `rca:0.2.9` -> RCA-only `latest-stable` -> anonymous exact-digest readback | publication proof open |
 | Carrier installed truth | Codex Plugin projection 与旧 `opl packages` 状态存在 | 聚合完整 Package 的 fresh carrier readback；Plugin-only 不得报告 complete installed | platform migration open |
 | Executor decoupling | Codex CLI 是当前唯一正式路径 | 一个 Git/local 中性 adapter 证明切换 executor 不重装、不丢 task/view/偏好 | neutral proof open |
 | Dependencies | 当前 RCA `capability_dependencies=[]` | 保持 required/optional identity presence + callability；未来 dependency 不得引入版本/ABI/lock/payload/digest/Release Set 门禁 | owner invariant closed |
