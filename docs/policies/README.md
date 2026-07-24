@@ -25,8 +25,12 @@ Machine boundary: 人读 policy 索引。机器真相继续归 contracts、schem
 
 当前统一口径：
 
-- `Agent-first` 由 RCA 物化的默认 `Codex CLI` concrete executor 与 OPL-hosted executor owner boundary 共同成立
-- 默认 concrete executor 仍是本地 `Codex CLI`；非 Codex executor 的 hosted selection、attempt ledger 与 receipt 归 OPL，RCA 不保留本地 adapter/proof lane；历史 `repo-local managed runtime pilot` 只保留为迁移 provenance
+- `Agent-first` 由 RCA-owned executor-neutral Package/capability 语义与 OPL-hosted
+  executor owner boundary 共同成立。
+- 当前首选且唯一产品化的 concrete executor route 仍是本地 `Codex CLI`，由 OPL
+  executor adapter 承载；RCA 不保留本地 adapter/proof lane。未来非 Codex route 只在
+  真实需要时增加，不能改变 RCA Package identity、installed truth、task 或 typed views；
+  历史 `repo-local managed runtime pilot` 只保留为迁移 provenance。
 - 共享宏观生命周期是：
   - `Source Readiness`
   - `Story Architecture`

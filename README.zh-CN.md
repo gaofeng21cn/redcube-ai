@@ -103,8 +103,12 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 ## 当前边界
 
 - `RedCube AI` 是独立的视觉交付 Foundry Agent。它对外第一身份是视觉交付：接收材料、分阶段完成视觉创作、审阅、回修、导出和文件交付。
-- 在 OPL family 中，RCA 是 domain agent package：RCA 保留视觉交付 authority，OPL 持有通用 runtime、package carrier、generated wrapper 和 hosted surface。
-- 对外第一入口是单一 `redcube-ai` 应用技能；`Codex`、`OPL` 和其他通用智能体可以通过这个入口访问稳定能力面。
+- 在 OPL family 中，RCA 是 `OPL Package(kind=agent)`：RCA 持有
+  executor-neutral 的 identity、capabilities、Work Item / typed-view 业务语义，以及
+  全部视觉交付 authority。
+- 对外第一入口是单一 `redcube-ai` 应用技能。它是当前 Codex carrier projection，
+  不是 Package identity 或完整 installed truth；`Codex`、`OPL` 和其他通用智能体可
+  通过受支持 route 访问同一套稳定 RCA 能力。
 - 它可以作为 One Person Lab 里的汇报工坊使用，也可以由 Codex 或其他 Agent 直接调用稳定能力入口。
 - 它负责材料接收、成品生成、审阅回路、导出和文件式交付。
 - 内容界定、受众适配和最终采用由专家把关。
@@ -115,8 +119,19 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 
 - `OPL` 可以把 RedCube 作为外部领域智能体托管；这条 hosted path 是内部集成面，不是 RedCube 的对外第一身份。
 - 任务启动后，OPL/Temporal 可以负责持久在线调度、唤醒、retry/dead-letter 与 resume；RCA 不内置 daemon、scheduler 或 attempt loop。
-- `Codex CLI` 是 RCA 当前唯一物化的 executor；其他 executor 的 hosted selection、attempt ledger 与回执归 OPL owner surface。
+- Package、carrier 与 executor 相互分离。RCA 的发布模型要求 owner 独立发布完整的
+  一方 Package bytes，只推进 RCA 自己的 `latest-stable`；共享 Release Set 只作
+  离线/QA 快照。
+- 普通 required/optional dependency 只检查 identity presence 与 entrypoint
+  callability，不比较版本/ABI，也不使用 lock、payload、digest 或原子发布 cohort。
+- `Codex CLI` 是当前首选且唯一产品化的 executor route，Codex Plugin 是当前 carrier
+  projection。未来切换 executor 不得要求重装 RCA，也不得丢失偏好、Work Item、
+  Temporal refs 或 typed views。
 - RedCube 保留视觉交付权威：视觉领域真相、review/export gates、标准产物、文件交接和 owner receipts。
+- exact ref/digest 继续用于一次发布的 bytes 完整性和 artifact/evidence lineage，但
+  不是普通组合 lock。
+- 当前 Package manifest 仍为迁移兼容保留旧 lifecycle 字段；本次文档更新不声明
+  carrier 迁移或公开 `latest-stable` proof 已完成。
 - 完整入口 taxonomy、service-safe domain entry、generated-wrapper 边界、合同 refs、canary evidence 和 no-readiness 规则由 [文档索引](./docs/README.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md)、[关键决策](./docs/decisions.md) 和 [合同说明](./contracts/README.md) 维护。
 
 </details>
@@ -132,7 +147,9 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 <details>
   <summary><strong>如果你准备把这个仓直接交给 Codex 或其他 Agent，先看这里</strong></summary>
 
-- 单独 clone 这个仓不会安装 OPL Framework 或托管运行时。需要 hosted execution 时，先准备当前 `one-person-lab` checkout 或 release bundle。
+- 单独 clone 这个仓不会安装 OPL Base、RCA Package 或托管运行时。需要 hosted
+  execution 时，先准备 OPL Base，并通过受支持 carrier 安装 RCA；Full/offline 快照
+  可以提供同一 Package 的离线 seed，但不会成为另一份 currentness authority。
 - 先读 [文档索引](./docs/README.md)，再读 [合同说明](./contracts/README.md)、[项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md) 和 [关键决策](./docs/decisions.md)。
 - 把公开 package 读作 `RedCube AI Foundry Agent`：一个 app skill 和一个 service-safe domain entry，加上 OPL-generated wrapper/projection refs，视觉领域真相继续留在 RCA。
 - RedCube direct path 与 OPL-hosted path 必须回到同一套 RedCube-owned route、review、artifact 和 export surfaces。

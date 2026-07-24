@@ -106,8 +106,13 @@ You can start with prompts like:
 ## Current Boundary
 
 - `RedCube AI` is an independent visual-deliverable Foundry Agent. Its first public identity is visual delivery: source intake, staged visual authorship, review, repair, export, and file handoff.
-- In the OPL family, RCA is the domain agent package: RCA retains visual-deliverable authority, while OPL owns generic runtime, package carrier, generated wrapper, and hosted surfaces.
-- The first public surface is the single `redcube-ai` app skill; `Codex`, `OPL`, and other general agents can reach stable capabilities through that skill.
+- In the OPL family, RCA is `OPL Package(kind=agent)`: RCA owns its executor-neutral
+  identity, capabilities, work-item and typed-view semantics, and all
+  visual-deliverable authority.
+- The first public surface is the single `redcube-ai` app skill. It is the
+  current Codex carrier projection, not the Package identity or the complete
+  installed truth; `Codex`, `OPL`, and other general agents can reach the same
+  stable RCA capabilities through supported routes.
 - It can be used as the Presentation Foundry inside One Person Lab, and it can also be called directly by Codex or another agent through stable capability entries.
 - RedCube owns material intake, visual generation, review loops, export, and file handoff.
 - Content framing, audience fit, and final acceptance stay with experts.
@@ -118,8 +123,22 @@ You can start with prompts like:
 
 - OPL can host RedCube as an external domain agent, but that hosted path is an internal integration surface, not RedCube's first public identity.
 - After task start, OPL/Temporal may own persistent scheduling, wakeup, retry/dead-letter handling, and resume. RCA does not embed a daemon, scheduler, or attempt loop.
-- `Codex CLI` is the only executor materialized by RCA; hosted selection, attempt ledgers, and receipts for other executors are owned by OPL.
+- Package, carrier, and executor are separate. The RCA publication model puts
+  complete first-party Package bytes in its owner channel and advances only its own
+  `latest-stable`; a shared Release Set is only an offline/QA snapshot.
+- Required and optional Package dependencies use identity presence and
+  entrypoint callability, not version/ABI ranges, locks, payloads, digests, or
+  atomic release cohorts.
+- `Codex CLI` is the current preferred and only productized executor route.
+  Codex Plugin is the current carrier projection. Future executor routes must
+  not require reinstalling RCA or losing preferences, work items, Temporal
+  references, or typed views.
 - RedCube keeps the visual-deliverable authority: visual-domain truth, review/export gates, canonical artifacts, artifact handoff, and owner receipts.
+- Exact refs and digests remain required for one publication's byte integrity
+  and for artifact/evidence lineage; they are not ordinary composition locks.
+- The current Package manifest still contains legacy lifecycle fields for
+  migration compatibility. This documentation does not claim that the carrier
+  migration or public latest-stable proof is complete.
 - The full entry taxonomy, service-safe domain entry, generated-wrapper boundary, contract refs, canary evidence, and no-readiness rules are maintained in the [Docs Guide](./docs/README.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), [Decisions](./docs/decisions.md), and [Contracts Overview](./contracts/README.md).
 
 </details>
@@ -135,7 +154,10 @@ You can start with prompts like:
 <details>
   <summary><strong>Start here if you are handing this repo to Codex or another agent</strong></summary>
 
-- Cloning this repo does not install the OPL Framework or hosted runtime. If you need hosted execution, prepare the current `one-person-lab` checkout or release bundle first.
+- Cloning this repo does not install OPL Base, the RCA Package, or the hosted
+  runtime. For hosted execution, prepare OPL Base and install RCA through a
+  supported carrier; a Full/offline snapshot may seed the same Package but does
+  not become a separate currentness authority.
 - Read the [Docs Guide](./docs/README.md) first, then [Contracts Overview](./contracts/README.md), [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), and [Decisions](./docs/decisions.md).
 - Treat the public package as `RedCube AI Foundry Agent`: one app skill and one service-safe domain entry, with OPL-generated wrapper/projection refs and visual-domain truth kept inside RCA.
 - Direct RedCube use and OPL-hosted use must converge on the same RedCube-owned route, review, artifact, and export surfaces.

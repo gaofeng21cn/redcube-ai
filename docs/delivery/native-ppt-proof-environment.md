@@ -101,7 +101,9 @@ Native proof dependency handling is contract-backed:
 - proof container: `tools/native-ppt-proof/Dockerfile`
 - fail-closed typed blocker: `missing_renderer_dependency`
 
-OPL Connect/operator 管理已安装 Package 的依赖 currentness；显式 developer/CI proof lane 可以 provision：
+Hosted carrier / Framework 读取 renderer capability presence 与 callability；普通
+Package 组合不建立 renderer version/lock gate。显式 developer/CI proof lane 可以
+provision：
 
 - `libreoffice`
 - `poppler-utils`
