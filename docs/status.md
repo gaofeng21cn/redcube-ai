@@ -15,10 +15,11 @@ verification。
 
 Repo source 与 contracts 已表达私有控制面的结构退役，但 Package 平台组合迁移尚未
 闭合：当前 manifest 仍含旧 lock/payload/currentness/lifecycle receipt/rollback 字段，
-Framework 已提供受保护的单 Package publisher，但 RCA `0.2.9` 尚未进入 canonical
-owner tag、Framework projection 或 GHCR `latest-stable`；完整 carrier readback 与
-executor-neutral route 也仍需 fresh proof。本文不把候选 source version、机器合同或
-测试状态伪装成已发布或已安装。
+Framework 已提供受保护的单 Package publisher；RCA annotated owner tag `v0.2.9`
+已在远端并精确指向 canonical owner commit，但 Framework projection、immutable GHCR
+`rca:0.2.9`、RCA `latest-stable` 晋升与匿名 readback 仍未闭合。完整 carrier readback
+与 executor-neutral route 也仍需 fresh proof。本文不把 source version、owner Git tag、
+机器合同或测试状态伪装成已发布、current 或已安装。
 
 这也不证明已安装 Package callable、真实 visual StageRun 成功、review/export
 accepted、owner accepted、release ready 或 production ready。
@@ -28,7 +29,7 @@ accepted、owner accepted、release ready 或 production ready。
 | Surface | Current owner | Machine source |
 | --- | --- | --- |
 | Package identity/kind/capabilities | RCA | `contracts/opl_agent_package_manifest.json`；当前 shape 为过渡态 |
-| Package bytes publication | RCA owner source + Framework protected single-Package publisher | `v<version>` 必须绑定 exact owner commit；当前 `0.2.9` 尚无 canonical tag / GHCR public readback |
+| Package bytes publication | RCA owner source + Framework protected single-Package publisher | `v0.2.9` annotated owner tag 已绑定 canonical owner commit；Framework projection、immutable `rca:0.2.9`、`latest-stable` 晋升与 GHCR public readback 仍 open |
 | Physical install/update/remove | 实际 carrier platform；Framework 目标为薄 adapter/聚合 | 当前仍由 `opl packages` compatibility surface 暴露旧 lifecycle |
 | Executor route readiness | OPL executor adapter；当前首选 Codex CLI | OPL generated/hosted readback；非 Codex中性 proof 未闭合 |
 | Business Work Item / typed views | RCA 声明业务语义；OPL/Temporal 只聚合运行 refs | RCA descriptor/runtime contracts；通用投影仍待平台迁移 |
@@ -59,10 +60,11 @@ accepted、owner accepted、release ready 或 production ready。
 - Framework `publish-package.yml` 归档该 exact owner commit 的完整仓库 bytes，先写
   immutable `one-person-lab-packages/rca:<version>`，验证一致后再推进 RCA 自己的
   `latest-stable`。RCA 不复制 ORAS、CAS、receipt 或 reconciliation 状态机。
-- 2026-07-24 fresh readback 中，公开 `rca:latest-stable` 仍为 `0.2.7`，`0.2.8`
-  immutable tag 不存在。`0.2.9` 只是修正版本漂移的 owner candidate，完成
-  canonical commit/tag、Framework projection、protected publisher 与匿名 exact-digest
-  readback 前不得声称 current。
+- 2026-07-24 fresh readback 中，annotated tag `v0.2.9` 已在 owner Git remote，
+  并 peeled 到 canonical owner commit；公开 `rca:latest-stable` 仍为 `0.2.7`，
+  immutable `rca:0.2.9` 不存在。完成 Framework projection、protected publisher、
+  RCA-only channel 晋升与匿名 exact-digest readback 前不得声称 `0.2.9` 已发布或
+  current。
 
 ## 未闭合的 Package 迁移
 
