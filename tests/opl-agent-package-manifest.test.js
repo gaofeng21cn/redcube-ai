@@ -24,6 +24,24 @@ test('repo-local OPL agent package manifest keeps RCA package and authority boun
   assert.equal(manifest.surface_kind, 'opl_agent_package_manifest.v1');
   assert.equal(manifest.agent_id, 'rca');
   assert.equal(manifest.package_id, 'rca');
+  assert.deepEqual(manifest.presentation, {
+    display_name_i18n: { 'en-US': 'RedCube AI' },
+    description_i18n: { 'en-US': 'Image-first visual deliverables through OPL' },
+    session_routing_summary_i18n: {
+      'en-US': 'Run the RCA visual-deliverable stages through the OPL-hosted StageRun controller while preserving RCA visual truth and review/export authority.',
+    },
+    home_shortcuts: [{
+      shortcut_id: 'invoke_product_entry',
+      label_i18n: { 'en-US': 'Create or continue a visual deliverable' },
+      default_visible: true,
+      user_configurable: true,
+      route: {
+        route_kind: 'agent_package_shortcut',
+        executor: 'codex_cli',
+        codex_visible_entry: 'redcube-ai',
+      },
+    }],
+  });
   assert.match(manifest.version, /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
   assert.equal(packageJson.version, manifest.version);
   assert.equal(packageLock.version, manifest.version);
