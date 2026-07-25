@@ -149,15 +149,39 @@ You can start with prompts like:
 2. Technical readers and planners should read [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), [Decisions](./docs/decisions.md), and [Contracts Overview](./contracts/README.md).
 3. Developers and maintainers should continue from the [Docs Guide](./docs/README.md) into `docs/active/`, `docs/references/`, and `docs/policies/`.
 
-## Agent And Operator Quick Start
+## For Codex / Agents
 
 <details>
-  <summary><strong>Start here if you are handing this repo to Codex or another agent</strong></summary>
+  <summary><strong>Install the Codex plugin carrier or hand this repo to another agent</strong></summary>
 
-- Cloning this repo does not install OPL Base, the RCA Package, or the hosted
-  runtime. For hosted execution, prepare OPL Base and install RCA through a
-  supported carrier; a Full/offline snapshot may seed the same Package but does
-  not become a separate currentness authority.
+- The repo marketplace exposes the existing `redcube-ai` plugin carrier to
+  Codex. In the Codex desktop app, open this repository, restart the app after
+  the first checkout or marketplace change, open **Plugins**, select
+  **RedCube AI**, and install **RedCube AI**. Start a new task before invoking
+  `@RedCube AI` or `$redcube-ai` so the installed skill is loaded.
+- Codex CLI can configure, install, inspect, and remove the same carrier from
+  the repository root:
+
+  ```bash
+  codex plugin marketplace add .
+  codex plugin marketplace list --json
+  codex plugin add redcube-ai@redcube-ai --json
+  codex plugin list --marketplace redcube-ai --available --json
+  codex plugin remove redcube-ai@redcube-ai --json
+  codex plugin marketplace remove redcube-ai --json
+  ```
+
+- `codex plugin list --marketplace redcube-ai --available --json` is the
+  carrier readback. An installed and enabled `redcube-ai` entry, together with
+  the bundled `redcube-ai` skill, proves carrier installation and availability;
+  it does not prove OPL Base installation, canonical Package `rca` currentness,
+  hosted runtime or StageRun availability, artifact readiness, review/export
+  acceptance, or an RCA owner receipt.
+- For the complete OPL boundary and current readiness, continue to
+  [Status](./docs/status.md), [Contracts Overview](./contracts/README.md), and
+  `opl packages status --package-id rca --json` in an environment where OPL Base is
+  installed. Cloning this repo or installing the plugin does not install OPL
+  Base or grant the carrier Package/runtime/domain authority.
 - Read the [Docs Guide](./docs/README.md) first, then [Contracts Overview](./contracts/README.md), [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), and [Decisions](./docs/decisions.md).
 - Treat the public package as `RedCube AI Foundry Agent`: one app skill and one service-safe domain entry, with OPL-generated wrapper/projection refs and visual-domain truth kept inside RCA.
 - Direct RedCube use and OPL-hosted use must converge on the same RedCube-owned route, review, artifact, and export surfaces.

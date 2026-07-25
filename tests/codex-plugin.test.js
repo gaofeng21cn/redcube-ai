@@ -6,6 +6,7 @@ import { existsSync, readFileSync } from 'node:fs';
 const repoRoot = path.resolve('.');
 const pluginRoot = path.join(repoRoot, 'plugins', 'redcube-ai');
 const pluginManifestPath = path.join(pluginRoot, '.codex-plugin', 'plugin.json');
+const marketplacePath = path.join(repoRoot, '.agents', 'plugins', 'marketplace.json');
 const pluginIconPath = path.join(pluginRoot, 'assets', 'icon.png');
 const pluginSkillPath = path.join(pluginRoot, 'skills', 'redcube-ai', 'SKILL.md');
 const canonicalSkillPath = path.join(repoRoot, 'agent', 'primary_skill', 'SKILL.md');
@@ -70,6 +71,50 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.match(skillText, /at most three `repairer \+ re_reviewer` rounds[\s\S]*continue with the best readable artifact and explicit quality debt/);
   assert.equal(existsSync(path.join(repoRoot, 'plugins', 'rca')), false);
   assert.equal(existsSync(path.join(pluginRoot, 'skills', 'rca')), false);
+});
+
+test('repo marketplace exposes the Codex carrier without taking RCA package authority', () => {
+  const marketplace = readJson(marketplacePath);
+  const pluginManifest = readJson(pluginManifestPath);
+  const packageManifest = readJson(path.join(repoRoot, 'contracts', 'opl_agent_package_manifest.json'));
+  const readme = readFileSync(path.join(repoRoot, 'README.md'), 'utf-8');
+  const contractsReadme = readFileSync(path.join(repoRoot, 'contracts', 'README.md'), 'utf-8');
+  const repoHygiene = readFileSync(path.join(repoRoot, 'scripts', 'repo-hygiene.sh'), 'utf-8');
+
+  assert.equal(marketplace.name, 'redcube-ai');
+  assert.equal(marketplace.interface.displayName, 'RedCube AI');
+  assert.equal(marketplace.plugins.length, 1);
+  assert.deepEqual(marketplace.plugins[0], {
+    name: 'redcube-ai',
+    source: {
+      source: 'local',
+      path: './plugins/redcube-ai',
+    },
+    policy: {
+      installation: 'AVAILABLE',
+      authentication: 'ON_INSTALL',
+    },
+    category: 'Creative',
+  });
+  assert.equal(marketplace.plugins[0].name, pluginManifest.name);
+  assert.equal(packageManifest.package_id, 'rca');
+  assert.notEqual(marketplace.plugins[0].name, packageManifest.package_id);
+
+  assert.match(readme, /^## For Codex \/ Agents$/m);
+  assert.match(readme, /codex plugin marketplace add \./);
+  assert.match(readme, /codex plugin add redcube-ai@redcube-ai --json/);
+  assert.match(readme, /codex plugin list --marketplace redcube-ai --available --json/);
+  assert.match(readme, /codex plugin remove redcube-ai@redcube-ai --json/);
+  assert.match(readme, /codex plugin marketplace remove redcube-ai --json/);
+  assert.match(readme, /installed and enabled `redcube-ai` entry, together with\s+the bundled `redcube-ai` skill, proves carrier installation and availability/);
+  assert.match(readme, /does not prove OPL Base installation, canonical Package `rca` currentness/);
+  assert.match(readme, /opl packages status --package-id rca --json/);
+  assert.doesNotMatch(readme, /package transaction|lifecycle receipt/i);
+  assert.match(contractsReadme, /配置的 carrier\/runtime adapter 持有实际\s+install\/update\/remove 与 fresh physical readback/);
+  assert.match(contractsReadme, /Framework 只聚合\s+presence\/callability、executor routes 和 projected actions/);
+  assert.match(contractsReadme, /旧字段；这些\s+只服务迁移期兼容 consumer，不构成 OPL-owned Package Manager 的目标 authority/);
+  assert.match(repoHygiene, /git ls-files -- \.agents '\:\(exclude\)\.agents\/plugins\/marketplace\.json'/);
+  assert.match(repoHygiene, /repo hygiene: unexpected tracked \.agents paths/);
 });
 
 test('codex plugin has no duplicate repository-root manifest or repo-local installer', () => {

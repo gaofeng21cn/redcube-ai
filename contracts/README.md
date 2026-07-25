@@ -7,7 +7,12 @@ Machine boundary: JSON body 和 schema 是机器面；本文只解释 owner 和�
 
 ## Standard Agent canonical inputs
 
-- `opl_agent_package_manifest.json`：`rca` package sidecar；安装、lock、currentness、update、rollback 和 lifecycle receipt 归 OPL Connect。
+- `opl_agent_package_manifest.json`：`rca` Package sidecar。RCA owner 独立发布完整
+  bytes 并推进自己的 GHCR `latest-stable`；配置的 carrier/runtime adapter 持有实际
+  install/update/remove 与 fresh physical readback，Framework 只聚合
+  presence/callability、executor routes 和 projected actions。sidecar 当前仍含
+  version、lock、payload、currentness、lifecycle receipt 与 rollback 等旧字段；这些
+  只服务迁移期兼容 consumer，不构成 OPL-owned Package Manager 的目标 authority。
 - `domain_descriptor.json`：RCA domain identity 与标准 pack refs。
 - `pack_compiler_input.json`：declarative visual pack source refs。
 - `standard_agent_interface.json`：OPL compiler 可消费的标准接口声明，不含 repo-local command template。

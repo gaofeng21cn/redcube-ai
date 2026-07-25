@@ -1,0 +1,20 @@
+{
+  "name": "redcube-ai",
+  "interface": {
+    "displayName": "RedCube AI"
+  },
+  "plugins": [
+    {
+      "name": "redcube-ai",
+      "source": {
+        "source": "local",
+        "path": "./plugins/redcube-ai"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Creative"
+    }
+  ]
+}
