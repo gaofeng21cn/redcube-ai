@@ -31,8 +31,8 @@ Machine boundary: 当前状态必须从 repo source/contracts 与 owner readback
 
 ## Current State Summary
 
-- canonical Package id 为 `rca`、`kind=agent`、repo/package version 为 `0.2.9`；仓内
-  没有第二 Package identity。
+- canonical Package id 为 `rca`、`kind=agent`；当前 source version 只从 owner
+  manifest 与同步 carrier declarations 读取，仓内没有第二 Package identity。
 - Codex Plugin 是当前 carrier projection，Codex CLI 是当前首选 executor；RCA
   identity、capabilities、task 与 typed views 不以 Codex 私有字段定义。
 - `agent/` 是 declarative visual pack source，`contracts/action_catalog.json` 只声明 `invoke_product_entry`、`run_image_ppt_proof`、`run_native_ppt_proof` 三个 OPL-hosted stage actions。
@@ -48,8 +48,8 @@ Machine boundary: 当前状态必须从 repo source/contracts 与 owner readback
 | Boundary | Current fact | Gap / next owner evidence | State |
 | --- | --- | --- | --- |
 | Repo source morphology | declarative pack + native helpers + minimal authority functions；旧 private control plane 路径不存在 | 保持 no-resurrection guard；只需 repo-native regression | structurally closed |
-| Package descriptor | 当前 sidecar 混合 identity 与旧 lifecycle 字段 | Framework dual-read 后收缩为 executor-neutral identity/capability/task/view descriptor；旧字段无 active consumer | platform migration open |
-| Independent publication | Framework 已有 protected single-Package publisher；annotated owner tag `v0.2.9` 已在远端并绑定 canonical owner commit，但 Framework projection、immutable `rca:0.2.9`、RCA `latest-stable` 晋升与 GHCR readback 尚未完成 | Framework projection -> immutable `rca:0.2.9` -> RCA-only `latest-stable` -> anonymous exact-digest readback | publication proof open |
+| Package descriptor | 当前 sidecar 混合 identity 与旧 lifecycle 字段；Framework canonical source 与 `opl packages status` 仍有 lock/materializer/runtime-source 等 compatibility consumer | Framework owner 先切换已证 consumer，App/Shell owner fresh 审计各自 surface；全链 consumer-zero 后再收缩为 executor-neutral identity/capability/task/view descriptor | platform migration open |
+| Independent publication | source version 与 Git tag 只证明 owner source transport；active 文档不冻结某次 tag/SHA/GHCR 快照，完整 Package publication currentness 必须从 owner publication surface fresh 读取 | owner immutable revision -> RCA-only `latest-stable` -> anonymous exact-digest readback | publication proof open |
 | Carrier installed truth | Codex Plugin projection 与旧 `opl packages` 状态存在 | 聚合完整 Package 的 fresh carrier readback；Plugin-only 不得报告 complete installed | platform migration open |
 | Executor decoupling | Codex CLI 是当前唯一正式路径 | 一个 Git/local 中性 adapter 证明切换 executor 不重装、不丢 task/view/偏好 | neutral proof open |
 | Dependencies | 当前 RCA `capability_dependencies=[]` | 保持 required/optional identity presence + callability；未来 dependency 不得引入版本/ABI/lock/payload/digest/Release Set 门禁 | owner invariant closed |

@@ -8,18 +8,20 @@ Machine boundary: 结构事实以 root contracts、`agent/`、保留源码和 fr
 ## 当前结论
 
 RCA 当前是 `OPL Package(kind=agent)` 形式的标准 visual-deliverable domain pack：
-canonical Package id 为 `rca`，repo/package version 为 `0.2.9`。仓内保留
+canonical Package id 为 `rca`；source version 由 owner manifest 与同步 carrier
+declarations 读取。仓内保留
 executor-neutral identity/capability declarations、declarative visual pack、RCA
 authority contracts、Python native helpers、最小 authority functions 与 developer
 verification。
 
 Repo source 与 contracts 已表达私有控制面的结构退役，但 Package 平台组合迁移尚未
 闭合：当前 manifest 仍含旧 lock/payload/currentness/lifecycle receipt/rollback 字段，
-Framework 已提供受保护的单 Package publisher；RCA annotated owner tag `v0.2.9`
-已在远端并精确指向 canonical owner commit，但 Framework projection、immutable GHCR
-`rca:0.2.9`、RCA `latest-stable` 晋升与匿名 readback 仍未闭合。完整 carrier readback
-与 executor-neutral route 也仍需 fresh proof。本文不把 source version、owner Git tag、
-机器合同或测试状态伪装成已发布、current 或已安装。
+Framework canonical source 与 `opl packages status` 仍有 lock、materializer、
+runtime-source 与 lifecycle action 等 compatibility consumer；尚无 fresh
+consumer-zero proof。RCA owner publication currentness、完整 carrier readback 与
+executor-neutral route 也仍需从各自 owner surface fresh 读取。本文不冻结某次 tag、
+SHA、GHCR 快照或 installed output，也不把 source version、owner Git tag、机器合同或
+测试状态伪装成已发布、current 或已安装。
 
 这也不证明已安装 Package callable、真实 visual StageRun 成功、review/export
 accepted、owner accepted、release ready 或 production ready。
@@ -29,7 +31,7 @@ accepted、owner accepted、release ready 或 production ready。
 | Surface | Current owner | Machine source |
 | --- | --- | --- |
 | Package identity/kind/capabilities | RCA | `contracts/opl_agent_package_manifest.json`；当前 shape 为过渡态 |
-| Package bytes publication | RCA owner source + Framework protected single-Package publisher | `v0.2.9` annotated owner tag 已绑定 canonical owner commit；Framework projection、immutable `rca:0.2.9`、`latest-stable` 晋升与 GHCR public readback 仍 open |
+| Package bytes publication | RCA owner source + owner publication route | Git tag 只作 source transport；publication currentness 必须从 owner immutable revision、`latest-stable` 与匿名 exact-digest readback fresh 证明 |
 | Physical install/update/remove | 实际 carrier platform；Framework 目标为薄 adapter/聚合 | 当前仍由 `opl packages` compatibility surface 暴露旧 lifecycle |
 | Executor route readiness | OPL executor adapter；当前首选 Codex CLI | OPL generated/hosted readback；非 Codex中性 proof 未闭合 |
 | Business Work Item / typed views | RCA 声明业务语义；OPL/Temporal 只聚合运行 refs | RCA descriptor/runtime contracts；通用投影仍待平台迁移 |
@@ -60,16 +62,15 @@ accepted、owner accepted、release ready 或 production ready。
 - Framework `publish-package.yml` 归档该 exact owner commit 的完整仓库 bytes，先写
   immutable `one-person-lab-packages/rca:<version>`，验证一致后再推进 RCA 自己的
   `latest-stable`。RCA 不复制 ORAS、CAS、receipt 或 reconciliation 状态机。
-- 2026-07-24 fresh readback 中，annotated tag `v0.2.9` 已在 owner Git remote，
-  并 peeled 到 canonical owner commit；公开 `rca:latest-stable` 仍为 `0.2.7`，
-  immutable `rca:0.2.9` 不存在。完成 Framework projection、protected publisher、
-  RCA-only channel 晋升与匿名 exact-digest readback 前不得声称 `0.2.9` 已发布或
-  current。
+- Active status 不保存版本化 tag/SHA/GHCR 快照。判断发布 currentness 时必须 fresh
+  读取 owner tag、immutable revision、RCA-only `latest-stable` 与匿名 exact-digest
+  readback；任一层缺失都不得声称当前 source version 已发布或 current。
 
 ## 未闭合的 Package 迁移
 
-- 将 manifest 收缩为 executor-neutral identity/capability/task/view descriptor，并让旧字段
-  只读 dual-read；
+- Framework owner 先把已证 consumer 切换到 owner descriptor + native carrier
+  readback；App/Shell owner fresh 审计各自 surface；全链 consumer-zero 后再把
+  manifest 收缩为 executor-neutral identity/capability/task/view descriptor；
 - RCA owner 独立发布完整 bytes 并推进自己的 GHCR `latest-stable`，取得匿名 digest
   readback；
 - Codex Plugin projection 加完整 Package carrier readback，避免 Plugin-only 虚假
