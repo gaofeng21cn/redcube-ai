@@ -1,0 +1,68 @@
+{
+  "surface_kind": "opl_agent_package_manifest.v1",
+  "kind": "agent",
+  "agent_id": "rca",
+  "package_id": "rca",
+  "domain_id": "redcube_ai",
+  "display_name": "RedCube AI",
+  "presentation": {
+    "display_name_i18n": {
+      "en-US": "RedCube AI"
+    },
+    "description_i18n": {
+      "en-US": "Image-first visual deliverables through OPL"
+    },
+    "session_routing_summary_i18n": {
+      "en-US": "Run the RCA visual-deliverable stages through the OPL-hosted StageRun controller while preserving RCA visual truth and review/export authority."
+    },
+    "home_shortcuts": [
+      {
+        "shortcut_id": "invoke_product_entry",
+        "label_i18n": {
+          "en-US": "Create or continue a visual deliverable"
+        },
+        "default_visible": true,
+        "user_configurable": true,
+        "route": {
+          "route_kind": "agent_package_shortcut",
+          "executor": "codex_cli",
+          "codex_visible_entry": "redcube-ai"
+        }
+      }
+    ]
+  },
+  "publisher": "one-person-lab",
+  "version": "0.2.9",
+  "source": "first_party_repo_local",
+  "carrier_source_role": "codex_plugin_default_carrier_not_package_truth",
+  "source_repo": "https://github.com/gaofeng21cn/redcube-ai.git",
+  "schema_ref": "one-person-lab/contracts/opl-framework/agent-package-manifest.schema.json",
+  "domain_descriptor_ref": "contracts/domain_descriptor.json",
+  "task_provider_ref": "contracts/domain_descriptor.json#/standard_agent_interface/stage_catalog",
+  "action_catalog_ref": "contracts/action_catalog.json",
+  "view_refs": [],
+  "entrypoints": [
+    {
+      "entrypoint_id": "codex_primary_skill",
+      "entrypoint_kind": "codex_skill",
+      "source_ref": "agent/primary_skill/SKILL.md",
+      "carrier_ref": "plugins/redcube-ai/skills/redcube-ai/SKILL.md",
+      "authority": "carrier_only_not_domain_truth"
+    },
+    {
+      "entrypoint_id": "hosted_stage_actions",
+      "entrypoint_kind": "opl_hosted_action_catalog",
+      "source_ref": "contracts/action_catalog.json",
+      "authority": "opl_hosted_runtime_rca_domain_semantics"
+    }
+  ],
+  "codex_surface": {
+    "plugin_id": "redcube-ai",
+    "plugin_source_path": ".",
+    "required_skill_ids": [
+      "redcube-ai"
+    ]
+  },
+  "requires": [],
+  "capability_dependencies": []
+}

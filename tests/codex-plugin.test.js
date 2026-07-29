@@ -6,6 +6,7 @@ import { existsSync, readFileSync } from 'node:fs';
 const repoRoot = path.resolve('.');
 const pluginRoot = path.join(repoRoot, 'plugins', 'redcube-ai');
 const pluginManifestPath = path.join(pluginRoot, '.codex-plugin', 'plugin.json');
+const packageDescriptorPath = path.join(pluginRoot, 'opl-package.json');
 const marketplacePath = path.join(repoRoot, '.agents', 'plugins', 'marketplace.json');
 const pluginIconPath = path.join(pluginRoot, 'assets', 'icon.png');
 const pluginSkillPath = path.join(pluginRoot, 'skills', 'redcube-ai', 'SKILL.md');
@@ -115,6 +116,76 @@ test('repo marketplace exposes the Codex carrier without taking RCA package auth
   assert.match(contractsReadme, /旧字段；这些\s+只服务迁移期兼容 consumer，不构成 OPL-owned Package Manager 的目标 authority/);
   assert.match(repoHygiene, /git ls-files -- \.agents '\:\(exclude\)\.agents\/plugins\/marketplace\.json'/);
   assert.match(repoHygiene, /repo hygiene: unexpected tracked \.agents paths/);
+});
+
+test('native package descriptor exposes RCA without recreating package lifecycle authority', () => {
+  const packageJson = readJson(path.join(repoRoot, 'package.json'));
+  const pluginManifest = readJson(pluginManifestPath);
+  const descriptor = readJson(packageDescriptorPath);
+
+  assert.equal(descriptor.surface_kind, 'opl_agent_package_manifest.v1');
+  assert.equal(descriptor.kind, 'agent');
+  assert.equal(descriptor.agent_id, 'rca');
+  assert.equal(descriptor.package_id, 'rca');
+  assert.equal(descriptor.domain_id, 'redcube_ai');
+  assert.equal(descriptor.version, packageJson.version);
+  assert.equal(descriptor.version, pluginManifest.version);
+  assert.equal(descriptor.carrier_source_role, 'codex_plugin_default_carrier_not_package_truth');
+  assert.deepEqual(descriptor.codex_surface, {
+    plugin_id: 'redcube-ai',
+    plugin_source_path: '.',
+    required_skill_ids: ['redcube-ai'],
+  });
+  assert.deepEqual(descriptor.requires, []);
+  assert.deepEqual(descriptor.capability_dependencies, []);
+  assert.equal(descriptor.domain_descriptor_ref, 'contracts/domain_descriptor.json');
+  assert.equal(
+    descriptor.task_provider_ref,
+    'contracts/domain_descriptor.json#/standard_agent_interface/stage_catalog',
+  );
+  assert.equal(descriptor.action_catalog_ref, 'contracts/action_catalog.json');
+  assert.deepEqual(descriptor.view_refs, []);
+  assert.deepEqual(descriptor.entrypoints.map(({ entrypoint_id }) => entrypoint_id), [
+    'codex_primary_skill',
+    'hosted_stage_actions',
+  ]);
+  assert.deepEqual(descriptor.presentation.home_shortcuts, [{
+    shortcut_id: 'invoke_product_entry',
+    label_i18n: { 'en-US': 'Create or continue a visual deliverable' },
+    default_visible: true,
+    user_configurable: true,
+    route: {
+      route_kind: 'agent_package_shortcut',
+      executor: 'codex_cli',
+      codex_visible_entry: 'redcube-ai',
+    },
+  }]);
+
+  for (const forbiddenField of [
+    'authority_boundary',
+    'configured_codex_plugin_carrier',
+    'content_lock',
+    'distribution_payload',
+    'health_check',
+    'lifecycle',
+    'machine_boundary',
+    'managed_shell',
+    'opl_managed_surface',
+    'package_core',
+    'permissions',
+    'receipt_ref',
+    'resolver',
+    'rollback_ref',
+    'source_contract',
+    'transaction',
+    'update_channel',
+  ]) {
+    assert.equal(
+      Object.hasOwn(descriptor, forbiddenField),
+      false,
+      `${forbiddenField} must remain outside the installed owner descriptor`,
+    );
+  }
 });
 
 test('codex plugin has no duplicate repository-root manifest or repo-local installer', () => {
