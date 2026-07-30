@@ -7,9 +7,11 @@ Machine boundary: 命令形状以当前安装的 OPL-generated interface 为准�
 
 ## 开始
 
-1. 从 App/Framework 的统一入口确保 `rca` Package 存在，并读取完整 Package 的
-   installed/callable carrier 状态。迁移期现有 `opl packages` action 仍可作为兼容入口，
-   但普通用户不需要理解 lock、payload、digest、receipt 或 Release Set。
+1. 使用 Framework 的 canonical 聚合入口 `opl packages` 确保 `rca` Package 存在，
+   并读取完整 Package 与实际 carrier 的 installed/callable 状态。Framework 委托
+   configured native carrier 执行物理动作并聚合 fresh readback；RCA owner 持有
+   identity、完整 bytes 与 publication。普通用户不需要理解 lock、payload、digest、
+   receipt 或 Release Set。
 2. 从 OPL-generated RCA surface 选择完整 visual-deliverable action，或显式选择 image/native proof action。
 3. 提供目标、source/artifact refs、交付格式与需要的 human-review intent。
 4. 让 OPL-hosted StageRun 按 RCA declarative stage graph 推进；不要在仓库里启动第二个 runner。
