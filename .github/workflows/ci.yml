@@ -1,12 +1,15 @@
 name: CI
 
 on:
-  push:
   pull_request:
     types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
   schedule:
     - cron: '17 19 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read

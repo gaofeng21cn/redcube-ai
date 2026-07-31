@@ -76,7 +76,10 @@ test('native PPT proof V2 contract is ready for opt-in CI triggers and cache pol
 
   assert.equal(contract.schema_version, 'native_ppt_proof_ci_contract.v2');
   assert.equal(contract.default_quality_lane.runs_true_renderer, false);
-  assert.deepEqual(contract.default_quality_lane.required_workflow_events, ['push', 'pull_request']);
+  assert.deepEqual(
+    contract.default_quality_lane.required_workflow_events,
+    ['pull_request', 'schedule', 'workflow_dispatch'],
+  );
   assert.equal(contract.proof_job.required_triggers.manual, 'workflow_dispatch');
   assert.equal(contract.proof_job.required_triggers.nightly.event, 'schedule');
   assert.match(contract.proof_job.required_triggers.nightly.cron, /^\d+ \d+ \* \* \*$/);

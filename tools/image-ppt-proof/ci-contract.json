@@ -2,7 +2,7 @@
   "schema_version": "image_ppt_proof_ci_contract.v1",
   "default_quality_lane": {
     "runs_real_image_generation": false,
-    "required_workflow_events": ["push", "pull_request"],
+    "required_workflow_events": ["pull_request", "schedule", "workflow_dispatch"],
     "allowed_checks": ["typecheck", "fast", "family", "meta"]
   },
   "proof_job": {
