@@ -66,7 +66,11 @@ test('repo-local OPL agent package manifest keeps RCA package and authority boun
   assert.deepEqual(manifest.codex_surface.required_skill_ids, ['redcube-ai']);
   assert.deepEqual(manifest.required_skill_ids, ['redcube-ai']);
   assert.equal(Object.hasOwn(manifest, 'distribution_payload'), false);
-  assert.equal(manifest.rollback_ref, 'rollback-ref:rca/unavailable');
+  assert.equal(Object.hasOwn(manifest, 'rollback_ref'), false);
+  assert.equal(Object.hasOwn(manifest.package_core, 'lock_owner'), false);
+  assert.equal(manifest.package_core.content_identity_fields.includes('package_lock_ref'), false);
+  assert.match(manifest.machine_boundary, /compatibility-to-delete/);
+  assert.doesNotMatch(manifest.machine_boundary, /owns package core, lock|owns [^.]*lifecycle receipt|owns [^.]*rollback readback/);
 
   assert.equal(manifest.authority_boundary.package_core_owner, 'opl_connect_agent_package_registry');
   assert.equal(manifest.authority_boundary.domain_truth_owner, 'redcube_ai');
