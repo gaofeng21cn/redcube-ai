@@ -44,7 +44,7 @@
     "domain_descriptor_ref": "contracts/domain_descriptor.json",
     "pack_compiler_input_ref": "contracts/pack_compiler_input.json"
   },
-  "machine_boundary": "This repo-local sidecar declares RCA package distribution and Codex carrier projection. OPL Connect owns package core, lock, lifecycle receipt, exposure, update, and rollback readback. RCA keeps visual truth, route truth, review/export verdict, artifact authority, visual memory body, and owner receipt authority; this manifest does not create a repo-owned generic runtime or package manager.",
+  "machine_boundary": "This repo-local sidecar declares RCA package distribution and Codex carrier projection. OPL Connect owns package-core and exposure projection plus the thin native-carrier adapter and fresh readback. Installed lock, lifecycle receipt, LKG, rollback, and durable transaction surfaces are compatibility-to-delete and are not manifest or currentness authority. RCA keeps visual truth, route truth, review/export verdict, artifact authority, visual memory body, and owner receipt authority; this manifest does not create a repo-owned generic runtime or package manager.",
   "package_core": {
     "core_kind": "opl_agent_package_core",
     "identity_fields": [
@@ -55,11 +55,9 @@
     "content_identity_fields": [
       "manifest_sha256",
       "payload_digest_ref",
-      "required_skill_pack_lock_refs",
-      "package_lock_ref"
+      "required_skill_pack_lock_refs"
     ],
     "dependency_source": "manifest_declared_capability_dependencies",
-    "lock_owner": "opl_connect_agent_package_registry",
     "exposure_owner": "opl_connect_agent_package_registry"
   },
   "codex_surface": {
@@ -141,7 +139,6 @@
     }
   ],
   "update_channel": "manifest_url",
-  "rollback_ref": "rollback-ref:rca/unavailable",
   "codex_visible_entry": "redcube-ai",
   "required_skill_ids": [
     "redcube-ai"
