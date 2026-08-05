@@ -136,7 +136,7 @@ test('native package descriptor exposes RCA without recreating package lifecycle
     plugin_source_path: '.',
     configured_codex_plugin_carrier: {
       kind: 'codex_plugin_manager',
-      plugin_selector: 'redcube-ai@redcube-ai-local',
+      plugin_selector: 'redcube-ai@redcube-ai',
       executor_route: 'codex_cli',
       marketplace_source: 'gaofeng21cn/redcube-ai',
       publication_ref: 'ghcr.io/gaofeng21cn/one-person-lab-packages/rca:latest-stable',

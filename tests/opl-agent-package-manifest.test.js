@@ -62,7 +62,7 @@ test('repo-local OPL agent package manifest keeps RCA package and authority boun
   assert.equal(manifest.codex_surface.plugin_id, 'redcube-ai');
   assert.deepEqual(manifest.codex_surface.configured_codex_plugin_carrier, {
     kind: 'codex_plugin_manager',
-    plugin_selector: 'redcube-ai@redcube-ai-local',
+    plugin_selector: 'redcube-ai@redcube-ai',
     executor_route: 'codex_cli',
     marketplace_source: 'gaofeng21cn/redcube-ai',
     publication_ref: 'ghcr.io/gaofeng21cn/one-person-lab-packages/rca:latest-stable',
