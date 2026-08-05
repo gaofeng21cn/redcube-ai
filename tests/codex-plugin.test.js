@@ -15,6 +15,44 @@ const pluginSkillPath = path.join(pluginRoot, 'skills', 'redcube-ai', 'SKILL.md'
 const canonicalSkillPath = path.join(repoRoot, 'agent', 'primary_skill', 'SKILL.md');
 const pluginSkillUiMetadataPath = path.join(pluginRoot, 'skills', 'redcube-ai', 'agents', 'openai.yaml');
 function readJson(filePath) { return JSON.parse(readFileSync(filePath, 'utf-8')); }
+const forbiddenLifecycleBasisFields = new Set([
+  'content_lock',
+  'dependency_resolution',
+  'distribution_payload',
+  'durable_transaction',
+  'installed_lock',
+  'last_known_good',
+  'lifecycle',
+  'lifecycle_receipt',
+  'lifecycle_receipt_owner',
+  'lkg',
+  'lock_owner',
+  'materialization',
+  'materialization_readiness',
+  'materializer',
+  'opl_managed_surface',
+  'package_core',
+  'package_lock_ref',
+  'payload',
+  'payload_digest_ref',
+  'receipt_ref',
+  'resolver',
+  'rollback',
+  'rollback_ref',
+  'transaction',
+  'update_channel',
+]);
+function assertNoLegacyLifecycleBasis(value, valuePath = 'descriptor') {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => assertNoLegacyLifecycleBasis(item, `${valuePath}[${index}]`));
+    return;
+  }
+  if (value === null || typeof value !== 'object') return;
+  for (const [key, nestedValue] of Object.entries(value)) {
+    assert.equal(forbiddenLifecycleBasisFields.has(key), false, `${valuePath}.${key}`);
+    assertNoLegacyLifecycleBasis(nestedValue, `${valuePath}.${key}`);
+  }
+}
 test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   const packageJson = readJson(path.join(repoRoot, 'package.json'));
   const manifest = readJson(pluginManifestPath);
@@ -137,6 +175,7 @@ test('marketplace root carrier contains the hosted RCA contract and stage runtim
     readFileSync(canonicalDescriptorPath, 'utf-8'),
   );
   assert.equal(descriptor.codex_surface.carrier_source_path, '.');
+  assertNoLegacyLifecycleBasis(descriptor);
   assert.equal(existsSync(path.join(marketplacePluginRoot, descriptor.source_contract.domain_descriptor_ref)), true);
   assert.equal(existsSync(path.join(marketplacePluginRoot, 'contracts', 'action_catalog.json')), true);
 
@@ -229,6 +268,7 @@ test('native package descriptor exposes RCA without recreating package lifecycle
       `${forbiddenField} must remain outside the installed owner descriptor`,
     );
   }
+  assertNoLegacyLifecycleBasis(descriptor);
 });
 
 test('nested Codex carrier remains a synchronized compatibility surface without a repo-local installer', () => {

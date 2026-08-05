@@ -79,14 +79,23 @@ test('repo-local OPL agent package manifest keeps RCA package and authority boun
   );
   assert.deepEqual(manifest.codex_surface.required_skill_ids, ['redcube-ai']);
   assert.deepEqual(manifest.required_skill_ids, ['redcube-ai']);
-  assert.equal(Object.hasOwn(manifest, 'distribution_payload'), false);
-  assert.equal(Object.hasOwn(manifest, 'rollback_ref'), false);
-  assert.equal(Object.hasOwn(manifest.package_core, 'lock_owner'), false);
-  assert.equal(manifest.package_core.content_identity_fields.includes('package_lock_ref'), false);
-  assert.match(manifest.machine_boundary, /compatibility-to-delete/);
-  assert.doesNotMatch(manifest.machine_boundary, /owns package core, lock|owns [^.]*lifecycle receipt|owns [^.]*rollback readback/);
+  for (const forbiddenField of [
+    'distribution_payload',
+    'lifecycle',
+    'opl_managed_surface',
+    'package_core',
+    'rollback_ref',
+    'update_channel',
+  ]) {
+    assert.equal(Object.hasOwn(manifest, forbiddenField), false, forbiddenField);
+  }
+  assert.deepEqual(manifest.capability_dependencies, []);
+  assert.match(manifest.machine_boundary, /per-package owner OCI latest-stable -> configured native carrier -> fresh readback/);
+  assert.match(manifest.machine_boundary, /Installed lock, payload, materializer, lifecycle receipt, LKG, rollback, and durable transaction surfaces are compatibility-to-delete/);
+  assert.doesNotMatch(manifest.machine_boundary, /owns package-core|owns [^.]*lifecycle receipt|owns [^.]*rollback readback/);
 
-  assert.equal(manifest.authority_boundary.package_core_owner, 'opl_connect_agent_package_registry');
+  assert.equal(Object.hasOwn(manifest.authority_boundary, 'package_core_owner'), false);
+  assert.equal(Object.hasOwn(manifest.authority_boundary, 'package_exposure_owner'), false);
   assert.equal(manifest.authority_boundary.domain_truth_owner, 'redcube_ai');
   assert.equal(manifest.authority_boundary.rca_owns_visual_truth, true);
   assert.equal(manifest.authority_boundary.rca_owns_review_export_verdict, true);

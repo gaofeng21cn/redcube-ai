@@ -44,22 +44,7 @@
     "domain_descriptor_ref": "contracts/domain_descriptor.json",
     "pack_compiler_input_ref": "contracts/pack_compiler_input.json"
   },
-  "machine_boundary": "This repo-local sidecar declares RCA package distribution and Codex carrier projection. OPL Connect owns package-core and exposure projection plus the thin native-carrier adapter and fresh readback. Installed lock, lifecycle receipt, LKG, rollback, and durable transaction surfaces are compatibility-to-delete and are not manifest or currentness authority. RCA keeps visual truth, route truth, review/export verdict, artifact authority, visual memory body, and owner receipt authority; this manifest does not create a repo-owned generic runtime or package manager.",
-  "package_core": {
-    "core_kind": "opl_agent_package_core",
-    "identity_fields": [
-      "package_id",
-      "agent_id",
-      "version"
-    ],
-    "content_identity_fields": [
-      "manifest_sha256",
-      "payload_digest_ref",
-      "required_skill_pack_lock_refs"
-    ],
-    "dependency_source": "manifest_declared_capability_dependencies",
-    "exposure_owner": "opl_connect_agent_package_registry"
-  },
+  "machine_boundary": "This repo-local sidecar declares RCA package distribution and Codex carrier projection. Ordinary Package currentness follows per-package owner OCI latest-stable -> configured native carrier -> fresh readback. Installed lock, payload, materializer, lifecycle receipt, LKG, rollback, and durable transaction surfaces are compatibility-to-delete and must not be used as Package lifecycle, currentness, or carrier-adoption implementation input. RCA keeps visual truth, route truth, review/export verdict, artifact authority, visual memory body, and owner receipt authority; this manifest does not create a repo-owned generic runtime or package manager.",
   "codex_surface": {
     "plugin_id": "redcube-ai",
     "codex_visible_entry": "redcube-ai",
@@ -79,18 +64,6 @@
     "carrier_source_path": ".",
     "canonical_primary_skill_source_ref": "agent/primary_skill/SKILL.md",
     "plugin_carrier_skill_ref": "plugins/redcube-ai/skills/redcube-ai/SKILL.md"
-  },
-  "lifecycle": {
-    "owner": "opl_packages",
-    "module_id": "rca",
-    "commands": {
-      "install": "opl packages install rca",
-      "update": "opl packages update rca",
-      "uninstall": "opl packages uninstall rca"
-    },
-    "repo_local_installer_allowed": false,
-    "repo_local_marketplace_mutation_allowed": false,
-    "repo_local_user_symlink_mutation_allowed": false
   },
   "skill_packs": [
     {
@@ -145,7 +118,6 @@
       "access": "requires_rca_artifact_authority_receipt"
     }
   ],
-  "update_channel": "manifest_url",
   "codex_visible_entry": "redcube-ai",
   "required_skill_ids": [
     "redcube-ai"
@@ -157,16 +129,9 @@
       "carrier": "codex_plugin",
       "source_surface": "codex_surface",
       "projection_role": "package_carrier_adapter",
-      "owns_package_core": false,
       "owns_domain_truth": false
     }
   ],
-  "opl_managed_surface": {
-    "package_shape": "thin_agent_package",
-    "dependency_resolution": "managed_dependency_graph",
-    "dependency_update_policy": "independent_package_target",
-    "developer_mode_dependency_policy": "source_checkout_when_authorized_else_pull_request"
-  },
   "managed_shell": {
     "clean_runner_profile": {
       "profile_role": "domain_compatibility_clean_runner",
@@ -181,8 +146,6 @@
   },
   "authority_boundary": {
     "repo_manifest_role": "repo_local_package_sidecar",
-    "package_core_owner": "opl_connect_agent_package_registry",
-    "package_exposure_owner": "opl_connect_agent_package_registry",
     "domain_truth_owner": "redcube_ai",
     "rca_owns_visual_truth": true,
     "rca_owns_route_truth": true,
