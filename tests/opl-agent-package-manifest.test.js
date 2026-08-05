@@ -13,7 +13,8 @@ test('repo-local OPL agent package manifest keeps RCA package and authority boun
   const manifest = readJson('contracts/opl_agent_package_manifest.json');
   const domainDescriptor = readJson('contracts/domain_descriptor.json');
   const registration = readJson('contracts/opl_domain_manifest_registration.json');
-  const pluginManifest = readJson('plugins/redcube-ai/.codex-plugin/plugin.json');
+  const pluginManifest = readJson('.codex-plugin/plugin.json');
+  const compatibilityPluginManifest = readJson('plugins/redcube-ai/.codex-plugin/plugin.json');
   const packageJson = readJson('package.json');
   const packageLock = readJson('package-lock.json');
   const pyproject = fs.readFileSync(path.join(repoRoot, 'pyproject.toml'), 'utf8');
@@ -60,6 +61,7 @@ test('repo-local OPL agent package manifest keeps RCA package and authority boun
 
   assert.equal(manifest.carrier_source_role, 'codex_plugin_default_carrier_not_package_truth');
   assert.equal(manifest.codex_surface.plugin_id, 'redcube-ai');
+  assert.equal(manifest.codex_surface.carrier_source_path, '.');
   assert.deepEqual(manifest.codex_surface.configured_codex_plugin_carrier, {
     kind: 'codex_plugin_manager',
     plugin_selector: 'redcube-ai@redcube-ai',
@@ -69,7 +71,12 @@ test('repo-local OPL agent package manifest keeps RCA package and authority boun
   });
   assert.equal(pluginManifest.name, 'redcube-ai');
   assert.equal(pluginManifest.version, manifest.version);
+  assert.equal(compatibilityPluginManifest.version, manifest.version);
   assert.notEqual(pluginManifest.name, manifest.package_id);
+  assert.equal(
+    fs.readFileSync(path.join(repoRoot, 'opl-package.json'), 'utf8'),
+    fs.readFileSync(path.join(repoRoot, 'contracts/opl_agent_package_manifest.json'), 'utf8'),
+  );
   assert.deepEqual(manifest.codex_surface.required_skill_ids, ['redcube-ai']);
   assert.deepEqual(manifest.required_skill_ids, ['redcube-ai']);
   assert.equal(Object.hasOwn(manifest, 'distribution_payload'), false);

@@ -5,6 +5,8 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const repoRoot = path.resolve('.');
 const pluginRoot = path.join(repoRoot, 'plugins', 'redcube-ai');
+const rootPluginManifestPath = path.join(repoRoot, '.codex-plugin', 'plugin.json');
+const rootPackageDescriptorPath = path.join(repoRoot, 'opl-package.json');
 const pluginManifestPath = path.join(pluginRoot, '.codex-plugin', 'plugin.json');
 const packageDescriptorPath = path.join(pluginRoot, 'opl-package.json');
 const marketplacePath = path.join(repoRoot, '.agents', 'plugins', 'marketplace.json');
@@ -89,7 +91,7 @@ test('repo marketplace exposes the Codex carrier without taking RCA package auth
     name: 'redcube-ai',
     source: {
       source: 'local',
-      path: './plugins/redcube-ai',
+      path: './',
     },
     policy: {
       installation: 'AVAILABLE',
@@ -116,6 +118,40 @@ test('repo marketplace exposes the Codex carrier without taking RCA package auth
   assert.match(contractsReadme, /旧字段；这些\s+只服务迁移期兼容 consumer，不构成 OPL-owned Package Manager 的目标 authority/);
   assert.match(repoHygiene, /git ls-files -- \.agents '\:\(exclude\)\.agents\/plugins\/marketplace\.json'/);
   assert.match(repoHygiene, /repo hygiene: unexpected tracked \.agents paths/);
+});
+
+test('marketplace root carrier contains the hosted RCA contract and stage runtime closure', () => {
+  const marketplace = readJson(marketplacePath);
+  const marketplacePluginRoot = path.resolve(repoRoot, marketplace.plugins[0].source.path);
+  const rootPluginManifest = readJson(rootPluginManifestPath);
+  const canonicalDescriptorPath = path.join(repoRoot, 'contracts', 'opl_agent_package_manifest.json');
+  const descriptor = readJson(rootPackageDescriptorPath);
+  const actionCatalog = readJson(path.join(marketplacePluginRoot, descriptor.entrypoints
+    .find(({ entrypoint_id }) => entrypoint_id === 'hosted_stage_actions').source_ref));
+
+  assert.equal(marketplacePluginRoot, repoRoot);
+  assert.equal(rootPluginManifest.skills, './plugins/redcube-ai/skills/');
+  assert.equal(rootPluginManifest.version, descriptor.version);
+  assert.equal(
+    readFileSync(rootPackageDescriptorPath, 'utf-8'),
+    readFileSync(canonicalDescriptorPath, 'utf-8'),
+  );
+  assert.equal(descriptor.codex_surface.carrier_source_path, '.');
+  assert.equal(existsSync(path.join(marketplacePluginRoot, descriptor.source_contract.domain_descriptor_ref)), true);
+  assert.equal(existsSync(path.join(marketplacePluginRoot, 'contracts', 'action_catalog.json')), true);
+
+  const stageManifestRefs = new Set(actionCatalog.actions.map(
+    ({ execution_binding }) => execution_binding.stage_manifest_ref,
+  ));
+  assert.deepEqual([...stageManifestRefs], ['agent/stages/manifest.json']);
+  for (const stageManifestRef of stageManifestRefs) {
+    const stageManifestPath = path.join(marketplacePluginRoot, stageManifestRef);
+    const stageManifest = readJson(stageManifestPath);
+    assert.equal(existsSync(stageManifestPath), true);
+    for (const stage of stageManifest.stages) {
+      assert.equal(existsSync(path.join(marketplacePluginRoot, stage.policy_ref)), true, stage.policy_ref);
+    }
+  }
 });
 
 test('native package descriptor exposes RCA without recreating package lifecycle authority', () => {
@@ -195,7 +231,14 @@ test('native package descriptor exposes RCA without recreating package lifecycle
   }
 });
 
-test('codex plugin has no duplicate repository-root manifest or repo-local installer', () => {
-  assert.equal(existsSync(path.join(repoRoot, '.codex-plugin', 'plugin.json')), false);
+test('nested Codex carrier remains a synchronized compatibility surface without a repo-local installer', () => {
+  const packageJson = readJson(path.join(repoRoot, 'package.json'));
+  const rootPluginManifest = readJson(rootPluginManifestPath);
+  const nestedPluginManifest = readJson(pluginManifestPath);
+  const nestedDescriptor = readJson(packageDescriptorPath);
+
+  assert.equal(rootPluginManifest.version, packageJson.version);
+  assert.equal(nestedPluginManifest.version, packageJson.version);
+  assert.equal(nestedDescriptor.version, packageJson.version);
   assert.equal(existsSync(path.join(repoRoot, 'scripts', 'install-codex-plugin.ts')), false);
 });
