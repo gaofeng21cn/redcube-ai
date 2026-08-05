@@ -69,8 +69,10 @@ Package bytes；RCA artifact/evidence hash 只证明领域 lineage。两者都�
 ## 不属于当前完成声明的内容
 
 本页定义长期 owner boundary，不表示该迁移已经完成。当前
-`contracts/opl_agent_package_manifest.json` 和 OPL consumer 仍包含旧
-lock/payload/currentness/lifecycle receipt 字段；它们只能作为兼容迁移输入。
+`contracts/opl_agent_package_manifest.json` 已退役 installed-lock authority 与
+lifecycle-receipt ownership，但仍保留 source version、content-identity refs、lifecycle
+locator 与 managed-dependency metadata；OPL consumer 也仍有 lock/materializer/runtime-source
+兼容读面。这些只能作为迁移输入，不能覆盖 fresh carrier readback。
 独立 GHCR owner publisher、完整 carrier readback、executor-neutral route proof 和旧
 Package Manager 删除都需要 fresh terminal evidence。
 

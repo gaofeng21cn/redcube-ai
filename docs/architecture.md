@@ -95,6 +95,8 @@ Package-to-Package 组合或 executor 启动 lock。
 
 下列形态在 active source 中必须为零：repo-local CLI、domain handler dispatcher、generic scheduler/runner、Attempt/session/workspace store、review/repair transport、executor adapter、status/workbench wrapper、package install/update manager，以及对这些能力的 compatibility alias。
 
-当前机器合同仍处于过渡态：`contracts/opl_agent_package_manifest.json` 尚含
-version/lock/payload/currentness/lifecycle receipt/rollback 等旧字段。它们可由 dual-read
-兼容层读取，但不得驱动新增设计或被本文解释为目标架构已完成。
+当前机器合同仍处于过渡态：`contracts/opl_agent_package_manifest.json` 已退役
+installed-lock authority 与 lifecycle-receipt ownership，并声明配置的 Codex Plugin
+carrier；剩余 source version、content-identity refs、lifecycle locator 与
+managed-dependency metadata 可由 dual-read 兼容层读取，但不得驱动新增设计、覆盖 fresh
+carrier readback 或被本文解释为目标架构已完成。

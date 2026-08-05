@@ -63,7 +63,9 @@ RCA owner 发布新 identity 或保留向后兼容 adapter，不建设中央版�
 
 ## D10 旧 Package lifecycle 合同只作迁移输入
 
-当前 `contracts/opl_agent_package_manifest.json` 中的 version、lock、payload、
-currentness、lifecycle receipt、rollback 和 managed dependency graph 字段仍服务旧
-consumer。它们在 dual-read 与功能等价证据闭合前保持可读，但不得新增 writer、
-consumer 或设计依赖；最终由 carrier fresh readback 和薄 Framework projection 取代。
+当前 `contracts/opl_agent_package_manifest.json` 已退役 installed-lock authority 与
+lifecycle-receipt ownership 字段，并把 Codex Plugin 明确为 carrier locator。仍保留的
+source version、`package_core` content-identity refs、lifecycle command locator 与
+managed-dependency metadata 在 dual-read 与功能等价证据闭合前保持可读，但不得成为
+installed/currentness authority，也不得新增 writer、consumer 或设计依赖；最终由 carrier
+fresh readback 和薄 Framework projection 取代。

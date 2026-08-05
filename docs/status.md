@@ -15,9 +15,12 @@ authority contracts、Python native helpers、最小 authority functions 与 dev
 verification。
 
 Repo source 与 contracts 已表达私有控制面的结构退役，但 Package 平台组合迁移尚未
-闭合：当前 manifest 仍含旧 lock/payload/currentness/lifecycle receipt/rollback 字段，
+闭合：当前 manifest 的 source version 为 `0.2.12`，已声明
+`redcube-ai@redcube-ai` Codex Plugin carrier，并已退役 installed-lock authority 与
+lifecycle-receipt ownership 字段；仍保留的 `package_core` content-identity refs、
+lifecycle command locator 与 managed-dependency metadata 只是迁移期兼容面。
 Framework canonical source 与 `opl packages status` 仍有 lock、materializer、
-runtime-source 与 lifecycle action 等 compatibility consumer；尚无 fresh
+runtime-source 与 lifecycle action 等 compatibility consumer，尚无 fresh
 consumer-zero proof。RCA owner publication currentness、完整 carrier readback 与
 executor-neutral route 也仍需从各自 owner surface fresh 读取。本文不冻结某次 tag、
 SHA、GHCR 快照或 installed output，也不把 source version、owner Git tag、机器合同或
