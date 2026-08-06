@@ -15,16 +15,18 @@ authority contracts、Python native helpers、最小 authority functions 与 dev
 verification。
 
 Repo source 与 contracts 已表达私有控制面的结构退役，但 Package 平台组合迁移尚未
-闭合：当前 manifest 的 source version 为 `0.2.12`，已声明
+闭合：当前 manifest 的 source version 为 `0.2.13`，已声明
 `redcube-ai@redcube-ai` Codex Plugin carrier，并已退役 installed-lock authority 与
-lifecycle-receipt ownership 字段；仍保留的 `package_core` content-identity refs、
-lifecycle command locator 与 managed-dependency metadata 只是迁移期兼容面。
-Framework canonical source 与 `opl packages status` 仍有 lock、materializer、
-runtime-source 与 lifecycle action 等 compatibility consumer，尚无 fresh
-consumer-zero proof。RCA owner publication currentness、完整 carrier readback 与
-executor-neutral route 也仍需从各自 owner surface fresh 读取。本文不冻结某次 tag、
-SHA、GHCR 快照或 installed output，也不把 source version、owner Git tag、机器合同或
-测试状态伪装成已发布、current 或已安装。
+lifecycle-receipt ownership 字段；`package_core`、lifecycle command locator、
+managed-dependency、update-channel 与 package/exposure-owner 元数据也已删除。当前
+sidecar 仍保留 source-contract、Codex carrier、health/proof 与 clean-runner
+compatibility metadata，不能据此声明目标 descriptor 迁移闭合。Framework canonical
+source 与 `opl packages status` 的 lock、materializer、runtime-source 与 lifecycle
+action compatibility consumer 仍需由 Framework owner 取得 fresh consumer-zero proof。
+RCA owner publication currentness、完整 carrier readback 与 executor-neutral route 也仍需
+从各自 owner surface fresh 读取。本文不冻结某次 tag、SHA、GHCR 快照或 installed
+output，也不把 source version、owner Git tag、机器合同或测试状态伪装成已发布、
+current 或已安装。
 
 这也不证明已安装 Package callable、真实 visual StageRun 成功、review/export
 accepted、owner accepted、release ready 或 production ready。

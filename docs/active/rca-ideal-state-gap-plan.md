@@ -39,18 +39,19 @@ Machine boundary: 当前状态必须从 repo source/contracts 与 owner readback
 - `contracts/generated_surface_handoff.json` 声明 generated surfaces 归 OPL、repo-local handler targets 为空、结构 cutover 已闭合，并明确 production evidence 未闭合。
 - `contracts/functional_privatization_audit.json` 只保留 RCA visual authority decisions 与 Python native helpers；旧 repo-local default/control surfaces 已退役。
 - `contracts/live_stage_run_progress_evidence.json` 当前只有 typed blocker `post_standardization_live_stage_evidence_required`，没有 owner、quality/export、long-soak 或 no-regression receipts；它明确不声明 domain ready 或 production ready。
-- `contracts/opl_agent_package_manifest.json` 当前 source version 为 `0.2.12`，已声明
+- `contracts/opl_agent_package_manifest.json` 当前 source version 为 `0.2.13`，已声明
   `redcube-ai@redcube-ai` Codex Plugin carrier，并已退役 installed-lock authority 与
-  lifecycle-receipt ownership 字段。仍保留的 `package_core` content-identity refs、
-  lifecycle command locator 与 managed-dependency metadata 是迁移期兼容元数据，不是
-  installed truth、currentness authority 或目标架构已完成的证明。
+  lifecycle-receipt ownership 字段；`package_core`、lifecycle command locator、
+  managed-dependency、update-channel 与 package/exposure-owner 元数据也已删除。仍保留的
+  source-contract、Codex carrier、health/proof 与 clean-runner metadata 只作迁移期兼容，
+  不是 installed truth、currentness authority 或目标架构已完成的证明。
 
 ## Current-State vs Ideal-State Gaps
 
 | Boundary | Current fact | Gap / next owner evidence | State |
 | --- | --- | --- | --- |
 | Repo source morphology | declarative pack + native helpers + minimal authority functions；旧 private control plane 路径不存在 | 保持 no-resurrection guard；只需 repo-native regression | structurally closed |
-| Package descriptor | 当前 sidecar 已退役 installed-lock authority 与 lifecycle-receipt ownership，配置了 native carrier locator，但仍混合 identity、content-identity refs、lifecycle command locator 与 managed-dependency metadata；Framework canonical source 与 `opl packages status` 仍有 lock/materializer/runtime-source 等 compatibility consumer | Framework owner 先切换已证 consumer，App/Shell owner fresh 审计各自 surface；全链 consumer-zero 后再收缩为 executor-neutral identity/capability/task/view descriptor | platform migration open |
+| Package descriptor | 当前 sidecar 已退役 installed-lock authority、lifecycle-receipt ownership、`package_core`、lifecycle command locator 与 managed-dependency metadata，并配置 native carrier locator；仍保留 source-contract、Codex carrier、health/proof 与 clean-runner compatibility metadata，Framework canonical source 与 `opl packages status` 仍有 lock/materializer/runtime-source 等 compatibility consumer | Framework owner 先切换已证 consumer，App/Shell owner fresh 审计各自 surface；全链 consumer-zero 后再收缩为 executor-neutral identity/capability/task/view descriptor | platform migration open |
 | Independent publication | source version 与 Git tag 只证明 owner source transport；active 文档不冻结某次 tag/SHA/GHCR 快照，完整 Package publication currentness 必须从 owner publication surface fresh 读取 | owner immutable revision -> RCA-only `latest-stable` -> anonymous exact-digest readback | publication proof open |
 | Carrier installed truth | Codex Plugin projection 与旧 `opl packages` 状态存在 | 聚合完整 Package 的 fresh carrier readback；Plugin-only 不得报告 complete installed | platform migration open |
 | Executor decoupling | Codex CLI 是当前唯一正式路径 | 一个 Git/local 中性 adapter 证明切换 executor 不重装、不丢 task/view/偏好 | neutral proof open |
@@ -69,8 +70,9 @@ Machine boundary: 当前状态必须从 repo source/contracts 与 owner readback
 2. 一方完整 Package bytes 进入 RCA 自己的 GHCR repository，owner 只推进 RCA
    `latest-stable`。Exact ref/digest/checksum/SBOM/attestation 仅保护单次发布完整性。
 3. Framework dual-read owner descriptor 与迁移期 manifest；RCA manifest 已不再持有
-   installed-lock authority 或 lifecycle-receipt ownership，剩余 content-identity、
-   lifecycle locator 与 managed-dependency 元数据只能兼容读取，不能新增 writer 或 consumer。
+   installed-lock authority、lifecycle-receipt ownership、`package_core`、lifecycle
+   command locator 或 managed-dependency metadata。剩余 source-contract、Codex carrier、
+   health/proof 与 clean-runner metadata 只能兼容读取，不能新增 writer 或 consumer。
 4. Base 薄 OCI adapter 只下载/校验 bytes 并交给 Package 声明的 carrier/runtime
    adapter；Codex Plugin Manager 是当前 projection adapter。fresh readback 必须区分
    complete installed 与 Plugin-only。
