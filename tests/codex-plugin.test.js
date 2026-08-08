@@ -129,7 +129,7 @@ test('repo marketplace exposes the Codex carrier without taking RCA package auth
     name: 'redcube-ai',
     source: {
       source: 'local',
-      path: './',
+      path: './plugins/redcube-ai',
     },
     policy: {
       installation: 'AVAILABLE',
@@ -158,37 +158,40 @@ test('repo marketplace exposes the Codex carrier without taking RCA package auth
   assert.match(repoHygiene, /repo hygiene: unexpected tracked \.agents paths/);
 });
 
-test('marketplace root carrier contains the hosted RCA contract and stage runtime closure', () => {
+test('nested native carrier keeps the hosted RCA runtime owned by the repo', () => {
   const marketplace = readJson(marketplacePath);
   const marketplacePluginRoot = path.resolve(repoRoot, marketplace.plugins[0].source.path);
-  const rootPluginManifest = readJson(rootPluginManifestPath);
+  const pluginManifest = readJson(pluginManifestPath);
   const canonicalDescriptorPath = path.join(repoRoot, 'contracts', 'opl_agent_package_manifest.json');
-  const descriptor = readJson(rootPackageDescriptorPath);
-  const actionCatalog = readJson(path.join(marketplacePluginRoot, descriptor.entrypoints
+  const ownerDescriptor = readJson(canonicalDescriptorPath);
+  const carrierDescriptor = readJson(packageDescriptorPath);
+  const actionCatalog = readJson(path.join(repoRoot, ownerDescriptor.entrypoints
     .find(({ entrypoint_id }) => entrypoint_id === 'hosted_stage_actions').source_ref));
 
-  assert.equal(marketplacePluginRoot, repoRoot);
-  assert.equal(rootPluginManifest.skills, './plugins/redcube-ai/skills/');
-  assert.equal(rootPluginManifest.version, descriptor.version);
+  assert.equal(marketplacePluginRoot, pluginRoot);
+  assert.equal(pluginManifest.skills, './skills/');
+  assert.equal(pluginManifest.version, ownerDescriptor.version);
+  assert.equal(carrierDescriptor.version, ownerDescriptor.version);
   assert.equal(
     readFileSync(rootPackageDescriptorPath, 'utf-8'),
     readFileSync(canonicalDescriptorPath, 'utf-8'),
   );
-  assert.equal(descriptor.codex_surface.carrier_source_path, '.');
-  assertNoLegacyLifecycleBasis(descriptor);
-  assert.equal(existsSync(path.join(marketplacePluginRoot, descriptor.source_contract.domain_descriptor_ref)), true);
-  assert.equal(existsSync(path.join(marketplacePluginRoot, 'contracts', 'action_catalog.json')), true);
+  assert.equal(ownerDescriptor.codex_surface.carrier_source_path, '.');
+  assertNoLegacyLifecycleBasis(ownerDescriptor);
+  assertNoLegacyLifecycleBasis(carrierDescriptor);
+  assert.equal(existsSync(path.join(repoRoot, ownerDescriptor.source_contract.domain_descriptor_ref)), true);
+  assert.equal(existsSync(path.join(repoRoot, 'contracts', 'action_catalog.json')), true);
 
   const stageManifestRefs = new Set(actionCatalog.actions.map(
     ({ execution_binding }) => execution_binding.stage_manifest_ref,
   ));
   assert.deepEqual([...stageManifestRefs], ['agent/stages/manifest.json']);
   for (const stageManifestRef of stageManifestRefs) {
-    const stageManifestPath = path.join(marketplacePluginRoot, stageManifestRef);
+    const stageManifestPath = path.join(repoRoot, stageManifestRef);
     const stageManifest = readJson(stageManifestPath);
     assert.equal(existsSync(stageManifestPath), true);
     for (const stage of stageManifest.stages) {
-      assert.equal(existsSync(path.join(marketplacePluginRoot, stage.policy_ref)), true, stage.policy_ref);
+      assert.equal(existsSync(path.join(repoRoot, stage.policy_ref)), true, stage.policy_ref);
     }
   }
 });
