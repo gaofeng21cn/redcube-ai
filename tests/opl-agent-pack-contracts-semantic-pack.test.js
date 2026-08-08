@@ -114,6 +114,25 @@ test('RCA canonical semantic pack remains concrete while root stage/pack contrac
   assert.equal(packRefs.source_refs.stage_graph_source_ref, 'agent/stages/manifest.json');
 });
 
+test('RCA compiler input keeps only Framework profile refs plus its native-helper delta', () => {
+  const packRefs = readJson('contracts/pack_compiler_input.json');
+
+  assert.deepEqual(packRefs.implementation_profile, {
+    base_profile_ref: 'contracts/opl-framework/standard-agent-implementation-profile.schema.json',
+    helpers: {
+      entries: [{
+        language: 'python',
+        role: 'native_helper',
+        source_roots: ['python/redcube_ai/native_helpers/'],
+      }],
+    },
+  });
+  assert.deepEqual(packRefs.standard_agent_pack_abi, {
+    authority_ref:
+      'contracts/opl-framework/standard-domain-agent-skeleton-contract.json#/agent_pack_contract/standard_agent_pack_abi',
+  });
+});
+
 test('RCA opts into the canonical quality profile with one independent primary-only Meta Review', () => {
   const stageManifest = readJson('agent/stages/manifest.json');
   const qualityPolicy = readJson('contracts/stage_quality_cycle_policy.json');
