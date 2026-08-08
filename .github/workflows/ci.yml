@@ -21,14 +21,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Checkout OPL Framework
         run: |
           git clone --depth=1 --filter=blob:none https://github.com/gaofeng21cn/one-person-lab.git ../one-person-lab
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
@@ -41,12 +41,12 @@ jobs:
           echo "OPL_BIN=$GITHUB_WORKSPACE/../one-person-lab/bin/opl" >> "$GITHUB_ENV"
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v9
         with:
           version: '0.9.5'
           enable-cache: true
@@ -82,29 +82,29 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v9
         with:
           version: '0.9.5'
           enable-cache: true
           cache-dependency-glob: 'uv.lock'
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: native-ppt-proof-playwright-${{ runner.os }}-${{ hashFiles('uv.lock') }}
@@ -143,29 +143,29 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v9
         with:
           version: '0.9.5'
           enable-cache: true
           cache-dependency-glob: 'uv.lock'
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: image-ppt-proof-playwright-${{ runner.os }}-${{ hashFiles('uv.lock') }}
