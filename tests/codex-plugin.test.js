@@ -8,6 +8,7 @@ const pluginRoot = path.join(repoRoot, 'plugins', 'redcube-ai');
 const rootPluginManifestPath = path.join(repoRoot, '.codex-plugin', 'plugin.json');
 const rootPackageDescriptorPath = path.join(repoRoot, 'opl-package.json');
 const pluginManifestPath = path.join(pluginRoot, '.codex-plugin', 'plugin.json');
+const portablePluginManifestPath = path.join(pluginRoot, 'plugin.json');
 const packageDescriptorPath = path.join(pluginRoot, 'opl-package.json');
 const marketplacePath = path.join(repoRoot, '.agents', 'plugins', 'marketplace.json');
 const pluginIconPath = path.join(pluginRoot, 'assets', 'icon.png');
@@ -278,10 +279,23 @@ test('nested Codex carrier remains a synchronized compatibility surface without 
   const packageJson = readJson(path.join(repoRoot, 'package.json'));
   const rootPluginManifest = readJson(rootPluginManifestPath);
   const nestedPluginManifest = readJson(pluginManifestPath);
+  const portablePluginManifest = readJson(portablePluginManifestPath);
   const nestedDescriptor = readJson(packageDescriptorPath);
 
   assert.equal(rootPluginManifest.version, packageJson.version);
   assert.equal(nestedPluginManifest.version, packageJson.version);
+  assert.equal(portablePluginManifest.version, packageJson.version);
+  assert.equal(
+    portablePluginManifest.$schema,
+    'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json',
+  );
+  assert.equal(portablePluginManifest.name, nestedPluginManifest.name);
+  assert.deepEqual(
+    portablePluginManifest.extensions['com.openai'].interface,
+    nestedPluginManifest.interface,
+  );
+  assert.equal(Object.hasOwn(portablePluginManifest, 'skills'), false);
+  assert.equal(existsSync(path.join(pluginRoot, 'mcp.json')), false);
   assert.equal(nestedDescriptor.version, packageJson.version);
   assert.equal(existsSync(path.join(repoRoot, 'scripts', 'install-codex-plugin.ts')), false);
 });

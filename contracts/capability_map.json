@@ -100,7 +100,7 @@
           },
           {
             "ref_kind": "contract_ref",
-            "ref": "plugins/redcube-ai/.codex-plugin/plugin.json",
+            "ref": "plugins/redcube-ai/plugin.json",
             "role": "canonical_plugin_scaffold_source_locator"
           }
         ],
