@@ -101,7 +101,7 @@ test('native PPT proof V2 contract is ready for opt-in CI triggers and cache pol
   assert.match(runner, /candidate_route_model/);
   assert.match(workflow, /github\.event_name == 'schedule'/);
   assert.match(workflow, /contains\(github\.event\.pull_request\.labels\.\*\.name, 'native-ppt-proof'\)/);
-  assert.match(workflow, /native-ppt-proof:\n[\s\S]*?uses:\s*astral-sh\/setup-uv@v7[\s\S]*?enable-cache:\s*true[\s\S]*?cache-dependency-glob:\s*['"]uv\.lock['"]/);
+  assert.match(workflow, /native-ppt-proof:\n[\s\S]*?uses:\s*astral-sh\/setup-uv@v9\.0\.0[\s\S]*?enable-cache:\s*true[\s\S]*?cache-dependency-glob:\s*['"]uv\.lock['"]/);
   assert.match(workflow, /native-ppt-proof-playwright-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('uv\.lock'\) \}\}/);
   assert.match(runner, /artifact-index\.json/);
   assert.match(runner, /proof-artifact-index\.ts --profile native-ppt/);

@@ -47,7 +47,7 @@ test('image PPT proof optional CI lane never runs live image generation by defau
     ],
   );
   assert.match(workflow, /image-ppt-proof:\n[\s\S]*?github\.event_name == 'schedule'/);
-  assert.match(workflow, /image-ppt-proof:\n[\s\S]*?uses:\s*astral-sh\/setup-uv@v7[\s\S]*?enable-cache:\s*true[\s\S]*?cache-dependency-glob:\s*['"]uv\.lock['"]/);
+  assert.match(workflow, /image-ppt-proof:\n[\s\S]*?uses:\s*astral-sh\/setup-uv@v9\.0\.0[\s\S]*?enable-cache:\s*true[\s\S]*?cache-dependency-glob:\s*['"]uv\.lock['"]/);
   assert.match(workflow, /contains\(github\.event\.pull_request\.labels\.\*\.name, 'image-ppt-proof'\)/);
   assert.match(workflow, /tools\/image-ppt-proof\/run\.sh --output-dir artifacts\/image-ppt-proof --mock-image-generation/);
   assert.doesNotMatch(workflow, /tools\/image-ppt-proof\/run\.sh[^\n]*--live-image-generation/);
