@@ -1,4 +1,4 @@
 interface:
   display_name: "RedCube AI"
-  short_description: "Image-first visual deliverables through OPL"
+  short_description: "Image-first visual content design, generation, review, and delivery."
   default_prompt: "Use $redcube-ai through installed OPL-generated interfaces and hosted StageRun. For ordinary PPT/PPTX requests, create complete slide images and package them in PPTX; choose native editable PowerPoint only when the user explicitly requires editable native objects."

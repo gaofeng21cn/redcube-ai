@@ -39,7 +39,7 @@ Machine boundary: 当前状态必须从 repo source/contracts 与 owner readback
 - `contracts/generated_surface_handoff.json` 声明 generated surfaces 归 OPL、repo-local handler targets 为空、结构 cutover 已闭合，并明确 production evidence 未闭合。
 - `contracts/functional_privatization_audit.json` 只保留 RCA visual authority decisions 与 Python native helpers；旧 repo-local default/control surfaces 已退役。
 - `contracts/live_stage_run_progress_evidence.json` 当前只有 typed blocker `post_standardization_live_stage_evidence_required`，没有 owner、quality/export、long-soak 或 no-regression receipts；它明确不声明 domain ready 或 production ready。
-- `contracts/opl_agent_package_manifest.json` 当前 source version 为 `0.2.14`，已声明
+- `contracts/opl_agent_package_manifest.json` 当前 source version 为 `0.2.15`，已声明
   `redcube-ai@redcube-ai` Codex Plugin carrier，并已退役 installed-lock authority 与
   lifecycle-receipt ownership 字段；`package_core`、lifecycle command locator、
   managed-dependency、update-channel 与 package/exposure-owner 元数据也已删除。仍保留的

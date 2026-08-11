@@ -15,7 +15,7 @@ authority contracts、Python native helpers、最小 authority functions 与 dev
 verification。
 
 Repo source 与 contracts 已表达私有控制面的结构退役，但 Package 平台组合迁移尚未
-闭合：当前 manifest 的 source version 为 `0.2.14`，已声明
+闭合：当前 manifest 的 source version 为 `0.2.15`，已声明
 `redcube-ai@redcube-ai` Codex Plugin carrier，并已退役 installed-lock authority 与
 lifecycle-receipt ownership 字段；`package_core`、lifecycle command locator、
 managed-dependency、update-channel 与 package/exposure-owner 元数据也已删除。当前

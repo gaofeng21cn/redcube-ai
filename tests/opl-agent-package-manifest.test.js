@@ -26,8 +26,11 @@ test('repo-local OPL agent package manifest keeps RCA package and authority boun
   assert.equal(manifest.agent_id, 'rca');
   assert.equal(manifest.package_id, 'rca');
   assert.deepEqual(manifest.presentation, {
-    display_name_i18n: { 'en-US': 'RedCube AI' },
-    description_i18n: { 'en-US': 'Image-first visual deliverables through OPL' },
+    display_name_i18n: { 'zh-CN': 'RedCube AI', 'en-US': 'RedCube AI' },
+    description_i18n: {
+      'zh-CN': '以图像为核心的视觉内容设计、生成、评审与交付。',
+      'en-US': 'Image-first visual content design, generation, review, and delivery.',
+    },
     session_routing_summary_i18n: {
       'en-US': 'Run the RCA visual-deliverable stages through the OPL-hosted StageRun controller while preserving RCA visual truth and review/export authority.',
     },

@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "redcube-ai",
-  "version": "0.2.14",
-  "description": "Codex plugin carrier for the RCA visual deliverable domain app; the canonical OPL package id is rca.",
+  "version": "0.2.15",
+  "description": "Image-first visual content design, generation, review, and delivery.",
   "author": {
     "name": "Gao Feng",
     "url": "https://github.com/gaofeng21cn"

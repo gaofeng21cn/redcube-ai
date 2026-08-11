@@ -56,6 +56,7 @@ function assertNoLegacyLifecycleBasis(value, valuePath = 'descriptor') {
 }
 test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   const packageJson = readJson(path.join(repoRoot, 'package.json'));
+  const packageManifest = readJson(path.join(repoRoot, 'contracts', 'opl_agent_package_manifest.json'));
   const manifest = readJson(pluginManifestPath);
   const skillText = readFileSync(pluginSkillPath, 'utf-8');
   const canonicalSkillText = readFileSync(canonicalSkillPath, 'utf-8');
@@ -68,7 +69,7 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.equal(manifest.interface.category, 'Creative');
   assert.equal(manifest.interface.composerIcon, './assets/icon.png');
   assert.equal(manifest.interface.logo, './assets/icon.png');
-  assert.match(manifest.description, /Codex plugin/i);
+  assert.equal(manifest.description, packageManifest.presentation.description_i18n['en-US']);
   assert.equal(existsSync(pluginIconPath), true);
   assert.match(metadataText, /display_name: "RedCube AI"/);
   assert.match(metadataText, /default_prompt: "Use \$redcube-ai/);
