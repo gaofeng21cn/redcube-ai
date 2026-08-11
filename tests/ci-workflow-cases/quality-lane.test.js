@@ -35,5 +35,5 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   const lock = readRepoFile('uv.lock');
   assert.match(lock, /name = "playwright"\nversion = "1\.59\.0"/);
   assert.match(lock, /name = "python-pptx"\nversion = "1\.0\.2"/);
-  assert.match(lock, /name = "pillow"\nversion = "12\.2\.0"/);
+  assert.match(lock, /name = "pillow"\nversion = "12\.3\.0"/);
 });
