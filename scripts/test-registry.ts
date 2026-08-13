@@ -35,6 +35,7 @@ const TEST_REGISTRY: readonly TestRegistryEntry[] = Object.freeze([
   { file: 'tests/rca-foundry-agent-os-domain-kernel-manifest.test.ts', lane: 'meta', fast: true },
   { file: 'tests/rca-functional-audit-retirement.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/rca-private-platform-retirement-readback.test.js', lane: 'meta', smoke: true, fast: true },
+  { file: 'tests/rca-source-truth-refs-contract.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/stage-run-kernel-profile.test.js', lane: 'meta', fast: true },
   { file: 'tests/test-workspace-lifecycle.test.js', lane: 'meta' },
   { file: 'tests/block-content-fit-review.test.js', lane: 'integration' },
