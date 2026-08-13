@@ -18,3 +18,4 @@ Runtime event refs:
 Owner boundary:
 - RCA owns source readiness and source truth refs.
 - OPL consumes refs and schedules attempts.
+- When the optional `source_truth_refs` input is present, RCA consumes the declared manifest/readiness/digest refs and evaluates source readiness semantically; OPL remains responsible for byte/currentness validation and avoiding duplicate workspace discovery or hashing.

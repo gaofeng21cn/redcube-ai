@@ -40,7 +40,9 @@
       "required_fields": [
         "workspace_root"
       ],
-      "optional_fields": [],
+      "optional_fields": [
+        "source_truth_refs"
+      ],
       "workspace_locator_fields": [
         "workspace_root"
       ],
@@ -119,7 +121,9 @@
       "required_fields": [
         "workspace_root"
       ],
-      "optional_fields": [],
+      "optional_fields": [
+        "source_truth_refs"
+      ],
       "workspace_locator_fields": [
         "workspace_root"
       ],
@@ -191,7 +195,9 @@
       "required_fields": [
         "workspace_root"
       ],
-      "optional_fields": [],
+      "optional_fields": [
+        "source_truth_refs"
+      ],
       "workspace_locator_fields": [
         "workspace_root"
       ],
