@@ -1,14 +1,7 @@
 import math
 import json
 
-
-def safe_text(value, fallback: str = '') -> str:
-    text = str(value or '').strip()
-    return text or fallback
-
-
-def safe_list(value):
-    return value if isinstance(value, list) else []
+from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.common import safe_list, safe_text
 
 
 def connector_direction_failure(shape_id: str, role: str) -> dict:

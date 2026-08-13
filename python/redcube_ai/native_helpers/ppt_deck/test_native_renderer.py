@@ -7,9 +7,21 @@ from PIL import Image
 
 from redcube_ai.native_helpers import renderer_dependencies
 from redcube_ai.native_helpers.ppt_deck import native
+from redcube_ai.native_helpers.ppt_deck import native_layout_grammar, native_manifest_qa
+from redcube_ai.native_helpers.ppt_deck.native_layouts_parts import common
 
 
 class NativePptLibreOfficeRendererTest(unittest.TestCase):
+    def test_safe_input_helpers_have_one_rca_owner_with_compatibility_exports(self):
+        self.assertIs(native_manifest_qa.safe_text, common.safe_text)
+        self.assertIs(native_manifest_qa.safe_list, common.safe_list)
+        self.assertIs(native_layout_grammar.safe_text, common.safe_text)
+        self.assertIs(native_layout_grammar.safe_list, common.safe_list)
+        self.assertEqual(common.safe_text('  title  '), 'title')
+        self.assertEqual(common.safe_text(None, 'fallback'), 'fallback')
+        self.assertEqual(common.safe_list(['slide']), ['slide'])
+        self.assertEqual(common.safe_list('slide'), [])
+
     def test_auto_renderer_binds_preprovisioned_true_render_capability(self):
         def fake_which(name):
             return {
