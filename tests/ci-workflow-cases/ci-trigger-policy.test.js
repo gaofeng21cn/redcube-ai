@@ -5,16 +5,17 @@ import { existsSync } from 'node:fs';
 
 import { readRepoFile, readRepoJson, repoRoot } from './shared.js';
 
-test('CI trigger policy keeps PR, daily, and manual coverage without push duplication', () => {
+test('source CI stays on per-change and manual triggers while qualification is weekly or manual', () => {
   const workflow = readRepoFile('.github/workflows/ci.yml');
+  const qualification = readRepoFile('.github/workflows/qualification.yml');
 
-  assert.doesNotMatch(workflow, /^  push:/m);
-  assert.match(
-    workflow,
-    /pull_request:\n\s+types:\s+\[opened, synchronize, reopened, labeled\]/,
-  );
+  assert.match(workflow, /push:\n\s+branches: \[main\]/);
+  assert.match(workflow, /^  pull_request:/m);
   assert.match(workflow, /workflow_dispatch:/);
-  assert.match(workflow, /schedule:\n\s+- cron:\s*['"]17 19 \* \* \*['"]/);
+  assert.doesNotMatch(workflow, /schedule:/);
+  assert.match(qualification, /workflow_dispatch:/);
+  assert.match(qualification, /schedule:\n\s+- cron:\s*['"]17 19 \* \* 0['"]/);
+  assert.doesNotMatch(qualification, /pull_request:/);
   assert.match(
     workflow,
     /concurrency:\n\s+group: \$\{\{ github\.workflow \}\}-\$\{\{ github\.ref \}\}\n\s+cancel-in-progress: true/,
@@ -31,7 +32,7 @@ test('CI trigger policy keeps PR, daily, and manual coverage without push duplic
     const contract = readRepoJson(contractPath);
     assert.deepEqual(
       contract.default_quality_lane.required_workflow_events,
-      ['pull_request', 'schedule', 'workflow_dispatch'],
+      ['pull_request', 'workflow_dispatch'],
     );
   }
 });

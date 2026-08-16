@@ -233,16 +233,12 @@ test('native PPT proof CI contract keeps true renderer out of default quality an
   assert.equal(contract.default_quality_lane.runs_true_renderer, false);
   assert.deepEqual(
     contract.default_quality_lane.required_workflow_events,
-    ['pull_request', 'schedule', 'workflow_dispatch'],
+    ['pull_request', 'workflow_dispatch'],
   );
   assert.equal(contract.proof_job.runs_true_renderer, true);
   assert.equal(contract.proof_job.required_triggers.manual, 'workflow_dispatch');
-  assert.equal(contract.proof_job.required_triggers.nightly.event, 'schedule');
-  assert.equal(contract.proof_job.required_triggers.pull_request_label.label, 'native-ppt-proof');
-  assert.deepEqual(
-    contract.proof_job.required_triggers.pull_request_label.types,
-    ['labeled', 'synchronize', 'opened', 'reopened'],
-  );
+  assert.equal(contract.proof_job.required_triggers.weekly.event, 'schedule');
+  assert.equal(contract.proof_job.required_triggers.weekly.cron, '17 19 * * 0');
   assert.equal(contract.proof_job.artifact_index.path, 'artifacts/native-ppt-proof/artifact-index.json');
   assert.equal(contract.proof_job.artifact_index.required, true);
   assert.deepEqual(

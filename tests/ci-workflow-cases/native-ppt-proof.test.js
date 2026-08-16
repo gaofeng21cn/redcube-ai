@@ -5,7 +5,7 @@ import { readRepoFile, readRepoJson } from './shared.js';
 
 test('native PPT Linux proof environment is documented without adding a desktop-app fallback', () => {
   const dockerfile = readRepoFile('tools/native-ppt-proof/Dockerfile');
-  const workflow = readRepoFile('.github/workflows/ci.yml');
+  const workflow = readRepoFile('.github/workflows/qualification.yml');
   const installScript = readRepoFile('tools/native-ppt-proof/install-deps.sh');
   const runner = readRepoFile('tools/native-ppt-proof/run.sh');
 
@@ -72,22 +72,17 @@ test('native PPT proof V2 contract is ready for opt-in CI triggers and cache pol
   const contract = readRepoJson('tools/native-ppt-proof/ci-contract.json');
   const laneContract = readRepoJson('contracts/runtime-program/ppt-native-authoring-proof-lane.json');
   const runner = readRepoFile('tools/native-ppt-proof/run.sh');
-  const workflow = readRepoFile('.github/workflows/ci.yml');
+  const workflow = readRepoFile('.github/workflows/qualification.yml');
 
   assert.equal(contract.schema_version, 'native_ppt_proof_ci_contract.v2');
   assert.equal(contract.default_quality_lane.runs_true_renderer, false);
   assert.deepEqual(
     contract.default_quality_lane.required_workflow_events,
-    ['pull_request', 'schedule', 'workflow_dispatch'],
+    ['pull_request', 'workflow_dispatch'],
   );
   assert.equal(contract.proof_job.required_triggers.manual, 'workflow_dispatch');
-  assert.equal(contract.proof_job.required_triggers.nightly.event, 'schedule');
-  assert.match(contract.proof_job.required_triggers.nightly.cron, /^\d+ \d+ \* \* \*$/);
-  assert.equal(contract.proof_job.required_triggers.pull_request_label.label, 'native-ppt-proof');
-  assert.deepEqual(
-    contract.proof_job.required_triggers.pull_request_label.types,
-    ['labeled', 'synchronize', 'opened', 'reopened'],
-  );
+  assert.equal(contract.proof_job.required_triggers.weekly.event, 'schedule');
+  assert.equal(contract.proof_job.required_triggers.weekly.cron, '17 19 * * 0');
   assert.deepEqual(
     contract.proof_job.required_cache_layers.map((layer) => layer.id),
     ['npm', 'uv', 'playwright'],
@@ -99,18 +94,10 @@ test('native PPT proof V2 contract is ready for opt-in CI triggers and cache pol
   assert.deepEqual(laneContract.candidate_route_model.runnable_routes, ['author_pptx_native', 'repair_pptx_native']);
   assert.match(runner, /ppt-native-authoring-proof-lane\.json/);
   assert.match(runner, /candidate_route_model/);
-  assert.match(workflow, /github\.event_name == 'schedule'/);
-  assert.match(workflow, /contains\(github\.event\.pull_request\.labels\.\*\.name, 'native-ppt-proof'\)/);
+  assert.match(workflow, /schedule:/);
+  assert.doesNotMatch(workflow, /pull_request:/);
   assert.match(workflow, /native-ppt-proof:\n[\s\S]*?uses:\s*astral-sh\/setup-uv@v9\.0\.0[\s\S]*?enable-cache:\s*true[\s\S]*?cache-dependency-glob:\s*['"]uv\.lock['"]/);
   assert.match(workflow, /native-ppt-proof-playwright-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('uv\.lock'\) \}\}/);
   assert.match(runner, /artifact-index\.json/);
   assert.match(runner, /proof-artifact-index\.ts --profile native-ppt/);
-  assert.doesNotMatch(
-    workflow,
-    /quality:\n[\s\S]*?tools\/native-ppt-proof\/run\.sh[\s\S]*?Run family tests/,
-  );
-  assert.doesNotMatch(
-    workflow,
-    /quality:\n[\s\S]*?tools\/image-ppt-proof\/run\.sh[\s\S]*?Run family tests/,
-  );
 });

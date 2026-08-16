@@ -7,22 +7,18 @@ test('image PPT proof optional CI lane never runs live image generation by defau
   const contract = readRepoJson('tools/image-ppt-proof/ci-contract.json');
   const runner = readRepoFile('tools/image-ppt-proof/run.sh');
   const proofImplementation = readRepoFile('tools/image-ppt-proof/run-proof.py');
-  const workflow = readRepoFile('.github/workflows/ci.yml');
+  const workflow = readRepoFile('.github/workflows/qualification.yml');
 
   assert.equal(contract.schema_version, 'image_ppt_proof_ci_contract.v1');
   assert.equal(contract.default_quality_lane.runs_real_image_generation, false);
   assert.deepEqual(
     contract.default_quality_lane.required_workflow_events,
-    ['pull_request', 'schedule', 'workflow_dispatch'],
+    ['pull_request', 'workflow_dispatch'],
   );
   assert.equal(contract.proof_job.runs_real_image_generation_by_default, false);
   assert.equal(contract.proof_job.required_triggers.manual, 'workflow_dispatch');
-  assert.equal(contract.proof_job.required_triggers.nightly.event, 'schedule');
-  assert.equal(contract.proof_job.required_triggers.pull_request_label.label, 'image-ppt-proof');
-  assert.deepEqual(
-    contract.proof_job.required_triggers.pull_request_label.types,
-    ['labeled', 'synchronize', 'opened', 'reopened'],
-  );
+  assert.equal(contract.proof_job.required_triggers.weekly.event, 'schedule');
+  assert.equal(contract.proof_job.required_triggers.weekly.cron, '17 19 * * 0');
   assert.equal(contract.proof_job.artifact_index.path, 'artifacts/image-ppt-proof/artifact-index.json');
   assert.equal(contract.proof_job.artifact_index.schema_version, 'image_ppt_proof_artifact_index.v1');
   assert.equal(contract.proof_job.artifact_index.required, true);
@@ -46,9 +42,9 @@ test('image PPT proof optional CI lane never runs live image generation by defau
       'final_delivery_manifest_json',
     ],
   );
-  assert.match(workflow, /image-ppt-proof:\n[\s\S]*?github\.event_name == 'schedule'/);
+  assert.match(workflow, /image-ppt-proof:/);
   assert.match(workflow, /image-ppt-proof:\n[\s\S]*?uses:\s*astral-sh\/setup-uv@v9\.0\.0[\s\S]*?enable-cache:\s*true[\s\S]*?cache-dependency-glob:\s*['"]uv\.lock['"]/);
-  assert.match(workflow, /contains\(github\.event\.pull_request\.labels\.\*\.name, 'image-ppt-proof'\)/);
+  assert.doesNotMatch(workflow, /pull_request:/);
   assert.match(workflow, /tools\/image-ppt-proof\/run\.sh --output-dir artifacts\/image-ppt-proof --mock-image-generation/);
   assert.doesNotMatch(workflow, /tools\/image-ppt-proof\/run\.sh[^\n]*--live-image-generation/);
   assert.match(workflow, /name:\s*image-ppt-proof[\s\S]*?artifacts\/image-ppt-proof\/artifact-index\.json/);

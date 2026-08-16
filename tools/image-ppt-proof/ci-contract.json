@@ -2,7 +2,7 @@
   "schema_version": "image_ppt_proof_ci_contract.v1",
   "default_quality_lane": {
     "runs_real_image_generation": false,
-    "required_workflow_events": ["pull_request", "schedule", "workflow_dispatch"],
+    "required_workflow_events": ["pull_request", "workflow_dispatch"],
     "allowed_checks": ["typecheck", "fast", "family", "meta"]
   },
   "proof_job": {
@@ -10,14 +10,9 @@
     "runs_real_image_generation_by_default": false,
     "required_triggers": {
       "manual": "workflow_dispatch",
-      "nightly": {
+      "weekly": {
         "event": "schedule",
-        "cron": "17 19 * * *"
-      },
-      "pull_request_label": {
-        "event": "pull_request",
-        "types": ["labeled", "synchronize", "opened", "reopened"],
-        "label": "image-ppt-proof"
+        "cron": "17 19 * * 0"
       }
     },
     "required_cache_layers": [
