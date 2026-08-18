@@ -19,6 +19,7 @@
       {
         "shortcut_id": "invoke_product_entry",
         "label_i18n": {
+          "zh-CN": "制作视觉交付物",
           "en-US": "Create or continue a visual deliverable"
         },
         "default_visible": true,

@@ -238,7 +238,10 @@ test('native package descriptor exposes RCA without recreating package lifecycle
   ]);
   assert.deepEqual(descriptor.presentation.home_shortcuts, [{
     shortcut_id: 'invoke_product_entry',
-    label_i18n: { 'en-US': 'Create or continue a visual deliverable' },
+    label_i18n: {
+      'zh-CN': '制作视觉交付物',
+      'en-US': 'Create or continue a visual deliverable',
+    },
     default_visible: true,
     user_configurable: true,
     route: {
