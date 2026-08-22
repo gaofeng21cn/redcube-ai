@@ -7,14 +7,12 @@ Machine boundary: 命令形状以当前安装的 OPL-generated interface 为准�
 
 ## 开始
 
-1. 使用 Framework 的 canonical 聚合入口 `opl packages` 确保 `rca` Package 存在，
-   并读取完整 Package 与实际 carrier 的 installed/callable 状态。Framework 委托
-   configured native carrier 执行物理动作并聚合 fresh readback；RCA owner 持有
-   identity、完整 bytes 与 publication。普通用户不需要理解 lock、payload、digest、
-   receipt 或 Release Set。
+1. 通过当前 OPL-generated interface 确认 `rca` Package 已由实际 carrier 安装并可调用，
+   读取完整 Package 的 fresh readback。Framework 委托 configured native carrier 执行
+   物理动作并聚合状态；RCA owner 持有 identity、完整 bytes 与 publication。
 2. 从 OPL-generated RCA surface 选择完整 visual-deliverable action，或显式选择 image/native proof action。
 3. 提供目标、source/artifact refs、交付格式与需要的 human-review intent。
-4. 让 OPL-hosted StageRun 按 RCA declarative stage graph 推进；不要在仓库里启动第二个 runner。
+4. 让 OPL-hosted StageRun 按 RCA declarative stage graph 推进。
 5. 从 OPL status/workbench surface 读取 StageRun、artifact、review、blocker 与 owner refs。
 
 ## 常用动作语义
@@ -34,6 +32,6 @@ projection，Codex CLI 是当前首选 executor；切换 executor 不应重装 R
 
 需要“先看大纲/蓝图再继续”时，把 human-review intent 放入同一 action invocation。controller 在可审阅 artifact 后 materialize human gate；批准后沿同一 StageRun invocation 和 exact artifact lineage 继续。
 
-## 禁止路径
+## 运行期入口
 
-不要调用 repo-local `redcube`、`@redcube/domain-entry`、`@redcube/runtime`、历史 product-entry/domain-handler wrapper，或直接编辑 StageRun/session/current pointer。native helper 也只能在受约束 Attempt 中经 OPL envelope 调用。
+运行期 action、StageRun/status 和 native-helper 调用都走 OPL-generated/hosted surfaces；本仓的 repo-local scripts 只用于开发验证，RCA 领域判断仍由 RCA owner 持有。

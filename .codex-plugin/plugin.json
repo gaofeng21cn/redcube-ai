@@ -19,7 +19,7 @@
   "interface": {
     "displayName": "RedCube AI",
     "shortDescription": "Visual deliverable domain app for Codex.",
-    "longDescription": "Adds the redcube-ai Codex carrier for canonical OPL package rca while routing generated status/session/manifest wrappers through OPL and preserving direct product invoke plus domain-handler export/dispatch targets.",
+    "longDescription": "Provides the redcube-ai Codex carrier for canonical OPL package rca through OPL-generated interfaces and hosted StageRun.",
     "developerName": "Gao Feng",
     "category": "Creative",
     "capabilities": [
@@ -30,9 +30,8 @@
     "composerIcon": "./plugins/redcube-ai/assets/icon.png",
     "logo": "./plugins/redcube-ai/assets/icon.png",
     "defaultPrompt": [
-      "Read the RedCube AI domain-handler export for this workspace.",
-      "Inspect the current OPL generated product-entry refs for RedCube AI.",
-      "Continue the active RedCube deliverable loop in the same entry session."
+      "Use the installed redcube-ai skill through OPL-generated interfaces.",
+      "Start or continue the hosted RCA StageRun for this visual deliverable."
     ],
     "brandColor": "#C65D2E"
   }

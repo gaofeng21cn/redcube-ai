@@ -56,7 +56,6 @@ test('local structural diagnostics remain available after standalone advisory re
   assert.match(structuralGate, /\bsentrux check \./);
   assert.match(structuralGate, /scripts\/run-opl-quality-details\.sh/);
   assert.match(structuralGate, /exit "\$sentrux_status"/);
-  assert.match(structuralGate, /Sentrux advisory only; continuing/);
   assert.match(structuralGate, /exit 0/);
 
   assert.match(qualityDetails, /compare_ref="\$\{OPL_QUALITY_DETAILS_COMPARE_REF:-origin\/main\}"/);

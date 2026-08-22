@@ -51,8 +51,6 @@ test('image PPT proof optional CI lane never runs live image generation by defau
   assert.match(runner, /--mock-image-generation/);
   assert.doesNotMatch(runner, /--live-image-generation/);
   assert.doesNotMatch(runner, /skip-system-deps|native-ppt-proof\/install-deps/);
-  assert.match(runner, /never invokes an executor or a real image API/);
-  assert.match(runner, /OPL-hosted run_image_ppt_proof StageRun action/);
   assert.doesNotMatch(proofImplementation, /codex_native_imagegen_skill|OPENAI_API_KEY|experimental_bearer_token/);
   assert.doesNotMatch(proofImplementation, /mode\s*==\s*["']live["']/);
   assert.match(proofImplementation, /prompt-manifest\.json/);

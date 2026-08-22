@@ -130,8 +130,9 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 - RedCube 保留视觉交付权威：视觉领域真相、review/export gates、标准产物、文件交接和 owner receipts。
 - exact ref/digest 继续用于一次发布的 bytes 完整性和 artifact/evidence lineage，但
   不是普通组合 lock。
-- 当前 Package manifest 仍为迁移兼容保留旧 lifecycle 字段；本次文档更新不声明
-  carrier 迁移或公开 `latest-stable` proof 已完成。
+- RCA Package manifest 不再承载旧 lifecycle authority，当前声明 package、carrier、
+  authority 和兼容 surface。Framework 兼容读面与公开 `latest-stable` evidence 仍需
+  各自 owner fresh readback，不能由本仓文档或测试代替。
 - 完整入口 taxonomy、service-safe domain entry、generated-wrapper 边界、合同 refs、canary evidence 和 no-readiness 规则由 [文档索引](./docs/README.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md)、[关键决策](./docs/decisions.md) 和 [合同说明](./contracts/README.md) 维护。
 
 </details>

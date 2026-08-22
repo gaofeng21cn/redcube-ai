@@ -41,5 +41,5 @@ executor route 时应返回相应 diagnostic / typed blocker，不得退回 repo
 runtime、session store、直接 helper public command 或兼容 alias。普通 dependency 不因
 版本/ABI、lock、payload、digest 或 Release Set 不匹配而阻断。
 
-当前 manifest 中的旧 lifecycle 字段只作迁移兼容输入；本 policy 不声明 carrier
-迁移已经完成。
+当前 manifest 不再承载旧 lifecycle authority；Framework 兼容读面仍待 owner 取得
+consumer-zero 证据，本 policy 不声明 carrier 迁移已经完成。

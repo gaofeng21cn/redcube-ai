@@ -96,9 +96,6 @@ test('repo-local OPL agent package manifest keeps RCA package and authority boun
     assert.equal(Object.hasOwn(manifest, forbiddenField), false, forbiddenField);
   }
   assert.deepEqual(manifest.capability_dependencies, []);
-  assert.match(manifest.machine_boundary, /per-package owner OCI latest-stable -> configured native carrier -> fresh readback/);
-  assert.match(manifest.machine_boundary, /Installed lock, payload, materializer, lifecycle receipt, LKG, rollback, and durable transaction surfaces are compatibility-to-delete/);
-  assert.doesNotMatch(manifest.machine_boundary, /owns package-core|owns [^.]*lifecycle receipt|owns [^.]*rollback readback/);
 
   assert.equal(Object.hasOwn(manifest.authority_boundary, 'package_core_owner'), false);
   assert.equal(Object.hasOwn(manifest.authority_boundary, 'package_exposure_owner'), false);

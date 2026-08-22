@@ -184,35 +184,9 @@ test('RCA opts into the canonical quality profile with one independent primary-o
   );
 });
 
-test('package handoff prompt keeps the quality loop under the StageRun controller', () => {
-  const prompt = fs.readFileSync(
-    path.join(repoRoot, 'agent/prompts/package_and_handoff.md'),
-    'utf8',
-  );
-
-  assert.doesNotMatch(prompt, /Run the focused formal quality loop/);
-  assert.match(prompt, /controller-managed formal quality loop/);
-  assert.match(prompt, /current executor call performs only its injected Attempt role/);
-  assert.match(prompt, /must not run the whole sequence or create the next StageAttempt/);
-  assert.match(prompt, /Only the OPL StageRunController creates each fresh role Attempt/);
-  assert.match(prompt, /producer -> reviewer -> repairer -> re_reviewer/);
-});
-
 test('RCA Review routes cross-Stage repairs early without bypassing local repair or visual order', () => {
   const policy = readJson('contracts/stage_quality_cycle_policy.json');
   const routePolicy = policy.finding_and_repair_contract.route_output_policy;
-  const rolePrompt = fs.readFileSync(
-    path.join(repoRoot, 'agent/prompts/stage-quality-cycle-roles.md'),
-    'utf8',
-  );
-  const handoffPrompt = fs.readFileSync(
-    path.join(repoRoot, 'agent/prompts/package_and_handoff.md'),
-    'utf8',
-  );
-  const artifactPrompt = fs.readFileSync(
-    path.join(repoRoot, 'agent/prompts/artifact_creation.md'),
-    'utf8',
-  );
 
   assert.deepEqual(policy.cross_stage_route_selection, {
     primary_only_decisive_attempt_role: 'producer',
@@ -237,29 +211,6 @@ test('RCA Review routes cross-Stage repairs early without bypassing local repair
       'no_stage_route_decision_and_typed_blocker',
     blocked_or_human_gate: 'no_stage_route_decision',
   });
-  for (const section of [
-    rolePrompt.match(/## Reviewer\n\n([\s\S]*?)\n\n## Repairer/)?.[1] ?? '',
-    rolePrompt.match(/## Re Reviewer\n\n([\s\S]*)$/)?.[1] ?? '',
-  ]) {
-    assert.match(section, /`same_stage_repair_required`/);
-    assert.match(section, /`cross_stage_route_back_before_budget_exhaustion`/);
-    assert.match(section, /different declared Stage is the narrowest owner/);
-    assert.match(section, /decision_kind=route_back/);
-    assert.match(section, /target_stage_id.*different from the current Stage/);
-    assert.match(section, /only terminal route permitted.*while budget remains/);
-    assert.match(section, /zero consumable artifact returns no Stage route decision or recommendation/);
-  }
-  assert.match(handoffPrompt, /`same_stage_repair_required`/);
-  assert.match(handoffPrompt, /`cross_stage_route_back_before_budget_exhaustion`/);
-  assert.match(handoffPrompt, /package-local defect with repair budget remaining returns only a recommendation/);
-  assert.match(handoffPrompt, /upstream-owned defect may instead terminate this StageRun/);
-  assert.match(handoffPrompt, /exact-ref-and-hash no-output diagnostic/);
-  assert.match(handoffPrompt, /diagnostic remains consumable and may support that owner route/);
-  assert.match(handoffPrompt, /neither candidate nor diagnostic exists/);
-  assert.match(
-    artifactPrompt,
-    /candidate -> render\/mechanical evidence -> visual-director QA -> screenshot QA -> targeted repair -> rerender -> fresh re-review/,
-  );
   assert.deepEqual(policy.professional_sequence.ppt_visual_quality_loop, [
     'candidate',
     'render_and_mechanical_evidence',

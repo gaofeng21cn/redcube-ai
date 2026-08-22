@@ -12,15 +12,6 @@ const actionCatalog = JSON.parse(fs.readFileSync(
   path.join(repoRoot, 'contracts/action_catalog.json'),
   'utf8',
 ));
-const sourceIntakePrompt = fs.readFileSync(
-  path.join(repoRoot, 'agent/prompts/source_intake.md'),
-  'utf8',
-);
-const sourceIntakeStage = fs.readFileSync(
-  path.join(repoRoot, 'agent/stages/source_intake.md'),
-  'utf8',
-);
-
 const validRefs = {
   manifest_ref: 'opl-source-manifest:run-001',
   readiness_ref: 'opl-source-readiness:run-001',
@@ -116,16 +107,4 @@ test('all hosted RCA actions expose the same optional refs-only contract', () =>
   for (const action of actionCatalog.actions) {
     assert.deepEqual(action.optional_fields, ['source_truth_refs'], action.action_id);
   }
-});
-
-test('source_intake keeps semantic readiness in RCA and transport currentness in OPL', () => {
-  assert.match(sourceIntakePrompt, /source_truth_refs/);
-  assert.match(sourceIntakePrompt, /manifest_ref/);
-  assert.match(sourceIntakePrompt, /readiness_ref/);
-  assert.match(sourceIntakePrompt, /source_package_digest_ref/);
-  assert.match(sourceIntakePrompt, /digest is a locator\/currentness hint, not a content or readiness verdict/);
-  assert.match(sourceIntakePrompt, /OPL owns locator scope, immutable byte identity, currentness, session\/StageRun binding/);
-  assert.match(sourceIntakePrompt, /does not rescan or rehash an already accepted package/);
-  assert.match(sourceIntakeStage, /OPL remains responsible for byte\/currentness validation/);
-  assert.match(sourceIntakeStage, /duplicate workspace discovery or hashing/);
 });

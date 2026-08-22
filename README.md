@@ -136,9 +136,10 @@ You can start with prompts like:
 - RedCube keeps the visual-deliverable authority: visual-domain truth, review/export gates, canonical artifacts, artifact handoff, and owner receipts.
 - Exact refs and digests remain required for one publication's byte integrity
   and for artifact/evidence lineage; they are not ordinary composition locks.
-- The current Package manifest still contains legacy lifecycle fields for
-  migration compatibility. This documentation does not claim that the carrier
-  migration or public latest-stable proof is complete.
+- The RCA Package manifest no longer carries legacy lifecycle authority. It
+  declares the package, carrier, authority, and compatibility surfaces; Framework
+  compatibility read surfaces and public `latest-stable` evidence still require
+  their own owner readback.
 - The full entry taxonomy, service-safe domain entry, generated-wrapper boundary, contract refs, canary evidence, and no-readiness rules are maintained in the [Docs Guide](./docs/README.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), [Decisions](./docs/decisions.md), and [Contracts Overview](./contracts/README.md).
 
 </details>

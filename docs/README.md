@@ -61,6 +61,7 @@ Framework 跨仓迁移 SSOT：
 
 contract、focused test、source-closure 或 interface admission 只能证明结构和机器边界；它们不自动证明 visual ready、exportable、handoffable、domain ready 或 production ready。真实 StageRun、真实 artifact、review/export acceptance、owner receipt 和 long-soak 继续作为后置证据。
 
-当前 `contracts/opl_agent_package_manifest.json` 仍含旧 lifecycle 字段，是迁移兼容
-合同。文档归位、repo tests 或 schema pass 都不能证明独立 GHCR publisher、完整
-carrier installed truth、executor-neutral route 或旧 Package Manager 删除已经完成。
+当前 `contracts/opl_agent_package_manifest.json` 已移除旧 lifecycle authority，只保留
+identity、carrier、health/proof 与兼容元数据。Framework 的 lock/materializer/runtime-source
+兼容读面仍需 owner fresh consumer-zero proof；文档归位、repo tests 或 schema pass 都不能
+证明独立 GHCR publisher、完整 carrier installed truth、executor-neutral route 或迁移已经完成。

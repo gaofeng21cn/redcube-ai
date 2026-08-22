@@ -61,11 +61,12 @@ presence 与 declared entrypoint callability。禁止用 SemVer/ABI range、inst
 payload、digest、Release Set 或跨 Package 原子闭包限制组合。breaking interface 由
 RCA owner 发布新 identity 或保留向后兼容 adapter，不建设中央版本求解器。
 
-## D10 旧 Package lifecycle 合同只作迁移输入
+## D10 旧 Package lifecycle 合同不回到 RCA manifest
 
-当前 `contracts/opl_agent_package_manifest.json` 已退役 installed-lock authority 与
-lifecycle-receipt ownership 字段，并把 Codex Plugin 明确为 carrier locator。仍保留的
-source version、`package_core` content-identity refs、lifecycle command locator 与
-managed-dependency metadata 在 dual-read 与功能等价证据闭合前保持可读，但不得成为
-installed/currentness authority，也不得新增 writer、consumer 或设计依赖；最终由 carrier
-fresh readback 和薄 Framework projection 取代。
+当前 `contracts/opl_agent_package_manifest.json` 已移除 installed-lock authority、
+lifecycle-receipt ownership、`package_core`、lifecycle command locator 与
+managed-dependency metadata，并把 Codex Plugin 明确为 carrier locator。保留的
+source-contract、carrier、health/proof 与 clean-runner metadata 只服务兼容读取；Framework
+兼容 consumer 在 consumer-zero 前不得成为 installed/currentness authority，也不得驱动
+RCA 新增 writer 或设计依赖。最终状态由 carrier fresh readback 和薄 Framework projection
+证明。

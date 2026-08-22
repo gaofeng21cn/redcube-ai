@@ -42,10 +42,10 @@ Machine boundary: 可执行校验见 root contracts、`scripts/check-private-pla
     bytecode、test cache、build output 或 Package installed state。
 17. `agent/primary_skill/SKILL.md` 与 Plugin carrier mirror 必须保持字节一致；这是 carrier
     projection，不是双重 Package truth。
-18. 当前 manifest 已退役 installed-lock authority 与 lifecycle-receipt ownership；剩余
-    source version、content-identity refs、lifecycle locator 与 managed-dependency metadata
-    只能作为迁移兼容输入，不得成为 installed/currentness authority、新增 consumer 或
-    目标架构依据。
+18. 当前 manifest 已移除 installed-lock authority、lifecycle-receipt ownership、
+    `package_core`、lifecycle locator 与 managed-dependency metadata；保留的
+    source-contract、carrier、health/proof 与 clean-runner metadata 只能作为兼容输入，
+    不得成为 installed/currentness authority、新增 consumer 或目标架构依据。
 19. history 文档只能解释 provenance，不能被 active test、contract 或 runtime 当作
     callable surface。
 20. structure/conformance/test pass 不得升级成 Package published/current、domain ready 或

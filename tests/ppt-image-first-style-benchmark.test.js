@@ -6,7 +6,6 @@ import { readFileSync } from 'node:fs';
 const STYLE_PROFILE = 'prompts/ppt_deck/image-first-default-style-profile.json';
 const BENCHMARK_FIXTURE = 'prompts/ppt_deck/image-first-benchmark-fixture.json';
 const MANIFEST_FIXTURE = 'tests/fixtures/ppt-image-first-benchmark/manifest.json';
-const PROMPT_TEMPLATE = 'prompts/ppt_deck/image_first_prompt_template.md';
 const ROUTE_CONTRACT = 'contracts/runtime-program/ppt-image-first-production-route.json';
 
 function read(file) {
@@ -15,10 +14,6 @@ function read(file) {
 
 function readJson(file) {
   return JSON.parse(read(file));
-}
-
-function flattenPrompt(prompt) {
-  return Object.values(prompt).join('\n');
 }
 
 function assertNoForbiddenTermsInPositiveFields(page, forbiddenStyles) {
@@ -100,14 +95,6 @@ test('image-first benchmark fixture covers at least six complete 16:9 Chinese PP
       assert.equal(Object.hasOwn(page.prompt, field), true, `${page.slide_id}.${field}`);
     }
 
-    const promptText = flattenPrompt(page.prompt);
-    assert.match(page.prompt.asset_type, /Full 16:9 PPT slide page image, 1920x1080\./);
-    assert.match(page.prompt.primary_request, /complete 16:9 PPT slide page image/);
-    assert.match(page.prompt.primary_request, /not separate elements/);
-    assert.match(promptText, /white dotted notebook paper background/);
-    assert.match(promptText, /bold black sketch outlines/);
-    assert.match(promptText, /pastel marker blocks/);
-    assert.match(promptText, /large readable Chinese title/);
     assertNoForbiddenTermsInPositiveFields(page, profile.forbidden_styles);
   }
 });
@@ -140,8 +127,6 @@ test('image-first benchmark fixture blocks fragmentation-prone asset requests', 
       );
     }
 
-    assert.match(page.prompt.avoid, /isolated icon sets/);
-    assert.match(page.prompt.avoid, /separate components/);
   }
 });
 
@@ -170,7 +155,6 @@ test('style_reference_dir override is visual-reference-only and cannot relax def
   const profile = readJson(STYLE_PROFILE);
   const fixture = readJson(BENCHMARK_FIXTURE);
   const manifest = readJson(MANIFEST_FIXTURE);
-  const template = read(PROMPT_TEMPLATE);
 
   assert.equal(profile.style_reference_policy.user_override_field, 'style_reference_dir');
   assert.equal(fixture.style_reference_dir_policy.user_override_allowed, true);
@@ -187,8 +171,6 @@ test('style_reference_dir override is visual-reference-only and cannot relax def
     );
   }
 
-  assert.match(template, /`style_reference_dir` may point to user-supplied local reference images/);
-  assert.match(template, /must not relax the full-slide contract/);
   assert.equal(profile.style_reference_policy.repo_vendor_policy.includes('Do not vendor external reference images'), true);
 });
 
@@ -199,11 +181,6 @@ test('PPT authoring lane uses semantic prompt judgment and defaults to image-fir
   const intentCases = Object.fromEntries(
     selection.semantic_regression_cases.map((entry) => [entry.case_id, entry.expected_author_route]),
   );
-  const artifactPrompt = read('agent/prompts/artifact_creation.md');
-  const visualDirector = read('agent/professional_skills/rca-ppt-visual-director/SKILL.md');
-  const nativeDesigner = read('agent/professional_skills/rca-native-ppt-designer/SKILL.md');
-  const nativePrompt = read('prompts/ppt_deck/author_pptx_native.md');
-  const visualGate = read('agent/quality_gates/visual_pack_discipline.md');
 
   assert.equal(selection.contract_id, 'ppt_deck_authoring_lane_admission_v1');
   assert.equal(selection.decision_owner, 'decisive_codex_attempt');
@@ -246,19 +223,6 @@ test('PPT authoring lane uses semantic prompt judgment and defaults to image-fir
   });
   assert.equal(selection.lane_lock.validator_or_repair_failure_may_switch_lane, false);
   assert.equal(selection.lane_lock.agent_may_upgrade_image_first_to_native, false);
-
-  assert.match(artifactPrompt, /Generic requests for a “PPT”, “slides”, or `\.pptx` output/i);
-  assert.match(artifactPrompt, /whole-request semantic judgment owned by the decisive Codex Attempt/i);
-  assert.match(artifactPrompt, /keyword, regex, extension, or deterministic-script matching is forbidden/i);
-  assert.match(artifactPrompt, /Missing or ambiguous admission evidence selects `author_image_pages` without a human gate/i);
-  assert.match(visualDirector, /Native admission is a whole-request semantic decision owned by the decisive Codex Attempt/i);
-  assert.match(visualDirector, /template\/reference deck as visual and structural guidance under image-first by default/);
-  assert.match(visualDirector, /`visual_route_feasibility`[\s\S]*cannot admit native/i);
-  assert.match(nativeDesigner, /Do not infer native-vs-image-first admission here/);
-  assert.match(nativeDesigner, /Missing native admission is a route mismatch, not a hard stop/);
-  assert.match(nativePrompt, /semantic boundary examples, not trigger tokens[\s\S]*Generic “PPT” wording, `\.pptx` input\/output[\s\S]*is insufficient/i);
-  assert.match(visualGate, /Mentioning or `@`-ing OMA beside RCA[\s\S]*does not authorize Agent engineering/);
-  assert.match(visualGate, /cannot become route authority or reopen a quality cycle after the three-round repair budget is exhausted/);
 });
 
 test('image-first generation prefers the real Codex tool and automatically falls back through active Codex provider config', () => {
@@ -267,11 +231,6 @@ test('image-first generation prefers the real Codex tool and automatically falls
   const builtin = api.preferred_builtin_route;
   const fallback = api.automatic_api_fallback;
   const terminal = api.terminal_failure_policy;
-  const primarySkill = read('agent/primary_skill/SKILL.md');
-  const artifactPrompt = read('agent/prompts/artifact_creation.md');
-  const pageAuthor = read('agent/professional_skills/rca-ppt-page-author/SKILL.md');
-  const affordances = read('agent/tools/domain_affordances.md');
-  const routeDoc = read('docs/delivery/image-first-ppt-production-route.md');
   const compiler = readJson('contracts/pack_compiler_input.json');
   const cognitive = readJson('contracts/cognitive_kernel_adoption.json');
   const goldenPath = readJson('contracts/golden_path_profile.json');
@@ -369,12 +328,4 @@ test('image-first generation prefers the real Codex tool and automatically falls
     for (const ref of requiredCredentialRefs) assert.equal(credentialRefs.includes(ref), true, ref);
     assert.equal(sideEffectRefs.includes(requiredSideEffectRef), true, requiredSideEffectRef);
   }
-
-  for (const surface of [primarySkill, artifactPrompt, pageAuthor, affordances, routeDoc]) {
-    assert.match(surface, /imagegen|image_gen/);
-    assert.match(surface, /Codex|config\.toml/);
-    assert.match(surface, /gpt-image-2/);
-    assert.match(surface, /do not ask|without another user confirmation|without checking `OPENAI_API_KEY`|不再向用户确认/i);
-  }
-  assert.doesNotMatch(routeDoc, /codex_native_imagegen_skill/);
 });

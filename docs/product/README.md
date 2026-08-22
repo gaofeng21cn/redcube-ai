@@ -15,5 +15,5 @@ OpenAI、AI SDK、status 与 workbench surfaces。
 
 Codex Plugin Skill 是当前 domain-guidance carrier projection，不是 Package identity 或
 完整 installed truth。RCA identity/capabilities/task/typed views 归 RCA；实际 carrier
-持有 bytes lifecycle，Framework 只聚合 fresh readback 和 action。当前旧 lifecycle
-字段仅作迁移兼容输入。
+持有 bytes lifecycle，Framework 只聚合 fresh readback 和 action。RCA manifest 不再承载
+旧 lifecycle authority；Framework 兼容读面仍属于迁移输入。

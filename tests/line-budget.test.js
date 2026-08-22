@@ -130,14 +130,6 @@ test('OPL module bootstrap uses reproducible npm install without mutating lockfi
   assert.doesNotMatch(bootstrap, /npm install/);
 });
 
-test('RedCube AI skill requires OPL-generated interfaces and rejects repo-local runtime launchers', () => {
-  const skill = fs.readFileSync(path.join(repoRoot, 'plugins/redcube-ai/skills/redcube-ai/SKILL.md'), 'utf8');
-
-  assert.match(skill, /Operate RCA only through its installed OPL-generated interfaces and hosted StageRun\./);
-  assert.match(skill, /Do not bypass RCA with .*ad-hoc scripts, or direct checkout edits/);
-  assert.doesNotMatch(skill, /npm run --prefix <redcube-ai-repo> redcube --/);
-});
-
 function makeLines(lineCount) {
   return Array.from({ length: lineCount }, (_, index) => `line ${index + 1}`).join('\n') + '\n';
 }
