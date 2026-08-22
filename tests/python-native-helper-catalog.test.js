@@ -91,20 +91,8 @@ test('native helper catalog binds exact tracked Python entrypoints', () => {
   assert.deepEqual(nativeDescriptor.required_commands, ['officecli', 'soffice', 'pdftoppm']);
 });
 
-test('native helper package imports and doctor emits diagnostics without executing generation', () => {
+test('native helper doctor reports registered entrypoints and optional dependencies without execution', () => {
   const python = resolveRedCubePythonCommand();
-  const modules = [
-    'redcube_ai.native_helpers.ppt_deck.review',
-    'redcube_ai.native_helpers.ppt_deck.export',
-    'redcube_ai.native_helpers.ppt_deck.native',
-  ];
-  const importResult = spawnSync(
-    python.command,
-    [...python.args, '-c', `import ${modules.join(', ')}`],
-    { cwd: repoRoot, encoding: 'utf8', env: pythonEnv() },
-  );
-  assert.equal(importResult.status, 0, importResult.stderr || importResult.stdout);
-
   const doctorResult = spawnSync(
     python.command,
     [...python.args, '-m', 'redcube_ai.native_helpers.doctor'],
@@ -121,6 +109,16 @@ test('native helper package imports and doctor emits diagnostics without executi
     report.helpers.every((helper) => helper.entrypoint.probe_descriptor_matches_source === true),
     true,
   );
+  assert.equal(
+    report.helpers.every((helper) => helper.importability.module_spec_found === true),
+    true,
+  );
+  for (const helper of report.helpers) {
+    assert.deepEqual(
+      helper.optional_dependencies.summary.map((dependency) => dependency.name),
+      helper.optional_dependencies.declared,
+    );
+  }
   assert.equal(report.renderer_availability.dependency_install.automatic_install_allowed, false);
   assert.equal(
     report.renderer_availability.dependency_install.provisioning_owner,

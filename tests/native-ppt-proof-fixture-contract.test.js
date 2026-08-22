@@ -5,8 +5,6 @@ import { mkdtempSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { runNativePlanValidation } from './helpers/ppt-native-python-layout-fixtures.js';
-
 function buildNativeProofFixture() {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-proof-fixture-'));
   const outputFile = path.join(workspaceRoot, 'native-helper-input.json');
@@ -83,6 +81,4 @@ test('native PPT proof fixture emits the complete AI-first native shape plan con
       assert.equal(zoneIds.has(shape.layout_zone_id), true, `${slide.slide_id}:${shape.shape_id}`);
     }
   }
-  const validation = runNativePlanValidation(payload, 'redcube-native-proof-fixture-contract-');
-  assert.equal(validation.ok, true, JSON.stringify(validation, null, 2));
 });

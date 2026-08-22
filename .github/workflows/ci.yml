@@ -30,19 +30,7 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: '3.12'
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v10.0.1
-        with:
-          version: '0.9.5'
-          enable-cache: true
-          cache-dependency-glob: 'uv.lock'
       - name: Install dependencies
-        env:
-          UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/redcube-ai-source-venv
-        run: |
-          uv sync --locked --no-dev --extra native --no-install-project --python 3.12
-          echo "$UV_PROJECT_ENVIRONMENT/bin" >> "$GITHUB_PATH"
-          echo "REDCUBE_PYTHON_COMMAND=$UV_PROJECT_ENVIRONMENT/bin/python" >> "$GITHUB_ENV"
-          npm ci
+        run: npm ci
       - name: Run source gate
         run: scripts/verify.sh ci
