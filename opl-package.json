@@ -37,6 +37,7 @@
   "source": "first_party_repo_local",
   "carrier_source_role": "codex_plugin_default_carrier_not_package_truth",
   "source_repo": "https://github.com/gaofeng21cn/redcube-ai.git",
+  "domain_descriptor_ref": "contracts/domain_descriptor.json",
   "schema_ref": "one-person-lab/contracts/opl-framework/agent-package-manifest.schema.json",
   "source_contract": {
     "central_manifest_ref": "contracts/opl-framework/packages/rca.json",

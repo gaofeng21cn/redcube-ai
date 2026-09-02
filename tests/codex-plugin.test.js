@@ -123,6 +123,7 @@ test('nested native carrier keeps the hosted RCA runtime owned by the repo', () 
     readFileSync(canonicalDescriptorPath, 'utf-8'),
   );
   assert.equal(ownerDescriptor.codex_surface.carrier_source_path, '.');
+  assert.equal(ownerDescriptor.domain_descriptor_ref, 'contracts/domain_descriptor.json');
   assertNoLegacyLifecycleBasis(ownerDescriptor);
   assertNoLegacyLifecycleBasis(carrierDescriptor);
   assert.equal(existsSync(path.join(repoRoot, ownerDescriptor.source_contract.domain_descriptor_ref)), true);
