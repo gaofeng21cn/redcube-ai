@@ -68,6 +68,7 @@ OFFICECLI_MATERIALIZER_POLICY = {
     'save_before_close_required': True,
     'validate_required': True,
     'view_issues_required': True,
+    'quality_issue_policy': 'record_and_continue_with_ready_claims_closed_when_allow_quality_debt_otherwise_reject',
     'view_text_required': True,
     'true_render_proof_required_after_officecli_gate': True,
     'true_render_proof_substitute_allowed': False,
@@ -940,7 +941,7 @@ def main() -> None:
     shape_manifest.parent.mkdir(parents=True, exist_ok=True)
     shape_manifest.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
     result = {
-        'status': 'completed_with_quality_debt' if deck_build.get('quality_debt') else 'completed',
+        'status': 'completed_with_quality_debt' if manifest.get('quality_debt') else 'completed',
         'builder': manifest['builder'],
         'capability': manifest['capability'],
         'engine_contract': engine_contract,

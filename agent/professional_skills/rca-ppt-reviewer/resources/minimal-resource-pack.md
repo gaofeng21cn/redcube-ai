@@ -1,5 +1,20 @@
 # RCA PPT Reviewer Minimal Resource Pack
 
+## Payload Fields
+
+- `visual_qa`: inspect pixels, contact sheet rhythm, source fidelity, title hierarchy, text fit, collisions, crop, leaks, and export evidence before returning a verdict ref.
+- `ppt_visual_density`: mark density as `pass`, `weak`, or `block` using screenshot evidence and the approved density band; never infer density from manifest counts alone.
+- `repair_target_row`: `slide_id`, visible problem, source or design contract violated, required change, rerun route, owner stage, preserve-or-redraw scope.
+- `handoff_evidence_check`: confirm review refs, screenshot refs, route source, PPTX/PDF refs, artifact gallery ref, unresolved weak/blocking pages, and forbidden-authority flags before package/handoff stages consume the result.
+- `story_arc_visual_check`: pixels and titles prove necessity, feasibility, and landing path in order; product names do not outrun audience motivation.
+- `draft_label_check`: declare `draft`, `reviewed_draft`, or `handoff_candidate` based on screenshot review and unresolved weak/blocking pages; this is not a production-readiness claim.
+- `route_back_decision`: owner stage, blocked slide ids, evidence refs, required repair, and preserve-or-redraw scope.
+- `memory_proposal_gate`: only propose reusable visual lessons; route every accept/reject decision to `rca-visual-memory-curator`.
+- `repeated_visual_failure_diagnosis`: prior attempt refs, current pixel evidence, unchanged/changed defect, likely owner, route arbitration need, and smallest rerun scope.
+- `route_arbitration_review`: route used, route claimed, required proof evidence, route mismatch if any, and repair owner for image-first, HTML, or native PPTX.
+- `native_package_review`: planned kinds, readback kinds, relationship/part refs, notes/motion refs, mismatches, and stable-id repair targets.
+- `blind_comparison_candidate`: anonymized pair refs, professionality findings, aesthetics findings, stability findings, edit-task findings, and forbidden authority claim.
+
 Owner: `redcube_ai`
 State: `skill_local_resource`
 Boundary: refs-only professional method resource. This file is not visual truth, an artifact body, an owner receipt, a quality verdict, an export verdict, or runtime state.

@@ -45,6 +45,7 @@ result = materialize_native_pptx(
     payload['slides'],
     Path(sys.argv[2]),
     template_intake=payload.get('template_intake'),
+    allow_quality_debt=payload.get('allow_quality_debt', False),
 )
 print(json.dumps(result, ensure_ascii=False))
 `;

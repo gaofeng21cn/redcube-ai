@@ -9,6 +9,8 @@ import zipfile
 from collections import Counter
 from pathlib import Path
 
+from .native_hyperlinks import readback_hyperlinks
+
 
 _LENGTH = re.compile(r'^(-?\d+(?:\.\d+)?)(pt|cm|mm|in)?$')
 
@@ -176,6 +178,7 @@ def _record(file: Path, node: dict, id_to_name: dict[str, str]) -> dict:
         'fill': str(format_.get('fill') or ''),
         'bounds_emu': _bounds(format_),
         'placeholder': bool(format_.get('isPlaceholder') or node.get('type') == 'placeholder'),
+        'hyperlinks': readback_hyperlinks(node),
     }
     if kind == 'connector':
         start = str(format_.get('startShape') or '')

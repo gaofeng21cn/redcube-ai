@@ -9,7 +9,7 @@ description: "Use when RedCube AI needs a PPT story specialist to turn frozen so
 
 Turn the accepted source and audience goal into a claim spine, storyline, slide roles, evidence placement, and transitions. Preserve source meaning and public naming while allowing outline, blueprint, capacity, and visual discoveries to iterate. Route unsupported claims or structural overload upstream instead of solving them with layout.
 
-Operate as the PPT narrative specialist inside the RCA stage chain. Keep the stage prompt as the canonical schema owner; use this skill to make the story work professional, source-faithful, page-by-page, and ready for visual direction.
+Keep the stage prompt as the schema owner. On continuation or repair, reuse accepted source and claim refs, and revise only story decisions affected by current feedback or changed user constraints.
 
 ## AI-First / Contract-Light Boundary
 
@@ -69,21 +69,12 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 
 ## Design Registry Consumption
 
-- Read `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/communication_mode_registry` and `#/visualization_pattern_registry` before finalizing the slide blueprint. Emit `communication_mode_id` (or a fully stated custom behavior), plus a `visualization_pattern_id` and selection rationale for every proof-bearing slide.
+- Consult relevant entries of `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/communication_mode_registry` and `#/visualization_pattern_registry` for new or changed story decisions. Emit `communication_mode_id` (or a fully stated custom behavior), plus a `visualization_pattern_id` and selection rationale for every proof-bearing slide; preserve still-current selections without a repeat catalog scan.
 - Use `contracts/runtime-program/ppt-master-learning-landing.json` only as provenance and coverage. If no registry pattern honestly fits, keep the proof intent and record a bespoke-composition rationale; never name an upstream template as local authority.
 
-## Minimal Template Resource
+## Resources
 
-- `serial_pipeline`: `source_lock -> claim_spine -> detailed_outline -> slide_blueprint -> visual_direction_ready`. Each step names the accepted input ref, output ref, next gate, and repair owner before the next step starts.
-- `story_spec_lock`: audience, goal, non-negotiable source refs, forbidden claims, slide ids, page roles, action-title language, evidence placement, and approval state.
-- `progressive_disclosure`: one audience decision per page, one proof object per page, and one transition into the next page; overflow becomes a split-page or repair target.
-- `blueprint_row`: `slide_id`, `page_role`, `action_title`, `core_claim`, `evidence_refs`, `proof_object`, `visible_text_budget`, `speaker_note_goal`, `transition`.
-- `first_use_contract`: full visible name, accepted abbreviation, public link/source ref when allowed, and the slide where abbreviation becomes safe.
-- `necessity_feasibility_landing_check`: the outline names the audience problem, why existing tools fail, what proof makes the proposed route feasible, and what adoption path is credible.
-- `visual_proof_intent`: per slide visible proof object, screenshot-checkable claim, source-fidelity risk, and route-back owner if proof would fail.
-- `claim_spine_lock`: claim id, source refs, introduction slide, proof slide, resolution slide, and forbidden drift.
-- `repeated_visual_failure_story_triage`: contact-sheet or screenshot evidence, affected slide ids, likely story defect, required blueprint repair, and downstream owner to retry after story repair.
-- Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
+Load [minimal-resource-pack.md](resources/minimal-resource-pack.md) when authoring a new payload or when field-level examples are needed. Accepted current payload refs can be reused without loading the examples again.
 
 ## Stage Prompt Boundary
 
@@ -94,9 +85,9 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 
 ## Blockers And Repair Targets
 
-Return `typed_blocker` only when:
+If no consumable source or planning artifact is produced, return a no-output diagnostic and quality debt as the next stage input.
 
-- If no consumable source or planning artifact is produced, return a no-output diagnostic and quality debt; do not block the next declared stage.
+Return `typed_blocker` only when:
 - The requested claim is legally or authoritatively disallowed, or requires an explicit owner decision.
 - Permission, credential, approval, authority, or stage identity/currentness prevents continuation.
 

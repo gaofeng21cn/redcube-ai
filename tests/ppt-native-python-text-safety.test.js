@@ -56,7 +56,7 @@ test('native PPTX preflight rejects narrow route labels that force awkward short
       kind: 'text_box',
       role: 'body_sentence',
       quality_role: 'content',
-      editable_text: '共同输入先锁定比较对象，避免把素材差异误判成路径差异。',
+      editable_text: '共同输入锁定比较对象，避免素材差异干扰路径判断。',
       bounds: { left_in: 1.15, top_in: 3.75, width_in: 2.35, height_in: 1.16 },
       font_size: 18,
       color: '#111827',

@@ -323,6 +323,7 @@
     "save_before_close_required": true,
     "validate_required": true,
     "view_issues_required": true,
+    "quality_issue_policy": "record_and_continue_with_ready_claims_closed_when_allow_quality_debt_otherwise_reject",
     "view_text_required": true,
     "true_render_proof_required_after_officecli_gate": true,
     "true_render_proof_substitute_allowed": false,

@@ -1,6 +1,7 @@
 from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.common import ai_shape_text, safe_list, safe_text, shape_kind
 from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.geometry import shape_rect_from_ai_bounds
 from redcube_ai.native_helpers.ppt_deck.native_package import source_payload_sha256
+from redcube_ai.native_helpers.ppt_deck.native_hyperlinks import planned_hyperlinks
 from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.style import (
     ai_shape_color,
     ai_shape_fill,
@@ -277,6 +278,7 @@ def native_shape_manifest_record(shape_spec: dict) -> dict:
         'line': ai_shape_line(shape_spec, text=text),
         'materialization_intent': safe_text(shape_spec.get('materialization_intent'), 'native_data_object' if kind in {'chart', 'table', 'metric_grid'} else 'native_object'),
         'officecli_materialized': True,
+        'hyperlinks': planned_hyperlinks(shape_spec),
     }
     if kind == 'connector':
         record.update({

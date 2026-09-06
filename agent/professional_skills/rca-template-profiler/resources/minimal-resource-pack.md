@@ -1,5 +1,16 @@
 # RCA Template Profiler Minimal Resource Pack
 
+## Payload Fields
+
+- `style_boundary`: separate reusable layout intelligence from decorative skin; RCA keeps route policy, source truth, visual judgment, and review/export authority.
+- `template_profile_row`: `layout_id`, use case, zones, required roles, title safe zone, content capacity, minimum font floor, spacing rules, and reuse ceiling.
+- `placeholder_capacity`: per zone record max headline/body/label length, object count, image/chart/table affordance, safe inset, and overflow risk.
+- `editable_pptx_grammar`: for native routes, each template zone must expose a stable zone id, allowed shape roles, coordinate bounds, hierarchy, and prohibited mistakes.
+- `current_style_ref_pack`: current source deck/version, representative page refs, allowed reuse, stale refs to reject, and prompt-facing density limits.
+- `visual_proof_requirements`: required evidence refs for profile compliance, such as contact-sheet rhythm, title-safe-zone screenshots, native shape manifest refs, and blocked-zone repair targets.
+- `template_route_caveats`: route, supported layout families, unsupported content types, required evidence, repeated-failure risk, and downstream owner.
+- `native_template_inventory`: theme/master/layout ids, placeholder roles, editable object inventory, chart/table affordances, notes/motion inventory, inheritance policy, and package refs.
+
 Owner: `redcube_ai`
 State: `skill_local_resource`
 Boundary: refs-only professional method resource. This file is not visual truth, an artifact body, an owner receipt, a quality verdict, an export verdict, or runtime state.

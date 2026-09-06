@@ -5,8 +5,6 @@ description: "Use when RedCube AI needs a PPT review specialist to inspect rende
 
 # RCA PPT Reviewer
 
-Operate as the RCA visual review specialist. Judge rendered pages and screenshots directly, then return pass/block verdict refs, weak pages, repair targets, or typed blockers. File presence and mechanical metrics are supporting evidence only.
-
 ## Runtime Summary
 
 Independently review the exact rendered pixels and route-specific package/readback evidence against source, story, visual direction, readability, and export intent. Mechanical findings support but never replace visual judgment. Prioritize defects, choose the smallest coherent repair owner/scope, and require repaired bytes to be rerendered and freshly reviewed before pass/export claims.
@@ -45,7 +43,7 @@ Independently review the exact rendered pixels and route-specific package/readba
 - `blind_comparison_candidate`: anonymized professional-quality and aesthetics observations for parity evaluation; this is evidence for RCA authority, not an owner receipt.
 - Route-back decisions for story, visual direction, page authoring, native PPT design, or memory curation when the visible defect belongs outside reviewer repair.
 - Memory proposal candidates for `rca-visual-memory-curator`; reviewer findings are not accepted memory by themselves.
-- Typed blockers when review evidence is missing or invalid.
+- Quality-debt diagnostics for missing or invalid review evidence; typed blockers only for the hard boundaries below.
 
 ## Execution Rules
 
@@ -80,28 +78,16 @@ Independently review the exact rendered pixels and route-specific package/readba
 - Contact-sheet review must include rhythm and density, not only image count and file sizes. Generated image decks commonly pass mechanical checks while still having too much text on selected pages.
 - First-use naming and public link/source treatment are reviewable content quality issues. Block or repair when abbreviations appear before full names, when evidence pages omit available public links, or when visible links crowd the page.
 - Review the story arc as pixels: the deck should show why the proposal is necessary, why it is feasible, and how it lands. A visually polished product tour can still be a story failure.
-- Screenshot/contact-sheet evidence is required before export/handoff; a PPTX assembled from unreviewed images remains draft-only.
+- Screenshot/contact-sheet evidence is required for a reviewed-ready claim; a PPTX assembled from unreviewed images remains a non-ready candidate.
 
 ## Design Registry Consumption
 
-- Read `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/communication_mode_registry`, `#/visualization_pattern_registry`, and `#/professional_style_registry`. Review mode fit, selected pattern id, and every required observable semantic against current pixels and package readback.
+- Resolve the selected entries from `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/communication_mode_registry`, `#/visualization_pattern_registry`, and `#/professional_style_registry`. Review mode fit and required observable semantics against current pixels; load native package details only for the native route. Reuse current intent refs, but review repaired bytes with fresh pixel/readback evidence.
 - Use `contracts/runtime-program/ppt-master-learning-landing.json` only as provenance. Missing visual/readback evidence blocks the verdict; catalog coverage never authorizes `visual_ready` or an owner receipt.
 
-## Minimal Template Resource
+## Resources
 
-- `visual_qa`: inspect pixels, contact sheet rhythm, source fidelity, title hierarchy, text fit, collisions, crop, leaks, and export evidence before returning a verdict ref.
-- `ppt_visual_density`: mark density as `pass`, `weak`, or `block` using screenshot evidence and the approved density band; never infer density from manifest counts alone.
-- `repair_target_row`: `slide_id`, visible problem, source or design contract violated, required change, rerun route, owner stage, preserve-or-redraw scope.
-- `handoff_evidence_check`: confirm review refs, screenshot refs, route source, PPTX/PDF refs, artifact gallery ref, unresolved weak/blocking pages, and forbidden-authority flags before package/handoff stages consume the result.
-- `story_arc_visual_check`: pixels and titles prove necessity, feasibility, and landing path in order; product names do not outrun audience motivation.
-- `draft_label_check`: declare `draft`, `reviewed_draft`, or `handoff_candidate` based on screenshot review and unresolved weak/blocking pages; this is not a production-readiness claim.
-- `route_back_decision`: owner stage, blocked slide ids, evidence refs, required repair, and preserve-or-redraw scope.
-- `memory_proposal_gate`: only propose reusable visual lessons; route every accept/reject decision to `rca-visual-memory-curator`.
-- `repeated_visual_failure_diagnosis`: prior attempt refs, current pixel evidence, unchanged/changed defect, likely owner, route arbitration need, and smallest rerun scope.
-- `route_arbitration_review`: route used, route claimed, required proof evidence, route mismatch if any, and repair owner for image-first, HTML, or native PPTX.
-- `native_package_review`: planned kinds, readback kinds, relationship/part refs, notes/motion refs, mismatches, and stable-id repair targets.
-- `blind_comparison_candidate`: anonymized pair refs, professionality findings, aesthetics findings, stability findings, edit-task findings, and forbidden authority claim.
-- Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
+Load [minimal-resource-pack.md](resources/minimal-resource-pack.md) when authoring a new payload or when field-level examples are needed. Accepted current payload refs can be reused without loading the examples again.
 
 ## Stage Prompt Boundary
 

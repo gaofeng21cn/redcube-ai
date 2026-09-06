@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import {
@@ -12,8 +12,73 @@ import {
   createNativeObjectWorkspace,
   runPackageReadback,
   runNativeObjectMaterializer,
+  runNativeObjectMaterializerFailure,
   shape,
 } from './helpers/ppt-native-object-package-fixtures.js';
+
+test('native object and inline hyperlinks preserve exact targets through package readback', () => {
+  const { workspaceRoot } = createNativeObjectWorkspace('redcube-native-hyperlinks-');
+  const text = 'Read the source and continue';
+  const result = runNativeObjectMaterializer({
+    workspaceRoot,
+    payload: { slides: [{
+      slide_id: 'S01',
+      _editable_native_shapes: [shape('S01-links', 'text_box', bounds(0.8, 1, 9, 1), {
+        text, font_size: 24, fill: 'none', line: 'none',
+        link: 'https://example.com/deck',
+        paragraphs: [{ text, runs: [
+          { text: 'Read the ' },
+          { text: 'source', link: 'https://openai.com/research', bold: true },
+          { text: ' and ' },
+          { text: 'continue', link: 'slide[1]' },
+        ] }],
+      })],
+    }] },
+  });
+  const readback = runPackageReadback(result.outputPptx);
+  const links = readback.slides[0].objects.find((object) => object.name === 'S01-links').hyperlinks;
+  assert.equal(links.object, 'https://example.com/deck');
+  assert.equal(links.runs.find((run) => run.text === 'source').link, 'https://openai.com/research');
+  assert.equal(links.runs.find((run) => run.text === 'continue').link, 'slide[1]');
+});
+
+test('invalid hyperlink targets fail before replacing an existing native artifact', () => {
+  const { workspaceRoot } = createNativeObjectWorkspace('redcube-native-link-preflight-');
+  const outputPptx = path.join(workspaceRoot, 'existing.pptx');
+  const original = Buffer.from('existing artifact must remain untouched');
+  writeFileSync(outputPptx, original);
+  for (const link of ['javascript:alert(1)', 'file:///private/example', 'slide[2]', 'relative/path']) {
+    const result = runNativeObjectMaterializerFailure({
+      workspaceRoot, outputPptx,
+      payload: { slides: [{ slide_id: 'S01', _editable_native_shapes: [
+        shape('S01-link', 'text_box', bounds(1, 1, 5, 1), { text: 'Source', font_size: 24, link }),
+      ] }] },
+    });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /native PPT hyperlink/);
+    assert.deepEqual(readFileSync(outputPptx), original);
+  }
+});
+
+test('native quality-debt mode preserves a readable candidate while strict validation rejects overflow', () => {
+  const { workspaceRoot } = createNativeObjectWorkspace('redcube-native-quality-debt-');
+  const payload = { slides: [{ slide_id: 'S01', _editable_native_shapes: [
+    shape('S01-overflow', 'text_box', bounds(1, 1, 2, 0.3), {
+      text: 'This intentionally overloaded candidate needs a larger text frame before it can pass review.',
+      font_size: 30, fill: 'none', line: 'none',
+    }),
+  ] }] };
+  const strict = runNativeObjectMaterializerFailure({ workspaceRoot, payload });
+  assert.notEqual(strict.status, 0);
+  assert.match(strict.stderr, /officecli quality gate failed/);
+  const candidate = runNativeObjectMaterializer({ workspaceRoot, payload: { ...payload, allow_quality_debt: true } });
+  assert.equal(candidate.package_readback.slide_count, 1);
+  assert.equal(candidate.quality_debt.reason, 'native_materialized_visual_quality');
+  assert.equal(candidate.quality_debt.issues.length > 0, true);
+  assert.equal(candidate.quality_debt.blocks_stage_transition, false);
+  assert.equal(candidate.quality_debt.blocks_visual_ready_claim, true);
+  assert.equal(candidate.quality_debt.blocks_export_ready_claim, true);
+});
 
 test('native PPT edit task survives package readback and true rerender', () => {
   const { workspaceRoot } = createNativeObjectWorkspace('redcube-native-editability-');

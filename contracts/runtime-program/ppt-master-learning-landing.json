@@ -2,7 +2,7 @@
   "surface_kind": "external_learning_landing_audit",
   "contract_id": "ppt-master-learning-landing",
   "projection_id": "redcube-ai.ppt-master-learning-landing.v1",
-  "date_anchor": "2026-07-10",
+  "date_anchor": "2026-09-06",
   "owner": "redcube_ai",
   "audit_status": "non_live_functional_landing_complete",
   "claims_live_evidence_complete": false,
@@ -10,10 +10,20 @@
   "claims_owner_receipt": false,
   "external_source": {
     "repository": "https://github.com/hugohe3/ppt-master",
-    "commit": "b0beba5b659c664bdbf0c07227fbdee313698dd7",
-    "inspected_date": "2026-07-10",
+    "commit": "d3d81fe3cf4cc642de225159586308bbe98eeb4d",
+    "skill_version": "6.3.0",
+    "inspected_date": "2026-09-06",
     "role": "pattern_source_only",
     "inspected_paths": [
+      "skills/ppt-master/SKILL.md",
+      "skills/ppt-master/references/native-data-interface.md",
+      "skills/ppt-master/references/native-formula.md",
+      "skills/ppt-master/references/native-hyperlinks.md",
+      "skills/ppt-master/references/native-shape-authoring.md"
+    ],
+    "historical_baseline_commit": "b0beba5b659c664bdbf0c07227fbdee313698dd7",
+    "comparison_method": "independent_commit_trees_and_content_no_common_ancestor",
+    "historical_baseline_inspected_paths": [
       "skills/ppt-master/SKILL.md",
       "skills/ppt-master/templates/spec_lock_reference.md",
       "skills/ppt-master/templates/design_spec_reference.md",
@@ -57,6 +67,26 @@
     "icon_corpus",
     "svg_template_bodies"
   ],
+  "refresh_20260906": {
+    "scope": "Astra_skill_routing_candidate_quality_semantics_and_current_native_object_patterns",
+    "resource_ref": "agent/professional_skills/rca-native-ppt-designer/resources/native-object-semantics.md",
+    "adopted": [
+      {"topic":"conditional_native_interfaces","landing":"selected_registry_entries_and_route_conditional_resources","evidence":"contracts/runtime-program/ppt-native-ai-first-design-pack.json#/visualization_pattern_registry"},
+      {"topic":"object_local_data_fidelity","landing":"explicit_native_data_or_stable_drawingml_intent_with_source_value_and_package_readback","evidence":"tests/ppt-native-quality-package-readback.test.js"},
+      {"topic":"native_hyperlinks","landing":"authored_shape_and_inline_run_links_with_exact_target_preflight_and_readback","evidence":"tests/ppt-native-editability-regression.test.js"},
+      {"topic":"semantic_shape_selection","landing":"relationship_fit_and_independently_editable_components_using_existing_preset_connector_group_and_path_helpers","evidence":"agent/professional_skills/rca-native-ppt-designer/resources/native-object-semantics.md"}
+    ],
+    "evaluated_without_runtime_import": [
+      {"topic":"native_formula_compiler","reason":"upstream_owns_a_full_Microsoft_LaTeX_mhchem_compiler_and_PowerPoint_only_contract_not_exposed_by_RCA","landing":"exact_math_source_and_height_intent_preserved_no_false_formula_editability_claim"},
+      {"topic":"semantic_table_v2_and_extended_chart_schemas","reason":"not_equivalent_to_the_current_RCA_OfficeCLI_payload","landing":"preserve_source_with_explicit_supported_object_or_scoped_diagnostic_never_simplify_data"},
+      {"topic":"preset_and_boolean_svg_engines","reason":"RCA_already_materializes_native_presets_connectors_groups_and_custom_paths","landing":"adopt_geometry_intent_and_editability_boundaries_without_copying_tools_or_assets"}
+    ],
+    "rejected": ["mandatory_full_shape_vocabulary_scan", "forced_serial_executor", "per_stage_human_approval", "foreign_runtime_and_role_protocol", "template_assets_and_svg_bodies"],
+    "historical_catalog_scope": "source_catalog_coverage_and_original_workflow_coverage_remain_bound_to_historical_baseline_commit",
+    "parity_boundary": "historical_blind_benchmark_pin_is_unchanged_no_current_upstream_noninferiority_claim",
+    "claims_new_formula_or_full_extended_chart_support": false,
+    "claims_live_visual_ready": false
+  },
   "source_catalog_coverage": {
     "communication_modes": {
       "source_ref": "skills/ppt-master/references/modes/_index.md",
@@ -530,6 +560,7 @@
     }
   ],
   "closeout": {
+    "scope": "historical_20260710_landing_not_the_20260906_release",
     "planned": ["source catalogs mapped", "all pinned workflows classified", "local registries landed", "five Skill consumers bound", "runtime and asset imports rejected"],
     "done": ["5 modes plus custom escape mapped", "18 style ids mapped", "76 visualization ids mapped", "17 workflow files inspected and classified", "existing preview review calibration and re-export behavior bound", "adopt/adapt/watch_only/reject/no_code_needed audit recorded"],
     "deferred": ["live same-source blind comparison", "cross-render application readback", "fresh RCA visual_ready receipt"],

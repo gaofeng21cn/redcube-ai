@@ -19,10 +19,6 @@ Operate as the template and reference-deck analysis specialist. Convert design i
 - Treat `visual_pack_compiler_handoff`, `contracts/pack_compiler_input.json`, and stage-control profile refs as handoff surfaces. They may point to profile rows, template refs, route policy, receipt refs, and forbidden-authority flags; they must not embed capacity judgment, template taste, stale-reference decisions, or layout recipes as contract truth.
 - Keep profile output small and reusable. Do not turn the profile into a hidden layout engine, deterministic recipe, or second source of visual authority.
 
-## Consolidation Decision
-
-Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual-director` or `rca-native-ppt-designer`: profiling is pre-route layout intelligence for image-first, HTML, and native PPTX; visual direction consumes the profile for style and rhythm, while native design consumes it only when editable PPTX is explicitly selected.
-
 ## Inputs
 
 - User-provided PPTX template, reference deck, screenshots, brand guide, or existing deck.
@@ -50,7 +46,7 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 
 ## Execution Rules
 
-1. Profile before styling. Do not reduce the template to colors, fonts, or background images.
+1. Profile before styling. Reuse a current source-bound profile for unchanged template bytes and constraints; refresh affected rows when either changes. Do not reduce the template to colors, fonts, or background images.
 2. Extract semantic layout. Identify what each placeholder does: action title, claim, evidence, chart, metric, timeline, system map, source note, or takeaway.
 3. Measure capacity. For each zone, estimate readable text length, minimum font size, object count, and safe inset.
 4. Preserve hierarchy. Keep title, body, evidence, label, caption, footer, and auxiliary roles separate.
@@ -85,20 +81,12 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 
 ## Design Registry Consumption
 
-- Read `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/visualization_pattern_registry`, `#/layout_archetype_taxonomy`, and `#/professional_style_registry`. Emit pattern compatibility, semantic zones, and capacity for the selected local pattern id.
-- Use `contracts/runtime-program/ppt-master-learning-landing.json` only to trace external coverage. Block or route back when real placeholders, masters, layouts, or inherited objects cannot carry the selected pattern semantics.
+- Consult relevant entries of `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/visualization_pattern_registry`, `#/layout_archetype_taxonomy`, and `#/professional_style_registry` for a new or changed profile. Emit pattern compatibility, semantic zones, and capacity for the selected local pattern id; native inheritance details apply only when required by the route.
+- Use `contracts/runtime-program/ppt-master-learning-landing.json` only to trace external coverage. Capacity mismatch creates a repair target and closes fidelity claims; it does not create an execution blocker.
 
-## Minimal Template Resource
+## Resources
 
-- `style_boundary`: separate reusable layout intelligence from decorative skin; RCA keeps route policy, source truth, visual judgment, and review/export authority.
-- `template_profile_row`: `layout_id`, use case, zones, required roles, title safe zone, content capacity, minimum font floor, spacing rules, and reuse ceiling.
-- `placeholder_capacity`: per zone record max headline/body/label length, object count, image/chart/table affordance, safe inset, and overflow risk.
-- `editable_pptx_grammar`: for native routes, each template zone must expose a stable zone id, allowed shape roles, coordinate bounds, hierarchy, and prohibited mistakes.
-- `current_style_ref_pack`: current source deck/version, representative page refs, allowed reuse, stale refs to reject, and prompt-facing density limits.
-- `visual_proof_requirements`: required evidence refs for profile compliance, such as contact-sheet rhythm, title-safe-zone screenshots, native shape manifest refs, and blocked-zone repair targets.
-- `template_route_caveats`: route, supported layout families, unsupported content types, required evidence, repeated-failure risk, and downstream owner.
-- `native_template_inventory`: theme/master/layout ids, placeholder roles, editable object inventory, chart/table affordances, notes/motion inventory, inheritance policy, and package refs.
-- Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
+Load [minimal-resource-pack.md](resources/minimal-resource-pack.md) when authoring a new payload or when field-level examples are needed. Accepted current payload refs can be reused without loading the examples again.
 
 ## Stage Prompt Boundary
 
@@ -112,11 +100,11 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 
 Return `typed_blocker` only when:
 
-- A required template/reference deck is unreadable, corrupted, unavailable because of permission/credential limits, or cannot legally be used.
+- Permission/credential limits or legal restrictions prevent use of the required template/reference.
 - A brand/template conflict requires an explicit owner decision before any profile artifact can be produced.
 - Authority or stage identity/currentness makes the referenced template invalid for this deliverable.
 
-When a consumable profile can still be produced, missing optional references, low template capacity, route mismatch, density/readability risk, incomplete placeholder inventory, or screenshot-only evidence is quality debt plus a downstream route recommendation. It must not block stage transition; it only blocks fidelity, native-editability, `visual_ready`, and `export_ready` claims.
+Unreadable or corrupt references produce a no-output diagnostic or a partial profile with quality debt. Missing optional references, low template capacity, route mismatch, density/readability risk, incomplete placeholder inventory, or screenshot-only evidence likewise becomes quality debt plus a downstream repair recommendation. This closes fidelity, native-editability, `visual_ready`, and `export_ready` claims while preserving continuation.
 
 Return `repair_target` when:
 

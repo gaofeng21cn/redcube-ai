@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 
 from redcube_ai.native_helpers.ppt_deck.native_layout_constants import SLIDE_HEIGHT_IN, SLIDE_WIDTH_IN
+from redcube_ai.native_helpers.ppt_deck.native_hyperlinks import assert_hyperlink_readback, planned_hyperlinks, readback_hyperlinks, text_units, validate_hyperlinks
 from redcube_ai.native_helpers.ppt_deck.native_manifest_qa import fail_closed_on_manifest_qa, manifest_qa_failures
 from redcube_ai.native_helpers.ppt_deck.native_package import (
     copy_template_source,
@@ -278,7 +279,7 @@ def _apply_paragraph_and_run_formatting(officecli: str, output_pptx: Path, slide
         offset = 0
         for run in [item for item in safe_list(paragraph.get('runs')) if isinstance(item, dict)]:
             text = str(run.get('text') or '')
-            end = offset + len(text)
+            end = offset + text_units(text)
             run_props = {'range': f'{offset}:{end}'}
             for key in ('font', 'size', 'bold', 'italic', 'color', 'underline'):
                 if run.get(key) not in (None, ''):
@@ -332,6 +333,44 @@ def _apply_table_formatting(officecli: str, output_pptx: Path, slide_index: int,
             )
             command_count += 1
     return command_count
+
+
+def _apply_hyperlinks(officecli: str, output_pptx: Path, slide_index: int, shape_spec: dict) -> int:
+    links = planned_hyperlinks(shape_spec)
+    if not links['object'] and not links['runs']:
+        return 0
+    object_path = _object_path(slide_index, shape_spec)
+    count = 0
+    if links['object']:
+        _run_officecli(officecli, ['set', str(output_pptx), object_path, '--prop', f"link={links['object']}"])
+        count += 1
+    for link in links['runs']:
+        paragraph_path = f"{object_path}/p[{link['paragraph_index']}]"
+        # OfficeCLI range splits runs but does not apply link; set each exact run afterwards.
+        _run_officecli(officecli, [
+            'set', str(output_pptx), paragraph_path,
+            '--prop', f"range={link['start']}:{link['end']}", '--prop', f"link={link['link']}",
+        ])
+        response = parse_json_output(_run_officecli(officecli, ['get', str(output_pptx), paragraph_path, '--depth', '1', '--json']))
+        nodes = (response.get('data') or {}).get('results') or []
+        paragraph = nodes[0] if nodes else {}
+        offset = 0
+        matched = ''
+        for index, run in enumerate(paragraph.get('children') or [], 1):
+            text = str(run.get('text') or '')
+            end = offset + text_units(text)
+            if text and offset >= link['start'] and end <= link['end']:
+                _run_officecli(officecli, ['set', str(output_pptx), f'{paragraph_path}/r[{index}]', '--prop', f"link={link['link']}"])
+                matched += text
+                count += 1
+            offset = end
+        if matched != link['text']:
+            raise RuntimeError('native PPT inline hyperlink range does not match authored text')
+        count += 2
+    response = parse_json_output(_run_officecli(officecli, ['get', str(output_pptx), object_path, '--depth', '6', '--json']))
+    nodes = (response.get('data') or {}).get('results') or []
+    assert_hyperlink_readback(links, readback_hyperlinks(nodes[0] if nodes else {}))
+    return count + 1
 
 
 def _apply_groups(officecli: str, output_pptx: Path, groups: list[dict]) -> int:
@@ -463,8 +502,9 @@ def _fill_existing_slide_indices(slides: list[dict], slide_count: int) -> list[i
     return indices
 
 
-def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | None = None) -> dict:
+def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | None = None, *, allow_quality_debt: bool = False) -> dict:
     _assert_animation_targets(slides)
+    validate_hyperlinks(slides)
     officecli = shutil.which('officecli')
     if not officecli:
         raise RuntimeError('native PPT officecli materializer requires officecli on PATH')
@@ -551,6 +591,7 @@ def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | N
             for shape_spec in object_specs:
                 post_command_count += _apply_paragraph_and_run_formatting(officecli, output_pptx, slide_index, shape_spec)
                 post_command_count += _apply_table_formatting(officecli, output_pptx, slide_index, shape_spec)
+                post_command_count += _apply_hyperlinks(officecli, output_pptx, slide_index, shape_spec)
         post_command_count += _apply_groups(officecli, output_pptx, groups)
         post_command_count += _apply_notes_and_motion(officecli, output_pptx, slides, slide_indices, flattened)
         _run_officecli(officecli, ['save', str(output_pptx)])
@@ -569,13 +610,11 @@ def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | N
     validate_payload = parse_json_output(validate)
     issues_payload = parse_json_output(issues)
     text_payload = parse_json_output(text)
-    validate_count = 0
     issues_count = issue_count(issues_payload)
-    if validate_count > 0 or issues_count > 0:
+    if issues_count > 0 and not allow_quality_debt:
         raise RuntimeError(
             'native PPTX officecli quality gate failed: '
             + json.dumps({
-                'validate_count': validate_count,
                 'issues_count': issues_count,
                 'validate': validate_payload,
                 'view_issues': issues_payload,
@@ -591,7 +630,7 @@ def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | N
         expected_width_in=float(expected_canvas.get('width') or SLIDE_WIDTH_IN),
         expected_height_in=float(expected_canvas.get('height') or SLIDE_HEIGHT_IN),
     )
-    if not geometry_audit['ok']:
+    if not geometry_audit['ok'] and not allow_quality_debt:
         raise RuntimeError(
             'native PPTX geometry audit failed: '
             + json.dumps(geometry_audit, ensure_ascii=False, sort_keys=True)
@@ -608,6 +647,14 @@ def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | N
         'package_readback': package_readback,
         'template_preservation': template_preservation(template_before, package_readback, mode),
         'plan_slide_indices': slide_indices,
+        'quality_debt': {
+            'reason': 'native_materialized_visual_quality',
+            'issues': (issues_payload.get('data') or {}).get('issues') or [],
+            'geometry_audit': geometry_audit,
+            'blocks_stage_transition': False,
+            'blocks_visual_ready_claim': True,
+            'blocks_export_ready_claim': True,
+        } if issues_count > 0 or not geometry_audit['ok'] else None,
     }
 
 
@@ -627,6 +674,7 @@ def _expected_materialized_kinds(native_shape: dict) -> set[str]:
 
 
 def _assert_package_object_evidence(native_shape: dict, materialized: dict) -> None:
+    assert_hyperlink_readback(native_shape.get('hyperlinks') or {}, materialized.get('hyperlinks') or {})
     shape_id = safe_text(native_shape.get('shape_id'))
     actual_kind = safe_text(materialized.get('kind'))
     expected_kinds = _expected_materialized_kinds(native_shape)
@@ -891,7 +939,10 @@ def build_deck(
         fail_closed_on_manifest_qa(manifest_slides)
     for slide in manifest_slides:
         slide.pop('_deck_layout_rhythm', None)
-    officecli_gate = materialize_native_pptx(slides, output_pptx, template_intake=template_intake)
+    officecli_gate = materialize_native_pptx(
+        slides, output_pptx, template_intake=template_intake,
+        allow_quality_debt=allow_quality_debt,
+    )
     _bind_manifest_to_package(
         manifest_slides,
         officecli_gate['package_readback'],
@@ -913,8 +964,11 @@ def build_deck(
                 if slide.get('shape_plan_quality_debt')
             ],
             'manifest_qa_failures': qa_failures,
+            'officecli_quality_debt': officecli_gate.get('quality_debt'),
             'blocks_materialization': False,
+            'blocks_visual_ready_claim': True,
+            'blocks_export_ready_claim': True,
         } if allow_quality_debt and (
-            qa_failures or any(slide.get('shape_plan_quality_debt') for slide in manifest_slides)
+            qa_failures or officecli_gate.get('quality_debt') or any(slide.get('shape_plan_quality_debt') for slide in manifest_slides)
         ) else None,
     }

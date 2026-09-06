@@ -77,24 +77,13 @@ Use the accepted blueprint, visual direction, and template profile to author an 
 
 ## Design Registry Consumption
 
-- Read `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/visualization_pattern_registry`, `#/professional_style_registry`, and `#/connector_semantics`. Preserve each selected `visualization_pattern_id`, declare its observable semantics, and choose the supported typed materialization mode explicitly.
+- Read the selected entries of `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/visualization_pattern_registry`, `#/professional_style_registry`, and `#/connector_semantics` when they affect the current plan. Preserve current selections, declare observable semantics, and choose the supported typed materialization mode explicitly; revisit only decisions invalidated by a source, design, or capability change.
 - Use `contracts/runtime-program/ppt-master-learning-landing.json` only as provenance. Reject an unexpressible typed shape from the native-ready claim, emit a shape-plan diagnostic or route-back, and continue to another declared stage; never substitute an unknown kind with a generic rectangle or copy an upstream SVG body.
+- For charts, tables, links, formulas, or custom shapes, load `resources/native-object-semantics.md`. It maps current local payloads, fidelity evidence, and unsupported upstream features without importing another runtime.
 
-## Minimal Template Resource
+## Resources
 
-- `spec_lock`: `design_spec_lock_id`, design thesis, palette, typography, grid, motif, rhythm, route constraints, QA gates, and forbidden native shortcuts.
-- `native_pptx_editability`: the deck must remain editable through Office shapes, text, tables, charts, and connectors; full-page images can only be explicit visual assets, not the slide body.
-- `editable_pptx_grammar`: `template_layout_grammar`, `template_layout_binding`, and `native_shapes[]` must use editable Office objects, declared zones, inch bounds, role ids, quality roles, font sizes, fills/lines, and z-order.
-- `shape_row`: `id`, `slide_id`, `role`, `zone_id`, `left_in`, `top_in`, `width_in`, `height_in`, `text`, `font_size_pt`, `fill`, `line`, `z_order`, `quality_role`.
-- `native_repair_loop`: repair the plan, rerender, compare screenshots, update shape manifest refs, then return review/export refs, quality debt, or a no-output diagnostic; typed blocker remains reserved for the explicit hard-stop whitelist.
-- `image_to_native_followup`: consume approved director notes, source refs, contact-sheet findings, and selected editable targets before writing native shapes.
-- `native_ppt_qa_plan`: shape manifest refs, screenshot refs, editable-object checks, hyperlink/text checks, expected reviewer checks, and blocked-slide-only repair scope.
-- `native_admission_readback`: exact current-user semantic evidence, decision owner, selected slides, rejected image-first/native alternatives, contact-sheet evidence, required native QA refs, and route-back owner. This record verifies admission but cannot create it.
-- `repeated_native_failure_triage`: prior render refs, current screenshot/shape-manifest mismatch, owner boundary, preserved slides, and next repair route.
-- `native_route_back`: owner stage, affected slide ids, failed evidence, and whether the fix belongs to template profile, visual direction, page authoring, or native shape plan.
-- `typed_native_object`: stable id, object kind, semantic role, materialization intent, editable payload, relationships, bounds/z-order, and package readback expectation.
-- `presentation_semantics`: slide id, speaker notes, transition, timing, optional animation timeline, and static-readability assertion.
-- Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
+Load [minimal-resource-pack.md](resources/minimal-resource-pack.md) when authoring a new payload or when field-level examples are needed. Accepted current payload refs can be reused without loading the examples again.
 
 ## Stage Prompt Boundary
 
@@ -102,7 +91,7 @@ Use the accepted blueprint, visual direction, and template profile to author an 
 - `rca-template-profiler` supplies route-agnostic template profile and placeholder capacity when a template or reference deck exists.
 - `artifact_creation` owns native page materialization through the selected route.
 - `review_and_revision` owns rendered review and repair verdict.
-- `package_and_handoff` owns export after gates pass.
+- `package_and_handoff` may export a clearly non-ready candidate or diagnostic after quality debt; passing review gates is required for native-ready, `visual_ready`, and `export_ready` claims.
 - This skill does not write visual truth, review/export verdicts, owner receipts, runtime state, or memory bodies.
 
 ## Blockers And Repair Targets
@@ -111,7 +100,7 @@ Missing native admission is a route mismatch, not a hard stop: return `route_bac
 
 Return `typed_blocker` only when:
 
-- A template/reference requirement is impossible to read or legally use.
+- A template/reference cannot legally be used, or a real permission or authority boundary prevents using it.
 - Permission, credential, explicit human approval, authority, or stage identity/currentness prevents legal continuation.
 
 If no consumable blueprint, visual direction, editable shape plan, or PPTX artifact exists, return a no-output diagnostic and quality debt as the next stage input. Do not turn ordinary missing authoring output into an authority blocker.

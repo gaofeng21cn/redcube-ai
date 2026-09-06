@@ -26,6 +26,21 @@
     "third_party_template_asset_copied": false,
     "discipline_adoption_mode": "clean_room_design_discipline_only"
   },
+  "native_object_semantics": {
+    "resource_ref": "agent/professional_skills/rca-native-ppt-designer/resources/native-object-semantics.md",
+    "source_owner": "approved_source_and_ai_authored_object_plan",
+    "data_fidelity": "reconcile_declared_chart_series_categories_and_table_cells_with_package_readback_and_pixels",
+    "hyperlinks": {
+      "object_field": "native_shapes[].link",
+      "inline_field": "native_shapes[].paragraphs[].runs[].link",
+      "supported_carriers": ["text_box", "shape", "path"],
+      "external_schemes": ["https", "http", "mailto", "tel"],
+      "internal_target": "slide[N]_within_final_one_based_roster",
+      "readback": "exact_object_target_and_inline_text_span_target"
+    },
+    "structural_math": "exact_source_preserved_but_no_validated_native_formula_materializer_claim",
+    "unsupported_payload": "preserve_source_and_emit_scoped_diagnostic_without_silent_simplification"
+  },
   "layout_archetype_taxonomy": {
     "required": true,
     "selection_owner": "llm_agent",
@@ -572,7 +587,10 @@
     "selection_owner": "rca-ppt-visual-director",
     "selection_field": "slide_blueprint.slides[].visualization_pattern_id",
     "selection_rationale_field": "slide_blueprint.slides[].visualization_selection_rationale",
-    "full_registry_scan_required": true,
+    "full_registry_scan_required": false,
+    "selection_policy": "reuse_current_selections_or_read_relevant_families_then_broaden_on_no_match",
+    "reselection_triggers": ["source_or_claim_change", "style_or_route_constraint_change", "observed_semantic_mismatch", "capability_change"],
+    "native_materialization_details": "load_only_for_admitted_native_route",
     "no_match_policy": "author_bespoke_composition_and_record_selection_rationale",
     "copy_upstream_svg_body_allowed": false,
     "source_coverage_ref": "contracts/runtime-program/ppt-master-learning-landing.json#/source_catalog_coverage/visualizations",

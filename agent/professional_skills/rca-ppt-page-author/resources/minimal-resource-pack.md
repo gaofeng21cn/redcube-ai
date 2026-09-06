@@ -1,5 +1,17 @@
 # RCA PPT Page Author Minimal Resource Pack
 
+## Payload Fields
+
+- `page_contract`: `slide_id`, approved claim, proof object, visual direction ref, selected route, density band, text budget, required evidence, and review risk.
+- `serial_page_pipeline`: read page contract, choose structural visual, place title/proof/evidence zones, check density, then emit route-specific payload.
+- `ppt_visual_density`: reduce labels, slots, or secondary notes before shrinking text below the readable floor; if the page still fails, return a repair target.
+- `editable_pptx_grammar`: every native shape needs role, zone id, bounds in inches, font size for text, visible fill/line when structural, z-order, and stable manifest id.
+- `progressive_disclosure`: keep page-level hierarchy obvious at first glance; secondary detail moves to notes, appendix, or the next slide.
+- `image_first_page_payload`: `slide_id`, current `style_ref`, prompt text, visible label budget, forbidden text, expected 16:9 output ref, import ref, and contact-sheet ref.
+- `page_visual_proof_packet`: generated/rendered page ref, pixel screenshot ref, 16:9 normalization ref, contact-sheet ref, route source ref, native shape manifest ref when applicable, preserved-page hashes for blocked-slide repairs, and unresolved QA risks.
+- `draft_to_review_gate`: generated/rendered page exists and is consumable; 16:9, contact-sheet, density, or repair gaps become named quality debt and repair targets before package/export consumes the best available page.
+- `repeated_failure_triage`: slide id, previous repair evidence, current pixel/contact-sheet finding, owner stage, preserve/redraw decision, and whether route arbitration is required.
+
 Owner: `redcube_ai`
 State: `skill_local_resource`
 Boundary: refs-only professional method resource. This file is not visual truth, an artifact body, an owner receipt, a quality verdict, an export verdict, or runtime state.

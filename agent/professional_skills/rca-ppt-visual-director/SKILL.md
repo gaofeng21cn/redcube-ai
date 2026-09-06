@@ -75,23 +75,13 @@ Operate as the visual direction specialist between blueprint approval and page a
 
 ## Design Registry Consumption
 
-- Read `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/communication_mode_registry`, `#/visualization_pattern_registry`, and `#/professional_style_registry`. Preserve the blueprint mode, independently lock a local style profile or explicit custom behavior, and bind every semantic composition row to a pattern id plus selection rationale.
-- Scan the full local visualization registry before selecting. When nothing fits, author a bespoke composition and record the no-match rationale; `contracts/runtime-program/ppt-master-learning-landing.json` is provenance only, never a template or visual authority.
+- Preserve the current blueprint mode and independently select a local style profile or explicit custom behavior. Bind semantic compositions to a pattern id and rationale using the relevant entries in `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/communication_mode_registry`, `#/visualization_pattern_registry`, and `#/professional_style_registry`.
+- Load native object, connector, and template-binding details only for an admitted native route. Image-first and HTML use the shared communication/style vocabulary without inheriting native materialization work.
+- Reuse a current selection when source, meaning, style, and route constraints still fit. Consult relevant registry families for a new or changed decision; broaden only when no suitable match is found. A full registry scan is not required. A bespoke composition with an explicit rationale remains supported; `contracts/runtime-program/ppt-master-learning-landing.json` is provenance only.
 
-## Minimal Template Resource
+## Resources
 
-- `spec_lock`: deck thesis, palette, typography scale, grid, motif, title safe zone, density ceiling, route policy, proof-object families, and forbidden regressions.
-- `style_boundary`: what the deck may borrow from a reference deck, what must stay RCA-owned, and which visible elements must not appear as template skin.
-- `rhythm_row`: `slide_id`, `page_role`, `proof_object`, `layout_family`, `density_band`, `peak_role`, `template_binding`, `repair_risk`.
-- `ppt_visual_density`: classify each slide as `sparse`, `balanced`, or `dense`; dense pages need a named reason, readable floor, and split/shorten fallback.
-- `progressive_disclosure`: move from overview to proof to decision through visible structure, not by revealing more small text on the same page.
-- `page_visual_direction_row`: `slide_id`, `first_glance_hook`, `composition`, `visible_text_budget`, `style_ref`, `image_prompt_intent`, `density_risk`, and `repair_fallback`.
-- `style_ref_lock`: approved reference deck/version, representative slide refs, allowed borrowings, forbidden stale refs, and owner approval state.
-- `route_back_decision`: owner stage, reason, evidence ref, affected slide ids, and whether to repair story, template profile, route policy, page payload, or native shape plan.
-- `visual_proof_plan`: required contact-sheet rhythm check, per-slide screenshot target, native QA refs when applicable, and proof that visible claims remain source-faithful.
-- `visual_route_feasibility`: locked route, rejected alternatives, explicit native semantic admission evidence or `not_admitted`, pixel/contact-sheet evidence required, native QA required, and owner route-back if evidence is missing; this record cannot create native admission.
-- `semantic_composition_map`: action-title promise, page role, required visual relation, accepted object families, and evidence a reviewer can observe.
-- Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
+Load [minimal-resource-pack.md](resources/minimal-resource-pack.md) when authoring a new payload or when field-level examples are needed. Accepted current payload refs can be reused without loading the examples again.
 
 ## Stage Prompt Boundary
 
@@ -103,9 +93,9 @@ Operate as the visual direction specialist between blueprint approval and page a
 
 ## Blockers And Repair Targets
 
-Return `typed_blocker` only when:
+If no consumable blueprint or visual-direction artifact is produced, return a no-output diagnostic and quality debt as the next stage input.
 
-- If no consumable blueprint or visual-direction artifact is produced, return a no-output diagnostic and quality debt; do not block the next declared stage.
+Return `typed_blocker` only when:
 - A brand/template conflict requires an explicit owner decision before any direction can be selected.
 - Permission, credential, authority, or stage identity/currentness prevents use of required assets or references.
 

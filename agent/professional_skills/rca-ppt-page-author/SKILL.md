@@ -9,7 +9,7 @@ description: "Use when RedCube AI needs a PPT page authoring specialist to creat
 
 Author audience-facing pages from the accepted source, story/blueprint, visual direction, and selected route. Preserve claims, fit content at readable scale, choose semantic visuals, and emit route-appropriate proof expectations. Repair only blocked pages when possible; reroute story, direction, template, or route defects instead of hiding them with helper defaults.
 
-Operate as the page-level author inside RCA artifact creation. Produce page plans or artifacts only from approved upstream contracts, one page at a time, with enough detail for later screenshot and export QA.
+Produce page plans or artifacts from the accepted upstream refs, with enough detail for later screenshot and export QA. Preserve page order and shared design decisions; independent page production does not require a serial executor.
 
 ## AI-First / Contract-Light Boundary
 
@@ -44,8 +44,8 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 
 ## Execution Rules
 
-1. Respect serial gates. Do not author a page before source, story, blueprint, and visual direction exist for that page.
-2. Work page by page. Re-read the page contract before authoring, then check it against deck-level rhythm and style.
+1. Consume the available source, story, blueprint, and visual direction for the page. Missing inputs produce bounded assumptions, repair targets, or a no-output diagnostic under the quality policy below.
+2. Work from each page's current contract and check it against deck-level rhythm and style. Reuse already-read refs until an upstream change invalidates them.
 3. Preserve approved claims and evidence. Do not rewrite the story to fit a convenient layout unless returning a repair target.
 4. Keep visible text clean. Do not expose prompt names, source ids, local paths, route names, RCA internals, operator notes, or system fields.
 5. Prefer fewer, larger, meaningful visual groups over many small cards. For image-first prompts, use fewer than the maximum readable labels; generated text often becomes denser and less controllable than the written prompt suggests.
@@ -69,34 +69,24 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 - Page authoring must consume the current approved style refs. If the style source changes, regenerate prompts or payloads that cite the old style rather than mixing old and new visual lines.
 - Native PPTX pages must carry shape-manifest and render-proof expectations before reviewer QA; an editable claim without those refs is a route mismatch.
 
-## Minimal Template Resource
+## Resources
 
-- `page_contract`: `slide_id`, approved claim, proof object, visual direction ref, selected route, density band, text budget, required evidence, and review risk.
-- `serial_page_pipeline`: read page contract, choose structural visual, place title/proof/evidence zones, check density, then emit route-specific payload.
-- `ppt_visual_density`: reduce labels, slots, or secondary notes before shrinking text below the readable floor; if the page still fails, return a repair target.
-- `editable_pptx_grammar`: every native shape needs role, zone id, bounds in inches, font size for text, visible fill/line when structural, z-order, and stable manifest id.
-- `progressive_disclosure`: keep page-level hierarchy obvious at first glance; secondary detail moves to notes, appendix, or the next slide.
-- `image_first_page_payload`: `slide_id`, current `style_ref`, prompt text, visible label budget, forbidden text, expected 16:9 output ref, import ref, and contact-sheet ref.
-- `page_visual_proof_packet`: generated/rendered page ref, pixel screenshot ref, 16:9 normalization ref, contact-sheet ref, route source ref, native shape manifest ref when applicable, preserved-page hashes for blocked-slide repairs, and unresolved QA risks.
-- `draft_to_review_gate`: generated/rendered page exists and is consumable; 16:9, contact-sheet, density, or repair gaps become named quality debt and repair targets before package/export consumes the best available page.
-- `repeated_failure_triage`: slide id, previous repair evidence, current pixel/contact-sheet finding, owner stage, preserve/redraw decision, and whether route arbitration is required.
-- Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
+Load [minimal-resource-pack.md](resources/minimal-resource-pack.md) when authoring a new payload or when field-level examples are needed. Accepted current payload refs can be reused without loading the examples again.
 
 ## Stage Prompt Boundary
 
 - `artifact_creation` owns artifact production under selected route policy.
 - This skill does not approve communication strategy, visual direction, review verdict, export readiness, or owner receipt.
 - `review_and_revision` decides whether rendered pages pass or need repair.
-- `package_and_handoff` exports only after review gates pass.
+- `package_and_handoff` may export the best readable non-ready candidate or a no-output diagnostic after quality debt. Passing review gates is required for `visual_ready` and `export_ready` claims, not for candidate delivery.
 
 ## Blockers And Repair Targets
 
-Return `typed_blocker` only when:
+Zero, corrupt, or unreadable output becomes a no-output/failure diagnostic and quality debt for the next declared stage. Preserve the original failed bytes when useful for repair; do not represent them as a valid PPTX.
 
-- If no consumable upstream plan or page artifact is produced, return a no-output diagnostic and quality debt; do not block the next declared stage.
+Return `typed_blocker` only when:
 - The selected route conflicts with the authoring-lane authority lock, such as claiming native editable PPTX while only wrapping page images.
 - Permission, credential, explicit human approval, authority, or stage identity/currentness prevents continuation.
-- The only produced artifact is corrupt or unreadable.
 
 Missing optional assets, fonts, template refs, runtime evidence, helper/preflight proof, layout quality, or partial page failures become `completed_with_quality_debt` when at least one readable page artifact exists. Preserve successful pages, spend the bounded repair budget on failed pages, then continue with the best available page set without ready claims.
 

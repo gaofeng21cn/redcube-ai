@@ -1,5 +1,20 @@
 # RCA Native PPT Designer Minimal Resource Pack
 
+## Payload Fields
+
+- `spec_lock`: `design_spec_lock_id`, design thesis, palette, typography, grid, motif, rhythm, route constraints, QA gates, and forbidden native shortcuts.
+- `native_pptx_editability`: the deck must remain editable through Office shapes, text, tables, charts, and connectors; full-page images can only be explicit visual assets, not the slide body.
+- `editable_pptx_grammar`: `template_layout_grammar`, `template_layout_binding`, and `native_shapes[]` must use editable Office objects, declared zones, inch bounds, role ids, quality roles, font sizes, fills/lines, and z-order.
+- `shape_row`: `id`, `slide_id`, `role`, `zone_id`, `left_in`, `top_in`, `width_in`, `height_in`, `text`, `font_size_pt`, `fill`, `line`, `z_order`, `quality_role`.
+- `native_repair_loop`: repair the plan, rerender, compare screenshots, update shape manifest refs, then return review/export refs, quality debt, or a no-output diagnostic; typed blocker remains reserved for the explicit hard-stop whitelist.
+- `image_to_native_followup`: consume approved director notes, source refs, contact-sheet findings, and selected editable targets before writing native shapes.
+- `native_ppt_qa_plan`: shape manifest refs, screenshot refs, editable-object checks, hyperlink/text checks, expected reviewer checks, and blocked-slide-only repair scope.
+- `native_admission_readback`: exact current-user semantic evidence, decision owner, selected slides, rejected image-first/native alternatives, contact-sheet evidence, required native QA refs, and route-back owner. This record verifies admission but cannot create it.
+- `repeated_native_failure_triage`: prior render refs, current screenshot/shape-manifest mismatch, owner boundary, preserved slides, and next repair route.
+- `native_route_back`: owner stage, affected slide ids, failed evidence, and whether the fix belongs to template profile, visual direction, page authoring, or native shape plan.
+- `typed_native_object`: stable id, object kind, semantic role, materialization intent, editable payload, relationships, bounds/z-order, and package readback expectation.
+- `presentation_semantics`: slide id, speaker notes, transition, timing, optional animation timeline, and static-readability assertion.
+
 Owner: `redcube_ai`
 State: `skill_local_resource`
 Boundary: refs-only professional method resource. This file is not visual truth, an artifact body, an owner receipt, a quality verdict, an export verdict, or runtime state.

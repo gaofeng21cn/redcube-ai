@@ -1,6 +1,6 @@
 ---
 name: redcube-ai
-description: Use when Codex needs RedCube AI (RCA) to create, revise, review, or package a visual deliverable such as a slide deck/PPT, poster, social visual, or visual handoff. Ordinary PPT/PPTX requests default to full-slide images packaged in a .pptx container; select native editable PowerPoint only when the current user explicitly requires editable/native objects. Do not use for Agent engineering merely because OMA is mentioned.
+description: Use when Codex needs RedCube AI (RCA) to create, revise, review, or package a visual deliverable such as a slide deck/PPT, poster, social visual, or visual handoff.
 ---
 
 # RedCube AI
@@ -64,6 +64,11 @@ For a `ppt_deck`, decide the authoring lane from the complete current user reque
 - Use OPL-generated status/workbench surfaces to report progress and resume the same invocation.
 
 ## References
+
+Resolve these package refs through the installed RCA package/hosted owner. The
+Codex plugin carries this entrypoint only; its directory is not the package root.
+Load the contract or professional resource for the selected action and stage,
+and reuse accepted refs while their source, user constraints, and scope remain current.
 
 - `contracts/action_catalog.json`
 - `agent/stages/manifest.json`
