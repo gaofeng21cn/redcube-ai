@@ -31,7 +31,7 @@ HTML 与 native editable PPTX 继续保留为显式二线路线。用户明确�
 
 ## Long-Deck Production Contract
 
-完整长 deck 生产吸收“肠癌AI”65 页 GPT-Image-2 工作台经验，但不把该长样本放进默认回归。长 deck 触发条件是 `expected_slide_count > proof_runner.max_default_slide_count`，或 operator 显式标记 `long_deck`。
+完整长 deck 与默认轻量 developer fixture 分别验证。长 deck 触发条件是 `expected_slide_count > proof_runner.max_default_slide_count`，或 operator 显式标记 `long_deck`。
 
 - 每页命名采用 `slideNN-short-name.png`；expected slide count 来自 `slide_blueprint.expected_slide_count` 或 `slide_blueprint.slides.length`。
 - 产物面至少包括 prompts、raw PNG、1920x1080 normalized PNG、style refs、fact verification ledger、visual QC ledger、contact sheet、PPTX。
@@ -55,14 +55,8 @@ runner 只用于 developer / CI proof，不是 RCA Agent runtime 或 CLI surface
 tools/image-ppt-proof/run.sh --output-dir artifacts/image-ppt-proof --mock-image-generation
 ```
 
-Developer proof 使用 6 页以内 lightweight fixture，不读取完整“肠癌AI”长 PPT，也不调用 Codex executor 或真实图片 API。真实 image generation 由 OPL-hosted `run_image_ppt_proof` StageRun action 按双路线合同执行；config-backed API 是同一 hosted Attempt 的受限 fallback，不是 RCA 私有 executor。CI `image-ppt-proof` job 只验证 developer proof 产物合同，不形成真实图片生成或 domain-ready 证据。
+Developer proof 使用 6 页以内 lightweight fixture，也不调用 Codex executor 或真实图片 API。真实 image generation 由 OPL-hosted `run_image_ppt_proof` StageRun action 按双路线合同执行；config-backed API 是同一 hosted Attempt 的受限 fallback，不是 RCA 私有 executor。CI `image-ppt-proof` job 只验证 developer proof 产物合同，不形成真实图片生成或 domain-ready 证据。
 
-## Lifecycle Note
+## 验证边界
 
-本文只承担当前 image-first PPT route support，不维护 closeout ledger 或 rollout receipt。旧 planned/done/deferred/skipped/verification 过程以 `contracts/runtime-program/ppt-image-first-production-route.json`、`tools/image-ppt-proof/ci-contract.json`、相关测试和 history/provenance 为准。
-
-当前仍有效的读法：
-
-- `ppt_deck` 默认 image-first full-slide authoring。
-- HTML / native editable PPTX 是显式可选 route，不是 fallback chain。
-- 真实 production visual-stage long soak、artifact-producing owner receipt 和 final visual ready/exportable/handoffable verdict 仍回到 [RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md) 与 RCA-owned review/export gates。
+本文只解释当前路线。机器字段由 `contracts/runtime-program/ppt-image-first-production-route.json` 与 `tools/image-ppt-proof/ci-contract.json` 持有；过程记录使用 Git 追溯。真实 artifact-producing owner receipt、review/export acceptance 与 long-soak 的验收要求见 [未完成验收](../active/rca-ideal-state-gap-plan.md)。

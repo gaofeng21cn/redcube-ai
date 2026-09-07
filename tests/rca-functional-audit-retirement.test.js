@@ -51,7 +51,10 @@ test('RCA private control-plane retirement provenance covers every physically ab
   }
   for (const entry of audit.retired_generated_surface_provenance) {
     assert.match(entry.replacement_ref, /^(?:opl_generated:|opl_hosted:|agent\/)/);
-    assert.deepEqual(entry.provenance_refs, ['docs/history/process/retired-surface-provenance.md']);
+    assert.notDeepEqual(entry.provenance_refs, []);
+    for (const ref of entry.provenance_refs) {
+      assert.match(ref, /^https:\/\/github\.com\/gaofeng21cn\/redcube-ai\/blob\/[a-f0-9]{40}\//);
+    }
   }
   assert.notDeepEqual(audit.bridge_exit_gate.physical_delete_authorization_refs, []);
   assert.notDeepEqual(audit.bridge_exit_gate.no_forbidden_write_refs, []);

@@ -17,4 +17,4 @@ Blueprint and visual direction must be consumable before materialization. The HT
 
 ## Handoff
 
-Return the render object required by the attached output contract. Runtime owns shell assembly, persistence, screenshot QA, repair routing, and export authority.
+Return the render object required by the attached output contract. Runtime owns shell assembly, persistence, screenshot mechanics, and repair transport; RCA owns visual judgment and export authority.

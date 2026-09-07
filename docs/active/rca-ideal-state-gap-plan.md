@@ -1,136 +1,27 @@
-# RCA 理想目标态差距与完善计划
+# RCA 未完成验收
 
-Owner: RedCube AI
-Purpose: 维护 RCA 的 single Active Truth：当前结构事实、理想态差距、owner evidence gate 与下一轮可执行入口。
-State: active_truth
-Machine boundary: 当前状态必须从 repo source/contracts 与 owner readback 派生；本文不持有 package currentness、visual/review/export verdict、owner receipt、release 或 production truth。
+本页只持有尚未关闭工作的 owner、下一动作和验收条件。源码事实见 [状态](../status.md)，目标见 [目标态参考](../references/rca-visual-deliverable-agent-ideal-state.md)。完成项更新所属文档和机器证据后从本页移除，过程由 Git 或外部 evidence owner 保管。
 
-## Ideal-State Reference
-
-- Canonical reference：[`docs/references/rca-visual-deliverable-agent-ideal-state.md`](../references/rca-visual-deliverable-agent-ideal-state.md)
-- Framework 跨仓迁移 SSOT：
-  [`one-person-lab/docs/active/opl-package-platform-composition-migration.md`](https://github.com/gaofeng21cn/one-person-lab/blob/main/docs/active/opl-package-platform-composition-migration.md)
-- 目标：RCA 是 executor-neutral 的 `OPL Package(kind=agent)`，持有 Package
-  identity/capabilities、business Work Item、typed views、declarative visual pack、
-  domain-specific native helpers 与不可下放的
-  visual/artifact/review/export/memory/owner authority。Carrier platform 持有实际 bytes
-  lifecycle；OPL 只持有跨 carrier 发现、presence/callability、generated interfaces、
-  StageRun/Attempt、session/workspace/status/workbench 和 execution receipt envelope。
-
-## Active Owner Discovery
-
-| Truth | Owner | Machine surface |
+| 工作 | Owner 与下一动作 | 关闭证据 |
 | --- | --- | --- |
-| RCA Package identity/capabilities/task/typed views | RedCube AI | 当前 `contracts/opl_agent_package_manifest.json`；目标 descriptor shape 待兼容迁移 |
-| RCA complete Package publication | RedCube AI owner | 目标为 RCA-owned GHCR repository + per-Package `latest-stable`；fresh proof open |
-| Package physical install/update/remove | 实际 carrier platform | 目标为 carrier fresh readback + Framework thin adapter；当前 `opl packages ... --json` 为 compatibility surface |
-| Executor route | OPL executor adapter；当前首选 Codex CLI | generated/hosted callable readback；中性 route proof open |
-| RCA domain/source/visual authority | RedCube AI | `agent/`、RCA contracts、native helpers、authority functions |
-| Generated interfaces与 hosted lifecycle | One Person Lab | `contracts/pack_compiler_input.json`、`contracts/generated_surface_handoff.json` + OPL readback |
-| Live visual/review/export/owner acceptance | RedCube AI owner lane | real StageRun artifact refs、quality/export receipts、owner receipts |
+| 完整 Package 与 hosted callability | Carrier / Framework owner 读取 RCA 完整 bytes、入口和 executor route；RCA 核对 descriptor 与 native helper refs | 完整 installed/callable carrier readback 与真实 hosted invocation；Plugin-only 不足 |
+| 独立发布 currentness | RCA publication owner 核对 immutable revision 与 RCA 自己的 channel | `latest-stable` 对应 exact revision 与匿名 digest readback；不以 source version 或 tag 替代 |
+| Package 组合与 executor 解耦 | Framework/App/Shell owner 按各自真实 consumer 处理迁移；RCA 仅修改自身 descriptor | consumer 切换与无活跃调用证明；切换 route 后 identity、能力、偏好、Work Item、Temporal refs 和 typed views 保留 |
+| 真实视觉交付 | RCA owner 在真实 workspace 调用 `invoke_product_entry`，记录准确 source/artifact lineage | StageRun/Attempt、可读 artifact、独立 Review、RCA quality/export 与 owner receipt |
+| 真实 memory lifecycle | RCA memory owner 消费 review-grounded proposal，执行 accept/reject 与受控 writeback | body 留在领域存储的 receipt、locator projection、retention/restore 和 scaleout evidence |
+| 恢复与规模 | Hosted runtime owner 与 RCA 联合执行 restart/resume/retry、long-soak 和跨域回归 | provider recovery、受控 visual-stage soak、重复 no-regression refs；每个领域独立签验收 |
+| Native PPT 非劣效 | RCA owner 按 [native spec](../specs/native-ppt-ppt-master-parity.md) 运行固定来源的对照、真实编辑和跨 viewer 阅读 | 同源双跑、独立盲评、exact package/source identity、跨 viewer evidence 与 RCA parity receipt |
 
-## Current State Summary
+## 领域验收入口
 
-- canonical Package id 为 `rca`、`kind=agent`；当前 source version 只从 owner
-  manifest 与同步 carrier declarations 读取，仓内没有第二 Package identity。
-- Codex Plugin 是当前 carrier projection，Codex CLI 是当前首选 executor；RCA
-  identity、capabilities、task 与 typed views 不以 Codex 私有字段定义。
-- `agent/` 是 declarative visual pack source，`contracts/action_catalog.json` 只声明 `invoke_product_entry`、`run_image_ppt_proof`、`run_native_ppt_proof` 三个 OPL-hosted stage actions。
-- `contracts/generated_surface_handoff.json` 声明 generated surfaces 归 OPL、repo-local handler targets 为空、结构 cutover 已闭合，并明确 production evidence 未闭合。
-- `contracts/functional_privatization_audit.json` 只保留 RCA visual authority decisions 与 Python native helpers；旧 repo-local default/control surfaces 已退役。
-- `contracts/live_stage_run_progress_evidence.json` 当前只有 typed blocker `post_standardization_live_stage_evidence_required`，没有 owner、quality/export、long-soak 或 no-regression receipts；它明确不声明 domain ready 或 production ready。
-- `contracts/opl_agent_package_manifest.json` 当前 source version 为 `0.2.16`，已声明
-  `redcube-ai@redcube-ai` Codex Plugin carrier，并已退役 installed-lock authority 与
-  lifecycle-receipt ownership 字段；`package_core`、lifecycle command locator、
-  managed-dependency、update-channel 与 package/exposure-owner 元数据也已删除。仍保留的
-  source-contract、Codex carrier、health/proof 与 clean-runner metadata 只作迁移期兼容，
-  不是 installed truth、currentness authority 或目标架构已完成的证明。
+先读取当前安装的 OPL interface 和完整 Package / executor 状态，再在 owner 授权的 workspace 执行：
 
-## Current-State vs Ideal-State Gaps
+```bash
+opl agents conformance --family-defaults --json
+opl agents run --domain redcube_ai --action invoke_product_entry --workspace <workspace>
+```
 
-| Boundary | Current fact | Gap / next owner evidence | State |
-| --- | --- | --- | --- |
-| Repo source morphology | declarative pack + native helpers + minimal authority functions；旧 private control plane 路径不存在 | 保持 no-resurrection guard；只需 repo-native regression | structurally closed |
-| Package descriptor | 当前 sidecar 已退役 installed-lock authority、lifecycle-receipt ownership、`package_core`、lifecycle command locator 与 managed-dependency metadata，并配置 native carrier locator；仍保留 source-contract、Codex carrier、health/proof 与 clean-runner compatibility metadata，Framework canonical source 与 `opl packages status` 仍有 lock/materializer/runtime-source 等 compatibility consumer | Framework owner 先切换已证 consumer，App/Shell owner fresh 审计各自 surface；全链 consumer-zero 后再收缩为 executor-neutral identity/capability/task/view descriptor | platform migration open |
-| Independent publication | source version 与 Git tag 只证明 owner source transport；active 文档不冻结某次 tag/SHA/GHCR 快照，完整 Package publication currentness 必须从 owner publication surface fresh 读取 | owner immutable revision -> RCA-only `latest-stable` -> anonymous exact-digest readback | publication proof open |
-| Carrier installed truth | Codex Plugin projection 与旧 `opl packages` 状态存在 | 聚合完整 Package 的 fresh carrier readback；Plugin-only 不得报告 complete installed | platform migration open |
-| Executor decoupling | Codex CLI 是当前唯一正式路径 | 一个 Git/local 中性 adapter 证明切换 executor 不重装、不丢 task/view/偏好 | neutral proof open |
-| Dependencies | 当前 RCA `capability_dependencies=[]` | 保持 required/optional identity presence + callability；未来 dependency 不得引入版本/ABI/lock/payload/digest/Release Set 门禁 | owner invariant closed |
-| Generated/hosted surface handoff | descriptor source 可用、repo-local targets 为空、owner 为 OPL | 由 OPL 对 complete installed/callable Package 与 generated projection 做 fresh readback | owner evidence open |
-| Native-helper envelope | RCA 保留 domain helper implementation，generic envelope 归 OPL | 需要真实 hosted invocation 的 exact helper/artifact/receipt lineage | live evidence open |
-| Visual/review/export authority | contracts 保留 RCA authority，OPL 不得代签 | 需要 RCA quality/export receipt 与 owner acceptance；provider completion 不能替代 | owner evidence open |
-| Recovery与规模 | repo tests 可证明结构和 helper 行为 | 需要 restart/resume/retry、long-soak 与 repeated cross-family no-regression evidence | production evidence open |
+conformance 只证明结构投影。实际 StageRun 保留 input identity、artifact refs、
+review/export、human gate、typed blocker 与 owner receipt；只有对应 owner 已产生可验证证据时才更新 `contracts/live_stage_run_progress_evidence.json`。
 
-## Package Composition Migration
-
-本仓只落实 RCA owner surface，不复制 Framework 的完整迁移状态机：
-
-1. RCA owner descriptor 保留 executor-neutral identity、`kind=agent`、capabilities、
-   required/optional identity、entrypoints、business task 和 typed views。
-2. 一方完整 Package bytes 进入 RCA 自己的 GHCR repository，owner 只推进 RCA
-   `latest-stable`。Exact ref/digest/checksum/SBOM/attestation 仅保护单次发布完整性。
-3. Framework dual-read owner descriptor 与迁移期 manifest；RCA manifest 已不再持有
-   installed-lock authority、lifecycle-receipt ownership、`package_core`、lifecycle
-   command locator 或 managed-dependency metadata。剩余 source-contract、Codex carrier、
-   health/proof 与 clean-runner metadata 只能兼容读取，不能新增 writer 或 consumer。
-4. Base 薄 OCI adapter 只下载/校验 bytes 并交给 Package 声明的 carrier/runtime
-   adapter；Codex Plugin Manager 是当前 projection adapter。fresh readback 必须区分
-   complete installed 与 Plugin-only。
-5. 至少一个 Git/local 中性 route 证明公共 identity 和业务状态不绑定 Codex。当前无需
-   并行实现第二个正式 executor 产品。
-6. retained consumer 清零、完整功能矩阵通过后，Framework/App/Shell 物理删除旧
-   resolver、lock、payload、LKG、lifecycle receipt、materialization 与 rollback
-   mirrors。
-
-功能不降级门：RCA 可安装、独立静默更新、卸载后不被 maintenance 回装；Home
-preference、Work Item、Temporal execution refs 与 typed views 在 carrier/executor
-切换后保留；Codex 当前正式路径仍能完整调用 native helpers、StageRun 和全部 RCA
-领域能力。任何一项不成立都不得删除旧兼容读路径。
-
-## Test / Evidence Boundary
-
-- `private-platform` guard、source-closure、repo tests、typecheck 与 OPL conformance 只能证明各自结构/实现边界。
-- doctor clean、Markdown 完整、contract validation、generated projection 或 provider
-  completion 都不能单独关闭 Package published/current、complete installed/callable、
-  visual、quality/export、owner、release、domain 或 production readiness。
-- Live evidence 后置，不阻塞已能由 repo source/contracts 独立证明的结构治理；一旦涉及 ready claim、artifact mutation、quality/export verdict 或 owner receipt，必须回到对应 owner surface。
-
-## Next-Round Agent Prompt
-
-目标：在不恢复 RCA repo-local 控制面、不中转 visual truth 给 OPL 的前提下，收集 post-standardization 的 fresh OPL-hosted RCA live evidence。
-
-- 写入范围：RCA owner 授权的 live evidence contract、当前状态 owner 文档和 evidence/history foldback；OPL package/runtime 面只能走对应 owner lane。
-- 非目标：不新增 RCA installer、Package Manager、CLI/runtime/session/workspace/
-  status/workbench、executor adapter、旧入口别名或 fallback；不由
-  docs/conformance/tests 签发 Package current、visual、quality/export、owner、
-  release、domain 或 production ready claim。
-- 当前事实输入：RCA checkout、`contracts/opl_agent_package_manifest.json`、
-  `contracts/generated_surface_handoff.json`、
-  `contracts/live_stage_run_progress_evidence.json`、complete Package carrier readback、
-  executor route readback、真实 StageRun/Attempt/artifact/receipt refs。
-- 验证命令：`opl packages status --package-id rca --json`、`opl agents conformance --family-defaults --json`、`opl agents run --domain redcube_ai --action invoke_product_entry --workspace <workspace>`，以及 RCA repo-native source guard。
-
-1. 读取 RCA `AGENTS.md`、本文件、`contracts/opl_agent_package_manifest.json`、
-   `contracts/generated_surface_handoff.json` 与
-   `contracts/live_stage_run_progress_evidence.json`，区分 owner descriptor、旧
-   compatibility fields、carrier installed state、executor route 和领域 evidence。
-2. 读取 Framework/实际 carrier 的 fresh RCA installed/callable 状态；迁移期可同时读取
-   `opl packages status --package-id rca --json`，但旧 payload/version/lock 只作
-   compatibility diagnostic。缺完整 bytes 或 callable entrypoint 时路由给 carrier /
-   Framework owner，不在 RCA 新建 installer、alias 或 fallback。
-3. 运行 `opl agents conformance --family-defaults --json`，只把结果表述为 structural projection/conformance evidence。
-4. 在真实 workspace 运行 `opl agents run --domain redcube_ai --action invoke_product_entry --workspace <workspace>`，保留 StageRun/Attempt、input hashes、artifact refs、review/export refs、typed blocker/human gate 与 owner receipt lineage。
-5. 只有 RCA owner surface 实际产生可验证 receipt 时，才更新 live evidence contract 与当前状态；失败、缺凭据、wrong-target/currentness 或 owner gate 必须原样记录 typed blocker，不能改写成 ready。
-6. 用 fresh readback 确认没有 repo-local CLI/runtime/session/workspace/status/workbench 复活；将过程记录放入 evidence/history，Active Truth 只保留当前事实、剩余 gap 与下一合法入口。
-
-- 完成门槛：有完整 Package installed/callable carrier readback 和明确 executor route；
-  有真实 hosted StageRun artifact lineage 或明确 typed blocker；所有
-  visual/review/export/owner/ready claim 都有 RCA owner receipt；没有第二控制面或
-  fallback。若声称 RCA 发布 current，还必须有 owner GHCR `latest-stable` 匿名
-  exact-digest readback。
-- 折回目标：当前事实进入 `docs/status.md` 与相应 contracts；可复查 evidence 进入 evidence owner surface；过程 provenance 进入 `docs/history/`；本文件只保留剩余 gap 和下一合法入口。
-
-## History / Tombstone Foldback
-
-- 旧 private-platform、product-entry、session continuity 与 hosted bridge 的过程 provenance 只从 `docs/history/` 和 Git history 读取。
-- 本文件不积累逐轮 SHA、测试计数、worktree 清单或完成百分比；完成的结构事实折回 `docs/status.md` 与 contracts，过程 evidence 进入 history/evidence owner surface。
+缺 carrier、权限、凭据、准确目标或 owner evidence 时记录真实 blocker。RCA 不为推进验收建立私有 installer/runtime，不以测试、文档、provider completion 或单个样片签发 ready。

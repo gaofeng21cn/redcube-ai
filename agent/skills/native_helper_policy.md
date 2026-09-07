@@ -3,7 +3,7 @@
 Owner: `RedCube AI`
 Purpose: `stage_skill_policy_ref_for_native_helper_boundaries`
 State: `policy_ref_not_standalone_professional_skill`
-Machine boundary: 本文件是 Declarative Visual Pack 的旧 `agent/skills/*.md` policy ref，用来约束 stage 如何使用 native helper。它不是 standalone Codex professional skill，也不是 tool/helper 本体。
+Machine boundary: 本文件是 Declarative Visual Pack 的 `agent/skills/*.md` policy ref，用来约束 stage 如何使用 native helper。它不是 standalone Codex professional skill，也不是 tool/helper 本体。
 
 策略:
 - Native helper 只能通过 RCA route policy、review/export gates、helper catalog refs 和 owner receipt refs 物化文件。

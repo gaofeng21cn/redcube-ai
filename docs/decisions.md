@@ -1,72 +1,27 @@
 # RedCube AI 关键决策
 
-Owner: RedCube AI
-Purpose: 记录仍有效的架构决策。
-State: active
-Machine boundary: 本文解释 contracts，不替代 contracts。
+本页只解释当前架构取舍；执行规则见 [硬约束](./invariants.md)，组件和调用路径见 [架构](./architecture.md)。
 
-## D1 标准 Agent 形态
+## 声明式专业包与平台执行分开
 
-RCA 是 `OPL Package(kind=agent)`，采用
-`executor-neutral Package identity + Declarative Visual Pack + OPL generated/hosted surfaces + minimal authority functions + Python native helpers`。
-已有私有平台实现只作为迁移输入，不保留 compatibility facade。
+视觉领域需要稳定的专业方法和批准权，通用队列、恢复、session、workspace 与安装状态已有平台 owner。RCA 因而保留 declarative visual pack、authority contracts 和 Python native helpers，避免两个控制面同时决定同一运行。
 
-## D2 Package、carrier 与 executor 分离
+## Package 身份独立于分发和执行
 
-RCA 持有 Package identity、capabilities、业务 Work Item / task、typed-view
-schema/data 与稳定 entrypoints。实际 carrier 平台持有其承载 bytes 的
-install/update/remove 和 fresh readback；OPL Framework 聚合跨 carrier 状态、presence
-graph、executor routes 与 generated surfaces。Codex Plugin 只是当前 carrier
-projection，不能成为 Package identity 或完整 installed truth。
+Codex Plugin 适合分发入口 Skill，但不能表示完整 Package bytes；Codex CLI 是当前产品路径，也不应定义领域 identity。把 Package、carrier、executor 分开，才能在平台替换时保留能力、偏好、任务和领域数据。真实安装状态由实际 carrier 读回，不能由源码版本推断。
 
-## D3 领域 authority 不上收
+## AI 负责创作，Helper 负责物化
 
-visual truth、route semantics、review/export verdict、artifact mutation、visual memory 与 owner receipt 继续归 RCA。上收 transport 不等于上收领域批准权。
+叙事、版式、图表语义和视觉验收需要结合内容判断。Python / OfficeCLI 负责确定性对象、几何、文件、渲染和导出证据，不能靠模板或分数取得设计与审阅权。具体规则归 [AI-first 质量边界](./policies/ai_first_quality_boundary.md)。
 
-## D4 Codex-first，但不由 RCA 实现 executor runtime
+## Proof 与生产验收分开
 
-Codex CLI 是当前首选 executor，Codex 路径是当前唯一需要正式维护的产品路径。
-executor selection、process lifecycle、session isolation、retry 和 execution receipt
-residency 由 OPL 托管；RCA pack 只声明 role、prompt、gate、affordance 与可调用
-capability。公共 Package 合同保持 executor-neutral；将来替换 executor 只替换 route
-adapter，不触发 RCA 重装或业务状态迁移。
+隔离 fixture 可稳定验证 helper 与封装行为，却不能证明真实图片生成、独立审阅或 owner 接受。两类证据分别保存，避免通过测试或单套样片把未闭合的生产验收改写为完成。
 
-## D5 Python 只保留 native helper
+## 按 Owner 独立发布
 
-Python 继续承担 PPT/Office/render/review/export mechanics。RCA 不再以 TypeScript package graph 实现 product/runtime orchestration；仓内 TypeScript 只用于验证和 developer proof tooling。
+完整 Package bytes 由 RCA owner channel 发布；共享离线快照不能约束普通 RCA 更新。发布完整性与领域 lineage 仍需 exact evidence，但它们不要求跨 Package 版本、ABI 或原子 release cohort 求解。
 
-## D6 Proof 与 production path 分离
+## 删除已经替代的实现与叙事
 
-developer proof 可直接验证 helper 和 artifact bytes，但真实 image generation、
-StageRun 与 review/export 必须通过 OPL-hosted path；Package 安装与更新必须通过实际
-carrier 的受控入口。proof pass 不能替代 owner acceptance、完整 Package
-installed/callable readback 或公开发布 currentness。
-
-## D7 物理删除优先于 tombstone facade
-
-已迁移 caller 的 CLI、runtime、domain-entry、governance、overlay、current-program baton 与聚合测试直接删除。来龙去脉只留在 `docs/history/` 与 Git history。
-
-## D8 RCA owner 独立发布完整 Package
-
-一方完整 RCA Package bytes 发布到 RCA 自己的 GHCR repository，RCA owner 只推进
-自己的 `latest-stable`。共享 `one-person-lab-manifest:latest-stable` 只保留
-Full/offline/integration-test/QA 快照用途，不参与 RCA 普通 currentness。发布使用的
-exact ref、digest、checksum、SBOM 和 attestation 保护该次 bytes 完整性，不进入普通
-Package 组合门禁。
-
-## D9 依赖按 presence 与 callability 组合
-
-普通 required/optional dependency 只声明 Package 或 capability identity，并检查
-presence 与 declared entrypoint callability。禁止用 SemVer/ABI range、installed lock、
-payload、digest、Release Set 或跨 Package 原子闭包限制组合。breaking interface 由
-RCA owner 发布新 identity 或保留向后兼容 adapter，不建设中央版本求解器。
-
-## D10 旧 Package lifecycle 合同不回到 RCA manifest
-
-当前 `contracts/opl_agent_package_manifest.json` 已移除 installed-lock authority、
-lifecycle-receipt ownership、`package_core`、lifecycle command locator 与
-managed-dependency metadata，并把 Codex Plugin 明确为 carrier locator。保留的
-source-contract、carrier、health/proof 与 clean-runner metadata 只服务兼容读取；Framework
-兼容 consumer 在 consumer-zero 前不得成为 installed/currentness authority，也不得驱动
-RCA 新增 writer 或设计依赖。最终状态由 carrier fresh readback 和薄 Framework projection
-证明。
+旧 caller 完成替换后，保留空 facade、tombstone 或历史操作手册会继续制造入口歧义。当前代码和 owner 文档承担有效规则，Git 保存决策发生时的版本，不新增兼容页。

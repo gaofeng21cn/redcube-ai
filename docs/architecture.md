@@ -1,102 +1,45 @@
 # RedCube AI 架构
 
-Owner: RedCube AI
-Purpose: 描述 RCA Package、carrier、executor、运行时与领域 authority 的边界。
-State: active
-Machine boundary: 具体字段以 root contracts、stage manifest、action catalog、native-helper catalog 与 OPL compiled interface 为准。
+本页持有组件归属与数据流；产品范围见 [项目定位](./project.md)，约束见 [硬约束](./invariants.md)，实现和验收状态见 [当前状态](./status.md)。
 
-## 顶层模型
+## 源码组件
 
-```text
-OPL Base        ~= R
-OPL App         ~= RStudio / replaceable GUI and deployment carrier
-OPL Package     ~= R Package
-RCA             = OPL Package(kind=agent)
-```
+| 组件 | RCA 持有 | 消费方 |
+| --- | --- | --- |
+| `agent/` | 阶段语义、prompt、专业 Skill、质量规则与知识引用 | OPL compiler 和 hosted executor |
+| `contracts/` | identity、action、schema、authority、helper descriptor 与证据引用 | Framework 公开合同及领域实现 |
+| `python/redcube_ai/native_helpers/` | PPT/Office/render/review/export 确定性 mechanics | OPL native-helper envelope；隔离 developer proof |
+| `runtime/authority_functions/` | 最小领域 authority 声明 | RCA owner chain |
+| `scripts/`、`tests/`、`tools/` | 开发验证与 proof | 开发者和 CI |
 
-RCA 是 executor-neutral 的完整 Package，不是 Codex Plugin 的别名。当前产品实现优先
-复用 Codex Plugin Manager 和 Codex CLI，但 OPL-owned identity、capabilities、
-business Work Item、Temporal refs 与 typed views 不绑定 Codex 私有字段。
+`runtime/authority_functions/` 目前是声明目录，不实现通用 runtime。RCA 不包含 repo-local CLI、domain-handler dispatcher、scheduler、Attempt/session/workspace store 或 Package Manager。
 
-## 主链路
+## 调用链
 
 ```text
-User / Codex App
-  -> installed/callable RCA Package readback
-  -> selected executor route (currently Codex CLI)
-  -> OPL-generated RCA action
-  -> OPL StageRun controller
-  -> decisive executor Attempt
-  -> RCA declarative stage pack
-  -> optional RCA Python native helper via OPL envelope
+完整 Package / carrier / executor 可调用性读回
+  -> OPL-generated action
+  -> hosted StageRun / isolated Attempt
+  -> RCA stage pack + 专业方法
+  -> 需要时调用 RCA native helper
   -> artifact / review / blocker / owner refs
-  -> OPL controller validates and materializes transition / execution receipt
+  -> OPL controller 校验并物化 transition 与 execution receipt
 ```
 
-只有终局 decisive Attempt 返回领域语义 `stage_route_decision`；非终局 Attempt 最多返回 `stage_route_recommendation`。OPL controller 只校验并物化 transition。RCA 仓不保存 current pointer、Attempt ledger、session store 或 runtime queue。
+`contracts/action_catalog.json` 声明动作及 hosted binding，`agent/stages/manifest.json` 声明阶段图，`contracts/generated_surface_handoff.json` 声明 generated surface owner 与领域写入边界。具体运行顺序见 [运行边界](./runtime/runtime_architecture.md)。
 
-## Package / Carrier / Executor
+终局 decisive Attempt 返回 `stage_route_decision`；非终局 Attempt 最多返回 `stage_route_recommendation`。独立 Meta Review 不修改上游 artifact，也不递归启动 Stage 内正式 Review。具体 outcome、repair budget 和 route-back 规则由 `contracts/stage_quality_cycle_policy.json` 持有。
 
-| Layer | Owner boundary |
-| --- | --- |
-| Package identity | RCA 持有 `id=rca`、`kind=agent`、capabilities、required/optional identity edges、业务 task、typed views 与稳定 entrypoints。 |
-| Package publication | RCA owner 向自己的 GHCR repository 发布完整 Package bytes，只推进自己的 `latest-stable`。Exact ref/digest 只用于该次发布完整性。 |
-| Carrier | Package 声明的 carrier/runtime adapter 承载并维护实际 bytes；Base 薄 OCI adapter 只下载/校验并移交 bytes，Codex Plugin Manager 只管理其 projection。完整 installed truth 来自所有实际 carrier 的 fresh readback。 |
-| Executor | Codex CLI 是当前首选 route；未来 executor adapter 只改变 callability/readiness，不改变 Package identity、installed state 或业务数据。 |
-| Framework composition | OPL 聚合 installed/callable、presence graph、executor route、Work Item/Temporal refs 与 typed views，不重建 resolver、lock、payload、LKG、lifecycle receipt、materializer 或 rollback manager。 |
+## Package、Carrier 与 Executor
 
-普通 `required` / `optional` dependency 只检查 identity presence 与 declared entrypoint
-callability。RCA 当前没有必需 Package dependency；未来增加 dependency 也不引入
-SemVer/ABI、exact lock/payload/digest、Release Set cohort 或跨 Package 原子更新门禁。
-缺 required capability 只局部使 RCA 对应 route unavailable，不阻塞 Base、App 或无关
-Package。
+RCA owner 持有 Package identity、能力和领域语义。实际 carrier 平台管理其承载的 bytes，并提供安装、更新、移除后的真实读回；Framework 聚合 presence/callability 和公开 action。当前配置的 Codex Plugin 只承载入口 Skill，full-copy 原因见 [carrier 说明](./references/primary-skill-plugin-carrier-boundary.md)。
 
-`one-person-lab-manifest:latest-stable` 不定义 RCA 普通 currentness，只可承载
-Full/offline/integration-test/QA 快照。Standard 与 Full 安装同一 App Official Profile；
-Full 只增加离线 seed，不形成第二份 RCA Package truth。
+完整 RCA bytes 的发布遵循 owner Package channel；共享 Release Set 仅用于离线或 QA 快照。普通 required/optional dependency 检查 identity presence 与 entrypoint callability。发布 digest 保护一次 bytes 交付，领域 artifact hash 保护 lineage，二者不构成中央依赖版本求解器。
 
-## 五层源码与运行边界
+当前首选 executor 为 Codex CLI；route adapter 属于平台。未来替换 executor 不应改变 RCA identity、能力、任务、偏好或 typed views。Framework 自身实现与迁移状态从其 [文档入口](https://github.com/gaofeng21cn/one-person-lab/blob/main/docs/README.md) 和公开 readback 读取，本仓不复制跨仓状态表。
 
-### 1. Declarative visual pack
+## 数据归属
 
-`agent/stages/manifest.json` 是 stage graph source，`agent/prompts/`、`agent/skills/`、`agent/professional_skills/`、`agent/quality_gates/`、`agent/knowledge/` 和 `agent/tools/` 提供阶段语义、专业能力与 tool affordance boundary。Manifest 通过 `quality_governance_profile_ref` 和 `meta_review_policy_ref` 接入 OPL 官方质量治理；`review_and_revision` 是独立、primary-only 的 Meta Review StageRun，不递归启动 Stage 内正式 Review。
+RCA 持有 visual truth、review/export verdict、artifact mutation authorization、visual memory accept/reject、typed blocker 和 owner receipt。平台可以传递 refs、验证身份、保存 execution receipt 和展示结果，但不能代签领域批准。
 
-### 2. OPL generated/hosted surfaces
-
-`contracts/action_catalog.json` 与 stage manifest 是 OPL compiler 输入。OPL 生成并托管 CLI、MCP、Skill、product-entry、OpenAI、AI SDK、status 与 workbench projection；RCA 不实现对应 wrapper。
-
-### 3. RCA business surfaces
-
-RCA 声明 Agent Work Item / task inventory、业务状态与可选 typed-view schema/data。
-Framework 只代理和关联 Temporal execution refs；App 只通过受控 renderer 渲染
-`view_kind`，不能把 RCA 私有字段复制成 App 或 Framework schema。
-
-### 4. RCA authority
-
-RCA 保留 source-readiness、visual-direction、review/export、artifact mutation、visual-memory 与 owner-receipt 领域判断。OPL 可以验证 ref、持久化 receipt 和投影结果，但不能改写 RCA visual truth 或伪造 RCA authority。`contracts/stage_artifact_kernel_adoption.json#/authority_boundary/opl_can_mutate_domain_artifact_body=false` 只禁止 OPL 改写领域 artifact body；RCA 仍是 artifact mutation authorization 与 canonical artifact authority 的唯一 owner。
-
-### 5. Native helpers
-
-`python/redcube_ai/native_helpers/` 只实现确定的 PPT/Office/render/review/export mechanics。`contracts/runtime-program/python-native-helper-catalog.json` 声明 helper；进程选择、超时、环境、JSON envelope 与 lifecycle 归 OPL。
-
-## Artifact 与状态
-
-repo source 不保存真实 PNG/PPTX/PDF、workspace state、receipt instance、session、runtime log 或 package lifecycle state。运行产物进入 OPL workspace/artifact root 或用户级 runtime-state；repo 只保存 schema、policy、locator vocabulary、developer-proof fixture 与 body-free evidence ref。
-
-Package 发布 checksum/digest 与 RCA artifact/evidence hash 都必须保留，但用途严格分离：
-前者证明单次发布 bytes，后者证明领域 artifact lineage。它们都不能成为普通
-Package-to-Package 组合或 executor 启动 lock。
-
-## Developer proof
-
-`tools/image-ppt-proof/` 与 `tools/native-ppt-proof/` 是 deterministic developer evidence。它们可直接调用 RCA native helper验证实现字节，但不能作为公开 runtime、真实 image-generation path、review verdict 或 ready claim。真实运行必须回到 OPL-hosted action。
-
-## 禁止的第二控制面
-
-下列形态在 active source 中必须为零：repo-local CLI、domain handler dispatcher、generic scheduler/runner、Attempt/session/workspace store、review/repair transport、executor adapter、status/workbench wrapper、package install/update manager，以及对这些能力的 compatibility alias。
-
-当前机器合同仍处于过渡态：`contracts/opl_agent_package_manifest.json` 已移除
-installed-lock authority、lifecycle-receipt ownership、`package_core`、lifecycle locator
-与 managed-dependency metadata，并声明配置的 Codex Plugin carrier；Framework 兼容层仍
-可读取旧 lock/materializer/runtime-source 状态，但不得驱动 RCA 新增设计、覆盖 fresh
-carrier readback 或被本文解释为目标架构已完成。
+运行 artifact、workspace、session、receipt instance、memory body 与日志保存在外部 workspace/runtime roots。源码只跟踪定义、schema、policy、locator 与隔离 developer fixtures。`tools/image-ppt-proof/` 和 `tools/native-ppt-proof/` 可验证 helper bytes，不能成为公开 runtime 或领域完成证据。

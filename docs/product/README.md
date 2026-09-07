@@ -1,19 +1,7 @@
-# Product
+# RCA 使用文档
 
-Owner: RedCube AI
-Purpose: 说明用户/operator 如何进入 RCA。
-State: active
-Machine boundary: action 名、输入输出读 OPL-generated interface；installed/callable
-state 读实际 carrier 的 complete-Package fresh readback。
+本目录只承载用户和 operator 操作说明。
 
-RCA 不提供 repo-local product shell。正式入口是安装并确认 `rca`
-`OPL Package(kind=agent)` callable 后，由 OPL 生成的 CLI、MCP、Skill、product-entry、
-OpenAI、AI SDK、status 与 workbench surfaces。
+- [使用入口](./human_quickstart.md)：安装入口 Skill、确认完整 Package、调用交付动作和保留人工审阅意图。
 
-- [Human quickstart](./human_quickstart.md)
-- [Public GitHub publish](./public-github-publish.md)
-
-Codex Plugin Skill 是当前 domain-guidance carrier projection，不是 Package identity 或
-完整 installed truth。RCA identity/capabilities/task/typed views 归 RCA；实际 carrier
-持有 bytes lifecycle，Framework 只聚合 fresh readback 和 action。RCA manifest 不再承载
-旧 lifecycle authority；Framework 兼容读面仍属于迁移输入。
+Package 与执行组件归属见 [架构](../architecture.md)，实际证据边界见 [状态](../status.md)。GitHub 建仓与旧本地配置指南已退役，历史使用 Git 追溯。

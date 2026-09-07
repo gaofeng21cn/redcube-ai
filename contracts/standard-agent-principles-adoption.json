@@ -21,7 +21,7 @@
   "source_refs": {
     "opl_projection_ref": "agent/principles/opl-standard-agent-principles.md",
     "domain_specialization_ref": "agent/principles/domain-specialization.md",
-    "domain_specific_principles_ref": "agent/principles/redcube-ai-principles.md",
+    "domain_specific_principles_ref": "agent/principles/domain-specialization.md",
     "stage_manifest_ref": "agent/stages/manifest.json",
     "stage_control_plane_ref": "opl-generated:family_stage_control_plane",
     "capability_map_ref": "contracts/capability_map.json",

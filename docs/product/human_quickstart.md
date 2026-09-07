@@ -5,28 +5,27 @@ Purpose: 给用户和 operator 一条不依赖 repo-local runtime 的 RCA 使用
 State: active
 Machine boundary: 命令形状以当前安装的 OPL-generated interface 为准；本文不冻结 CLI 参数。
 
-## 开始
+## 安装 Codex 入口
 
-1. 通过当前 OPL-generated interface 确认 `rca` Package 已由实际 carrier 安装并可调用，
-   读取完整 Package 的 fresh readback。Framework 委托 configured native carrier 执行
-   物理动作并聚合状态；RCA owner 持有 identity、完整 bytes 与 publication。
-2. 从 OPL-generated RCA surface 选择完整 visual-deliverable action，或显式选择 image/native proof action。
-3. 提供目标、source/artifact refs、交付格式与需要的 human-review intent。
-4. 让 OPL-hosted StageRun 按 RCA declarative stage graph 推进。
-5. 从 OPL status/workbench surface 读取 StageRun、artifact、review、blocker 与 owner refs。
+在 Codex 桌面中打开本仓；首次 checkout 或 marketplace 变化后重启应用，在 Plugins 中安装 RedCube AI，再新建任务调用 `@RedCube AI` 或 `$redcube-ai`。
 
-## 常用动作语义
+CLI 在仓库根目录管理同一 carrier：
 
-- `invoke_product_entry`：启动完整 RCA visual-deliverable stage graph；
-- `run_image_ppt_proof`：从 artifact creation 进入 image-first proof；
-- `run_native_ppt_proof`：从 artifact creation 进入 editable native PPT proof。
+```bash
+codex plugin marketplace add .
+codex plugin marketplace list --json
+codex plugin add redcube-ai@redcube-ai --json
+codex plugin list --marketplace redcube-ai --available --json
+```
 
-具体 action input/output schema 由当前 `contracts/action_catalog.json` 与 OPL compiled interface 决定。
+需要移除时使用 `codex plugin remove redcube-ai@redcube-ai --json`；删除 marketplace 使用 `codex plugin marketplace remove redcube-ai --json`。这些操作只管理入口 Skill carrier，不安装 OPL Base，也不证明完整 Package、hosted StageRun 或视觉验收。
 
-`rca` 是 executor-neutral 的 `OPL Package(kind=agent)`。Codex Plugin 是当前 carrier
-projection，Codex CLI 是当前首选 executor；切换 executor 不应重装 RCA 或丢失任务、
-偏好与 typed views。RCA owner 独立发布完整 Package bytes，并只推进自己的
-`latest-stable`；普通 dependency 只检查 identity presence 与 callability。
+## 执行交付
+
+1. 从当前 OPL interface 和实际 carrier 读取完整 `rca` Package 的 installed/callable 状态以及 executor readiness；缺少 runtime 或完整 bytes 时交由对应平台 owner 处理。
+2. 普通交付选择 `invoke_product_entry`；仅做 image proof 时选 `run_image_ppt_proof`，明确 native proof 时选 `run_native_ppt_proof`。动作输入与输出以 `contracts/action_catalog.json` 为准。
+3. 提供目标、受众、source/artifact refs、交付格式和人工审阅意图，让同一 hosted StageRun 按 RCA 阶段图继续。
+4. 从 OPL status/workbench 读取 artifact、review、blocker 和 owner refs。候选文件与质量债要明确说明，不能由文件存在推断正式接受。
 
 ## 人工审阅
 

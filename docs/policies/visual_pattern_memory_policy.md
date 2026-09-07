@@ -47,21 +47,9 @@ Machine boundary: 人读 visual memory policy。机器真相继续归 `contracts
 - PNG / PPTX / PDF / export bundle 的 canonical artifact state；
 - 应归 route code、prompt pack、review gate 或 owner receipt 的确定性逻辑。
 
-## 当前机器面
+## 合同与状态
 
-当前标准 memory descriptor 是 `contracts/memory_descriptor.json`，其中 `surface_kind=family_domain_memory_ref`、`version=family-domain-memory-ref.v1`、`memory_ref_id=rca_visual_pattern_memory`、`memory_family=visual_pattern_memory`、`owner=redcube_ai`。
-
-当前 adoption status 是 `descriptor_proof_contract_landed_runtime_writeback_pending`：
-
-- descriptor proof contract 已落地；
-- memory body migration、domain-owned runtime apply 与 production-scale writeback 不声明完成；
-- memory body migration 仍是 `domain_owned_runtime_apply_required`；
-- repo 不跟踪 memory body entries；
-- OPL apply 不被允许，也不能写 memory body、artifact blob、review/export verdict 或 owner receipt body。
-
-安装后的 OPL-generated surface 消费 `contracts/memory_descriptor.json`，只投影 memory locator、writeback proposal、receipt contract 与 operator receipt refs。RCA 仓不实现 export command、memory transport、receipt inventory 或 writeback runtime，也不跟踪 live receipt instances；production-scale writeback 只能由 fresh hosted StageRun evidence 与 RCA owner receipt 证明。
-
-这些 descriptor refs 只证明 direct skill 与 OPL-hosted path 共享 locator/receipt contract。它们不证明 memory body 已迁入 OPL，不声明 visual memory lifecycle complete，也不关闭 production visual-stage long soak。
+Descriptor、proposal、accept/reject 和 locator 字段见 [memory descriptor 说明](../references/domain_memory_descriptor_locator.md) 与 `contracts/memory_descriptor.json`。当前实现状态见 [状态](../status.md)，live writeback 与 scaleout 验收见 [未完成验收](../active/rca-ideal-state-gap-plan.md)。本 policy 不另存当前证据清单。
 
 ## Stage 使用
 
@@ -71,7 +59,9 @@ Memory 只能小规模进入对应 stage：
 - `communication_strategy`：取 story rhythm、audience framing 与信息层级经验。
 - `visual_direction`：取 style、density、composition、route 与 asset-use caveat。
 - `review_and_revision`：取 recurring visual failure mode 与 repair expectation。
-- `package_and_handoff`：取不覆盖 route gate 的 export-process lesson。
+- `package_and_handoff`：仅透传已有的非权威 proposal 并绑定 terminal export refs，不调用 Curator 或签 accept/reject。
+
+Screenshot-review summary 可以产生一个可复用 proposal 或 `skip`；接受/拒绝是 export 后独立的 RCA memory-owner 动作，需真实 review、terminal export 与 provenance refs。
 
 Memory 可以影响 prompt context 和 reviewer attention；它不能接受视觉结果、批准导出、选择 route、写 artifact body 或修改 canonical artifact。
 
@@ -97,17 +87,3 @@ OPL 不能：
 - 写 artifact body；
 - 授权 artifact authority、visual ready、exportable、handoffable、domain ready 或 production ready。
 - 把 visual pattern memory refs 做成 visual route scorer、layout controller、review-pass gate、export gate 或 artifact-ready signal。
-
-Family-level governance 读 `/Users/gaofeng/workspace/one-person-lab/docs/references/operating-governance/family-domain-memory-governance.md`。该路径是人读治理参考，不是 RCA 机器接口。
-
-## 当前证据尾项
-
-仍开放的 evidence tail：
-
-- production-like visual pattern memory accepted/rejected receipt scaleout；
-- writeback receipt 与 locator projection 的 runtime writeback scaleout claim；
-- retention / restore receipt scaleout；
-- OPL-hosted controlled visual-stage long-soak 中的 consumed-memory refs 与 RCA-owned receipt refs 循环；
-- cross-family no-regression proof，且不迁移 memory body、artifact body、route truth 或 review/export verdict。
-
-这些证据尾项关闭前，`descriptor_proof_contract_landed_runtime_writeback_pending` 和 refs-only receipt visibility 不能写成 visual memory lifecycle complete、production ready、domain ready、visual ready、exportable 或 handoffable。

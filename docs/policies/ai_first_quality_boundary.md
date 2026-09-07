@@ -5,7 +5,7 @@ Purpose: `ai_first_quality_boundary_policy`
 State: `current_policy`
 Machine boundary: 人读质量边界 policy。机器真相继续归 contracts、declarative pack、OPL-generated/hosted surface 行为、StageRun artifacts、author/reviewer artifacts、owner receipts 和 RCA-owned review/export gates。
 
-这份 policy 固定 `RedCube AI` 的 AI-first 质量边界。它记录 RCA 近期修复后的长期规则：结构化 pack、schema、gate、audit、review projection 和 scorecard 只能约束流程、传递证据和表达机械状态；创作判断、视觉判断、审稿判断和最终交付质量判断必须由 AI-authored author / reviewer artifact 持有。
+这份 policy 固定 `RedCube AI` 的 AI-first 质量边界。长期规则是：结构化 pack、schema、gate、audit、review projection 和 scorecard 只能约束流程、传递证据和表达机械状态；创作判断、视觉判断、审稿判断和最终交付质量判断必须由 AI-authored author / reviewer artifact 持有。
 
 ## Owner boundary
 

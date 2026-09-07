@@ -17,11 +17,9 @@ Machine boundary: 本文定义目标接口、owner、数据流和验收口径；
 
 该目标不改变 `author_image_pages` 的默认视觉路线。`author_pptx_native` / `repair_pptx_native` 继续是用户明确要求 editable / DrawingML 时选择的路线，并继续受 RCA `visual_director_review -> screenshot_review -> export_pptx` authority gate 约束。
 
-## 2026-07-10 实现读回
+## 来源与当前证据
 
-非 Live 实现已落地：typed native object fidelity、template preservation、package/relationship readback、真实 edit/save/readback/render 回归、semantic quality gates、professional method registry、Learning Landing Audit 和 blind parity evaluator 均已进入现有 RCA stage/skill/helper/contract 边界。该实现没有引入第二 runtime、第二 skill、上游模板资产或 owner authority。
-
-完整规格仍为 `partial`。Notes、transition、timing 和 optional animation 已有真实 package materialization 与 OOXML readback；未关闭项是 PowerPoint/LibreOffice/Keynote 或 Google Slides fresh cross-viewer human readback、同源 RCA 与 pinned `ppt-master` 双跑、5 名独立盲评、完整 edit evidence、exact package/source identity binding 和 RCA parity owner receipt。当前缺口读 [RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md) 与 `contracts/live_stage_run_progress_evidence.json`；测试绿、catalog coverage 或单套 proof 不能替代这些证据。
+本规格的固定对照来源由 `contracts/runtime-program/ppt-master-parity-benchmark.json` 持有；最新上游学习版本由 `contracts/runtime-program/ppt-master-learning-landing.json` 持有，二者不互相替代。当前实现与证据结论读 [状态](../status.md)，未闭合的跨 viewer、同源盲评和 owner receipt 工作读 [未完成验收](../active/rca-ideal-state-gap-plan.md)。以下条款是目标和验收要求，不能据本文声明已完成。
 
 ## 外部模式分类
 
@@ -45,7 +43,7 @@ Machine boundary: 本文定义目标接口、owner、数据流和验收口径；
 - `visual_direction` 冻结 design system、page rhythm、visual peak、template profile consumption 和 route-specific constraints。
 - `author_pptx_native` / `repair_pptx_native` 消费上述 refs，生成 typed editable scene plan；不自行重写已批准 narrative。
 - `visual_director_review` / `screenshot_review` 消费真实 render 与 package readback，返回 unit repair targets 或 pass candidate。
-- `export_pptx` 只在 RCA authority gate 通过后发布 artifact refs。
+- `export_pptx` 可以交付带明确质量债的候选 artifact refs；只有 RCA authority gate 通过后才能声明正式接受。
 
 Stage 不沉淀跨 stage 专业方法、不手写 OOXML、不签 visual/export ready。
 
@@ -111,7 +109,7 @@ Chart/table 支持两种显式 materialization intent：
 - 新增 preflight、package readback 和 visual review 都在 stage 内完成；不得把内部检查暴露成用户逐项确认。
 - 可修复错误返回结构化 unit repair targets，`repair_pptx_native` 只重做阻断页/对象，复用未阻断 artifact hashes。
 - notes/motion/template intake 是同一 native route 的能力，不新增第二公开 skill、第二 runtime 或第二 source of truth。
-- 外部依赖不可用时返回 typed blocker；不得用降级矩形、截图打包或 synthetic preview 伪装完成。
+- 外部能力不可用时记录对应诊断，按当前 Stage 质量预算保留可读候选或 no-output diagnostic；真实 executor、权限、安全和 authority 边界仍 hard-stop。不得用降级矩形、截图打包或 synthetic preview 伪装完成。
 
 ## 质量与稳定性验收
 
@@ -158,5 +156,4 @@ RCA 只有在专业性和美观度 A/B 非劣效下界不低于参考项目 5 �
 6. benchmark 保留真实 chart/table fixture，并有 package assertions。
 7. 至少产出一套真实复杂 native PPT proof，包含 chart/table/picture/connector/notes/transition，并通过真实 render 和 screenshot review。
 8. 文档、contracts、tests、generated/hosted projection 与实际能力一致。
-9. 所有并行 worktree 已复核、吸收回 `main`、清理；根 checkout 干净。
-10. Learning Landing Audit 逐项给出 fresh evidence；无法完成的项必须是明确 typed blocker，不得静默 deferred。
+9. Learning Landing Audit 逐项给出 fresh evidence；无法完成的项必须是明确 typed blocker，不得静默 deferred。

@@ -18,7 +18,7 @@ authority。
 | Surface | 职责 | 不承担 |
 | --- | --- | --- |
 | `agent/primary_skill/SKILL.md` | RCA 的标准 OPL domain pack / Rich App primary skill canonical source。它是 `contracts/capability_map.json#/capabilities?surface_role=primary_skill` 登记的 canonical source，用于表达 RedCube 作为 visual-deliverable domain app 的主 skill 语义。 | 不持有 visual truth、artifact body、review/export verdict、owner receipt、typed blocker 或 runtime data。 |
-| `plugins/redcube-ai/skills/redcube-ai/SKILL.md` | Codex plugin install carrier 的 materialized full skill copy / compat mirror。它随 `plugins/redcube-ai/.codex-plugin/plugin.json` 暴露给 Codex plugin scaffold、安装发现和外部 carrier channel；Codex plugin 安装需要真实 `SKILL.md` 文件，所以这里保留物理文件，而不是 stub、symlink 或纯指针。 | 不定义第二套 RCA 业务能力，不持有 agent membership / status 权威，不覆盖 canonical source，也不持有 visual truth、artifact body、review/export verdict、owner receipt、typed blocker 或 runtime data。 |
+| `plugins/redcube-ai/skills/redcube-ai/SKILL.md` | Codex plugin install carrier 的 materialized full skill copy。它随 `plugins/redcube-ai/.codex-plugin/plugin.json` 暴露给 Codex plugin scaffold、安装发现和外部 carrier channel；Codex plugin 安装需要真实 `SKILL.md` 文件，所以这里保留物理文件，而不是 stub、symlink 或纯指针。 | 不定义第二套 RCA 业务能力，不持有 agent membership / status 权威，不覆盖 canonical source，也不持有 visual truth、artifact body、review/export verdict、owner receipt、typed blocker 或 runtime data。 |
 
 `plugins/redcube-ai/skills/redcube-ai/SKILL.md` 与 `agent/primary_skill/SKILL.md` 的 full-copy 关系是有意的 carrier materialization，不是待删除的重复实现。两者的同步关系由 `contracts/capability_map.json` 的 `redcube-ai.primary_skill.carrier_projection_contract` 记录：`canonical_source=agent/primary_skill/SKILL.md`，`carrier_materialization=materialized_full_skill_copy`，`codex_install_requires_real_skill_md=true`，`carrier_role=transport_install_detail_not_agent_membership_or_status`，`authority=false`。
 
@@ -34,5 +34,4 @@ Codex plugin 安装和发现需要 plugin 目录下的真实 `SKILL.md` carrier 
 - OPL / Codex plugin carrier 可以发现、承载和投影 skill 入口，但不能写 RCA visual truth、artifact body、memory body、review/export verdict、owner receipt、typed blocker 或 runtime data，也不能成为 agent membership/status 权威。
 - 完整 Package installed truth 必须由 Framework 聚合所有实际 carrier 的 fresh
   readback；Plugin presence 只能证明这一 carrier projection 存在。
-- 第 11 条 `Codex plugin legacy alias cutover` 已关闭的是 legacy alias / scaffold 归一：根层 `.codex-plugin/plugin.json`、repo-local installer、`plugins/rca` 和旧 `skills/rca` alias 不再作为安装或发现路径。它不是要求删除 `agent/primary_skill/SKILL.md` 或 `plugins/redcube-ai/skills/redcube-ai/SKILL.md` 之一。
 - 以后如果 plugin carrier 的安装机制变化，先更新 `contracts/capability_map.json` 的 capability ref 和 plugin scaffold，再同步本文；不能直接把 carrier mirror 当作重复实现删除，也不能把它降成 stub、symlink 或纯指针。

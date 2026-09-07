@@ -5,7 +5,7 @@
 - RCA 持有 visual truth、layout/review/export verdict、artifact、visual memory 和 owner receipt authority；Framework 只提供通用 runtime、transport、gallery/handoff shell 与 generated interfaces。
 - `agent/primary_skill/SKILL.md` 是主路由，稳定能力和 carrier 映射以 `agent/` 与 `contracts/` 为准。
 - Plugin、CLI 或其他 carrier/executor 不取得 RCA identity、完整 installed truth 或领域 authority。
-- 当前兼容字段与迁移计划留在 `README.md`、contracts 和 active plans；不得从根规则推断 release 或 production ready。
+- 当前源码与证据边界见 `docs/status.md`，剩余工作见 `docs/active/rca-ideal-state-gap-plan.md`，文档更新与退役见 `docs/docs_portfolio_consolidation.md`；不得从根规则推断 release 或 production ready。
 - 默认验证运行 `scripts/verify.sh`；视觉或交付物变更还须执行对应的 render、pixel/layout 和 artifact readback。
 
 <!-- CODEGRAPH_START -->

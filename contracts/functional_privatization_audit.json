@@ -80,54 +80,54 @@
       "surface_id": "rca_private_cli",
       "replacement_ref": "opl_generated:standard_agent_cli",
       "provenance_refs": [
-        "docs/history/process/retired-surface-provenance.md"
+        "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
       ]
     },
     {
       "surface_id": "rca_private_domain_entry",
       "replacement_ref": "opl_hosted:standard_agent_stage_binding",
       "provenance_refs": [
-        "docs/history/process/retired-surface-provenance.md"
+        "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
       ]
     },
     {
       "surface_id": "rca_private_runtime",
       "replacement_ref": "opl_hosted:stage_run_controller",
       "provenance_refs": [
-        "docs/history/process/retired-surface-provenance.md"
+        "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
       ]
     },
     {
       "surface_id": "rca_private_runtime_protocol",
       "replacement_ref": "opl_hosted:runway_ledger_contracts",
       "provenance_refs": [
-        "docs/history/process/retired-surface-provenance.md"
+        "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
       ]
     },
     {
       "surface_id": "rca_private_governance",
       "replacement_ref": "agent/quality_gates/",
       "provenance_refs": [
-        "docs/history/process/retired-surface-provenance.md"
+        "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
       ]
     },
     {
       "surface_id": "rca_private_overlay_core",
       "replacement_ref": "agent/",
       "provenance_refs": [
-        "docs/history/process/retired-surface-provenance.md"
+        "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
       ]
     }
   ],
   "bridge_exit_gate": {
     "physical_delete_authorization_refs": [
-      "docs/history/process/retired-surface-provenance.md#2026-07-14-standard-agent-private-control-plane-retirement"
+      "https://github.com/gaofeng21cn/redcube-ai/blob/471039cf8306589928f3b5ee5077dff025655bb5/docs/history/process/standard-agent-private-platform-retirement-20260714.md"
     ],
     "no_forbidden_write_refs": [
       "contracts/standard_agent_conformance_profile.json#/physical_morphology/required_parity_gates"
     ],
     "provenance_refs": [
-      "docs/history/process/retired-surface-provenance.md"
+      "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
     ]
   },
   "default_surface_boundary": {

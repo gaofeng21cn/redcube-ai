@@ -114,57 +114,15 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 - 内容界定、受众适配和最终采用由专家把关。
 - 外部发布、上传和最终对外交付由人工监督完成。
 
-<details>
-  <summary><strong>技术层 OPL / executor 边界</strong></summary>
+## 使用与文档
 
-- `OPL` 可以把 RedCube 作为外部领域智能体托管；这条 hosted path 是内部集成面，不是 RedCube 的对外第一身份。
-- 任务启动后，OPL/Temporal 可以负责持久在线调度、唤醒、retry/dead-letter 与 resume；RCA 不内置 daemon、scheduler 或 attempt loop。
-- Package、carrier 与 executor 相互分离。RCA 的发布模型要求 owner 独立发布完整的
-  一方 Package bytes，只推进 RCA 自己的 `latest-stable`；共享 Release Set 只作
-  离线/QA 快照。
-- 普通 required/optional dependency 只检查 identity presence 与 entrypoint
-  callability，不比较版本/ABI，也不使用 lock、payload、digest 或原子发布 cohort。
-- `Codex CLI` 是当前首选且唯一产品化的 executor route，Codex Plugin 是当前 carrier
-  projection。未来切换 executor 不得要求重装 RCA，也不得丢失偏好、Work Item、
-  Temporal refs 或 typed views。
-- RedCube 保留视觉交付权威：视觉领域真相、review/export gates、标准产物、文件交接和 owner receipts。
-- exact ref/digest 继续用于一次发布的 bytes 完整性和 artifact/evidence lineage，但
-  不是普通组合 lock。
-- RCA Package manifest 不再承载旧 lifecycle authority，当前声明 package、carrier、
-  authority 和兼容 surface。Framework 兼容读面与公开 `latest-stable` evidence 仍需
-  各自 owner fresh readback，不能由本仓文档或测试代替。
-- 完整入口 taxonomy、service-safe domain entry、generated-wrapper 边界、合同 refs、canary evidence 和 no-readiness 规则由 [文档索引](./docs/README.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md)、[关键决策](./docs/decisions.md) 和 [合同说明](./contracts/README.md) 维护。
+通过 Codex 安装入口 Skill 后，仍需完整 RCA Package 和可调用的 OPL-hosted runtime 执行交付。安装、动作和人工审阅步骤统一见 [使用入口](./docs/product/human_quickstart.md)。
 
-</details>
+本仓提供声明式视觉 pack、专业方法、机器合同与 Python native helpers。当前证据合同仍记录 live StageRun 验收缺口，不声明 domain ready 或 production ready；实际源码与证据边界见 [当前状态](./docs/status.md)。
 
-## 这个仓库应该怎么读
+- [文档索引](./docs/README.md)：按读者问题导航。
+- [架构](./docs/architecture.md)：Package、carrier、executor 与领域 authority 的归属。
+- [合同说明](./contracts/README.md)：可执行机器输入。
+- [文档生命周期](./docs/docs_portfolio_consolidation.md)：当前文档维护与退役规则。
 
-1. 潜在用户先读当前首页，再继续看 [文档索引](./docs/README.md)。
-2. 技术规划、架构判断和方向同步，继续读 [项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md)、[关键决策](./docs/decisions.md) 以及 [合同说明](./contracts/README.md)。
-3. 开发者和维护者继续从 [文档索引](./docs/README.md) 进入 `docs/active/`、`docs/references/` 与 `docs/policies/`。
-
-## 给 Agent 和技术操作者的快速入口
-
-<details>
-  <summary><strong>如果你准备把这个仓直接交给 Codex 或其他 Agent，先看这里</strong></summary>
-
-- 单独 clone 这个仓不会安装 OPL Base、RCA Package 或托管运行时。需要 hosted
-  execution 时，先准备 OPL Base，并通过受支持 carrier 安装 RCA；Full/offline 快照
-  可以提供同一 Package 的离线 seed，但不会成为另一份 currentness authority。
-- 先读 [文档索引](./docs/README.md)，再读 [合同说明](./contracts/README.md)、[项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md) 和 [关键决策](./docs/decisions.md)。
-- 把公开 package 读作 `RedCube AI Foundry Agent`：一个 app skill 和一个 service-safe domain entry，加上 OPL-generated wrapper/projection refs，视觉领域真相继续留在 RCA。
-- RedCube direct path 与 OPL-hosted path 必须回到同一套 RedCube-owned route、review、artifact 和 export surfaces。
-- 当前 repo-local 命令、命令 target 与验证矩阵由文档索引、contracts 和 `scripts/test-registry.ts` 维护；Agent 不需要先从零散实现文件里反推当前执行真相。
-- `docs/active/` 用来读当前 baton，`docs/references/` 用来读当前支撑参考，`docs/history/` 用来读已吸收里程碑、proof 记录、tombstone 和 provenance。
-
-</details>
-
-## 延伸阅读
-
-- [文档索引](./docs/README.md)
-- [项目概览](./docs/project.md)
-- [当前状态](./docs/status.md)
-- [架构](./docs/architecture.md)
-- [硬约束](./docs/invariants.md)
-- [关键决策](./docs/decisions.md)
-- [合同说明](./contracts/README.md)
+开发验证从 `scripts/verify.sh` 开始；lane 定义在 `scripts/test-registry.ts`。已退休实现和计划通过 Git 历史追溯，不作为运行入口。

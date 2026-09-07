@@ -118,85 +118,15 @@ You can start with prompts like:
 - Content framing, audience fit, and final acceptance stay with experts.
 - External publishing and upload steps stay under human supervision.
 
-<details>
-  <summary><strong>Technical OPL / executor boundary</strong></summary>
+## Usage And Documentation
 
-- OPL can host RedCube as an external domain agent, but that hosted path is an internal integration surface, not RedCube's first public identity.
-- After task start, OPL/Temporal may own persistent scheduling, wakeup, retry/dead-letter handling, and resume. RCA does not embed a daemon, scheduler, or attempt loop.
-- Package, carrier, and executor are separate. The RCA publication model puts
-  complete first-party Package bytes in its owner channel and advances only its own
-  `latest-stable`; a shared Release Set is only an offline/QA snapshot.
-- Required and optional Package dependencies use identity presence and
-  entrypoint callability, not version/ABI ranges, locks, payloads, digests, or
-  atomic release cohorts.
-- `Codex CLI` is the current preferred and only productized executor route.
-  Codex Plugin is the current carrier projection. Future executor routes must
-  not require reinstalling RCA or losing preferences, work items, Temporal
-  references, or typed views.
-- RedCube keeps the visual-deliverable authority: visual-domain truth, review/export gates, canonical artifacts, artifact handoff, and owner receipts.
-- Exact refs and digests remain required for one publication's byte integrity
-  and for artifact/evidence lineage; they are not ordinary composition locks.
-- The RCA Package manifest no longer carries legacy lifecycle authority. It
-  declares the package, carrier, authority, and compatibility surfaces; Framework
-  compatibility read surfaces and public `latest-stable` evidence still require
-  their own owner readback.
-- The full entry taxonomy, service-safe domain entry, generated-wrapper boundary, contract refs, canary evidence, and no-readiness rules are maintained in the [Docs Guide](./docs/README.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), [Decisions](./docs/decisions.md), and [Contracts Overview](./contracts/README.md).
+Installing the Codex entry skill still requires the complete RCA Package and callable OPL-hosted runtime to execute a deliverable. Installation, action selection, and human review steps have one owner: the [Usage Guide](./docs/product/human_quickstart.md).
 
-</details>
+This repository supplies the declarative visual pack, professional methods, machine contracts, and Python native helpers. Its current evidence contract still records a live StageRun acceptance gap and does not claim domain or production readiness. See [Current Status](./docs/status.md) for source facts and evidence limits.
 
-## How To Read This Repository
+- [Docs Guide](./docs/README.md): navigation by reader need.
+- [Architecture](./docs/architecture.md): Package, carrier, executor, and domain authority ownership.
+- [Contracts](./contracts/README.md): executable machine inputs.
+- [Document Lifecycle](./docs/docs_portfolio_consolidation.md): maintenance and retirement rules.
 
-1. Potential users should start here, then continue to the [Docs Guide](./docs/README.md).
-2. Technical readers and planners should read [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), [Decisions](./docs/decisions.md), and [Contracts Overview](./contracts/README.md).
-3. Developers and maintainers should continue from the [Docs Guide](./docs/README.md) into `docs/active/`, `docs/references/`, and `docs/policies/`.
-
-## For Codex / Agents
-
-<details>
-  <summary><strong>Install the Codex plugin carrier or hand this repo to another agent</strong></summary>
-
-- The repo marketplace exposes the existing `redcube-ai` plugin carrier to
-  Codex. In the Codex desktop app, open this repository, restart the app after
-  the first checkout or marketplace change, open **Plugins**, select
-  **RedCube AI**, and install **RedCube AI**. Start a new task before invoking
-  `@RedCube AI` or `$redcube-ai` so the installed skill is loaded.
-- Codex CLI can configure, install, inspect, and remove the same carrier from
-  the repository root:
-
-  ```bash
-  codex plugin marketplace add .
-  codex plugin marketplace list --json
-  codex plugin add redcube-ai@redcube-ai --json
-  codex plugin list --marketplace redcube-ai --available --json
-  codex plugin remove redcube-ai@redcube-ai --json
-  codex plugin marketplace remove redcube-ai --json
-  ```
-
-- `codex plugin list --marketplace redcube-ai --available --json` is the
-  carrier readback. An installed and enabled `redcube-ai` entry, together with
-  the bundled `redcube-ai` skill, proves carrier installation and availability;
-  it does not prove OPL Base installation, canonical Package `rca` currentness,
-  hosted runtime or StageRun availability, artifact readiness, review/export
-  acceptance, or an RCA owner receipt.
-- For the complete OPL boundary and current readiness, continue to
-  [Status](./docs/status.md), [Contracts Overview](./contracts/README.md), and
-  `opl packages status --package-id rca --json` in an environment where OPL Base is
-  installed. Cloning this repo or installing the plugin does not install OPL
-  Base or grant the carrier Package/runtime/domain authority.
-- Read the [Docs Guide](./docs/README.md) first, then [Contracts Overview](./contracts/README.md), [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), and [Decisions](./docs/decisions.md).
-- Treat the public package as `RedCube AI Foundry Agent`: one app skill and one service-safe domain entry, with OPL-generated wrapper/projection refs and visual-domain truth kept inside RCA.
-- Direct RedCube use and OPL-hosted use must converge on the same RedCube-owned route, review, artifact, and export surfaces.
-- Use the repo-local commands, command targets, and verification matrix maintained in the Docs Guide, contracts, and `scripts/test-registry.ts`; do not reconstruct current execution truth from scattered implementation files.
-- Use `docs/active/` for current baton records, `docs/references/` for current support references, and `docs/history/` for absorbed milestones, proof records, tombstones, and provenance.
-
-</details>
-
-## Further Reading
-
-- [Docs Guide](./docs/README.md)
-- [Project](./docs/project.md)
-- [Status](./docs/status.md)
-- [Architecture](./docs/architecture.md)
-- [Invariants](./docs/invariants.md)
-- [Decisions](./docs/decisions.md)
-- [Contracts Overview](./contracts/README.md)
+Start developer verification with `scripts/verify.sh`; lanes are defined in `scripts/test-registry.ts`. Retired implementations and plans remain traceable in Git history and are not execution entrypoints.

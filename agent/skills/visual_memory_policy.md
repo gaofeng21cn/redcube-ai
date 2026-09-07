@@ -3,7 +3,7 @@
 Owner: `RedCube AI`
 Purpose: `stage_skill_policy_ref_for_visual_memory_boundary`
 State: `policy_ref_not_standalone_professional_skill`
-Machine boundary: 本文件是 Declarative Visual Pack 的旧 `agent/skills/*.md` policy ref，用来约束 stage 如何提出、接受、拒绝和投影 visual memory。它不是 standalone Codex professional skill，也不是 external skill repo。
+Machine boundary: 本文件是 Declarative Visual Pack 的 `agent/skills/*.md` policy ref，用来约束 stage 如何提出、接受、拒绝和投影 visual memory。它不是 standalone Codex professional skill，也不是 external skill repo。
 
 策略:
 - Memory body 和 accept/reject verdict 归 RCA。

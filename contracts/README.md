@@ -32,7 +32,7 @@ Machine boundary: JSON body 和 schema 是机器面；本文只解释 owner 和�
 
 `runtime-program/` 只保留 RCA domain quality、PPT/native-helper 和 developer-proof contracts，例如 `python-native-helper-catalog.json`、`ppt-native-python-engine-contract.json` 与路线质量合同。它不再保存 current-program baton、product-entry、session、domain-entry、runtime package 或 Hermes adapter control plane。
 
-迁移前 `production_acceptance/` snapshot 已物理退役；历史来源只在 `docs/history/` 与 Git history 读取。当前 readiness 必须由 fresh hosted evidence 与 RCA owner receipt 证明。
+迁移前 `production_acceptance/` snapshot 已物理退役；历史来源通过 Git history 读取。当前 readiness 必须由 fresh hosted evidence 与 RCA owner receipt 证明。
 
 ## Retired machine surfaces
 

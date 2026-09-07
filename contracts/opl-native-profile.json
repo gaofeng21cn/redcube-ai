@@ -1,5 +1,5 @@
 {
-  "active_truth_owner": "docs/active/rca-ideal-state-gap-plan.md",
+  "active_truth_owner": "docs/status.md",
   "canonical_docs": [
     {
       "path": "README.md",
@@ -70,15 +70,13 @@
   "schema": "opl_native_profile.v1",
   "taxonomy_dirs": [
     "docs/active",
-    "docs/public",
     "docs/product",
     "docs/runtime",
     "docs/delivery",
     "docs/source",
     "docs/policies",
     "docs/specs",
-    "docs/references",
-    "docs/history"
+    "docs/references"
   ],
   "verification_commands": [
     "scripts/verify.sh",
@@ -86,7 +84,6 @@
     "package.json:scripts.test:fast",
     "package.json:scripts.test:full",
     "package.json:scripts.build",
-    "package.json:scripts.typecheck",
-    "python -m pytest"
+    "package.json:scripts.typecheck"
   ]
 }

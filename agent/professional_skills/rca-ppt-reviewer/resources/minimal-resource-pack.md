@@ -99,9 +99,9 @@ preserve_or_redraw: redraw S07 only
 
 - Review pixels and contact sheet rhythm before reading manifests.
 - Source claims, numbers, labels, and conclusions match approved refs.
-- Internal routes, local paths, prompt names, and operator wording are blockers.
+- Internal routes, local paths, prompt names, and operator wording in visible content require repair and close ready claims; progression follows the Stage quality budget.
 - Weak findings and blocking defects use different fields.
-- Export can proceed only with required review, screenshot, PPTX/PDF, and gallery refs.
+- Candidate export may continue with explicit quality debt or a no-output diagnostic; accepted export claims require the declared review, screenshot, package, and owner evidence.
 - Contact sheets are checked for rhythm and density, not only file count.
 - Drafts with known weak pages stay labeled as drafts until repaired.
 - Native labels are reconciled with package object/part/relationship readback.

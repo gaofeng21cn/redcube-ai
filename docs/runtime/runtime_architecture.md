@@ -25,7 +25,7 @@ professional skill、quality gate 和 tool affordance boundary。
 
 ## Route 与 receipt
 
-decisive Attempt 返回语义 route recommendation/impact。OPL controller 校验 evidence 与 authority 后物化 transition 和 formal review receipt；RCA authority 对 visual/review/export/artifact/memory/owner 语义负责。
+终局 decisive Attempt 返回 `route_impact.stage_route_decision`；非终局 Attempt 最多返回 `stage_route_recommendation`。OPL controller 校验 evidence 与 authority 后物化 transition 和 formal review receipt；RCA authority 对 visual/review/export/artifact/memory/owner 语义负责。
 
 ## 状态与恢复
 

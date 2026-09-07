@@ -12,7 +12,7 @@ Gate rules:
 - Owner receipt signer: `redcube_ai`
 - Visual pack discipline stays in RCA: image-first, HTML, native PPTX, screenshot review, export, artifact locator, visual memory, and native helper implementation are domain quality surfaces, not generic runtime residue.
 - Production evidence tail must produce artifact-producing owner receipt, review/export receipt, visual memory receipt, workspace receipt scaleout, production-like no-regression ref, Temporal controlled visual-stage long-soak ref, human review receipt, or RCA typed blocker.
-- Generic session, runtimeWatch, workbench, operator projection, neutral route-run record, and domain_action_adapter compatibility surfaces can only stay as refs-only adapters before the thinning gate; after OPL default caller parity and no-active-caller proof they must delete or tombstone.
+- Generic session, runtime status, workbench, operator projection, and execution transport belong to OPL. RCA consumes hosted refs and does not maintain private adapters or compatibility surfaces for those functions.
 
 Forbidden substitutions:
 - Provider completion cannot become visual ready, exportable, handoffable, source-ready, or review-pass verdict.

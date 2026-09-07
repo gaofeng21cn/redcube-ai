@@ -31,7 +31,6 @@
     ],
     "allowed_residue_prefixes": [
       "contracts/",
-      "docs/history/",
       "tests/"
     ],
     "required_surface_ids": [

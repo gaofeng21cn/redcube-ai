@@ -3,7 +3,7 @@
 Owner: `RedCube AI`
 Purpose: `stage_skill_policy_ref_for_ai_first_visual_authoring`
 State: `policy_ref_not_standalone_professional_skill`
-Machine boundary: 本文件是 Declarative Visual Pack 的旧 `agent/skills/*.md` policy ref，用来约束 stage authoring 行为。它不是 standalone Codex professional skill，也不沉淀完整的 story architecture、visual direction、page authoring 或 review 方法。
+Machine boundary: 本文件是 Declarative Visual Pack 的 `agent/skills/*.md` policy ref，用来约束 stage authoring 行为。它不是 standalone Codex professional skill，也不沉淀完整的 story architecture、visual direction、page authoring 或 review 方法。
 
 适用 stage:
 - `source_intake`
