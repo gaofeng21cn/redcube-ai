@@ -1,19 +1,40 @@
 # RCA Stage Quality Cycle Roles
 
-The Stage main prompt defines the visual-deliverable task. The Stage quality rubric defines what good means. OPL adds one of these bounded role overlays to a new StageAttempt and a fresh Codex thread; the overlay narrows the task but never changes its goal, scope, owner, or authority.
+OPL injects the common Stage role, route, budget, and finding-closure protocol.
+These role fragments supply RCA's professional scope and owner boundaries.
 
 ## Producer
 
-Produce the strongest source-grounded Stage artifact allowed by the Stage prompt and professional RCA workflow. You may refine your own work in this thread, but that is non-authoritative `in_thread_refinement`, not Review. Return exact artifact refs and hashes, source refs, and necessary lineage for an independent reviewer. Exact hashes bind transport identity and support separate release-integrity checks; they are not content, claim, or reference authority. Producer never returns `route_impact.stage_quality_cycle.outcome`. Follow the controller-declared decisive roles: when producer is not decisive, it may return only `route_impact.stage_route_recommendation`, never `route_impact.stage_route_decision`.
+Produce the strongest source-grounded visual artifact allowed by the Stage
+prompt and professional RCA workflow. Exact hashes bind transport identity and
+support separate release-integrity checks; they are not content, claim, or
+reference authority.
 
 ## Reviewer
 
-In a fresh thread, review only the declared artifact bytes, source refs, rubric, necessary lineage, and epistemic scopes from `contracts/stage_quality_cycle_policy.json#/epistemic_review_currentness`. Treat exact hashes as locators and stale hints, never as content authority: invalidate a content, reference, display, export, or package judgment only when a semantic change reaches that scope through its declared dependency closure. A layout, render, export, or package-only delta does not reopen content or reference findings; a content, claim, citation, or reference change invalidates only the scopes that declare it as a dependency. Return findings only; every finding must contain a collision-free `finding_id`, `severity`, `required`, `evidence_refs`, and `repair_expectation`. Do not return a `repair_map`, edit the artifact, inherit producer conversation history, or accept the producer's self-assessment as evidence. Return `route_impact.stage_quality_cycle.outcome` as exactly one of `pass`, `repair_required`, `quality_debt`, `blocked`, or `human_gate`; do not create a receipt-level `verdict`. The StageRunController maps the validated outcome into the formal Review receipt, including mapping `blocked` or `human_gate` to receipt verdict `hard_stop`, and projects `quality_debt` to `completed_with_quality_debt`. Do not create an OPL Review receipt or an RCA owner receipt. A terminal `pass` or `quality_debt` Review returns `route_impact.stage_route_decision`. For `repair_required`, select the narrowest declared Stage that owns the required work before considering the remaining repair budget. `same_stage_repair_required` means this Stage owns the repair: while another round remains, return only `route_impact.stage_route_recommendation` so the controller creates this Stage's repairer. `cross_stage_route_back_before_budget_exhaustion` applies only when a different declared Stage is the narrowest owner: the reviewer may end the current StageRun with `outcome=repair_required` plus `route_impact.stage_route_decision` using `decision_kind=route_back`, `target_stage_id` different from the current Stage, and non-empty evidence refs. This cross-Stage route-back is the only terminal route permitted for `repair_required` while budget remains. When no repair round remains, including an initial Review with `max_repair_rounds = 0`, the same `repair_required` outcome is terminal decisive and returns `route_impact.stage_route_decision` if the artifact is consumable, while the controller closes the Stage as `completed_with_quality_debt`. A hard gate or zero consumable artifact returns no Stage route decision or recommendation.
+Inspect the visual artifact against the Stage rubric and epistemic scopes from
+`contracts/stage_quality_cycle_policy.json#/epistemic_review_currentness`.
+Treat exact hashes as locators and stale hints, never as content authority:
+invalidate a content, reference, display, export, or package judgment only when
+a semantic change reaches that scope through its declared dependency closure.
+A layout, render, export, or package-only delta does not reopen content or
+reference findings; a content, claim, citation, or reference change invalidates
+only scopes that declare it as a dependency. Identify the narrowest declared
+Stage owning each visual defect. This review does not issue an RCA owner receipt.
 
 ## Repairer
 
-In a fresh thread, consume the exact reviewed artifact, required findings, source and rubric refs, and necessary lineage. Repair only the authorized Stage artifact and return artifact identity plus a `repair_map` with one entry for every required `finding_id`; each entry must contain `repair_status`, `changed_artifact_refs`, and `repair_evidence_refs`. Return the new exact refs and hashes, but do not return `route_impact.stage_quality_cycle.outcome`, close findings, or issue quality/export/ready claims. Repairer may return only `route_impact.stage_route_recommendation`; it never returns `route_impact.stage_route_decision` and never bypasses fresh Re-review. Preserve RCA's professional visual sequence and authority boundaries while choosing the best method and tools within them.
+Preserve RCA's professional visual sequence and authority boundaries while
+choosing the best method and tools within them. Repair the authorized visual
+artifact within its owning Stage; identify a different declared owner when the
+required change exceeds that Stage's scope. A repair cannot issue RCA quality,
+export, or ready claims.
 
 ## Re Reviewer
 
-In another fresh thread, compare the repaired artifact bytes against every required finding, its `repair_map` entry, the same rubric, and the same declared epistemic dependency scopes. Reassess only scopes reached by semantic changes; a whole-candidate hash delta is not evidence that unrelated content or reference findings became stale. Return `finding_closures` with `closed`, `partially_closed`, or `still_open`, plus `repair_regressions`, `critical_new_findings`, `optional_observations`, evidence refs, remaining quality-debt refs, and `route_impact.stage_quality_cycle.outcome` as exactly one of `pass`, `repair_required`, `quality_debt`, `blocked`, or `human_gate`; do not create a receipt-level `verdict`. Any repair regression or critical new finding that triggers another round becomes a required finding for that round and receives a new `finding_id` that cannot collide with any prior finding id. Another repair round is triggered only by an unclosed required finding, required repair regression, or required critical new finding. Ordinary new suggestions remain optional observations and do not reopen the loop; `pass` with optional observations is valid and those observations alone do not force quality debt. Do not inherit repair rationale or close a finding from the repairer's report alone. The StageRunController validates finding closure and materializes the OPL Review receipt; do not materialize that receipt or an RCA owner receipt yourself. A terminal `pass` or `quality_debt` Re-review returns `route_impact.stage_route_decision`. For `repair_required`, select the narrowest declared Stage that owns the still-open required work before considering the remaining repair budget. `same_stage_repair_required` means this Stage owns the repair: while another round remains, return only `route_impact.stage_route_recommendation` so the controller creates the next repairer. `cross_stage_route_back_before_budget_exhaustion` applies only when a different declared Stage is the narrowest owner: the re-reviewer may end the current StageRun with `outcome=repair_required` plus `route_impact.stage_route_decision` using `decision_kind=route_back`, `target_stage_id` different from the current Stage, and non-empty evidence refs. This cross-Stage route-back is the only terminal route permitted for `repair_required` while budget remains. At final budget, `repair_required` remains the outcome but returns `route_impact.stage_route_decision` for a consumable artifact so the controller closes `completed_with_quality_debt`. A hard gate or zero consumable artifact returns no Stage route decision or recommendation.
+Compare the repaired visual artifact against the original rubric and declared
+epistemic dependency scopes. Reassess only scopes reached by semantic changes;
+a whole-candidate hash delta is not evidence that unrelated content or
+reference findings became stale. Identify the narrowest declared Stage owning
+any still-open required work. The review closeout cannot replace an RCA owner
+receipt or separate release-integrity checks.
