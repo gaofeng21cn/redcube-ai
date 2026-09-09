@@ -1,6 +1,10 @@
 import math
 
 from redcube_ai.native_helpers.ppt_deck.native_layouts import safe_text
+from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.text_metrics import (
+    normalized_text_char_count,
+    weighted_text_width_pt as weighted_text_width_px,
+)
 from redcube_ai.native_helpers.ppt_deck.native_quality_constants import (COMPOSITION_BUCKET_PX, MIN_NATIVE_TEXT_PANEL_INSET_PX)
 
 
@@ -45,27 +49,6 @@ def rect_union_area(rects: list[dict]) -> float:
             ):
                 area += (right - left) * (bottom - top)
     return area
-
-
-def weighted_text_width_px(text: str, font_size: float) -> float:
-    width = 0.0
-    for char in safe_text(text):
-        codepoint = ord(char)
-        if char.isspace():
-            width += font_size * 0.32
-        elif codepoint > 127:
-            width += font_size * 0.95
-        elif char.isupper():
-            width += font_size * 0.68
-        elif char in {'-', '/', ':'}:
-            width += font_size * 0.38
-        else:
-            width += font_size * 0.56
-    return width
-
-
-def normalized_text_char_count(text: str) -> int:
-    return sum(1 for char in safe_text(text) if not char.isspace() and char not in {'，', '。', '、', ',', '.', ':', '：', ';', '；'})
 
 
 def text_shape_estimated_lines(shape: dict) -> int:

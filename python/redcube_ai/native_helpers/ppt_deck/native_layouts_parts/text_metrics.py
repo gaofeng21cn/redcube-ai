@@ -43,6 +43,7 @@ def ai_shape_font_size(shape_spec: dict, role: str) -> float:
 
 
 def weighted_text_width_pt(text: str, font_size: float) -> float:
+    """Estimate width in the supplied font-size unit (points or pixels)."""
     width = 0.0
     for char in safe_text(text):
         codepoint = ord(char)
