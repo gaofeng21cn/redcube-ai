@@ -4,6 +4,19 @@ Stage id: `source_intake`
 Owner: RedCube AI
 Purpose: freeze source truth, audience constraints, source gaps, and allowed evidence before communication planning.
 
+Read the supplied material and explain what the audience needs to understand or
+decide, which claims the sources support, and which examples or visuals can carry
+those claims. Reconcile conflicting versions and distinguish user requirements,
+source facts, interpretation, and missing material. Preserve an accepted source
+package when its scope is current; use its contents to make the readiness judgment.
+
+Produce a source-grounded brief with the intended deliverable, audience, use
+situation, hard constraints, usable evidence and assets, and consequential gaps.
+The brief must let `communication_strategy` plan without repeating intake.
+Persist the judgment in the domain workspace and return its refs; a source list
+alone does not explain what can safely be communicated. Keep ordinary gaps as
+bounded assumptions or follow-up needs while preserving source and safety limits.
+
 Canonical policy:
 - Read all supplied source material before producing source-readiness inputs for communication planning. When `source_truth_refs` are supplied, consume the referenced source package and readiness evidence as the prevalidated source-truth basis instead of rediscovering the generic workspace.
 - Treat `source_materials_full_text`, `source_truth_refs`, source package refs, and explicit user constraints as the only source-truth basis.

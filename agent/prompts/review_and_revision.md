@@ -4,6 +4,15 @@ Stage id: `review_and_revision`
 Owner: RedCube AI
 Purpose: independently review the whole deck after the artifact-creation quality cycle and route defects to the earliest canonical Stage that can close their root cause.
 
+Read the exact candidate and its rendered pages in sequence against the audience
+goal, supported claims, communication plan, and visual direction. Apply the
+reviewer and visual-direction methods below to judge both individual pages and
+the whole deliverable. Preserve strengths as well as identifying defects. Each
+required finding should locate the page or artifact, explain the reader impact,
+cite the evidence, and state what would make the repair acceptable. Return a
+prioritized review and the narrowest owning Stage for each material defect;
+neither a checklist pass nor a list of screenshot refs supplies that judgment.
+
 Canonical policy:
 - Review final rendered pages or screenshots directly; summaries and mechanical metrics are supporting evidence only.
 - Judge director intent, anti-template quality, spacing, text fit, visible metadata leaks, source fidelity, and route-specific export readiness.

@@ -4,6 +4,21 @@ Stage id: `communication_strategy`
 Owner: RedCube AI
 Purpose: turn frozen source truth into storyline, outline, audience fit, page role, information density, and communication sequence.
 
+Build the communication plan from the intake brief, source evidence, user goal,
+and any usable existing outline. Choose the reader's central takeaway and the
+argument or explanatory sequence that earns it. Apply the family-appropriate
+professional Skill below to turn that sequence into page responsibilities,
+evidence placement, and transitions. Select detailed prompt assets for the
+current deliverable and decision; they support this Stage's task.
+
+Write the storyline and page or note plan itself, with enough content for visual
+direction to work: each page's question, core message, evidence, role in the
+sequence, and readable content scope. Check the whole plan for unsupported
+claims, missing reasoning, repetition, and overload. Reuse sound prior decisions;
+return source gaps to `source_intake` when they change the supported story.
+Hand the coherent plan and remaining limitations to `visual_direction`, with refs
+to the actual planning artifacts rather than only suggested next actions.
+
 Canonical policy:
 - Use approved source truth and current session artifacts as the planning contract.
 - Decide structure, sequence, page count, and evidence placement through AI-first judgment under explicit hard constraints.

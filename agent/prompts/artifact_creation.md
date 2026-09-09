@@ -4,6 +4,20 @@ Stage id: `artifact_creation`
 Owner: RedCube AI
 Purpose: create candidate visual deliverables through the selected RCA route while preserving source truth and approved visual direction.
 
+Create or repair the requested visual pages using the current source, content
+plan, visual direction, selected route, and existing artifacts. Read the relevant
+professional method below and apply it to actual page content; then use the
+route's tools and detailed prompt assets to materialize the candidate. A page
+plan or an image-generation prompt is an intermediate result, not a delivered
+page. Keep approved usable pages and concentrate repair on the affected scope.
+
+Inspect the rendered candidate for content fidelity, composition, text legibility,
+and continuity with neighboring pages. Correct defects owned by page production
+within the current role; identify the upstream decision when a repair needs new
+source, story, or visual direction. Return the actual candidate files, render and
+source refs, applied professional method, and specific remaining findings for
+independent review. Completion of this work does not close the formal review gate.
+
 Canonical policy:
 - Use approved communication strategy, visual direction, source whitelist, and route policy as the authoring contract.
 - Default `ppt_deck` route creates complete 16:9 image-first slide pages; native PPTX and HTML are explicit selected routes.

@@ -4,6 +4,20 @@ Stage id: `visual_direction`
 Owner: RedCube AI
 Purpose: define visual language, rhythm, density, layout risk controls, visual anchors, and anti-template constraints before artifact creation.
 
+Translate the communication plan into a visual system that helps the audience
+follow its reasoning. Consume any applicable template profile and use the visual
+director Skill to choose typography, composition, imagery, emphasis, and page
+rhythm. Judge these choices against the actual content, display context, brand,
+readability, and user constraints rather than a favored template.
+
+Author a direction that page production can follow: show which visual treatment
+serves each page's message, how evidence will remain legible, what stays consistent,
+and where the sequence needs variation or emphasis. Resolve crowded or ambiguous
+pages by changing composition or returning a content decision to
+`communication_strategy`. Hand the direction, page-specific intentions, reference
+assets, and known production risks to `artifact_creation`; an aesthetic adjective
+list or a Skill referral alone is not an actionable visual direction.
+
 Canonical policy:
 - Build visual direction from current approved blueprint or note plan, not from fixed examples.
 - Cover all real page ids, rhythm roles, peak pages, layout family ceilings, typography, spacing, and forbidden regressions.

@@ -4,6 +4,16 @@ Stage id: `package_and_handoff`
 Owner: RedCube AI
 Purpose: export final files, package manifests, publication copy, resume handles, artifact inventory refs, and owner handoff receipts.
 
+Assemble the deliverable requested by the user from the reviewed candidate and
+current review evidence. Materialize the requested file formats, notes or caption
+copy, and package contents through the selected family route. Open or render the
+final exports and check that content, order, page count, links, and supporting
+materials agree with the accepted candidate. Use the reviewer Skill for package
+and export judgment. Return usable file locations, an intelligible handoff,
+remaining review debt, and any concrete owner action; the inventory and receipts
+support those files rather than substitute for them. Keep publication or sending
+actions within their separately authorized scope.
+
 Canonical policy:
 - Always materialize the best available export candidate or an exact-ref-and-hash no-output diagnostic. That diagnostic is a consumable progress artifact; only failure to materialize either a candidate or the diagnostic is literal zero consumable artifact. Review debt blocks export-ready and handoff-ready claims, not stage progression; include repair refs when useful.
 - Produce real files and machine-readable manifest refs; metadata alone cannot stand in for PPTX, PDF, PNG, HTML, caption, or bundle outputs.
