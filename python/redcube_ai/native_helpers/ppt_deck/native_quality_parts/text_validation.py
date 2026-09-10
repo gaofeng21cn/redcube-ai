@@ -194,7 +194,7 @@ def audience_label_readability_failures(native_shapes: list[dict]) -> list[dict]
 
 
 def normalized_content_char_count(text: str) -> int:
-    return sum(1 for char in safe_text(text) if not char.isspace() and char not in {'，', '。', '、', ',', '.', ':', '：', ';', '；'})
+    return normalized_text_char_count(text)
 
 
 def content_depth_audit(native_shapes: list[dict]) -> dict:

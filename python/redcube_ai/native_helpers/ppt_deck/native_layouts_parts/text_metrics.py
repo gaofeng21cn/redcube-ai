@@ -156,7 +156,7 @@ def ai_text_capacity_failure(shape_spec: dict) -> dict | None:
 
 
 def normalized_content_char_count(text: str) -> int:
-    return sum(1 for char in safe_text(text) if not char.isspace() and char not in {'，', '。', '、', ',', '.', ':', '：', ';', '；'})
+    return normalized_text_char_count(text)
 
 
 def ai_content_depth_failures(shapes: list[dict]) -> list[dict]:
