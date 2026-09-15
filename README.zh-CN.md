@@ -114,6 +114,19 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 - 内容界定、受众适配和最终采用由专家把关。
 - 外部发布、上传和最终对外交付由人工监督完成。
 
+## 安装
+
+通过 OPL 的标准软件包入口安装：
+
+```bash
+opl packages install rca --json
+opl packages status --package-id rca --json
+```
+
+正式发布渠道为 `ghcr.io/gaofeng21cn/one-person-lab-packages/rca`，不可变版本用于精确引用，`latest-stable` 指向当前版本。OPL 与原生插件管理器负责安装和更新；不通过独立 GitHub Release 页面或附件分发。
+
+安装后新建任务以加载专业技能。软件包安装、运行可用性和领域验收分别记录；具体边界见[当前状态](./docs/status.md)。
+
 ## 使用与文档
 
 通过 Codex 安装入口 Skill 后，仍需完整 RCA Package 和可调用的 OPL-hosted runtime 执行交付。安装、动作和人工审阅步骤统一见 [使用入口](./docs/product/human_quickstart.md)。

@@ -118,6 +118,19 @@ You can start with prompts like:
 - Content framing, audience fit, and final acceptance stay with experts.
 - External publishing and upload steps stay under human supervision.
 
+## Installation
+
+Install through the standard OPL Package entry:
+
+```bash
+opl packages install rca --json
+opl packages status --package-id rca --json
+```
+
+The publication channel is `ghcr.io/gaofeng21cn/one-person-lab-packages/rca`. Immutable versions identify exact releases; `latest-stable` selects the current version. OPL and the native plugin manager handle installation and updates. Separate GitHub Release pages and attachments are not used for distribution.
+
+Start a new task after installation to load the professional skills. Package installation, runtime callability, and domain acceptance remain separate; see [Current Status](./docs/status.md).
+
 ## Usage And Documentation
 
 Installing the Codex entry skill still requires the complete RCA Package and callable OPL-hosted runtime to execute a deliverable. Installation, action selection, and human review steps have one owner: the [Usage Guide](./docs/product/human_quickstart.md).
