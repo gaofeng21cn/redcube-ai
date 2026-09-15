@@ -48,7 +48,7 @@ Produce page plans or artifacts from the accepted upstream refs, with enough det
 2. Work from each page's current contract and check it against deck-level rhythm and style. Reuse already-read refs until an upstream change invalidates them.
 3. Preserve approved claims and evidence. Do not rewrite the story to fit a convenient layout unless returning a repair target.
 4. Keep visible text clean. Do not expose prompt names, source ids, local paths, route names, RCA internals, operator notes, or system fields.
-5. Prefer fewer, larger, meaningful visual groups over many small cards. For image-first prompts, use fewer than the maximum readable labels; generated text often becomes denser and less controllable than the written prompt suggests.
+5. Choose meaningful visual groups at readable scale. For image-first prompts, retain the objects, relations, evidence and labels required by the page role; do not maximize whitespace or minimize label counts at the expense of proof.
 6. Use structural visuals, not decoration: connectors, rails, bands, timelines, maps, tables, charts, proof strips, and decision panels must carry first-glance logic.
 7. Size content before committing layout. If text cannot fit at the readability floor, shorten copy, reduce slots, change layout, or return a repair target.
 8. For repair, target only blocked pages when the review surface names them; preserve passed pages and record what feedback was consumed.
@@ -65,9 +65,17 @@ Produce page plans or artifacts from the accepted upstream refs, with enough det
 - Do not skip route gates: visual direction -> page prompts/payloads -> generated/rendered pages -> contact sheet -> visual QA -> PPTX assembly/export. A PPTX made before screenshot review is only a draft artifact.
 - For image-first decks, every generated page must be imported into the artifact workspace, normalized to 16:9, included in a contact sheet, and only then wrapped into PPTX.
 - Keep full-page image PPTX honest. It is acceptable for the image-first route, but it must not be described as native editable PPTX.
-- When a page is text-dense after generation, redraw the page with fewer labels rather than accepting tiny generated text. Preserve unaffected pages and repair only the blocked slide ids when possible.
+- When generated text is too dense, improve hierarchy/composition and shorten redundant explanation while preserving essential evidence and publication attribution. Route a genuine capacity conflict to story/direction; do not silently delete proof or accept tiny text.
 - Page authoring must consume the current approved style refs. If the style source changes, regenerate prompts or payloads that cite the old style rather than mixing old and new visual lines.
 - Native PPTX pages must carry shape-manifest and render-proof expectations before reviewer QA; an editable claim without those refs is a route mismatch.
+
+## Source-Faithful Image Repairs
+
+Keep the page's content whitelist separate from its style reference. A reference supplies visual language, not sample sizes, titles, institutions or production instructions. Preserve verified publication status on each research-bearing method/result page; follow the accepted compact citation format instead of repeating a full paper title.
+
+For medical imagery, verify modality, anatomy, plane and before/after pairing, not only the CT/MRI label. Mechanisms must distinguish training inputs, practical use and interpretation; do not fabricate curves, error bars or geographic locations as decoration. A local edit can change neighboring numbers, arrows or objects, so emit the whole affected page for renewed content review. Repeated failure on the same object should lead to a corrected content/reference-driven reconstruction within the existing repair budget, not endless cosmetic retries.
+
+Keep blueprint, active prompt, image, speaker text, source records and PPTX notes consistent with the same current page data. When a desired content improvement changes approved story meaning, return it to the story owner rather than changing source authority inside page authoring.
 
 ## Resources
 

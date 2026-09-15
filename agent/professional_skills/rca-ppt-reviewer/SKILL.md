@@ -53,7 +53,7 @@ Independently review the exact rendered pixels and route-specific package/readba
 4. Fail closed the visual-ready/export-ready claim on visible leaks. Internal route names, prompt names, operator wording, local paths, source ids, RCA system terms, or hidden production instructions in visible slide text become quality debt and targeted repair input; they do not block the next stage.
 5. Separate weak observation from blocking defect. Use only allowed verdict enums from the stage prompt, and put non-blocking concerns in findings.
 6. Repair targets must be actionable: name page id, visible problem, required change, owner stage, and whether to rerun page authoring, native repair, HTML repair, or image repair.
-7. Preserve passed pages. Do not request full-deck redraw when blocked-slide repair is sufficient.
+7. Preserve pages whose approval still matches current source, story and style requirements. A new whole-deck content/style request requires reassessing all pages, including previous passes; it does not require redrawing pages that still fit.
 8. Do not use provider completion, queue state, file existence, or test pass as a visual-ready claim.
 9. Keep RCA authority clear. Review/export verdicts belong to RCA; OPL may transport refs and repair hints only.
 10. Route back to the real owner. Story defects go to story architecture, density/style defects to visual direction, page construction defects to page authoring, editable-object defects to native PPT design, and reusable lessons to memory curation.
@@ -76,9 +76,17 @@ Independently review the exact rendered pixels and route-specific package/readba
 
 - A draft can be useful without being a review-passed handoff candidate. Label V0/V1 outcomes honestly and record known weak pages instead of calling the deck final because PPTX assembly succeeded.
 - Contact-sheet review must include rhythm and density, not only image count and file sizes. Generated image decks commonly pass mechanical checks while still having too much text on selected pages.
-- First-use naming and public link/source treatment are reviewable content quality issues. Block or repair when abbreviations appear before full names, when evidence pages omit available public links, or when visible links crowd the page.
+- Naming and publication attribution are reviewable content quality issues. Follow the brief's full-name requirements and retain journal/year or actual status on research-bearing method/result pages. A compact on-slide citation with complete sources in notes is valid when the brief allows it; absence of a visible URL alone is not a defect.
 - Review the story arc as pixels: the deck should show why the proposal is necessary, why it is feasible, and how it lands. A visually polished product tour can still be a story failure.
 - Screenshot/contact-sheet evidence is required for a reviewed-ready claim; a PPTX assembled from unreviewed images remains a non-ready candidate.
+
+## Evidence, Density And Long-Deck Readback
+
+Review both under-explained and overcrowded pages against their role and the latest accepted quality benchmark. Separate style continuity from layout repetition. For a hand-drawn brief, inspect all readable scripts and numeric/citation labels as well as illustration. A pleasing image cannot offset a missing mechanism, publication attribution, wrong anatomy, unsupported result, or causal overclaim. A repeated defect should expand review to all related uses before selecting repair ids.
+
+Contact sheets locate rhythm and style problems; they do not replace individual review of previously unreviewed content. Persist page-specific findings and their exact image refs in the existing review artifact. Limit image-history load with appropriately resized review copies and targeted detail checks; a high-detail flag is not proof of byte-size reduction. Resume from accepted refs and remaining work, not by reimporting all previous images or rerunning preparation that can reset delivered assets.
+
+For full-slide image PPTX, prior visual approval may carry forward when deterministic checks establish each page's actual relationship order, exact media bytes, full-frame geometry, absence of crop/rotation/covering layers, and matching notes. A matching media set alone is insufficient. This avoids reuploading unchanged pages while preserving the distinction between visual judgment and packaging proof. If equivalence fails, review the affected final rendering; editable-object claims require native evidence separately. Record validator size limits honestly and use route-appropriate independent checks without claiming that a rejected validator passed.
 
 ## Design Registry Consumption
 

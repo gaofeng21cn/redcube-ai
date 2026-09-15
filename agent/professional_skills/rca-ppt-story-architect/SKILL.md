@@ -63,9 +63,17 @@ Keep the stage prompt as the schema owner. On continuation or repair, reuse acce
 ## Workbench Lessons To Preserve
 
 - For product/platform or capability decks, default the narrative test to `necessity -> feasibility -> landing path` unless the approved brief says otherwise. Do not open with a product-family tour before the audience understands why the change is needed.
-- First appearance of a named project, method, product, or evidence source should use its full name and a public source/link when available. Later slides may use abbreviations after the first-use contract is clear.
+- First appearance of a named project, method, product, or evidence source should use its full name and a public source/link when available. Later slides may use abbreviations after the first-use contract is clear, unless the user requires the full name on every appearance. Preserve explicitly requested application order and naming.
 - A "clear logic but weak effect" review usually means the spine is under-motivated or over-named. Repair by moving the audience problem and proof threshold earlier, not by adding more product labels.
 - If a live talk or user review says a middle chapter causes a break, treat that as a story-architecture defect. Merge, demote, or split the chapter before sending the deck to visual direction.
+
+## Revising An Accepted Lecture
+
+Approval of the narrative preserves its claim spine, key evidence, and speaker-led concept progression; it does not freeze every sentence or diagram. Within the current revision scope, inspect necessity, repetition, mechanism, figure-text agreement, and practical value, including pages already redrawn. For a deck-wide request, record each page's role, transition, evidence needs, defect, and keep/rewrite/restructure decision in the existing blueprint before grouped repairs. A local fix need not become a deck-wide rewrite.
+
+Judge information sufficiency by page role. A mechanism needs inputs and meaningful relationships; a research claim needs its task, essential result and publication identity; a bridge must motivate the next step without pre-empting its explanation. Empty space, word counts, card counts, and fixed neighboring-page ratios cannot establish quality. Merge or split only when the narrative and current page constraints justify it.
+
+Keep on-slide proof distinct from spoken explanation and full source records. Academic method and result pages should retain verified journal/year or actual publication status; full titles, DOI and experimental conditions belong in notes/source records when the brief calls for compact citations. Never strengthen conclusions by merging metrics across incompatible cohorts or settings, confusing percent with percentage points, or treating a model score as proof of clinical benefit. Freeze verified facts, not weak wording.
 
 ## Design Registry Consumption
 

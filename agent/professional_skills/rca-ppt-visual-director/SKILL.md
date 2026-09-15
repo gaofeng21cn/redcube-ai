@@ -45,7 +45,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 ## Execution Rules
 
 1. Start from the approved blueprint. Do not invent slide ids, compress the deck into a default rhythm, or copy seed examples.
-2. Lock style before pages. Define palette, typography, grid, motif, content density, and visual anchors before any page rendering stage.
+2. Define shared palette, typography, material, mark-making and visual anchors before rendering. Let grids, title placement, grouping and spatial composition follow each page's claim and proof needs; style consistency does not require identical layouts.
 3. Use layout rhythm as a quality gate. Consecutive pages need changing first-glance structure, not just changed wording.
 4. Use show-don't-tell visual planning. Name the proof object on each page: timeline, system map, status board, decision rail, evidence band, chart, table, or comparison.
 5. Treat templates as layout intelligence. A template profile is semantic zones, placeholder capacity, spacing, and hierarchy, not a background skin.
@@ -70,8 +70,16 @@ Operate as the visual direction specialist between blueprint approval and page a
 - A reference deck must be version-locked. Record the current source path/ref, representative pages, and what may be borrowed. Do not silently reuse stale archive pages just because they are visually familiar.
 - A `.pptx` reference or requested `.pptx` output does not imply editable authoring. Extract its approved visual/template signals for image-first unless explicit native admission evidence says otherwise.
 - When the user asks to reuse a current deck style, profile the latest approved visual line first, then bind each slide to that style boundary. Treat older decks as historical references unless explicitly approved.
-- Image-first density ceiling is stricter than editable PPTX: keep on-image text to a small number of short labels, and move explanation to speaker notes or the next page.
+- Check both insufficient and excessive information in image-first pages. Keep necessary objects, relationships, evidence, results and source attribution readable on the page; move supporting explanation to notes. Improve grouping or composition before removing proof. Do not impose a universal short-label count or density ratio.
 - Contact sheets are a visual rhythm gate. The reviewer should be able to spot story order, repeated layouts, and overloaded pages from the sheet before opening individual slides.
+
+## Accepted Style And Revision Calibration
+
+Use the user's latest accepted visual quality as the benchmark, including newly authored pages when preferred. Earlier pages are not automatically the aesthetic ceiling. Specify which palette relationships, midtones, transparent layers, fine linework, material cues and spatial depth to preserve; do not flatten better pages to match weaker ones. Representative pages should show that one visual language supports different page roles and information loads, without becoming another user approval gate.
+
+For an explicitly hand-drawn brief, typography is part of authorship: review headings, body text, Latin names, Arabic and Roman numerals, and publication labels for readable pen-pressure, width, baseline and stroke variation. Paper texture behind rigid print type does not satisfy that brief. This rule is style-conditional, not a hand-drawn default for all RCA decks.
+
+When the user requests whole-deck coherence, assess every current page, including previously passed/redrawn ones, then scope repairs from the new benchmark. Preserve pages that still meet the current intent. Record semantic information gaps and style defects separately in the existing direction payload; do not turn counts or a uniform card layout into the quality standard.
 
 ## Design Registry Consumption
 
