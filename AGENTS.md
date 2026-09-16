@@ -17,3 +17,5 @@
 <!-- CODEGRAPH_END -->
 
 - 软件包发布统一使用 OPL OCI 流程和标准安装入口，不创建或保留独立 GitHub Release 页面及附件。共享规则由 Framework 的 docs/delivery/artifact-package-lifecycle-boundary.md 持有。
+
+- GitHub 上自己新建的对外文本用英文书写：commit subject/body、PR 标题与正文、Issue、comment、Release 正文与 Release Notes。产品名、代码标识、路径、命令与原始引用除外。他人写的 Issue、PR 或 comment，无论对方用什么语言，回复沿用对方的语言；历史中已有的非英文 commit 保持原样。
