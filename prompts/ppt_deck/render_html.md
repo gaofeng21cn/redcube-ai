@@ -25,4 +25,9 @@ Do not materialize without a consumable blueprint and visual direction. HTML is 
 
 ## Handoff
 
+Apply the page-author Skill's HTML rendering-fidelity method: current-source
+navigation, settled font/image/layout evidence, role-based typography and
+shared-asset identity. CSS font-family is not proof of the font actually used.
+Missing runtime evidence remains explicit review debt, not invented success.
+
 Return the render object required by the attached output contract. Runtime owns shell assembly, persistence, screenshots, and deterministic checks; the AI owns the audience-facing markup and composition.

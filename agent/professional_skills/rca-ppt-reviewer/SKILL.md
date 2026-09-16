@@ -88,6 +88,60 @@ Contact sheets locate rhythm and style problems; they do not replace individual 
 
 For full-slide image PPTX, prior visual approval may carry forward when deterministic checks establish each page's actual relationship order, exact media bytes, full-frame geometry, absence of crop/rotation/covering layers, and matching notes. A matching media set alone is insufficient. This avoids reuploading unchanged pages while preserving the distinction between visual judgment and packaging proof. If equivalence fails, review the affected final rendering; editable-object claims require native evidence separately. Record validator size limits honestly and use route-appropriate independent checks without claiming that a rejected validator passed.
 
+## Render And Final-File Evidence
+
+When HTML typography is part of the brief, inspect actual platform fonts after
+font loading, including title/body, SVG, multilingual text, numbers and symbols.
+Computed CSS alone is not font-use evidence; report any unverified fallback.
+Keep lettering inside original research images distinct from editable DOM text.
+Check natural title wrapping, not just bounding boxes. Intersecting line boxes
+are candidate findings until pixels show a collision; intentional decorative
+bleed is not automatically a defect. Conversely, a clean overflow report does
+not establish that SVG labels, images or covering layers are correct.
+
+Use screenshots bound to the current source and dependencies after font/image
+loading and layout settlement. Validate navigation, first/last-page states, keyboard,
+presentation/Esc and requested narrow viewports in the actual HTML deliverable.
+Long and concise decks need their own final order, source mapping and notes
+checks, even when individual page media can reuse prior approval.
+
+Reconcile source, rendered pages, review refs, exported package and each declared
+handoff copy separately. Inspect hidden-slide state and, where applicable, file
+visibility flags; decode QR codes from the final used image or reuse evidence
+bound to those unchanged bytes. A candidate package must not replace an accepted
+artifact before the applicable review/owner authorization. Never update hashes
+merely to make stale review evidence appear current. Package integrity,
+third-party import, media equivalence and native PowerPoint playback are separate
+claims; report only the layer actually checked. Source-editable HTML does not
+make an image-based PPTX natively editable.
+
+## Image-Heavy Attempt Continuity
+
+Budget image bytes separately from tokens. Inline base64 is approximately
+`4 * ceil(file_bytes / 3)` per occurrence; repeated returns count again, and
+text, tool definitions, history and client re-encoding add uncertainty. File
+estimates are not measured HTTP request sizes. Choose a route-appropriate budget
+with headroom rather than hard-coding a provider limit or reducing the user's
+model context window. Persist page-specific findings and remaining slide ids in
+the existing StageRun artifacts before the budget is exhausted.
+
+For an observed tool-result ordering incompatibility, return one image-bearing
+tool result per model round and review it before the next. Independent page
+production and non-image queries may remain parallel. Do not assume a
+parallel-tool flag is honored without evidence. A missing-output error can occur
+with complete results when an intervening message, such as an image-resize notice,
+causes premature upstream validation; shrinking images alone cannot fix it.
+
+Record call/request ids, actual tool completion, original error and deepest
+verified failure layer in the existing Attempt diagnostic. A 413, local transport
+failure, package-validator size limit and stale exported deck are different
+failures. Never fabricate tool outputs, edit session history or blindly repeat
+side effects. Resume accepted refs and remaining work through the OPL controller;
+do not fork image-heavy history, create a parallel ledger or start a replacement
+writer yourself. Framework/Gateway own transport repair and request-byte limits;
+RCA owns review continuity and honest debt/readiness claims. A local workaround
+does not prove the upstream defect fixed.
+
 ## Design Registry Consumption
 
 - Resolve the selected entries from `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/communication_mode_registry`, `#/visualization_pattern_registry`, and `#/professional_style_registry`. Review mode fit and required observable semantics against current pixels; load native package details only for the native route. Reuse current intent refs, but review repaired bytes with fresh pixel/readback evidence.

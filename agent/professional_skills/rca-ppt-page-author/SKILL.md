@@ -77,6 +77,27 @@ For medical imagery, verify modality, anatomy, plane and before/after pairing, n
 
 Keep blueprint, active prompt, image, speaker text, source records and PPTX notes consistent with the same current page data. When a desired content improvement changes approved story meaning, return it to the story owner rather than changing source authority inside page authoring.
 
+## HTML Rendering Fidelity
+
+For the selected HTML lane, preserve the brief's typeface and role-based scale;
+do not force cover, chapter, evidence and numeric-display text into one size.
+Repair isolated trailing title characters through meaningful line breaks or a
+separate citation line before reducing text below readable scale. Existing
+paper figures retain their original lettering; they are not CSS font failures.
+
+Emit render expectations for current source bytes and dependencies. Cache-busting
+must reach the actual navigation URL, not merely a variable updated after the
+render command was assembled. Wait for fonts, image decoding and settled layout
+before screenshots, and again after viewport changes. Record failed image loads
+rather than swallowing decode failures as success. CSS declarations and computed
+font-family do not establish the actual font used for each script or SVG label;
+request platform-font evidence when typography fidelity is material.
+
+Keep source, rendered-page refs and speaker notes aligned to the same slide ids.
+Before repairing a shared or linked page asset, resolve its target and consumers
+so a short-deck repair cannot silently overwrite the master. A current HTML page
+does not establish that the PPTX or handoff copy has been regenerated.
+
 ## Resources
 
 Load [minimal-resource-pack.md](resources/minimal-resource-pack.md) when authoring a new payload or when field-level examples are needed. Accepted current payload refs can be reused without loading the examples again.

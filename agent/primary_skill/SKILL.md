@@ -40,6 +40,15 @@ For a `ppt_deck`, decide the authoring lane from the complete current user reque
 5. Preserve user requests for plan review, approval, or staged continuation as a declared human-review intent. The hosted controller materializes the gate; RCA does not create a private pause/resume mechanism.
 6. Lock the selected image/native/HTML lane for the deliverable. Validator or repair failure cannot silently switch lanes.
 
+For HTML fidelity, use the page-author's actual-render method and the reviewer's
+actual-font/final-file evidence method. For image-heavy review, retain accepted
+page refs and remaining work in the existing StageRun artifacts, budget bytes
+separately from tokens, and serialize image-bearing tool results only on routes
+with observed ordering incompatibility. Tool-output errors do not prove that
+execution failed; return a redacted diagnostic to the hosted controller without
+fabricating outputs or replaying the full image history. Source/render/package
+currentness, final-copy fidelity and native-viewer evidence remain distinct.
+
 ## Image Generation Execution
 
 - For `author_image_pages` and `repair_image_pages`, prefer the Codex system skill `imagegen` and the built-in `image_gen` tool. Determine tool availability only from the active executor tool inventory; the callable may be rendered as `image_gen.imagegen` or `image_gen__imagegen`. Skill installation alone is not proof that a hosted executor injected the tool.
@@ -75,6 +84,8 @@ and reuse accepted refs while their source, user constraints, and scope remain c
 - `contracts/runtime-program/ppt-image-first-production-route.json`
 - `contracts/stage_quality_cycle_policy.json`
 - `contracts/owner_receipt_contract.json`
+- `agent/professional_skills/rca-ppt-page-author/SKILL.md`
+- `agent/professional_skills/rca-ppt-reviewer/SKILL.md`
 - `docs/project.md`
 - `docs/architecture.md`
 - `docs/status.md`

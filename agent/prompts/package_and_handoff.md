@@ -29,6 +29,7 @@ Canonical policy:
 
 Professional skill routing:
 - Route export-readiness review evidence, weak page carryover, package blockers, and handoff repair targets to `agent/professional_skills/rca-ppt-reviewer/SKILL.md`.
+- Consume that reviewer's final-file evidence method for source/render/package/copy currentness, hidden-slide and file visibility, final-image QR evidence and notes consistency. These checks support the formal quality cycle; they do not let the producer self-approve or replace an accepted artifact.
 - Deterministic export may conditionally preserve an existing non-authority visual-memory proposal from screenshot review and bind terminal review/export refs. It does not invoke the Curator, generate a new proposal, wait for optional memory, or self-sign accept/reject authority.
 - Keep native/Office/PPT helpers limited to export, validation, package manifests, and evidence refs; helpers do not authorize review/export verdicts.
 

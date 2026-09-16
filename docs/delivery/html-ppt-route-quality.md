@@ -27,6 +27,21 @@ HTML 路线只在用户或 contract 显式选择时启用：
 - `fix_html` 必须消费 prior current HTML 与 review refs，只重画 blocked slide ids 或 operator 明确 target slide ids；未阻断页通过 `render_execution.reused_slide_ids` 和 `targeted_rerun.reused_slide_ids` 保持复用。
 - 如果 upstream planning 比 current HTML 更新，或 prior current HTML 缺失，`render_html` 可以 full regeneration；`fix_html` 不能在已有 blocked-slide refs 时做全局重画。
 
+## 实际渲染与交付
+
+页面执行方法归`rca-ppt-page-author`的HTML Rendering Fidelity，验收归
+`rca-ppt-reviewer`的Render And Final-File Evidence。`render_html`、
+`screenshot_review`与`export_pptx`的实际提示词分别接入这些方法，不另建验收状态。
+
+统一字体时核对浏览器实际使用字族及回退，CSS声明不等于生效；等待字体、图片及
+viewport变化后的布局稳定。缓存参数须进入实际导航URL。文字行框相交仅是候选
+问题，最终由单页像素和语义判断；原论文图的字形不作为CSS修复对象。
+
+按源码、渲染、审阅、候选包、交付副本逐层核对。长短版独立核对映射、页序与
+讲稿；共享页面不能因写穿链接而污染母版。正式替换沿用既有Review及owner授权，
+检查隐藏幻灯片、适用平台的文件可见性和最终二维码。独立包/导入/等价验证不能
+冒称原生PowerPoint播放，缺少证据按既有质量债合同处理。
+
 ## Agent Lab
 
 HTML quality non-regression surface 只给 OPL Agent Lab 标准 suite 输入 refs：
