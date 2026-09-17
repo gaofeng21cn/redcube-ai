@@ -1,6 +1,8 @@
 # RCA 文档生命周期
 
-本页是本仓文档治理的唯一说明；导航见 [文档入口](./README.md)。文档解释事实，contracts、源码、实际调用者和 owner readback 决定机器行为。
+本页是本仓对 OPL 家族文档生命周期规则的唯一应用说明，规则 owner 为
+[`one-person-lab`](https://github.com/gaofeng21cn/one-person-lab/blob/main/docs/policies/docs-lifecycle-policy.md)；
+导航见 [文档入口](./README.md)。文档解释事实，contracts、源码、实际调用者和 owner readback 决定机器行为。
 
 ## 一文一责
 
