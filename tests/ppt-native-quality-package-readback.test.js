@@ -112,13 +112,13 @@ test('native PPT readback projects OfficeCLI objects without exposing package pa
     table: 1,
     text_box: 2,
   });
-  assert.equal(readback.notes_slide_count, 0);
+  assert.equal(readback.notes_slide_count, 1);
   assert.equal(readback.transition_count, 1);
   assert.equal(readback.animation_count, 0);
   assert.deepEqual(readback.part_counts, {
     chart: 1,
     media: 1,
-    notes: 0,
+    notes: 1,
     master: 0,
     layout: 0,
     theme: 1,
@@ -140,6 +140,6 @@ test('native PPT readback projects OfficeCLI objects without exposing package pa
   assert.equal(picture.relationship_target, undefined);
   assert.equal(picture.relationship_resolved, true);
   assert.equal(picture.content_type, 'image/png');
-  assert.equal(readback.slides[0].speaker_notes, '');
+  assert.equal(readback.slides[0].speaker_notes, 'Exact relationship-backed speaker note.');
   assert.equal(readback.slides[0].transition.type, 'fade');
 });
