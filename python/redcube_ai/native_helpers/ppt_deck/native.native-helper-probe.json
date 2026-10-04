@@ -16,9 +16,9 @@
     "effect_slots": [
       {
         "slot_id": "renderer_version_process",
-        "source_ref": "native.py",
+        "source_ref": "native_render_proof.py",
         "symbol": "command_version",
-        "source_digest": "sha256:7ac7a7842ef33d8c2e967d0fdda6a02ba3cb5075cdbe202a619fa959027234a4",
+        "source_digest": "sha256:6fe8ec7cff2a16924b9b60ac9f1bc1eff7401b1b65d7deef3d06b2fd44019998",
         "effect_kind": "process_spawn",
         "target_policy": "declared_command_set",
         "allowed_targets": [
@@ -28,27 +28,27 @@
       },
       {
         "slot_id": "render_cleanup_artifact_write",
-        "source_ref": "native.py",
+        "source_ref": "native_render_proof.py",
         "symbol": "clean_render_outputs",
-        "source_digest": "sha256:7ac7a7842ef33d8c2e967d0fdda6a02ba3cb5075cdbe202a619fa959027234a4",
+        "source_digest": "sha256:6fe8ec7cff2a16924b9b60ac9f1bc1eff7401b1b65d7deef3d06b2fd44019998",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
       },
       {
         "slot_id": "render_pdf_artifact_write",
-        "source_ref": "native.py",
+        "source_ref": "native_render_proof.py",
         "symbol": "render_pptx_to_pdf",
-        "source_digest": "sha256:7ac7a7842ef33d8c2e967d0fdda6a02ba3cb5075cdbe202a619fa959027234a4",
+        "source_digest": "sha256:6fe8ec7cff2a16924b9b60ac9f1bc1eff7401b1b65d7deef3d06b2fd44019998",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
       },
       {
         "slot_id": "render_pdf_process",
-        "source_ref": "native.py",
+        "source_ref": "native_render_proof.py",
         "symbol": "render_pptx_to_pdf",
-        "source_digest": "sha256:7ac7a7842ef33d8c2e967d0fdda6a02ba3cb5075cdbe202a619fa959027234a4",
+        "source_digest": "sha256:6fe8ec7cff2a16924b9b60ac9f1bc1eff7401b1b65d7deef3d06b2fd44019998",
         "effect_kind": "process_spawn",
         "target_policy": "declared_command_set",
         "allowed_targets": [
@@ -57,9 +57,9 @@
       },
       {
         "slot_id": "render_png_process",
-        "source_ref": "native.py",
+        "source_ref": "native_render_proof.py",
         "symbol": "render_png_from_pdf",
-        "source_digest": "sha256:7ac7a7842ef33d8c2e967d0fdda6a02ba3cb5075cdbe202a619fa959027234a4",
+        "source_digest": "sha256:6fe8ec7cff2a16924b9b60ac9f1bc1eff7401b1b65d7deef3d06b2fd44019998",
         "effect_kind": "process_spawn",
         "target_policy": "declared_command_set",
         "allowed_targets": [
@@ -70,16 +70,16 @@
         "slot_id": "native_result_artifact_write",
         "source_ref": "native.py",
         "symbol": "main",
-        "source_digest": "sha256:7ac7a7842ef33d8c2e967d0fdda6a02ba3cb5075cdbe202a619fa959027234a4",
+        "source_digest": "sha256:c020ca9ff57f78bc328f01a7fd2f5c5fbc63974ee0fca023062e19e6ef3ae476",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
       },
       {
         "slot_id": "officecli_materializer_process",
-        "source_ref": "native_layouts_parts/materializer.py",
+        "source_ref": "native_layouts_parts/materializer_commands.py",
         "symbol": "_run_officecli",
-        "source_digest": "sha256:624f9c984cab52209db995e540cae629dd90180a33e78e9c1155316f4c270da2",
+        "source_digest": "sha256:a4362843efc651609bebd0545f3bb889431d649ff68feac45920e9b06d9cda9d",
         "effect_kind": "process_spawn",
         "target_policy": "declared_command_set",
         "allowed_targets": [
@@ -88,9 +88,9 @@
       },
       {
         "slot_id": "officecli_materializer_artifact_write",
-        "source_ref": "native_layouts_parts/materializer.py",
+        "source_ref": "native_layouts_parts/materializer_commands.py",
         "symbol": "materialize_native_pptx",
-        "source_digest": "sha256:624f9c984cab52209db995e540cae629dd90180a33e78e9c1155316f4c270da2",
+        "source_digest": "sha256:a4362843efc651609bebd0545f3bb889431d649ff68feac45920e9b06d9cda9d",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
