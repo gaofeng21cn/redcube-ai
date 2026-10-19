@@ -5,6 +5,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$repo_root"
 
 export PATH="$HOME/.local/bin:$PATH"
+export OFFICECLI_SKIP_UPDATE=1
 
 proof_cache_root="${CODEX_HOME:-$HOME/.codex}/projects/redcube-ai/runtime-state/native-ppt-proof-cache"
 proof_tmp_root="/tmp/rca-native-ppt-proof"

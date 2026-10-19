@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+export OFFICECLI_SKIP_UPDATE=1
 
 have_command() {
   command -v "$1" >/dev/null 2>&1
@@ -16,7 +17,15 @@ have_poppler() {
 }
 
 have_officecli() {
-  have_command officecli && officecli --version >/dev/null 2>&1
+  have_command officecli && officecli --version >/dev/null 2>&1 || return 1
+
+  local probe_dir result=0
+  probe_dir="$(mktemp -d)"
+  officecli create "$probe_dir/probe.pptx" >/dev/null 2>&1 \
+    && officecli close "$probe_dir/probe.pptx" >/dev/null 2>&1 \
+    && [ -s "$probe_dir/probe.pptx" ] || result=1
+  rm -rf "$probe_dir"
+  return "$result"
 }
 
 officecli_asset_name() {
@@ -58,7 +67,7 @@ install_officecli() {
     return
   fi
 
-  local version="v1.0.100"
+  local version="v1.0.157"
   local asset checksum_file expected actual source
   local install_dir="$HOME/.local/bin"
   mkdir -p "$install_dir"
