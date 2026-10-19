@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-export OFFICECLI_SKIP_UPDATE=1
 
 have_command() {
   command -v "$1" >/dev/null 2>&1
@@ -63,11 +62,18 @@ officecli_asset_name() {
 }
 
 install_officecli() {
-  if have_officecli; then
+  local release_url version
+  release_url="$(curl -fsSL --connect-timeout 10 --max-time 60 -o /dev/null -w '%{url_effective}' \
+    https://github.com/iOfficeAI/OfficeCLI/releases/latest)"
+  version="${release_url##*/}"
+  if [[ ! "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Could not resolve the latest official OfficeCLI release." >&2
+    return 1
+  fi
+  if have_command officecli && [ "$(officecli --version)" = "${version#v}" ] && have_officecli; then
     return
   fi
 
-  local version="v1.0.157"
   local asset checksum_file expected actual source
   local install_dir="$HOME/.local/bin"
   mkdir -p "$install_dir"
@@ -75,7 +81,7 @@ install_officecli() {
   asset="$(officecli_asset_name)"
   checksum_file="$(mktemp)"
   source="$(mktemp)"
-  echo "Installing OfficeCLI native PPT materializer..."
+  echo "Installing latest OfficeCLI native PPT materializer ($version)..."
   curl -fsSL "https://github.com/iOfficeAI/OfficeCLI/releases/download/$version/SHA256SUMS" -o "$checksum_file"
   curl -fsSL "https://github.com/iOfficeAI/OfficeCLI/releases/download/$version/$asset" -o "$source"
   expected="$(grep "  $asset$" "$checksum_file" | awk '{print $1}')"
@@ -94,7 +100,8 @@ install_officecli() {
     rm -f "$checksum_file" "$source"
     exit 1
   fi
-  install -m 0755 "$source" "$install_dir/officecli"
+  install -m 0755 "$source" "$install_dir/officecli.new"
+  mv -f "$install_dir/officecli.new" "$install_dir/officecli"
   rm -f "$checksum_file" "$source"
 
   export PATH="$install_dir:$PATH"

@@ -1,8 +1,7 @@
 FROM ghcr.io/astral-sh/uv:0.9.5 AS uv
 FROM node:24-bookworm
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    OFFICECLI_SKIP_UPDATE=1
+ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /workspace
 
 COPY --from=uv /uv /uvx /bin/
@@ -16,8 +15,11 @@ RUN apt-get update \
       python3 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL https://github.com/iOfficeAI/OfficeCLI/releases/download/v1.0.157/SHA256SUMS -o /tmp/officecli-SHA256SUMS \
-    && curl -fsSL https://github.com/iOfficeAI/OfficeCLI/releases/download/v1.0.157/officecli-linux-x64 -o /usr/local/bin/officecli \
+RUN release_url="$(curl -fsSL --connect-timeout 10 --max-time 60 -o /dev/null -w '%{url_effective}' https://github.com/iOfficeAI/OfficeCLI/releases/latest)" \
+    && version="${release_url##*/}" \
+    && printf '%s\n' "$version" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$' \
+    && curl -fsSL "https://github.com/iOfficeAI/OfficeCLI/releases/download/$version/SHA256SUMS" -o /tmp/officecli-SHA256SUMS \
+    && curl -fsSL "https://github.com/iOfficeAI/OfficeCLI/releases/download/$version/officecli-linux-x64" -o /usr/local/bin/officecli \
     && grep '  officecli-linux-x64$' /tmp/officecli-SHA256SUMS | sed 's#officecli-linux-x64#/usr/local/bin/officecli#' | sha256sum -c - \
     && chmod +x /usr/local/bin/officecli \
     && officecli create /tmp/officecli-probe.pptx \

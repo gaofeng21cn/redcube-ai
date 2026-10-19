@@ -17,12 +17,13 @@ tools/native-ppt-proof/install-deps.sh
 macOS 使用 Homebrew 安装 LibreOffice、Poppler 和字体；Debian/Ubuntu 使用 apt。
 这是显式开发环境准备，不是 hosted action 的隐式安装动作。
 
-OfficeCLI 安装器与 Docker proof 镜像固定使用官方 `v1.0.157` 并核验
-`SHA256SUMS`，proof 进程通过 `OFFICECLI_SKIP_UPDATE=1` 禁止后台更新改写
-已核验的二进制。依赖检查还会在临时目录实际创建并关闭 PPTX；仅
-`--version` 成功不能证明 materializer 可用。此前从 `v1.0.100` 安装的
-Linux CI 在建档时出现 `System.Private.Xml` 装配加载失败；调查也确认
-未禁用更新时，该二进制会自行替换成新版本，故下载校验不能单独证明执行版本。
+OfficeCLI 安装器与 Docker proof 镜像每次准备环境时解析官方最新版，从同一
+release 下载二进制与 `SHA256SUMS` 并校验，不固定历史版本，也不关闭官方
+自动更新。已安装的最新版可以复用；更新以原子替换保留正在运行的旧进程。
+依赖检查在临时目录实际创建并关闭 PPTX，仅 `--version` 成功不能证明
+materializer 可用。Linux CI 曾在建档时出现 `System.Private.Xml` 装配加载
+失败，故最终仍须通过完整 native proof，不能由下载、版本号或自动更新
+单独推断生成与渲染成功。
 
 Python 依赖由 `pyproject.toml` 和 `uv.lock` 提供，Node 使用 `npm ci`。
 venv 必须在 checkout 外：
