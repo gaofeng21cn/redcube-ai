@@ -15,11 +15,17 @@ RUN apt-get update \
       python3 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL https://github.com/iOfficeAI/OfficeCLI/releases/download/v1.0.100/SHA256SUMS -o /tmp/officecli-SHA256SUMS \
-    && curl -fsSL https://github.com/iOfficeAI/OfficeCLI/releases/download/v1.0.100/officecli-linux-x64 -o /usr/local/bin/officecli \
+RUN release_url="$(curl -fsSL --connect-timeout 10 --max-time 60 -o /dev/null -w '%{url_effective}' https://github.com/iOfficeAI/OfficeCLI/releases/latest)" \
+    && version="${release_url##*/}" \
+    && printf '%s\n' "$version" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$' \
+    && curl -fsSL "https://github.com/iOfficeAI/OfficeCLI/releases/download/$version/SHA256SUMS" -o /tmp/officecli-SHA256SUMS \
+    && curl -fsSL "https://github.com/iOfficeAI/OfficeCLI/releases/download/$version/officecli-linux-x64" -o /usr/local/bin/officecli \
     && grep '  officecli-linux-x64$' /tmp/officecli-SHA256SUMS | sed 's#officecli-linux-x64#/usr/local/bin/officecli#' | sha256sum -c - \
     && chmod +x /usr/local/bin/officecli \
-    && rm -f /tmp/officecli-SHA256SUMS
+    && officecli create /tmp/officecli-probe.pptx \
+    && officecli close /tmp/officecli-probe.pptx \
+    && test -s /tmp/officecli-probe.pptx \
+    && rm -f /tmp/officecli-SHA256SUMS /tmp/officecli-probe.pptx
 
 ENV UV_PROJECT_ENVIRONMENT=/opt/redcube-venv \
     UV_CACHE_DIR=/tmp/uv-cache \
