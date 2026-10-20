@@ -22,8 +22,8 @@
     "line-budget:strict": "node scripts/line-budget.ts --strict"
   },
   "devDependencies": {
-    "@types/node": "^24.7.0",
-    "typescript": "^5.9.2"
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2"
   },
   "license": "Apache-2.0"
 }
