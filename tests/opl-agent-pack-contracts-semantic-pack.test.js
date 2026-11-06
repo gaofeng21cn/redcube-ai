@@ -59,6 +59,7 @@ test('RCA canonical semantic pack remains concrete while root stage/pack contrac
   const packRefs = readJson('contracts/pack_compiler_input.json');
   const domainDescriptor = readJson('contracts/domain_descriptor.json');
   const stageManifest = readJson('agent/stages/manifest.json');
+  const durableKnowledgeCatalogRef = 'contracts/durable_knowledge_catalog.json';
 
   assert.equal(packRefs.canonical_semantic_pack_root, 'agent/');
   assert.equal(packRefs.canonical_semantic_pack_role, 'repo_source_declarative_visual_pack');
@@ -74,7 +75,11 @@ test('RCA canonical semantic pack remains concrete while root stage/pack contrac
   });
 
   for (const relativePath of packRefs.required_domain_pack_paths) {
-    assert.equal(relativePath.startsWith('agent/'), true, relativePath);
+    assert.equal(
+      relativePath.startsWith('agent/') || relativePath === durableKnowledgeCatalogRef,
+      true,
+      relativePath,
+    );
     const fullPath = path.join(repoRoot, relativePath);
     assert.equal(fs.existsSync(fullPath), true, relativePath);
     const content = fs.readFileSync(fullPath, 'utf8');

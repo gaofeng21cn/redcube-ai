@@ -1,0 +1,158 @@
+{
+  "surface_kind": "opl_durable_knowledge_catalog",
+  "version": "durable-knowledge-catalog.v1",
+  "owner": "one-person-lab",
+  "domain_id": "redcube_ai",
+  "items": [
+    {
+      "surface_kind": "opl_durable_knowledge_item",
+      "version": "durable-knowledge-item.v1",
+      "knowledge_id": "redcube_ai.visual_truth_boundaries",
+      "title": "Visual Truth Boundaries",
+      "layer": "agent_pack",
+      "owner": "redcube_ai",
+      "body_ref": {
+        "kind": "repo_path",
+        "ref": "agent/knowledge/visual_truth_boundaries.md",
+        "sha256": "sha256:c37233f63d2bfacc2b491ac12547e7c289b3da9ecd70aa4fa0dd22699beb6b63"
+      },
+      "applicability": {
+        "domains": [
+          "redcube_ai"
+        ],
+        "stages": [
+          "source_intake"
+        ]
+      },
+      "status": "active",
+      "reviewed_at": "2026-11-06T00:00:00+08:00",
+      "next_review_at": "2027-05-06T00:00:00+08:00",
+      "freshness_policy": "migration_preserves_existing_domain_semantics",
+      "authority_boundary": {
+        "semantic_body_owner": "redcube_ai",
+        "opl_role": "catalog_recall_and_receipt_projection_only"
+      }
+    },
+    {
+      "surface_kind": "opl_durable_knowledge_item",
+      "version": "durable-knowledge-item.v1",
+      "knowledge_id": "redcube_ai.communication_visual_direction",
+      "title": "Communication Visual Direction",
+      "layer": "agent_pack",
+      "owner": "redcube_ai",
+      "body_ref": {
+        "kind": "repo_path",
+        "ref": "agent/knowledge/communication_visual_direction.md",
+        "sha256": "sha256:70ec6e2e85fc9b5c5260cbd6ccd8a9478e3b72a0145d45640d2121e0219fffc2"
+      },
+      "applicability": {
+        "domains": [
+          "redcube_ai"
+        ],
+        "stages": [
+          "communication_strategy",
+          "visual_direction"
+        ]
+      },
+      "status": "active",
+      "reviewed_at": "2026-11-06T00:00:00+08:00",
+      "next_review_at": "2027-05-06T00:00:00+08:00",
+      "freshness_policy": "migration_preserves_existing_domain_semantics",
+      "authority_boundary": {
+        "semantic_body_owner": "redcube_ai",
+        "opl_role": "catalog_recall_and_receipt_projection_only"
+      }
+    },
+    {
+      "surface_kind": "opl_durable_knowledge_item",
+      "version": "durable-knowledge-item.v1",
+      "knowledge_id": "redcube_ai.artifact_and_export_authority",
+      "title": "Artifact And Export Authority",
+      "layer": "agent_pack",
+      "owner": "redcube_ai",
+      "body_ref": {
+        "kind": "repo_path",
+        "ref": "agent/knowledge/artifact_and_export_authority.md",
+        "sha256": "sha256:d4b0da9d152971dd2eadd423ab89f3b68f09f39e46aa9590d2be5ce0fcc9389c"
+      },
+      "applicability": {
+        "domains": [
+          "redcube_ai"
+        ],
+        "stages": [
+          "artifact_creation",
+          "package_and_handoff"
+        ]
+      },
+      "status": "active",
+      "reviewed_at": "2026-11-06T00:00:00+08:00",
+      "next_review_at": "2027-05-06T00:00:00+08:00",
+      "freshness_policy": "migration_preserves_existing_domain_semantics",
+      "authority_boundary": {
+        "semantic_body_owner": "redcube_ai",
+        "opl_role": "catalog_recall_and_receipt_projection_only"
+      }
+    },
+    {
+      "surface_kind": "opl_durable_knowledge_item",
+      "version": "durable-knowledge-item.v1",
+      "knowledge_id": "redcube_ai.review_export_memory",
+      "title": "Review Export Memory",
+      "layer": "agent_pack",
+      "owner": "redcube_ai",
+      "body_ref": {
+        "kind": "repo_path",
+        "ref": "agent/knowledge/review_export_memory.md",
+        "sha256": "sha256:e18c858f2c016c393b18d024aefe068ea38d2903132458f36cf3e43380bd2590"
+      },
+      "applicability": {
+        "domains": [
+          "redcube_ai"
+        ],
+        "stages": [
+          "review_and_revision"
+        ]
+      },
+      "status": "active",
+      "reviewed_at": "2026-11-06T00:00:00+08:00",
+      "next_review_at": "2027-05-06T00:00:00+08:00",
+      "freshness_policy": "migration_preserves_existing_domain_semantics",
+      "authority_boundary": {
+        "semantic_body_owner": "redcube_ai",
+        "opl_role": "catalog_recall_and_receipt_projection_only"
+      }
+    },
+    {
+      "surface_kind": "opl_durable_knowledge_item",
+      "version": "durable-knowledge-item.v1",
+      "knowledge_id": "redcube_ai.owner_receipt_policy",
+      "title": "Owner Receipt Policy",
+      "layer": "agent_pack",
+      "owner": "redcube_ai",
+      "body_ref": {
+        "kind": "repo_path",
+        "ref": "agent/knowledge/owner_receipt_policy.md",
+        "sha256": "sha256:c66fc0e5ca02b745b73c6b4fde9f350f8b513bde45aa62b65bd407b7c5375f8a"
+      },
+      "applicability": {
+        "domains": [
+          "redcube_ai"
+        ],
+        "stages": [
+          "package_and_handoff"
+        ]
+      },
+      "status": "active",
+      "reviewed_at": "2026-11-06T00:00:00+08:00",
+      "next_review_at": "2027-05-06T00:00:00+08:00",
+      "freshness_policy": "migration_preserves_existing_domain_semantics",
+      "authority_boundary": {
+        "semantic_body_owner": "redcube_ai",
+        "opl_role": "catalog_recall_and_receipt_projection_only"
+      }
+    }
+  ],
+  "workspace_catalog_ref": "memory/opl_durable_knowledge_catalog.json",
+  "project_catalog_ref": "memory/opl_durable_knowledge_catalog.json",
+  "dated_state_catalog_ref": "state/opl_durable_knowledge_catalog.json"
+}

@@ -164,6 +164,20 @@
           }
         ],
         "sync_policy": "domain_agent_builtin_refs_only"
+      },
+      {
+        "capability_id": "rca-authority-policy-pack",
+        "source_ref": "agent/policies/visual-authority-policy.md",
+        "surface_role": "policy_pack",
+        "capability_kind": "reference_pack",
+        "runtime_projection_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "agent/policies/visual-authority-policy.md",
+            "role": "policy_pack"
+          }
+        ],
+        "sync_policy": "domain_agent_builtin_refs_only"
       }
     ]
   },
