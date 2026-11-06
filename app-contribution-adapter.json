@@ -1,0 +1,42 @@
+{
+  "schema_version": "opl-package-app-contribution-adapter.v1",
+  "reads": {
+    "rca.workspace.v1#status": {
+      "kind": "json_file",
+      "root": "profile",
+      "path": "${input.status_path}",
+      "transform": "runtime_detail",
+      "input_schema": {
+        "type": "object",
+        "required": ["status_path"],
+        "properties": {
+          "status_path": {
+            "type": "string",
+            "title": "Visual project status",
+            "description": "Workspace-relative path to one RCA project status or current-stage pointer JSON."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "rca.workspace.v1#artifacts": {
+      "kind": "json_file",
+      "root": "profile",
+      "path": "${input.manifest_path}",
+      "transform": "rca_artifacts",
+      "input_schema": {
+        "type": "object",
+        "required": ["manifest_path"],
+        "properties": {
+          "manifest_path": {
+            "type": "string",
+            "title": "Artifact manifest",
+            "description": "Workspace-relative path to one RCA artifact or stage outputs manifest."
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "actions": {}
+}

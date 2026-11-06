@@ -167,9 +167,28 @@ test('native package descriptor exposes RCA without recreating package lifecycle
       publication_ref: 'ghcr.io/gaofeng21cn/one-person-lab-packages/rca:latest-stable',
     },
     required_skill_ids: ['redcube-ai'],
+    app_contribution_abi: {
+      schema_version: 'opl-package-app-contribution-cli.v1',
+      transport: 'stdin_json_stdout_json',
+      argv: ['opl', 'app', 'contribution', 'adapter', '--stdin'],
+      request_schema: 'opl-package-app-contribution-request.v1',
+      response_schema: 'opl-package-app-contribution-response.v1',
+    },
+    app_contribution_adapter: {
+      manifest: 'app-contribution-adapter.json',
+    },
   });
   assert.deepEqual(descriptor.requires, []);
   assert.deepEqual(descriptor.capability_dependencies, []);
+  const adapter = readJson(path.join(repoRoot, 'app-contribution-adapter.json'));
+  const carrierAdapter = readJson(path.join(pluginRoot, 'app-contribution-adapter.json'));
+  assert.deepEqual(adapter, carrierAdapter);
+  assert.deepEqual(descriptor.app_contributions, readJson(packageDescriptorPath).app_contributions);
+  assert.deepEqual(Object.keys(adapter.reads), [
+    'rca.workspace.v1#status',
+    'rca.workspace.v1#artifacts',
+  ]);
+  assert.deepEqual(adapter.actions, {});
   assert.equal(descriptor.domain_descriptor_ref, 'contracts/domain_descriptor.json');
   assert.equal(
     descriptor.task_provider_ref,
