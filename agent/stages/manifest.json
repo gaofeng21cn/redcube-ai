@@ -39,7 +39,8 @@
       ],
       "trust_lane": "domain_agent",
       "policy_refs": [
-        "agent/policies/visual-authority-policy.md"
+        "agent/policies/visual-authority-policy.md",
+        "agent/policies/markdown-route-policy.md"
       ]
     },
     {
@@ -75,7 +76,8 @@
       ],
       "trust_lane": "ai_decision",
       "policy_refs": [
-        "agent/policies/visual-authority-policy.md"
+        "agent/policies/visual-authority-policy.md",
+        "agent/policies/markdown-route-policy.md"
       ]
     },
     {
@@ -111,7 +113,8 @@
       ],
       "trust_lane": "ai_decision",
       "policy_refs": [
-        "agent/policies/visual-authority-policy.md"
+        "agent/policies/visual-authority-policy.md",
+        "agent/policies/markdown-route-policy.md"
       ]
     },
     {
@@ -149,7 +152,8 @@
       ],
       "trust_lane": "codex_executor",
       "policy_refs": [
-        "agent/policies/visual-authority-policy.md"
+        "agent/policies/visual-authority-policy.md",
+        "agent/policies/markdown-route-policy.md"
       ]
     },
     {
@@ -186,7 +190,8 @@
       ],
       "trust_lane": "ai_decision",
       "policy_refs": [
-        "agent/policies/visual-authority-policy.md"
+        "agent/policies/visual-authority-policy.md",
+        "agent/policies/markdown-route-policy.md"
       ]
     },
     {
@@ -228,7 +233,8 @@
       "next_stage_refs": [],
       "trust_lane": "domain_agent",
       "policy_refs": [
-        "agent/policies/visual-authority-policy.md"
+        "agent/policies/visual-authority-policy.md",
+        "agent/policies/markdown-route-policy.md"
       ]
     }
   ],

@@ -27,7 +27,7 @@
       "status": "active",
       "reviewed_at": "2026-11-06T00:00:00+08:00",
       "next_review_at": "2027-05-06T00:00:00+08:00",
-      "freshness_policy": "migration_preserves_existing_domain_semantics",
+      "freshness_policy": "review_when_sources_or_applicability_change; exclude_after_next_review_at",
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
@@ -57,7 +57,7 @@
       "status": "active",
       "reviewed_at": "2026-11-06T00:00:00+08:00",
       "next_review_at": "2027-05-06T00:00:00+08:00",
-      "freshness_policy": "migration_preserves_existing_domain_semantics",
+      "freshness_policy": "review_when_sources_or_applicability_change; exclude_after_next_review_at",
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
@@ -87,7 +87,7 @@
       "status": "active",
       "reviewed_at": "2026-11-06T00:00:00+08:00",
       "next_review_at": "2027-05-06T00:00:00+08:00",
-      "freshness_policy": "migration_preserves_existing_domain_semantics",
+      "freshness_policy": "review_when_sources_or_applicability_change; exclude_after_next_review_at",
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
@@ -116,7 +116,7 @@
       "status": "active",
       "reviewed_at": "2026-11-06T00:00:00+08:00",
       "next_review_at": "2027-05-06T00:00:00+08:00",
-      "freshness_policy": "migration_preserves_existing_domain_semantics",
+      "freshness_policy": "review_when_sources_or_applicability_change; exclude_after_next_review_at",
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
@@ -145,14 +145,11 @@
       "status": "active",
       "reviewed_at": "2026-11-06T00:00:00+08:00",
       "next_review_at": "2027-05-06T00:00:00+08:00",
-      "freshness_policy": "migration_preserves_existing_domain_semantics",
+      "freshness_policy": "review_when_sources_or_applicability_change; exclude_after_next_review_at",
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
       }
     }
-  ],
-  "workspace_catalog_ref": "memory/opl_durable_knowledge_catalog.json",
-  "project_catalog_ref": "memory/opl_durable_knowledge_catalog.json",
-  "dated_state_catalog_ref": "state/opl_durable_knowledge_catalog.json"
+  ]
 }

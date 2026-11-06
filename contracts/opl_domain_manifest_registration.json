@@ -21,7 +21,7 @@
     "pack_compiler_input_ref": "contracts/pack_compiler_input.json",
     "generated_surface_handoff_ref": "contracts/generated_surface_handoff.json",
     "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json",
-    "domain_memory_descriptor_ref": "contracts/memory_descriptor.json",
+    "durable_knowledge_catalog_ref": "contracts/durable_knowledge_catalog.json",
     "artifact_locator_contract_ref": "contracts/artifact_locator_contract.json",
     "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json"
   },

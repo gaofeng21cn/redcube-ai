@@ -60,7 +60,7 @@
     "agent/knowledge/communication_visual_direction.md",
     "agent/knowledge/artifact_and_export_authority.md",
     "agent/knowledge/review_export_memory.md",
-    "agent/knowledge/markdown_route_policy.md",
+    "agent/policies/markdown-route-policy.md",
     "agent/knowledge/owner_receipt_policy.md",
     "agent/tools/domain_affordances.md",
     "agent/policies/visual-authority-policy.md"

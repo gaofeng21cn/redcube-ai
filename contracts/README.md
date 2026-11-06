@@ -24,7 +24,7 @@ Machine boundary: JSON body 和 schema 是机器面；本文只解释 owner 和�
 ## RCA authority and artifact contracts
 
 - `owner_receipt_contract.json`：owner receipt / typed blocker / no-regression 领域边界。
-- `artifact_locator_contract.json`、`memory_descriptor.json`：body-free locator vocabulary。
+- `artifact_locator_contract.json`、`durable_knowledge_catalog.json`：body-free locator vocabulary。
 - `stage_quality_cycle_policy.json`、`stage_artifact_kernel_adoption.json`、`stage_run_kernel_profile.json`：RCA 对 OPL StageRun 的消费约束；前者同时声明 slide content、claims、references、display、export 与 package 的 epistemic Review 依赖，hash 只作 locator/stale hint，release integrity 保持独立。
 - `foundry-agent-os-domain-kernel-manifest.json`、`capability_map.json`：领域能力与 carrier projection。
 

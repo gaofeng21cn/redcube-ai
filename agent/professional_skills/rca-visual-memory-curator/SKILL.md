@@ -16,7 +16,7 @@ During review summary, derive at most one small evidence-backed reusable-pattern
 - Use AI judgment here for whether a lesson is reusable, stage-scoped, evidence-backed, stale, too broad, a duplicate, a live defect that should route back, or an authority bypass.
 - Use AI judgment during proposal generation to decide whether a reusable lesson exists; no reusable lesson is a normal `skip`, not a blocker.
 - Use AI judgment during owner accept/reject only after rendered evidence, RCA review refs, and terminal export closeout refs prove the candidate is reusable rather than an unresolved defect.
-- Treat memory descriptors, locator refs, receipts, and `contracts/capability_map.json` as transport and discovery metadata only; they do not decide accept/reject and never contain memory body authority.
+- Treat knowledge catalogs, locator refs, receipts, and `contracts/capability_map.json` as transport and discovery metadata only; they do not decide accept/reject and never contain memory body authority.
 - Treat `visual_pack_compiler_handoff` as a carrier for memory proposal refs and accept/reject receipt refs only. It may route memory evidence to this skill, but it must not carry reusable lesson text as authority or decide accept/reject through contract fields.
 - Keep memory proposals prose-first and small. Reject attempts to encode visual taste, route scoring, review verdicts, or artifact state as contract data.
 
@@ -25,12 +25,12 @@ During review summary, derive at most one small evidence-backed reusable-pattern
 - Proposal generation: rendered artifact evidence, contact sheets, screenshot-review context, and visible findings. Export closeout is not required.
 - Owner accept/reject: an existing proposal candidate plus rendered evidence, RCA review refs, terminal export closeout refs, and provenance.
 - Proposed visual-pattern lesson, deliverable family, stage, audience, style, failure mode, and provenance.
-- Current memory descriptor and policy refs:
+- Current knowledge catalog and policy refs:
   - `docs/policies/visual_pattern_memory_policy.md`
   - `agent/skills/visual_memory_policy.md`
   - `agent/quality_gates/review_export_memory.md`
   - `agent/knowledge/review_export_memory.md`
-  - `contracts/memory_descriptor.json`
+  - `contracts/durable_knowledge_catalog.json`
 
 ## Outputs
 
@@ -38,7 +38,7 @@ During review summary, derive at most one small evidence-backed reusable-pattern
 - Owner accept/reject returns `visual_memory_accept_receipt` or `visual_memory_reject_receipt` refs from the RCA owner surface.
 - Rejection reasons when the proposal is artifact body, review/export verdict, route logic, stale evidence, or hidden template material.
 - `memory_route_back_target` when a proposed lesson is really an unresolved story, visual direction, page authoring, native PPT, or review defect.
-- Locator/projection refs that OPL may transport without reading or owning the memory body.
+- Body-free catalog and recall receipt projections; OPL reads accepted Markdown only inside the authorized StageRun snapshot.
 
 ## Execution Rules
 
@@ -48,7 +48,7 @@ During review summary, derive at most one small evidence-backed reusable-pattern
 4. In owner accept/reject mode, require the existing candidate, rendered evidence, RCA review refs, terminal export closeout refs, and provenance. Export itself never invokes or signs this decision.
 5. Accept only reusable visual-pattern lessons: story rhythm, density caveat, style caveat, route caveat, recurring failure mode, or repair expectation.
 6. Reject current deliverable body, slide/page text, artifact state, export verdicts, readiness claims, deterministic layout recipes, and hidden templates.
-7. Keep authority explicit. RCA owns memory body, accept/reject judgment, owner receipt, and typed blockers; OPL may only transport locator, proposal, receipt, and projection refs.
+7. Keep authority explicit. RCA owns memory body, accept/reject judgment, owner receipt, and typed blockers; OPL owns common catalog validation, scoped recall, exact execution snapshots, and consumption receipts; RCA retains semantic acceptance.
 8. Route back unresolved defects instead of storing them. If a candidate says a specific page still needs repair, return the owner stage and evidence refs rather than accepting it as memory.
 9. For repeated visual failures, accept only the reusable pattern after the blocked slides have a clear review/repair outcome. Otherwise return `route_back` to story, visual direction, page authoring, native PPT design, template profiling, or reviewer.
 10. Reject route arbitration as memory unless it is a reusable route caveat backed by evidence. Do not store route scores, layout controllers, accepted review verdicts, or hidden template recipes.
@@ -66,7 +66,7 @@ During review summary, derive at most one small evidence-backed reusable-pattern
 
 - `proposal_generation`: skip or non-authority candidate, family, stage, audience, reusable pattern, review evidence, provenance, scope, and caveat.
 - `accept_reject_review`: evidence sufficiency, reusability, authority boundary, stale-risk check, accept/reject verdict ref, and owner receipt ref.
-- `writeback_lifecycle`: propose -> RCA accept/reject -> receipt ref -> OPL locator/projection transport -> stage-scoped retrieval.
+- `writeback_lifecycle`: propose -> RCA accept/reject -> receipt ref -> owner updates scoped Markdown and OPL catalog -> stage-scoped snapshot retrieval.
 - `reject_reason`: artifact_body, verdict_body, route_logic, hidden_template, stale_evidence, global_rulebook, unsupported_provenance, or authority_bypass.
 - `memory_ai_judgment`: accept, reject, duplicate, stale, route_back, or typed_blocker with evidence refs and owner stage.
 - `repeated_visual_failure_memory_gate`: evidence refs, repair outcome, reusable lesson, unresolved defect check, accept/reject receipt ref, and route-back owner.
@@ -87,7 +87,7 @@ Return `typed_blocker` during owner accept/reject when:
 
 - The existing candidate, rendered evidence, review refs, terminal export closeout refs, or provenance are missing.
 - A proposal contains current artifact body, visible slide/page copy, route truth, review/export verdict text, owner receipt body, or production-ready claims.
-- OPL, Agent Lab, product shell, generated wrapper, or external eval output attempts to accept/reject visual memory or write memory body.
+- OPL, Agent Lab, product shell, generated wrapper, or external eval output attempts to accept/reject visual memory or change its semantic body without RCA owner acceptance.
 - Memory is being used as a visual route scorer, layout controller, review-pass gate, export gate, artifact-ready signal, or production readiness signal.
 - A proposal tries to store an unresolved visual defect as reusable memory instead of routing it back to the owner stage.
 - Repeated visual failure evidence lacks the final review/repair outcome needed to separate durable lesson from live defect.

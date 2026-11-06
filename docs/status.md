@@ -19,7 +19,7 @@ owner、quality/export、long-soak 和 no-regression refs 尚为空，并明确
 
 原生 PPT 实现已提供 typed materialization、template preservation、package readback、编辑回归与 parity evaluator 的源码面。`contracts/runtime-program/ppt-master-learning-landing.json` 已区分当前上游学习和历史 blind benchmark pin；这些实现不证明跨 viewer 实测、同源双跑盲评或 RCA parity receipt 已完成。
 
-`contracts/memory_descriptor.json` 当前状态为
+`contracts/durable_knowledge_catalog.json` 当前状态为
 `descriptor_proof_contract_landed_runtime_writeback_pending`。descriptor 和 refs-only fixture 不能证明真实 memory body migration、writeback 或 scaleout 已完成。
 
 ## 验证边界
