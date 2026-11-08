@@ -1,0 +1,118 @@
+---
+name: rca-native-ppt-designer
+description: "Use when RedCube AI needs a native editable PowerPoint specialist to produce AI-authored editable_shape_plan, design spec lock, template grammar, shape coordinates, and native PPTX repair targets under RCA native route rules."
+---
+
+# RCA Native PPT Designer
+
+Operate as the native editable PPTX design specialist. The AI-authored `editable_shape_plan` is the design authority; Office/Python helpers materialize, validate, render, and export refs. Their quality findings consume a bounded repair budget and do not block stage transition when a readable PPTX or shape plan already exists.
+
+## Runtime Summary
+
+Use the accepted blueprint, visual direction, and template profile to author an explicit editable shape plan before helper materialization. Native means real editable objects, semantic zones, stable ids, and deliberate notes/motion, not a full-page image label. After materialization inspect package/readback and rendered pixels; repair the plan, rerender, and obtain fresh review before native/export claims.
+
+## AI-First / Contract-Light Boundary
+
+- Use AI judgment here for editable design spec locks, shape grammar, zone binding, coordinate tradeoffs, native repair strategy, and when native editability is genuinely worth the route cost.
+- Do not infer native-vs-image-first admission here. The decisive Codex Attempt must already have recorded a whole-request semantic decision based on explicit current-user intent for editable text/shapes/charts/tables, native PowerPoint/DrawingML objects, editable master/layout/placeholder/theme preservation, or the native authoring route. These are semantic classes, not trigger tokens; a `.pptx` attachment/output, template, notes, quality target, Agent preference, or literal keyword match is insufficient.
+- Use AI judgment here when repeated native failures show a design-plan problem rather than a helper problem: zone grammar, coordinates, shape roles, typography, template capacity, or selected slide scope.
+- Treat validators, helper manifests, and `contracts/capability_map.json` as bounds, refs, and failure-token metadata; they do not invent native design, choose which pages need editability, or convert image-first success into native authority.
+- Keep contracts light by making the `editable_shape_plan` explicit. Do not add helper defaults, inference fallbacks, or compatibility rules that hide missing native design decisions.
+
+## Inputs
+
+- Approved source truth, slide blueprint, visual direction, route policy, native PPTX selection, and the exact current-request native admission evidence.
+- Template profile or reference deck analysis when available.
+- Native sample constraints such as `native_visual_sample`.
+- Preflight, shape-plan validation feedback, render QA feedback, or blocked-slide review results for repair.
+- RCA refs:
+  - `docs/references/native-ppt-open-source-design-discipline.md`
+  - `prompts/ppt_deck/author_pptx_native.md`
+  - `prompts/ppt_deck/author_pptx_native_sample.md`
+  - `prompts/ppt_deck/repair_pptx_native.md`
+  - `agent/skills/native_helper_policy.md`
+  - `agent/quality_gates/artifact_authority.md`
+  - `agent/knowledge/artifact_and_export_authority.md`
+
+## Outputs
+
+- `editable_shape_plan.design_spec_lock` with professional design brief, typography, palette, grid, motif, layout rhythm, borrowed discipline labels, forbidden items, and QA gates.
+- `deck_layout_rhythm_plan` with one row per slide.
+- `template_layout_grammar` with semantic archetypes, zones, placeholder capacity, required role groups, and prohibited mistakes.
+- Per-slide `template_layout_binding`, `layout_intent`, and `native_shapes[]` using editable Office objects with explicit bounds, roles, quality roles, font sizes, fills/lines, z-order, and zone ids.
+- A typed native object plan covering `text_box`, paragraph/run/native bullet, preset shape, line, connector, picture, group, path, chart, table, and metric-grid semantics without unknown-kind fallback.
+- `presentation_semantics`: speaker notes, transition, timing, and optional animation timeline; every animated page must remain understandable as a static slide.
+- `native_ppt_qa_plan`: editable-object proof, rendered screenshot refs, shape manifest refs, hyperlink/text editability checks, and blocked-slide repair scope.
+- Native repair targets or typed blockers.
+
+## Execution Rules
+
+1. Native means editable objects. Do not wrap full-page PNGs and call the result native PPTX.
+2. Verify native admission before designing. If exact current-request evidence is absent, return a route mismatch to image-first; do not treat a template/reference `.pptx` or requested `.pptx` output as admission.
+3. Lock design before coordinates. A thin spec id, motif, or color palette is not enough.
+4. Treat reference decks and templates as layout intelligence after route admission: semantic zones, placeholder capacity, spacing rhythm, hierarchy, and action-title discipline.
+5. Every non-decorative visible shape must bind to a declared zone and remain inside it.
+6. Use canonical bounds only: `left_in`, `top_in`, `width_in`, and `height_in`.
+7. Do not rely on helper defaults. Text-bearing shapes need explicit font size; structural shapes need visible fill or line; every visible shape needs a valid quality role.
+8. Preserve layout variety. Do not repeat the same concrete composition three pages in a row; in normal decks keep most composition signatures distinct.
+9. Respect readability floors: title, body, labels, tables, captions, gaps, edge margins, and title hierarchy must be planned before materialization.
+10. Plan structural visuals as editable shapes: rail, connector, axis, proof band, gate stack, input hub, metric grid, table, chart, or map.
+11. Repair by changing the AI plan. Do not hide failures in notes, shrink text below floor, mark content decorative, or let helpers rebalance the page.
+12. If a template or reference deck has not been profiled, request `rca-template-profiler` output first; this skill only binds that profile into native editable shapes.
+13. Make native QA explicit before materialization: shape manifest, rendered screenshots, editable text/hyperlink checks, and screenshot-review repair targets must be expected outputs.
+14. Route back when a native failure belongs to source/story, visual direction, or template profile rather than coordinates; do not make helpers infer missing design decisions.
+15. When converting from image-first, consume approved director notes, contact-sheet findings, source refs, and explicit editable targets. Do not trace pixels blindly or claim native readiness without native QA evidence.
+16. For repeated native repair failure, preserve passing slides and classify the failing boundary before rerender: shape grammar, zone capacity, text fit, helper materialization, review expectation, or route mismatch.
+17. Declare object kind and materialization intent explicitly. Use `stable_drawingml` for shape-built visuals where viewer consistency dominates and `native_data_object` for charts/tables where editable data semantics dominate.
+18. Use real connectors, pictures, groups, paths, charts, and tables when declared. Never permit the helper to convert an unknown or unsupported kind into a rectangle; preserve the best plan plus a repair target or no-output diagnostic and continue without ready claims.
+19. Keep notes and motion authored, not inferred. Bind notes to slide ids, choose transitions deliberately, keep timing optional, and use animation only when it strengthens the spoken sequence without making the static page incomplete.
+20. Make targeted repair stable-id based. Preserve passing slide/object hashes and rerender only blocked objects or slides unless an upstream design lock changed.
+
+## Workbench Lessons To Preserve
+
+- If the current route is image-first, do not retrofit it into a native claim. Full-page PNG decks can be the right draft/export route, but they are not editable_shape_plan evidence.
+- When converting an image-first success into native PPTX later, start from the approved page-by-page director notes and contact-sheet findings, not from tracing pixels blindly.
+- Native follow-up should target the pages that need editability, links, charts, or live text most. Do not make the whole deck native unless the current user explicitly requires it.
+- Public GitHub/source links are native-friendly candidates: keep them as editable text or hyperlink shapes when native PPTX is selected, not baked into a low-resolution image.
+
+## Design Registry Consumption
+
+- Read the selected entries of `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/visualization_pattern_registry`, `#/professional_style_registry`, and `#/connector_semantics` when they affect the current plan. Preserve current selections, declare observable semantics, and choose the supported typed materialization mode explicitly; revisit only decisions invalidated by a source, design, or capability change.
+- Use `contracts/runtime-program/ppt-master-learning-landing.json` only as provenance. Reject an unexpressible typed shape from the native-ready claim, emit a shape-plan diagnostic or route-back, and continue to another declared stage; never substitute an unknown kind with a generic rectangle or copy an upstream SVG body.
+- For charts, tables, links, formulas, or custom shapes, load `resources/native-object-semantics.md`. It maps current local payloads, fidelity evidence, and unsupported upstream features without importing another runtime.
+
+## Resources
+
+Load [minimal-resource-pack.md](resources/minimal-resource-pack.md) when authoring a new payload or when field-level examples are needed. Accepted current payload refs can be reused without loading the examples again.
+
+## Stage Prompt Boundary
+
+- `visual_direction` supplies deck-level visual intent; this skill turns it into native editable shape design.
+- `rca-template-profiler` supplies route-agnostic template profile and placeholder capacity when a template or reference deck exists.
+- `artifact_creation` owns native page materialization through the selected route.
+- `review_and_revision` owns rendered review and repair verdict.
+- `package_and_handoff` may export a clearly non-ready candidate or diagnostic after quality debt; passing review gates is required for native-ready, `visual_ready`, and `export_ready` claims.
+- This skill does not write visual truth, review/export verdicts, owner receipts, runtime state, or memory bodies.
+
+## Blockers And Repair Targets
+
+Missing native admission is a route mismatch, not a hard stop: return `route_back_decision` to `artifact_creation` with `author_image_pages / repair_image_pages`, preserve the current source/blueprint/direction refs, and continue image-first without asking the user to choose an internal route.
+
+Return `typed_blocker` only when:
+
+- A template/reference cannot legally be used, or a real permission or authority boundary prevents using it.
+- Permission, credential, explicit human approval, authority, or stage identity/currentness prevents legal continuation.
+
+If no consumable blueprint, visual direction, editable shape plan, or PPTX artifact exists, return a no-output diagnostic and quality debt as the next stage input. Do not turn ordinary missing authoring output into an authority blocker.
+
+Record `completed_with_quality_debt` and a repair target, not an execution blocker, when a consumable artifact exists but `design_spec_lock`, template grammar, zone binding, shape manifest, true render proof, artifact inventory, helper evidence, or visual quality is incomplete. Retry count is quality budget; after it is exhausted, preserve the best consumable plan/PPTX and continue without `visual_ready` or `export_ready` claims.
+
+Return `repair_target` when:
+
+- A shape falls outside its zone or canvas bounds.
+- Text fit, font floor, hierarchy, contrast, gap, or edge margin fails.
+- Connectors cross readable text.
+- Structural visual support is missing or only decorative.
+- A selected archetype does not match actual shape roles.
+- A native sample is too dense or uses a generic card grid instead of a proof/decision board.
+- Native QA evidence shows editable object, screenshot, hyperlink, or shape-manifest mismatch that requires plan repair before review can pass.

@@ -1,0 +1,176 @@
+{
+  "surface_kind": "opl_agent_lab_cost_estimate_profile",
+  "version": "opl-agent-lab-cost-estimate-profile.v1",
+  "profile_id": "rca-ppt-40",
+  "owner": "redcube_ai",
+  "canonical_agent_id": "rca",
+  "domain_id": "redcube-ai",
+  "task_family": "presentation_foundry_visual_delivery",
+  "estimate_ref": "cost-estimate:agent-lab/redcube-ai/ppt-40/gpt-5.5-xhigh",
+  "artifact_profile": {
+    "artifact_kind": "presentation_deck",
+    "slide_count": 40,
+    "route_artifact_kind": "ppt_deck",
+    "expected_route_ref": "domain-agent-entry:redcube-ai",
+    "text_model_ref": "openai:gpt-5.5",
+    "reasoning_effort": "xhigh",
+    "image_model_ref": "openai:gpt-image-2"
+  },
+  "stages": [
+    {
+      "stage_id": "intake",
+      "stage_ref": "cost-estimate-ref:agent-lab/rca-ppt-40/intake",
+      "stage_kind": "source_intake_and_brief_normalization",
+      "owner": "redcube-ai",
+      "model_ref": "openai:gpt-5.5",
+      "reasoning_effort": "xhigh",
+      "slide_count": 40,
+      "text_tokens": {
+        "input_tokens": 180000,
+        "cached_input_tokens": 40000,
+        "output_tokens": 35000
+      },
+      "assumption_refs": [
+        "assumption:rca-ppt-40/source-pack-under-80-pages-or-equivalent",
+        "assumption:rca-ppt-40/no-large-video-transcription"
+      ],
+      "calibration_refs": [
+        "calibration-ref:agent-lab/rca-source-intake-history-needed"
+      ]
+    },
+    {
+      "stage_id": "outline",
+      "stage_ref": "cost-estimate-ref:agent-lab/rca-ppt-40/outline",
+      "stage_kind": "storyline_and_slide_architecture",
+      "owner": "redcube-ai",
+      "model_ref": "openai:gpt-5.5",
+      "reasoning_effort": "xhigh",
+      "slide_count": 40,
+      "text_tokens": {
+        "input_tokens": 260000,
+        "cached_input_tokens": 90000,
+        "output_tokens": 75000
+      },
+      "assumption_refs": [
+        "assumption:rca-ppt-40/one-major-storyline-pass",
+        "assumption:rca-ppt-40/limited-human-direction-churn"
+      ],
+      "calibration_refs": [
+        "calibration-ref:agent-lab/rca-storyline-token-ledger-needed"
+      ]
+    },
+    {
+      "stage_id": "slide_generation",
+      "stage_ref": "cost-estimate-ref:agent-lab/rca-ppt-40/slide-generation",
+      "stage_kind": "slide_copy_and_speaker_notes",
+      "owner": "redcube-ai",
+      "model_ref": "openai:gpt-5.5",
+      "reasoning_effort": "xhigh",
+      "slide_count": 40,
+      "text_tokens": {
+        "input_tokens": 580000,
+        "cached_input_tokens": 200000,
+        "output_tokens": 175000
+      },
+      "assumption_refs": [
+        "assumption:rca-ppt-40/forty-slide-native-ppt-deck",
+        "assumption:rca-ppt-40/speaker-notes-or-copy-dense-slide-drafting"
+      ],
+      "calibration_refs": [
+        "calibration-ref:agent-lab/rca-copy-generation-token-ledger-needed",
+        "calibration-ref:agent-lab/rca-visual-direction-token-ledger-needed"
+      ]
+    },
+    {
+      "stage_id": "image_generation",
+      "stage_ref": "cost-estimate-ref:agent-lab/rca-ppt-40/image-generation",
+      "stage_kind": "image_generation_and_edits",
+      "owner": "redcube-ai",
+      "model_ref": "openai:gpt-image-2",
+      "slide_count": 40,
+      "operation_count": 40,
+      "image_tokens": {
+        "text_input_tokens": 80000,
+        "text_cached_input_tokens": 20000,
+        "image_input_tokens": 120000,
+        "image_cached_input_tokens": 20000,
+        "image_output_tokens": 320000
+      },
+      "assumption_refs": [
+        "assumption:rca-ppt-40/one-image-operation-per-slide-average",
+        "assumption:rca-ppt-40/no-bulk-high-variation-image-search-loop",
+        "assumption:rca-ppt-40/image-token-count-depends-on-size-quality-and-edits"
+      ],
+      "calibration_refs": [
+        "calibration-ref:agent-lab/rca-gpt-image-2-usage-ledger-needed"
+      ]
+    },
+    {
+      "stage_id": "render_review",
+      "stage_ref": "cost-estimate-ref:agent-lab/rca-ppt-40/render-review",
+      "stage_kind": "deck_render_review_iteration",
+      "owner": "redcube-ai",
+      "model_ref": "openai:gpt-5.5",
+      "reasoning_effort": "xhigh",
+      "slide_count": 40,
+      "text_tokens": {
+        "input_tokens": 300000,
+        "cached_input_tokens": 100000,
+        "output_tokens": 80000
+      },
+      "assumption_refs": [
+        "assumption:rca-ppt-40/two-render-review-passes",
+        "assumption:rca-ppt-40/screenshots-tokenized-as-model-input"
+      ],
+      "calibration_refs": [
+        "calibration-ref:agent-lab/rca-render-review-token-ledger-needed"
+      ]
+    },
+    {
+      "stage_id": "revision",
+      "stage_ref": "cost-estimate-ref:agent-lab/rca-ppt-40/revision",
+      "stage_kind": "final_packaging_and_handoff",
+      "owner": "redcube-ai",
+      "model_ref": "openai:gpt-5.5",
+      "reasoning_effort": "xhigh",
+      "slide_count": 40,
+      "text_tokens": {
+        "input_tokens": 120000,
+        "cached_input_tokens": 50000,
+        "output_tokens": 35000
+      },
+      "assumption_refs": [
+        "assumption:rca-ppt-40/native-ppt-and-export-package",
+        "assumption:rca-ppt-40/one-final-review-closeout"
+      ],
+      "calibration_refs": [
+        "calibration-ref:agent-lab/rca-handoff-token-ledger-needed"
+      ]
+    }
+  ],
+  "calibration_policy": {
+    "status": "estimate_profile_requires_provider_usage_receipts",
+    "required_runtime_receipt_refs": [
+      "usage-receipt-ref:provider/openai/responses-token-usage",
+      "usage-receipt-ref:provider/openai/image-token-usage",
+      "artifact-ref:rca/ppt-deck-slide-count"
+    ],
+    "variance_policy": "compare_profile_estimate_to_provider_usage_without_rewriting_visual_quality_or_artifact_verdict"
+  },
+  "pricing_boundary": {
+    "pricing_snapshot_owned_by_profile": false,
+    "pricing_calculation_owned_by_profile": false,
+    "generic_estimator_owner": "one-person-lab",
+    "profile_supplies_workload_assumptions_only": true
+  },
+  "authority_boundary": {
+    "refs_only": true,
+    "can_authorize_budget_spend": false,
+    "can_claim_actual_invoice_cost": false,
+    "can_claim_visual_ready": false,
+    "can_claim_exportable": false,
+    "can_write_domain_truth": false,
+    "can_write_artifact_body": false,
+    "can_write_owner_receipt": false
+  }
+}

@@ -1,0 +1,448 @@
+{
+  "contract_id": "ppt_image_first_production_route_v1",
+  "status": "landed",
+  "deliverable_family": "ppt_deck",
+  "default_visual_route": "author_image_pages",
+  "default_visual_policy": "image_first",
+  "default_enabled": true,
+  "route_selection_contract": {
+    "contract_id": "ppt_deck_authoring_lane_admission_v1",
+    "decision_owner": "decisive_codex_attempt",
+    "decision_mode": "whole_current_user_request_semantic_judgment",
+    "deterministic_selector_implemented_here": false,
+    "forbidden_decision_mechanisms": [
+      "literal_keyword_matching",
+      "regular_expression_matching",
+      "file_extension_matching",
+      "validator_or_helper_driven_selection"
+    ],
+    "examples_are": "semantic_regression_cases_not_trigger_vocabulary",
+    "requested_output_semantics": {
+      "generic_ppt_or_slides_request": "deliverable_family_only",
+      "pptx_output": "container_format_only",
+      "pptx_input_or_reference": "source_or_visual_reference_only"
+    },
+    "default_decision": {
+      "author_route": "author_image_pages",
+      "repair_route": "repair_image_pages",
+      "export_route": "export_pptx",
+      "final_container": "pptx_with_full_slide_images",
+      "ambiguity_policy": "select_image_first_without_human_gate"
+    },
+    "native_route_admission": {
+      "policy": "explicit_current_user_native_editability_or_native_authoring_semantics_required",
+      "evidence_source": "current_user_request_not_agent_inference_attachment_extension_or_validator_result",
+      "evidence_interpretation": "semantic_judgment_over_complete_current_user_request",
+      "admitted_semantic_intents": [
+        "editable_text_shapes_charts_or_tables",
+        "native_powerpoint_objects_or_drawingml",
+        "preserve_editable_master_layout_placeholder_or_theme_objects",
+        "explicit_native_pptx_authoring_route"
+      ],
+      "non_admitting_context_alone": [
+        "generic_ppt_or_slides_wording",
+        "pptx_output_extension",
+        "attached_or_reference_pptx",
+        "reuse_or_follow_template_style",
+        "speaker_notes_or_pdf_export",
+        "professional_or_high_quality_wording",
+        "agent_route_preference",
+        "native_validator_or_materializer_availability"
+      ],
+      "missing_evidence_decision": "author_image_pages"
+    },
+    "lane_lock": {
+      "lock_after_selection": true,
+      "validator_or_repair_failure_may_switch_lane": false,
+      "agent_may_upgrade_image_first_to_native": false,
+      "new_explicit_user_invocation_required_to_change_lane": true
+    },
+    "semantic_regression_cases": [
+      {
+        "case_id": "generic_ppt_request",
+        "request_semantics": ["make_a_ppt"],
+        "expected_author_route": "author_image_pages"
+      },
+      {
+        "case_id": "reference_pptx_template_request",
+        "request_semantics": ["attached_pptx", "use_as_reference", "follow_hospital_or_company_template"],
+        "expected_author_route": "author_image_pages"
+      },
+      {
+        "case_id": "pptx_output_with_notes_and_pdf",
+        "request_semantics": ["pptx_output", "speaker_notes", "pdf_export"],
+        "expected_author_route": "author_image_pages"
+      },
+      {
+        "case_id": "explicit_editable_objects_request",
+        "request_semantics": ["editable_text_shapes_charts_or_tables"],
+        "expected_author_route": "author_pptx_native"
+      },
+      {
+        "case_id": "explicit_drawingml_request",
+        "request_semantics": ["native_powerpoint_objects_or_drawingml"],
+        "expected_author_route": "author_pptx_native"
+      },
+      {
+        "case_id": "explicit_native_authoring_request",
+        "request_semantics": ["explicit_native_pptx_authoring_route"],
+        "expected_author_route": "author_pptx_native"
+      }
+    ]
+  },
+  "route_chain": [
+    "storyline",
+    "detailed_outline",
+    "slide_blueprint",
+    "visual_direction",
+    "author_image_pages",
+    "visual_director_review",
+    "screenshot_review",
+    "repair_image_pages",
+    "export_pptx"
+  ],
+  "api_contract": {
+    "contract_id": "rca_codex_image_generation_dual_route_v1",
+    "preferred_builtin_route": {
+      "skill_id": "imagegen",
+      "tool_namespace": "image_gen",
+      "tool_action": "imagegen",
+      "accepted_runtime_names": [
+        "image_gen.imagegen",
+        "image_gen__imagegen"
+      ],
+      "availability_authority": "active_executor_tool_inventory",
+      "skill_presence_is_not_tool_availability": true,
+      "model_selection": "inherited_from_codex_builtin_image_gen",
+      "explicit_provider_token_required": false,
+      "missing_openai_api_key_may_block": false
+    },
+    "automatic_api_fallback": {
+      "activation": [
+        "built_in_tool_absent_from_active_executor_inventory",
+        "built_in_tool_unavailable_before_any_image_artifact"
+      ],
+      "authorization": "selected_rca_image_first_route_authorizes_same_model_api_fallback_without_additional_user_confirmation",
+      "must_not_ask_user_to_confirm_fallback": true,
+      "must_not_request_new_openai_api_key_before_codex_config_resolution": true,
+      "config_path_precedence": [
+        "$CODEX_HOME/config.toml",
+        "~/.codex/config.toml"
+      ],
+      "config_parser": "toml",
+      "active_provider_resolution": "root.model_provider -> model_providers.<provider_id>",
+      "base_url_field": "base_url",
+      "credential_resolution_order": [
+        "model_providers.<provider_id>.experimental_bearer_token",
+        "model_providers.<provider_id>.api_key",
+        "environment value named by model_providers.<provider_id>.env_key"
+      ],
+      "preferred_client": "installed_imagegen_skill_scripts_image_gen_py",
+      "client_path_precedence": [
+        "active_imagegen_skill_root/scripts/image_gen.py",
+        "$CODEX_HOME/skills/.system/imagegen/scripts/image_gen.py",
+        "~/.codex/skills/.system/imagegen/scripts/image_gen.py"
+      ],
+      "client_dependency_policy": "use_active_openai_sdk_else_ephemeral_uv_run_with_openai_without_user_prompt",
+      "request": {
+        "api": "openai_compatible_images",
+        "path": "/images/generations",
+        "model": "gpt-image-2",
+        "final_slide_size": "2048x1152",
+        "output_format": "png"
+      },
+      "child_process_env_mapping": {
+        "OPENAI_BASE_URL": "resolved_base_url",
+        "OPENAI_API_KEY": "resolved_credential"
+      },
+      "credential_scope": "single_image_generation_child_process_only",
+      "forbidden": [
+        "parse_toml_with_shell_sourcing_or_ad_hoc_regex",
+        "write_token_to_shell_profile",
+        "persist_token_in_prompt_artifact_manifest_or_receipt",
+        "print_echo_or_return_token",
+        "require_OPENAI_API_KEY_to_already_exist",
+        "ask_user_to_install_openai_sdk_when_ephemeral_uv_is_available",
+        "ask_user_to_paste_or_configure_a_key_when_codex_provider_config_is_resolvable"
+      ]
+    },
+    "terminal_failure_policy": {
+      "when": [
+        "no_readable_codex_config",
+        "active_provider_missing_base_url_or_resolvable_credential",
+        "provider_rejects_auth_or_gpt_image_2_after_bounded_retry"
+      ],
+      "result": "redacted_typed_blocker_with_attempted_route_and_config_path_only",
+      "must_not_include_secret_values": true,
+      "must_not_offer_generic_openai_key_setup_as_first_remediation": true
+    },
+    "token_persistence_allowed": false,
+    "artifact_provenance_fields": [
+      "provider",
+      "endpoint",
+      "request_model",
+      "tool_options",
+      "response_id",
+      "image_call_id",
+      "revised_prompt",
+      "image_sha256",
+      "prompt_hash",
+      "style_reference_hash",
+      "cache_key",
+      "cache_status",
+      "source_image_hash",
+      "generation_cost_proxy",
+      "generated_at"
+    ]
+  },
+  "style_contract": {
+    "default_style_profile": "prompts/ppt_deck/image-first-default-style-profile.json",
+    "prompt_template": "prompts/ppt_deck/image_first_prompt_template.md",
+    "user_style_reference_dir_precedence": true,
+    "style_reference_artifact_store_required": true
+  },
+  "fact_governance": {
+    "fact_whitelist_surface": "shared_source_truth.readable_shared_source_truth_fields",
+    "verification_ledger_surface": "reports/fact-verification-ledger.json",
+    "rule": "visible factual claims in generated full-slide images must trace to whitelisted source truth, approved slide blueprint text, or operator-approved verified assets",
+    "unresolved_claim_policy": "block_or_rephrase_as_general_without_unverified_specifics",
+    "forbidden_generated_artifacts": [
+      "fake QR code",
+      "fake download link",
+      "fake DOI",
+      "fake logo",
+      "unverified hospital name",
+      "unverified patient demographics",
+      "unverified publication status",
+      "page number",
+      "slide number",
+      "chapter corner label"
+    ]
+  },
+  "verified_asset_overlay_policy": {
+    "asset_overlay_surface": "verified_asset_overlay_manifest",
+    "allowed_overlay_assets": [
+      "real QR code",
+      "download entry",
+      "verified UI screenshot",
+      "verified paper screenshot",
+      "operator supplied logo"
+    ],
+    "deterministic_overlay_only": true,
+    "overlay_manifest_required": true,
+    "machine_verification_required_when_applicable": true,
+    "composition_repair_allowed": false,
+    "model_generation_forbidden": [
+      "QR code",
+      "download URL",
+      "DOI",
+      "logo",
+      "publication screenshot"
+    ]
+  },
+  "long_deck_production_contract": {
+    "contract_id": "ppt_image_first_long_deck_production_v1",
+    "source_reference_pattern": "full 65-page GPT-Image-2 colorectal AI lecture deck",
+    "applies_when": "expected_slide_count > proof_runner.max_default_slide_count or operator marks deck as long_deck",
+    "full_colorectal_ai_long_deck_regression_allowed_by_default": false,
+    "canonical_slide_naming": "slideNN-short-name.png",
+    "expected_slide_count_source": "slide_blueprint.expected_slide_count || slide_blueprint.slides.length",
+    "required_artifact_surfaces": [
+      "prompts",
+      "images_raw",
+      "images_1920x1080",
+      "style_refs",
+      "fact_verification_ledger",
+      "visual_qc_ledger",
+      "contact_sheet",
+      "pptx"
+    ],
+    "completeness_gates": [
+      "expected slide count matches image page count",
+      "continuous slideNN ordering",
+      "all generated pages are 16:9 PNG",
+      "exported PPTX has one full-slide image per slide",
+      "exported PPTX media count matches slide count",
+      "full-deck contact sheet or manifest exists for operator review"
+    ],
+    "line_divergence_policy": {
+      "shared_truth_before_divergence": [
+        "source_truth",
+        "storyline"
+      ],
+      "divergence_allowed_from": [
+        "detailed_outline",
+        "slide_blueprint",
+        "visual_direction"
+      ],
+      "html_route_must_not_consume_image_route_pngs_by_default": true,
+      "image_route_is_not_html_skin": true
+    },
+    "rejected_repair_route_policy": {
+      "forbidden_for_page_fixes": [
+        "PIL composition patch",
+        "Canvas redraw patch",
+        "HTML rebuild patch"
+      ],
+      "allowed_postprocess_scope": [
+        "deterministic verified asset overlay only"
+      ],
+      "rejected_route_provenance_required": true
+    }
+  },
+  "audience_language_policy": {
+    "visible_operator_language_allowed": false,
+    "forbidden_visible_fragments": [
+      "汇报讨论用途",
+      "客观专业版",
+      "本次汇报边界",
+      "不在展示页暴露",
+      "本地原始文件名",
+      "清洗脚本名",
+      "RCA",
+      "RedCube",
+      "source intake",
+      "author_pptx_native",
+      "slide_blueprint",
+      "visual_direction"
+    ],
+    "rewrite_target": "project-facing audience language"
+  },
+  "layout_legibility_policy": {
+    "title_safe_zone_clear": {
+      "required": true,
+      "forbidden_elements": [
+        "section chip",
+        "corner card",
+        "badge",
+        "tag",
+        "decorative label"
+      ],
+      "preferred_section_signal": "footer_or_omit"
+    },
+    "table_legibility": {
+      "min_body_font_pt": 11,
+      "max_blank_ratio_in_card": 0.38,
+      "compact_cell_padding_required": true
+    },
+    "layout_density": {
+      "avoid_oversized_empty_cards": true,
+      "max_blank_ratio_in_card": 0.38
+    }
+  },
+  "review_export_gates": {
+    "visual_director_review_consumes": [
+      "full-slide PNG",
+      "prompt manifest",
+      "style manifest"
+    ],
+    "screenshot_review_consumes": [
+      "full-slide PNG",
+      "image_pages_bundle",
+      "prompt manifest",
+      "style manifest"
+    ],
+    "mechanical_checks": [
+      "16:9",
+      "non-empty PNG",
+      "duplicate hash",
+      "low information density",
+      "edge crop risk",
+      "title area crop risk",
+      "fragmentation risk",
+      "manifest presence",
+      "internal field leak risk",
+      "operator language leak",
+      "title safe zone obstruction",
+      "table font below 11pt",
+      "sparse oversized card",
+      "optional OCR manifest domain_action_adapter"
+    ],
+    "ready_claim_block_checks": [
+      "overflow_free",
+      "occlusion_free",
+      "visual_density_ok",
+      "edge_clearance_ok",
+      "block_content_fit_ok",
+      "title_typography_ok",
+      "external_audience_language_ok",
+      "title_safe_zone_clear",
+      "table_legibility_ok",
+      "layout_density_ok"
+    ],
+    "export_pptx": {
+      "source_visual_route": "author_image_pages|repair_image_pages",
+      "editable_shapes_claim_allowed": false,
+      "full_slide_image_pages_allowed": true
+    }
+  },
+  "alternate_routes": {
+    "html": {
+      "status": "production_selectable_optional",
+      "explicit_selection_required": true,
+      "routes": ["render_html", "fix_html"]
+    },
+    "native_editable_pptx": {
+      "status": "production_selectable_optional",
+      "explicit_selection_required": true,
+      "routes": ["author_pptx_native", "repair_pptx_native"],
+      "use_when": ["editable", "native PPTX", "DrawingML", "可编辑"]
+    }
+  },
+  "proof_runner": {
+    "command": "tools/image-ppt-proof/run.sh --output-dir artifacts/image-ppt-proof --mock-image-generation",
+    "cli_command": "redcube image-ppt proof --output-dir artifacts/image-ppt-proof --mock-image-generation",
+    "ci_contract": "tools/image-ppt-proof/ci-contract.json",
+    "default_mode": "mock",
+    "default_fixture": "tests/fixtures/ppt-image-first-lightweight/fixture.json",
+    "max_default_slide_count": 6,
+    "full_colorectal_ai_long_deck_regression_allowed_by_default": false,
+    "live_mode": "explicit",
+    "live_mode_requires": [
+      "codex_image_generation_dual_route_resolvable"
+    ],
+    "live_mode_requires_any": [
+      "codex_builtin_image_gen_tool_available",
+      "codex_config_gpt_image_2_fallback_resolvable"
+    ]
+  },
+  "runtime_hardening": {
+    "artifact_cache": {
+      "status": "landed",
+      "key_inputs": [
+        "slide_blueprint_hash",
+        "visual_direction_hash",
+        "prompt_hash",
+        "style_reference_hash",
+        "model",
+        "tool_options"
+      ],
+      "reuse_policy": "reuse_same_key_png_and_provenance_unless_force_redraw_or_repair_target",
+      "token_persistence_allowed": false
+    },
+    "repair_prompt_fidelity": {
+      "status": "landed",
+      "scope": "blocked_slide_ids_only",
+      "preserve_unblocked_pages": true,
+      "missing_prior_png_quality_debt_when_other_pages_are_consumable": true,
+      "zero_consumable_png_policy": "no_output_diagnostic_and_quality_debt"
+    },
+    "operator_ux": {
+      "status": "landed",
+      "surfaces": [
+        "manifest",
+        "status",
+        "session",
+        "redcube image-ppt proof"
+      ]
+    }
+  },
+  "deferred": [
+    "full colorectal AI long PPT as routine regression fixture",
+    "animation",
+    "narration",
+    "template import",
+    "online image search",
+    "SVG editor"
+  ]
+}

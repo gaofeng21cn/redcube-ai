@@ -1,0 +1,12 @@
+# Artifact Authority Gate
+
+Owner: RedCube AI
+Purpose: protect candidate artifact creation, mutation, export packaging, and handoff.
+
+Gate rules:
+- Artifact bodies belong in workspace/runtime artifact roots and are referenced through artifact locator contracts.
+- Artifact mutation requires RCA route policy, helper catalog refs, repair target refs, or owner receipt refs.
+- Native helpers may materialize artifacts, manifests, screenshots, PPTX/PDF, PNG sequences, and package directories.
+- Generated OPL surfaces may consume artifact refs; they cannot store artifact bodies or authorize artifact mutation.
+- Export preview cache refs and preserved slide hashes are evidence refs only; final export artifacts still require RCA export gate refs and artifact locator refs.
+- Final handoff candidates must preserve exact file hashes and render/package readback evidence across repair. Exact hashes and producer/repairer artifact-identity receipts provide transport identity and separate release-integrity evidence, not content authority or ready claims. A fresh reviewer/re-reviewer supplies the decisive outcome for the semantic dependency scopes actually reviewed; the OPL controller must bind it into a formal Review receipt before RCA owner authority may sign accepted final bytes or any ready claim.

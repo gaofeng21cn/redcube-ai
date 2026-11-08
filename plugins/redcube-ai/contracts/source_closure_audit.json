@@ -1,0 +1,131 @@
+{
+  "surface_kind": "standard_agent_source_closure_audit",
+  "version": "standard-agent-source-closure-audit.v1",
+  "entries": [
+    {
+      "file": "scripts/line-budget.ts",
+      "symbol": "main",
+      "source_digest": "sha256:7f94188c96dd86b0477476057f20f9931bdec8150e6c504f5da416d26a524d9a",
+      "allowed_effects": ["process_spawn"],
+      "role": "developer_tool",
+      "allowed_targets": ["git"]
+    },
+    {
+      "file": "scripts/run-test-group.ts",
+      "symbol": "runNodeTestBatch",
+      "source_digest": "sha256:71f7d1c6ed1b35ccea9d5392a4882433decd952abf0b997cb40de36027be3e6e",
+      "allowed_effects": ["process_spawn"],
+      "role": "developer_tool",
+      "allowed_targets": ["node"]
+    },
+    {
+      "file": "scripts/verification-runtime.ts",
+      "symbol": "ensureRepoTempEnvironment",
+      "source_digest": "sha256:e1f14cee6042758034c9d2aa6c3207618d1abe08b43b641d3975fb5a96e003e4",
+      "allowed_effects": ["process_spawn"],
+      "role": "developer_tool",
+      "allowed_targets": ["scripts/run-with-repo-temp-env.sh"]
+    },
+    {
+      "file": "scripts/verify-lane.ts",
+      "symbol": "run",
+      "source_digest": "sha256:be947e1acb731f055c0b2089254bd63d39126f65ef3e76ee0cad18c5af3e2b3a",
+      "allowed_effects": ["process_spawn"],
+      "role": "developer_tool",
+      "allowed_targets": [
+        "node",
+        "npm",
+        "scripts/repo-hygiene.sh",
+        "scripts/run-structural-quality-gate.sh"
+      ]
+    },
+    {
+      "file": "scripts/verify-lane.ts",
+      "symbol": "runPrivatePlatformReadback",
+      "source_digest": "sha256:be947e1acb731f055c0b2089254bd63d39126f65ef3e76ee0cad18c5af3e2b3a",
+      "allowed_effects": ["filesystem_write"],
+      "role": "developer_tool",
+      "allowed_targets": []
+    },
+    {
+      "file": "tools/image-ppt-proof/run-proof.py",
+      "symbol": "main",
+      "source_digest": "sha256:548ffdf74d14b667f4746adf2ce2d7ccc84c0dcd2c5bedbdeaa557ac72406cec",
+      "allowed_effects": ["filesystem_write"],
+      "role": "developer_tool",
+      "allowed_targets": []
+    },
+    {
+      "file": "tools/image-ppt-proof/run-proof.py",
+      "symbol": "write_delivery",
+      "source_digest": "sha256:548ffdf74d14b667f4746adf2ce2d7ccc84c0dcd2c5bedbdeaa557ac72406cec",
+      "allowed_effects": ["filesystem_write"],
+      "role": "developer_tool",
+      "allowed_targets": []
+    },
+    {
+      "file": "tools/image-ppt-proof/run-proof.py",
+      "symbol": "write_images",
+      "source_digest": "sha256:548ffdf74d14b667f4746adf2ce2d7ccc84c0dcd2c5bedbdeaa557ac72406cec",
+      "allowed_effects": ["filesystem_write"],
+      "role": "developer_tool",
+      "allowed_targets": []
+    },
+    {
+      "file": "tools/image-ppt-proof/run-proof.py",
+      "symbol": "write_json",
+      "source_digest": "sha256:548ffdf74d14b667f4746adf2ce2d7ccc84c0dcd2c5bedbdeaa557ac72406cec",
+      "allowed_effects": ["filesystem_write"],
+      "role": "developer_tool",
+      "allowed_targets": []
+    },
+    {
+      "file": "tools/image-ppt-proof/run-proof.py",
+      "symbol": "write_style_manifest",
+      "source_digest": "sha256:548ffdf74d14b667f4746adf2ce2d7ccc84c0dcd2c5bedbdeaa557ac72406cec",
+      "allowed_effects": ["filesystem_write"],
+      "role": "developer_tool",
+      "allowed_targets": []
+    },
+    {
+      "file": "tools/native-ppt-proof/build-fixture-input.ts",
+      "symbol": "<module>",
+      "source_digest": "sha256:8c21cf8d8eba356db50d49f53bec1f352f3afc0f9328e8b6dc20eb344be7d3bb",
+      "allowed_effects": ["filesystem_write"],
+      "role": "developer_tool",
+      "allowed_targets": []
+    },
+    {
+      "file": "tools/native-ppt-proof/evaluate-quality.ts",
+      "symbol": "runCli",
+      "source_digest": "sha256:b36b61e1abd67586be1f8054a08d0f742355f56fdc7ac9977176305c718b0b29",
+      "allowed_effects": ["filesystem_write"],
+      "role": "developer_tool",
+      "allowed_targets": []
+    },
+    {
+      "file": "tools/native-ppt-proof/run-editability-regression.py",
+      "symbol": "main",
+      "source_digest": "sha256:4c5f3f630d462913037441c376e2111db11bbb83e20569b32f5359d408f0c1f1",
+      "allowed_effects": ["filesystem_write"],
+      "role": "developer_tool",
+      "allowed_targets": []
+    },
+    {
+      "file": "tools/native-ppt-proof/run-editability-regression.py",
+      "symbol": "run_officecli",
+      "source_digest": "sha256:4c5f3f630d462913037441c376e2111db11bbb83e20569b32f5359d408f0c1f1",
+      "allowed_effects": ["process_spawn"],
+      "role": "developer_tool",
+      "allowed_targets": ["officecli"]
+    },
+    {
+      "file": "tools/proof-artifact-index.ts",
+      "symbol": "<module>",
+      "source_digest": "sha256:9fd0f650ccec12da06da911307b6402fc44886a43a89a76558627f9897742377",
+      "allowed_effects": ["filesystem_write"],
+      "role": "developer_tool",
+      "allowed_targets": []
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://one-person-lab.local/contracts/rca/stage-action.input.schema.json",
+  "title": "RCA hosted stage action input",
+  "type": "object",
+  "required": [
+    "workspace_root"
+  ],
+  "properties": {
+    "workspace_root": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^/"
+    },
+    "source_truth_refs": {
+      "type": "object",
+      "description": "Optional prevalidated source-truth locators. OPL validates bytes, currentness, and StageRun binding; RCA interprets the referenced readiness semantics.",
+      "required": [
+        "manifest_ref",
+        "readiness_ref",
+        "source_package_digest_ref"
+      ],
+      "properties": {
+        "manifest_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "readiness_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_package_digest_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

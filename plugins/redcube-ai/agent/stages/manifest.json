@@ -1,0 +1,265 @@
+{
+  "surface_kind": "opl_standard_agent_declarative_stage_manifest",
+  "version": "opl-standard-agent-declarative-stage-manifest.v1",
+  "target_domain_id": "redcube_ai",
+  "owner": "redcube_ai",
+  "quality_governance_profile_ref": "contracts/opl-framework/official-knowledge-deliverable-quality-profile.json",
+  "meta_review_policy_ref": "contracts/stage_quality_cycle_policy.json#/meta_review_policy",
+  "stages": [
+    {
+      "stage_id": "source_intake",
+      "stage_kind": "intake",
+      "title": "Source intake",
+      "display_names": {
+        "en-US": "Source intake",
+        "zh-CN": "资料接收与梳理"
+      },
+      "goal": "Freeze source truth, audience, constraints, and missing-material risk before visual planning.",
+      "policy_ref": "agent/stages/source_intake.md",
+      "prompt_ref": "agent/prompts/source_intake.md",
+      "knowledge_refs": [
+        "agent/knowledge/visual_truth_boundaries.md"
+      ],
+      "quality_gate_refs": [
+        "agent/quality_gates/visual_authority_boundaries.md",
+        "agent/quality_gates/source_and_truth.md"
+      ],
+      "stage_quality_cycle_policy_ref": "contracts/stage_quality_cycle_policy.json#/stage_policies/source_intake",
+      "allowed_action_refs": [
+        "invoke_product_entry"
+      ],
+      "requires": [
+        "visual_delivery_request_received"
+      ],
+      "ensures": [
+        "source_truth_frozen"
+      ],
+      "next_stage_refs": [
+        "communication_strategy"
+      ],
+      "trust_lane": "domain_agent",
+      "policy_refs": [
+        "agent/policies/visual-authority-policy.md",
+        "agent/policies/markdown-route-policy.md"
+      ]
+    },
+    {
+      "stage_id": "communication_strategy",
+      "stage_kind": "planning",
+      "title": "Communication strategy",
+      "display_names": {
+        "en-US": "Communication strategy",
+        "zh-CN": "传播策略"
+      },
+      "goal": "Shape storyline, outline, audience fit, information density, and key takeaways.",
+      "policy_ref": "agent/stages/communication_strategy.md",
+      "prompt_ref": "agent/prompts/communication_strategy.md",
+      "knowledge_refs": [
+        "agent/knowledge/communication_visual_direction.md"
+      ],
+      "quality_gate_refs": [
+        "agent/quality_gates/visual_authority_boundaries.md",
+        "agent/quality_gates/communication_and_direction.md"
+      ],
+      "stage_quality_cycle_policy_ref": "contracts/stage_quality_cycle_policy.json#/stage_policies/communication_strategy",
+      "allowed_action_refs": [
+        "invoke_product_entry"
+      ],
+      "requires": [
+        "source_truth_frozen"
+      ],
+      "ensures": [
+        "communication_strategy_artifact_recorded"
+      ],
+      "next_stage_refs": [
+        "visual_direction"
+      ],
+      "trust_lane": "ai_decision",
+      "policy_refs": [
+        "agent/policies/visual-authority-policy.md",
+        "agent/policies/markdown-route-policy.md"
+      ]
+    },
+    {
+      "stage_id": "visual_direction",
+      "stage_kind": "planning",
+      "title": "Visual direction",
+      "display_names": {
+        "en-US": "Visual direction",
+        "zh-CN": "视觉方向"
+      },
+      "goal": "Define layout density, image strategy, visual language, and feasibility before artifact creation.",
+      "policy_ref": "agent/stages/visual_direction.md",
+      "prompt_ref": "agent/prompts/visual_direction.md",
+      "knowledge_refs": [
+        "agent/knowledge/communication_visual_direction.md"
+      ],
+      "quality_gate_refs": [
+        "agent/quality_gates/visual_authority_boundaries.md",
+        "agent/quality_gates/communication_and_direction.md"
+      ],
+      "stage_quality_cycle_policy_ref": "contracts/stage_quality_cycle_policy.json#/stage_policies/visual_direction",
+      "allowed_action_refs": [
+        "invoke_product_entry"
+      ],
+      "requires": [
+        "communication_strategy_artifact_recorded"
+      ],
+      "ensures": [
+        "visual_direction_artifact_recorded"
+      ],
+      "next_stage_refs": [
+        "artifact_creation"
+      ],
+      "trust_lane": "ai_decision",
+      "policy_refs": [
+        "agent/policies/visual-authority-policy.md",
+        "agent/policies/markdown-route-policy.md"
+      ]
+    },
+    {
+      "stage_id": "artifact_creation",
+      "stage_kind": "creation",
+      "title": "Artifact creation",
+      "display_names": {
+        "en-US": "Artifact creation",
+        "zh-CN": "视觉成果制作"
+      },
+      "goal": "Create the visual deliverable through the selected RCA route while preserving source truth.",
+      "policy_ref": "agent/stages/artifact_creation.md",
+      "prompt_ref": "agent/prompts/artifact_creation.md",
+      "knowledge_refs": [
+        "agent/knowledge/artifact_and_export_authority.md"
+      ],
+      "quality_gate_refs": [
+        "agent/quality_gates/visual_authority_boundaries.md",
+        "agent/quality_gates/artifact_authority.md"
+      ],
+      "stage_quality_cycle_policy_ref": "contracts/stage_quality_cycle_policy.json#/stage_policies/artifact_creation",
+      "allowed_action_refs": [
+        "invoke_product_entry",
+        "run_image_ppt_proof",
+        "run_native_ppt_proof"
+      ],
+      "requires": [
+        "visual_direction_artifact_recorded"
+      ],
+      "ensures": [
+        "artifact_candidate_rendered"
+      ],
+      "next_stage_refs": [
+        "review_and_revision"
+      ],
+      "trust_lane": "codex_executor",
+      "policy_refs": [
+        "agent/policies/visual-authority-policy.md",
+        "agent/policies/markdown-route-policy.md"
+      ]
+    },
+    {
+      "stage_id": "review_and_revision",
+      "stage_kind": "review",
+      "stage_role": "cross_stage_meta_review",
+      "title": "Review and revision",
+      "display_names": {
+        "en-US": "Review and revision",
+        "zh-CN": "评审与修订"
+      },
+      "goal": "Independently review the whole deliverable, identify the earliest defect-owning stage, and issue pass, route-back, quality-debt, human-gate, or typed-blocker verdicts before export.",
+      "policy_ref": "agent/stages/review_and_revision.md",
+      "prompt_ref": "agent/prompts/review_and_revision.md",
+      "knowledge_refs": [
+        "agent/knowledge/review_export_memory.md"
+      ],
+      "quality_gate_refs": [
+        "agent/quality_gates/visual_authority_boundaries.md",
+        "agent/quality_gates/review_export_memory.md"
+      ],
+      "stage_quality_cycle_policy_ref": "contracts/stage_quality_cycle_policy.json#/stage_policies/review_and_revision",
+      "allowed_action_refs": [
+        "invoke_product_entry"
+      ],
+      "requires": [
+        "artifact_candidate_rendered"
+      ],
+      "ensures": [
+        "visual_review_artifact_recorded"
+      ],
+      "next_stage_refs": [
+        "package_and_handoff"
+      ],
+      "trust_lane": "ai_decision",
+      "policy_refs": [
+        "agent/policies/visual-authority-policy.md",
+        "agent/policies/markdown-route-policy.md"
+      ]
+    },
+    {
+      "stage_id": "package_and_handoff",
+      "stage_kind": "packaging",
+      "title": "Package and handoff",
+      "display_names": {
+        "en-US": "Package and handoff",
+        "zh-CN": "打包与交付"
+      },
+      "goal": "Export final files, preview metadata, resume handles, and operator handoff refs.",
+      "policy_ref": "agent/stages/package_and_handoff.md",
+      "prompt_ref": "agent/prompts/package_and_handoff.md",
+      "knowledge_refs": [
+        "agent/knowledge/artifact_and_export_authority.md",
+        "agent/knowledge/owner_receipt_policy.md"
+      ],
+      "quality_gate_refs": [
+        "agent/quality_gates/visual_authority_boundaries.md",
+        "agent/quality_gates/artifact_authority.md",
+        "agent/quality_gates/review_export_memory.md"
+      ],
+      "stage_quality_cycle_policy_ref": "contracts/stage_quality_cycle_policy.json#/stage_policies/package_and_handoff",
+      "handoff_review_boundary": {
+        "artifact_effect": "new_or_transformed_reviewable_bytes",
+        "freezes_canonical_artifact_bytes": true,
+        "issues_quality_export_publication_or_ready_claim": true,
+        "downstream_owner_retains_acceptance": true
+      },
+      "allowed_action_refs": [
+        "invoke_product_entry"
+      ],
+      "requires": [
+        "visual_review_artifact_recorded"
+      ],
+      "ensures": [
+        "export_handoff_artifact_recorded"
+      ],
+      "next_stage_refs": [],
+      "trust_lane": "domain_agent",
+      "policy_refs": [
+        "agent/policies/visual-authority-policy.md",
+        "agent/policies/markdown-route-policy.md"
+      ]
+    }
+  ],
+  "authority_boundary": {
+    "domain_truth_owner": "redcube_ai",
+    "opl_role": "projection_consumer_only",
+    "opl_can_write_domain_truth": false,
+    "opl_can_authorize_quality_or_export": false,
+    "opl_can_sign_owner_receipt": false,
+    "provider_completion_is_domain_completion": false
+  },
+  "progress_first_policy": {
+    "contract_id": "rca.progress_first_stage_admission.v1",
+    "semantic_route_decision_owner": "decisive_codex_attempt",
+    "stage_transition_materialization_owner": "opl_stage_run_controller",
+    "route_execution_grants_stage_transition_authority": false,
+    "codex_may_advance_skip_repeat_reverse_or_route_back": true,
+    "any_declared_stage_may_start_from_any_prior_stage_result": true,
+    "declared_requires_are_quality_context_not_launch_gates": true,
+    "next_stage_refs_are_recommendations_not_constraints": true,
+    "artifact_advances_stage": true,
+    "no_output_or_failure_diagnostic_advances_stage": true,
+    "retries_are_quality_budget": true,
+    "quality_debt_blocks_transition": false,
+    "quality_debt_blocks_ready_claims": true,
+    "explicit_human_gate_only": true
+  }
+}

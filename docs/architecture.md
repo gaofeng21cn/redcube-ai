@@ -32,7 +32,7 @@
 
 ## Package、Carrier 与 Executor
 
-RCA owner 持有 Package identity、能力和领域语义。实际 carrier 平台管理其承载的 bytes，并提供安装、更新、移除后的真实读回；Framework 聚合 presence/callability 和公开 action。当前配置的 Codex Plugin 只承载入口 Skill，full-copy 原因见 [carrier 说明](./references/primary-skill-plugin-carrier-boundary.md)。
+RCA owner 持有 Package identity、能力和领域语义。实际 carrier 平台管理其承载的 bytes，并提供安装、更新、移除后的真实读回；Framework 聚合 presence/callability 和公开 action。当前 Codex Plugin 自包含入口 Skill、声明式 pack、contracts、native helpers 和引用文档，由 `scripts/sync_carrier.py` 从 canonical source 投影；具体资源与权威边界见 [carrier 说明](./references/primary-skill-plugin-carrier-boundary.md)。
 
 完整 RCA bytes 的发布遵循 owner Package channel；共享 Release Set 仅用于离线或 QA 快照。普通 required/optional dependency 检查 identity presence 与 entrypoint callability。发布 digest 保护一次 bytes 交付，领域 artifact hash 保护 lineage，二者不构成中央依赖版本求解器。
 

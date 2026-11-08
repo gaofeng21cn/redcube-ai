@@ -18,7 +18,7 @@ codex plugin add redcube-ai@redcube-ai --json
 codex plugin list --marketplace redcube-ai --available --json
 ```
 
-需要移除时使用 `codex plugin remove redcube-ai@redcube-ai --json`；删除 marketplace 使用 `codex plugin marketplace remove redcube-ai --json`。这些操作只管理入口 Skill carrier，不安装 OPL Base，也不证明完整 Package、hosted StageRun 或视觉验收。
+需要移除时使用 `codex plugin remove redcube-ai@redcube-ai --json`；删除 marketplace 使用 `codex plugin marketplace remove redcube-ai --json`。carrier 包含入口 Skill 及其领域资源；OPL Base 和实际 executor 由平台提供，hosted StageRun 可调用性与视觉验收分别由运行及领域回执确认。
 
 ## 执行交付
 

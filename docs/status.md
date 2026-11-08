@@ -6,6 +6,7 @@
 
 - `contracts/opl_agent_package_manifest.json` 声明 Package `rca`、当前 Codex carrier 和稳定 entrypoints；source version 从该文件及同步的 Node/Python/Plugin declarations 读取。
 - `agent/` 为声明式 visual pack；`contracts/action_catalog.json` 提供完整交付、image proof 和 native proof 的 hosted action binding。
+- `scripts/sync_carrier.py` 将当前 tracked 领域资源确定性投影到 `plugins/redcube-ai/`；安装目录含 Mini App adapter、descriptor、阶段合同和 Python native helpers，不依赖仓库外层路径。`--check` 核对投影字节，实际安装与发布仍由各 owner 回读。
 - `contracts/generated_surface_handoff.json` 的 repo-local handler targets 为空，`structural_cutover_complete=true`，`production_evidence_complete=false`。
 - `contracts/functional_privatization_audit.json` 仅保留 visual authority decisions 与 Python native helpers；物理源码归属由 `contracts/physical_source_morphology_policy.json` 声明。旧私有 CLI、domain-entry、runtime、governance 和 overlay roots 已不存在。
 - 当前 manifest 仍包含 source-contract、carrier、health/proof 与 clean-runner metadata。它们不能单独证明完整 installed truth、发布 currentness 或 executor readiness；跨仓 consumer 的现状必须由其 owner fresh 读取。

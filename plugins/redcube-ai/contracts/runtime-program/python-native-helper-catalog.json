@@ -1,0 +1,284 @@
+{
+  "contract_id": "python-native-helper-catalog",
+  "date_anchor": "2026-04-26",
+  "owner": "redcube_ai",
+  "language": "python",
+  "package": {
+    "name": "redcube-ai",
+    "source_root": "python",
+    "import_root": "redcube_ai",
+    "pyproject": "pyproject.toml",
+    "diagnostics": {
+      "surface_kind": "python_native_helper_doctor",
+      "package_module": "redcube_ai.native_helpers.doctor",
+      "module_command": "python -m redcube_ai.native_helpers.doctor",
+      "developer_diagnostic_only": true,
+      "public_launcher": false,
+      "output_format": "fixed_json",
+      "executes_generation": false,
+      "executes_review_export_gates": false,
+      "route_authority": "diagnostic_only",
+      "bypass_product_entry_allowed": false
+    }
+  },
+  "scope": "Repo-tracked Python helper catalog for native PPT/Office/document automation surfaces.",
+  "typescript_boundary": "RCA declares visual route semantics and implements native helpers; OPL owns generated/hosted StageRun surfaces, catalog resolution, Python environment selection, process lifecycle, timeout, and the JSON execution receipt envelope.",
+  "framework_execution_envelope": {
+    "owner": "opl",
+    "surface": "opl pack native-helper run",
+    "command_shape": "opl pack native-helper run --catalog <catalog.json> --helper <helper_id> --request <request.json> --json",
+    "receipt_surface_kind": "opl_pack_native_helper_execution_receipt",
+    "rca_role": "catalog_declaration_helper_implementation_and_receipt_consumer",
+    "rca_owns_catalog_resolution": false,
+    "rca_owns_python_environment_selection": false,
+    "rca_owns_helper_process_lifecycle": false,
+    "rca_owns_json_execution_envelope": false,
+    "opl_owns_visual_truth": false,
+    "opl_owns_review_export_verdict": false,
+    "opl_owns_artifact_authority": false
+  },
+  "invocation_policy": {
+    "preferred_internal_invocation": "opl_pack_native_helper_envelope",
+    "preferred_argv_shape": [
+      "opl",
+      "pack",
+      "native-helper",
+      "run",
+      "--catalog",
+      "<catalog.json>",
+      "--helper",
+      "<helper_id>",
+      "--request",
+      "<request.json>",
+      "--json"
+    ],
+    "domain_implementation_shape": "python_package_module",
+    "legacy_wrapper_scripts_allowed": false,
+    "legacy_wrapper_scripts_are_preferred": false
+  },
+  "bypass_policy": {
+    "generic_bypass_allowed": false,
+    "required_entry_surface": "OPL-hosted RCA StageRun action with RCA authority receipt boundary",
+    "required_review_export_gates": [
+      "visual_director_review",
+      "screenshot_review",
+      "export_pptx"
+    ]
+  },
+  "helpers": [
+    {
+      "helper_id": "ppt_deck_review",
+      "source_ref": "python/redcube_ai/native_helpers/ppt_deck/review.py",
+      "probe_descriptor_ref": "python/redcube_ai/native_helpers/ppt_deck/review.native-helper-probe.json",
+      "package_module": "redcube_ai.native_helpers.ppt_deck.review",
+      "preferred_invocation": {
+        "kind": "package_module",
+        "argv": [
+          "-m",
+          "redcube_ai.native_helpers.ppt_deck.review"
+        ]
+      },
+      "owner": "python_native_helper",
+      "deliverable_family": "ppt_deck",
+      "runtime_surface": "screenshot_review",
+      "routes": [],
+      "gates": [
+        "screenshot_review"
+      ],
+      "purpose": "Rendered HTML or native PPT screenshot mechanical review.",
+      "requires": [
+        "playwright"
+      ],
+      "outputs": [
+        "quality_gate.json"
+      ],
+      "contract_refs": [
+        "contracts/action_catalog.json",
+        "agent/stages/manifest.json",
+        "contracts/owner_receipt_contract.json",
+        "contracts/runtime-program/ppt-native-authoring-proof-lane.json"
+      ]
+    },
+    {
+      "helper_id": "ppt_deck_export",
+      "source_ref": "python/redcube_ai/native_helpers/ppt_deck/export.py",
+      "probe_descriptor_ref": "python/redcube_ai/native_helpers/ppt_deck/export.native-helper-probe.json",
+      "package_module": "redcube_ai.native_helpers.ppt_deck.export",
+      "preferred_invocation": {
+        "kind": "package_module",
+        "argv": [
+          "-m",
+          "redcube_ai.native_helpers.ppt_deck.export"
+        ]
+      },
+      "owner": "python_native_helper",
+      "deliverable_family": "ppt_deck",
+      "runtime_surface": "export_pptx",
+      "routes": [
+        "export_pptx"
+      ],
+      "gates": [
+        "export_pptx"
+      ],
+      "purpose": "Screenshot bundle export into PPTX/PDF publish artifacts.",
+      "requires": [
+        "Pillow",
+        "python-pptx"
+      ],
+      "outputs": [
+        "publish_bundle.pptx",
+        "publish_bundle.pdf"
+      ],
+      "contract_refs": [
+        "contracts/action_catalog.json",
+        "agent/stages/manifest.json",
+        "contracts/owner_receipt_contract.json"
+      ]
+    },
+    {
+      "helper_id": "ppt_deck_native",
+      "source_ref": "python/redcube_ai/native_helpers/ppt_deck/native.py",
+      "probe_descriptor_ref": "python/redcube_ai/native_helpers/ppt_deck/native.native-helper-probe.json",
+      "package_module": "redcube_ai.native_helpers.ppt_deck.native",
+      "preferred_invocation": {
+        "kind": "package_module",
+        "argv": [
+          "-m",
+          "redcube_ai.native_helpers.ppt_deck.native"
+        ]
+      },
+      "owner": "python_native_helper",
+      "deliverable_family": "ppt_deck",
+      "runtime_surface": "native_ppt_authoring_repair",
+      "routes": [
+        "author_pptx_native",
+        "repair_pptx_native"
+      ],
+      "gates": [
+        "visual_director_review",
+        "screenshot_review",
+        "export_pptx"
+      ],
+      "purpose": "Editable native PPTX authoring and screenshot-feedback repair.",
+      "capability_status": "production_selectable_optional",
+      "default_enabled": false,
+      "engine_capabilities": {
+        "authoring_ir": "redcube_svg_ir",
+        "pptx_writer": "officecli_pptx_materializer",
+        "editable_pptx": true,
+        "strict_svg_preflight": true,
+        "true_render_proof_required": true,
+        "true_render_proof_renderer": "libreoffice_headless",
+        "cross_platform_render_required": true,
+        "screenshot_packaging": false
+      },
+      "officecli_materializer_policy": {
+        "policy_id": "ppt_native_officecli_materializer_quality_gate_v1",
+        "adoption_status": "qa_materializer_discipline_only",
+        "rca_main_workflow_owner": "redcube_stage_review_export",
+        "skill_authoring_loop_adopted": false,
+        "materializer_role": "default_editable_pptx_materializer_and_qa_gate",
+        "current_pptx_writer": "officecli_pptx_materializer",
+        "officecli_writer_adapter_default_enabled": true,
+        "required_gate_refs": [
+          "officecli_save_before_close",
+          "officecli_validate",
+          "officecli_view_issues",
+          "officecli_view_text"
+        ],
+        "save_before_close_required": true,
+        "validate_required": true,
+        "view_issues_required": true,
+        "quality_issue_policy": "record_and_continue_with_ready_claims_closed_when_allow_quality_debt_otherwise_reject",
+        "view_text_required": true,
+        "true_render_proof_required_after_officecli_gate": true,
+        "true_render_proof_substitute_allowed": false,
+        "deterministic_cjk_font_family": "Noto Sans CJK SC",
+        "default_visual_route_changed": false,
+        "default_executor_changed": false
+      },
+      "true_render_proof": {
+        "required": true,
+        "source_surface_kind": "native_pptx",
+        "renderer_selection_policy": "opl_probe_then_helper_capability_bind",
+        "user_preinstalled_libreoffice_required": false,
+        "renderer_kind": "libreoffice_headless",
+        "renderer_pipeline": "libreoffice_headless_pdf_png_v1",
+        "runtime": "libreoffice_headless",
+        "supported_renderers": [
+          {
+            "renderer_kind": "libreoffice_headless",
+            "renderer_stack": "libreoffice_headless_plus_poppler",
+            "renderer_pipeline": "libreoffice_headless_pdf_png_v1",
+            "runtime": "libreoffice_headless",
+            "components": [
+              "LibreOffice headless",
+              "Poppler pdftoppm"
+            ],
+            "proof_chain": [
+              "pptx_to_pdf",
+              "pdf_to_png"
+            ],
+            "required_capabilities": [
+              "soffice_headless",
+              "pdftoppm"
+            ]
+          }
+        ],
+        "bootstrap_policy": {
+          "capability_probe": "opl pack native-helper probe",
+          "automatic_bootstrap_allowed": false,
+          "user_preinstall_required": false,
+          "dependency_provisioning_owner": "opl_connect_or_operator",
+          "developer_proof_installer": "tools/native-ppt-proof/install-deps.sh",
+          "proof_container": "tools/native-ppt-proof/Dockerfile"
+        },
+        "cross_platform_render_required": true,
+        "synthetic_preview_allowed": false,
+        "html_render_substitute_allowed": false,
+        "officecli_validate_substitute_allowed": false,
+        "disallowed_substitutes": [
+          "synthetic_preview",
+          "html_render",
+          "officecli_validate",
+          "desktop_powerpoint_automation",
+          "apple_script_preview"
+        ],
+        "required_for_ready_claim": true,
+        "missing_policy": "completed_with_quality_debt_when_pptx_is_consumable",
+        "no_output_policy": "diagnostic_and_quality_debt"
+      },
+      "requires": [
+        "Pillow",
+        "python-pptx",
+        "LibreOffice headless",
+        "Poppler pdftoppm"
+      ],
+      "outputs": [
+        "native_pptx_file",
+        "shape_manifest.json",
+        "preview_screenshots",
+        "repair_log.json",
+        "chart/table/metric-grid manifest metrics",
+        "native_ppt_repair_evidence_v1"
+      ],
+      "developer_proof_runner": {
+        "repo_owned_runner": "tools/native-ppt-proof/run.sh",
+        "hosted_action_id": "run_native_ppt_proof",
+        "hosted_action_catalog_ref": "contracts/action_catalog.json",
+        "artifact_index": "artifacts/native-ppt-proof/artifact-index.json",
+        "authority": "developer_evidence_only",
+        "public_skill_policy": "do_not_register_as_second_public_skill_or_runtime"
+      },
+      "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",
+      "proof_lane_contract": "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
+      "contract_refs": [
+        "contracts/action_catalog.json",
+        "agent/stages/manifest.json",
+        "contracts/owner_receipt_contract.json",
+        "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
+        "contracts/runtime-program/ppt-native-python-engine-contract.json"
+      ]
+    }
+  ]
+}

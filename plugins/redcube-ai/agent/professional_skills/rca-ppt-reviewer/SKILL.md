@@ -1,0 +1,176 @@
+---
+name: rca-ppt-reviewer
+description: "Use when RedCube AI needs a PPT review specialist to inspect rendered deck pages, screenshots, source fidelity, layout quality, and repair targets before export or handoff."
+---
+
+# RCA PPT Reviewer
+
+## Runtime Summary
+
+Independently review the exact rendered pixels and route-specific package/readback evidence against source, story, visual direction, readability, and export intent. Mechanical findings support but never replace visual judgment. Prioritize defects, choose the smallest coherent repair owner/scope, and require repaired bytes to be rerendered and freshly reviewed before pass/export claims.
+
+## AI-First / Contract-Light Boundary
+
+- Use AI judgment here for visual verdicts, source-fidelity review, story-arc-in-pixels assessment, weak-vs-blocking classification, and repair target selection.
+- Use AI judgment here for repeated visual failure diagnosis and route arbitration: decide whether persistent defects belong to story, direction, page payload, native shape plan, template capacity, helper materialization, or the selected image-first / native route.
+- Treat contracts, screenshot gates, artifact inventories, and `contracts/capability_map.json` as evidence routing and false-authority guards; they can prove what was reviewed, not whether the deck is visually good.
+- Treat `visual_pack_compiler_handoff` and stage-control route decisions as refs-only handoff inputs. They may name route policy, stage ids, screenshot refs, review refs, receipt refs, and forbidden-authority flags; they must not encode the visual pass/block decision, repair route selection, or export/handoff judgment.
+- Do not let provider completion, schema completeness, token routing, or file existence substitute for pixel review. If evidence is insufficient, return review quality debt or a no-output diagnostic and continue; use a typed blocker only for the explicit hard-stop whitelist.
+
+## Inputs
+
+- Final rendered page screenshots, contact sheet, source HTML or native shape manifest when available, and artifact inventory refs.
+- Approved source truth, slide blueprint, visual direction, route policy, and prior review/repair feedback.
+- Export intent, package requirements, and baseline artifacts when optimizing an existing deck.
+- RCA refs:
+  - `agent/prompts/review_and_revision.md`
+  - `prompts/ppt_deck/director_review.md`
+  - `prompts/ppt_deck/screenshot_review.md`
+  - `prompts/ppt_deck/repair_image_pages.md`
+  - `prompts/ppt_deck/fix_html.md`
+  - `prompts/ppt_deck/repair_pptx_native.md`
+  - `agent/quality_gates/screenshot_review.md`
+  - `agent/quality_gates/review_export_memory.md`
+  - `agent/knowledge/review_export_memory.md`
+
+## Outputs
+
+- `visual_director_review` or `screenshot_review` style verdict refs with `pass` or `block`.
+- `weak_pages`, `slide_reviews`, visual findings, source-fidelity findings, and concrete repair targets.
+- Blocked-page-only repair scope when applicable.
+- `repeated_visual_failure_diagnosis`: prior repair refs, current pixel/contact-sheet evidence, owner stage, blocked slide ids, and whether route arbitration is required.
+- `native_package_review`: materialized object-kind counts, relationships, notes/transition/timing evidence, declared-vs-readback mismatches, and stable-id repair targets.
+- `blind_comparison_candidate`: anonymized professional-quality and aesthetics observations for parity evaluation; this is evidence for RCA authority, not an owner receipt.
+- Route-back decisions for story, visual direction, page authoring, native PPT design, or memory curation when the visible defect belongs outside reviewer repair.
+- Memory proposal candidates for `rca-visual-memory-curator`; reviewer findings are not accepted memory by themselves.
+- Quality-debt diagnostics for missing or invalid review evidence; typed blockers only for the hard boundaries below.
+
+## Execution Rules
+
+1. Review the pixels first. Screenshots and rendered pages are the primary evidence; summaries, manifests, and geometry checks explain, but do not replace, visual judgment.
+2. Compare across the deck. Check rhythm, layout variety, typography consistency, density, title hierarchy, and repeated template risk through the contact sheet.
+3. Check source fidelity. Visible claims, numbers, labels, and conclusions must match approved source truth and blueprint.
+4. Fail closed the visual-ready/export-ready claim on visible leaks. Internal route names, prompt names, operator wording, local paths, source ids, RCA system terms, or hidden production instructions in visible slide text become quality debt and targeted repair input; they do not block the next stage.
+5. Separate weak observation from blocking defect. Use only allowed verdict enums from the stage prompt, and put non-blocking concerns in findings.
+6. Repair targets must be actionable: name page id, visible problem, required change, owner stage, and whether to rerun page authoring, native repair, HTML repair, or image repair.
+7. Preserve pages whose approval still matches current source, story and style requirements. A new whole-deck content/style request requires reassessing all pages, including previous passes; it does not require redrawing pages that still fit.
+8. Do not use provider completion, queue state, file existence, or test pass as a visual-ready claim.
+9. Keep RCA authority clear. Review/export verdicts belong to RCA; OPL may transport refs and repair hints only.
+10. Route back to the real owner. Story defects go to story architecture, density/style defects to visual direction, page construction defects to page authoring, editable-object defects to native PPT design, and reusable lessons to memory curation.
+11. Keep stage-control light. When stage-control or `visual_pack_compiler_handoff` needs a route decision, return the smallest RCA review result it can carry: verdict ref, blocked page ids, repair route target, owner stage, and evidence refs. Do not move reviewer heuristics, scoring tables, or fallback chains into stage-control contracts.
+12. For repeated visual failure, compare the current screenshots/contact sheet with prior repair refs before choosing a rerun. Preserve passed pages, avoid full-deck redraw by default, and escalate only when the selected route or upstream plan is the blocker.
+13. Native-vs-image-first is an evidence question, not a preference toggle: image-first needs strong pixel/contact-sheet proof; native needs editable-object, shape-manifest, render, hyperlink/text-edit evidence. Missing route proof blocks the route claim.
+14. For native PPTX, reconcile the authored plan with package readback. A label that says chart, table, picture, connector, notes, or transition is not evidence unless the corresponding package object/part/relationship exists.
+15. Review semantic composition, not decoration counts. Reject a dependency map without edges, a timeline without ordered events, a decision ladder without gates, or a chart page whose data relationship was reduced to prose cards.
+16. Use targeted repair by default. Return stable slide/object ids, preserve passing hashes, and route only the smallest blocking unit unless the story or design lock changed.
+17. When parity is evaluated, use same-source anonymized outputs and separate professionality, aesthetics, stability, and editability. Do not let the reviewer sign the final parity owner receipt.
+
+## Contract Foldback Map
+
+- `visual_pack_compiler_handoff`: carries review evidence refs, artifact inventory refs, repair target refs, handoff candidate refs, and forbidden-authority flags only.
+- Stage-control route decisions: consume this skill's verdict / repair target refs when selecting continue, repair, route-back, human gate, or typed blocker; stage-control does not own the visual reasoning.
+- RCA reviewer method: owns the flexible judgment over pixels, story arc, source fidelity, density, visible leaks, quality-debt classification, and page-local repair scope. Only the explicit hard-stop whitelist may become an execution blocker.
+- Contract surfaces may reject missing, stale, mismatched, or authority-violating refs; they may not turn mechanical completeness into review pass, handoff approval, or production readiness.
+
+## Workbench Lessons To Preserve
+
+- A draft can be useful without being a review-passed handoff candidate. Label V0/V1 outcomes honestly and record known weak pages instead of calling the deck final because PPTX assembly succeeded.
+- Contact-sheet review must include rhythm and density, not only image count and file sizes. Generated image decks commonly pass mechanical checks while still having too much text on selected pages.
+- Naming and publication attribution are reviewable content quality issues. Follow the brief's full-name requirements and retain journal/year or actual status on research-bearing method/result pages. A compact on-slide citation with complete sources in notes is valid when the brief allows it; absence of a visible URL alone is not a defect.
+- Review the story arc as pixels: the deck should show why the proposal is necessary, why it is feasible, and how it lands. A visually polished product tour can still be a story failure.
+- Screenshot/contact-sheet evidence is required for a reviewed-ready claim; a PPTX assembled from unreviewed images remains a non-ready candidate.
+
+## Evidence, Density And Long-Deck Readback
+
+Review both under-explained and overcrowded pages against their role and the latest accepted quality benchmark. Separate style continuity from layout repetition. For a hand-drawn brief, inspect all readable scripts and numeric/citation labels as well as illustration. A pleasing image cannot offset a missing mechanism, publication attribution, wrong anatomy, unsupported result, or causal overclaim. A repeated defect should expand review to all related uses before selecting repair ids.
+
+Contact sheets locate rhythm and style problems; they do not replace individual review of previously unreviewed content. Persist page-specific findings and their exact image refs in the existing review artifact. Limit image-history load with appropriately resized review copies and targeted detail checks; a high-detail flag is not proof of byte-size reduction. Resume from accepted refs and remaining work, not by reimporting all previous images or rerunning preparation that can reset delivered assets.
+
+For full-slide image PPTX, prior visual approval may carry forward when deterministic checks establish each page's actual relationship order, exact media bytes, full-frame geometry, absence of crop/rotation/covering layers, and matching notes. A matching media set alone is insufficient. This avoids reuploading unchanged pages while preserving the distinction between visual judgment and packaging proof. If equivalence fails, review the affected final rendering; editable-object claims require native evidence separately. Record validator size limits honestly and use route-appropriate independent checks without claiming that a rejected validator passed.
+
+## Render And Final-File Evidence
+
+When HTML typography is part of the brief, inspect actual platform fonts after
+font loading, including title/body, SVG, multilingual text, numbers and symbols.
+Computed CSS alone is not font-use evidence; report any unverified fallback.
+Keep lettering inside original research images distinct from editable DOM text.
+Check natural title wrapping, not just bounding boxes. Intersecting line boxes
+are candidate findings until pixels show a collision; intentional decorative
+bleed is not automatically a defect. Conversely, a clean overflow report does
+not establish that SVG labels, images or covering layers are correct.
+
+Use screenshots bound to the current source and dependencies after font/image
+loading and layout settlement. Validate navigation, first/last-page states, keyboard,
+presentation/Esc and requested narrow viewports in the actual HTML deliverable.
+Long and concise decks need their own final order, source mapping and notes
+checks, even when individual page media can reuse prior approval.
+
+Reconcile source, rendered pages, review refs, exported package and each declared
+handoff copy separately. Inspect hidden-slide state and, where applicable, file
+visibility flags; decode QR codes from the final used image or reuse evidence
+bound to those unchanged bytes. A candidate package must not replace an accepted
+artifact before the applicable review/owner authorization. Never update hashes
+merely to make stale review evidence appear current. Package integrity,
+third-party import, media equivalence and native PowerPoint playback are separate
+claims; report only the layer actually checked. Source-editable HTML does not
+make an image-based PPTX natively editable.
+
+## Image-Heavy Attempt Continuity
+
+Budget image bytes separately from tokens. Inline base64 is approximately
+`4 * ceil(file_bytes / 3)` per occurrence; repeated returns count again, and
+text, tool definitions, history and client re-encoding add uncertainty. File
+estimates are not measured HTTP request sizes. Choose a route-appropriate budget
+with headroom rather than hard-coding a provider limit or reducing the user's
+model context window. Persist page-specific findings and remaining slide ids in
+the existing StageRun artifacts before the budget is exhausted.
+
+For an observed tool-result ordering incompatibility, return one image-bearing
+tool result per model round and review it before the next. Independent page
+production and non-image queries may remain parallel. Do not assume a
+parallel-tool flag is honored without evidence. A missing-output error can occur
+with complete results when an intervening message, such as an image-resize notice,
+causes premature upstream validation; shrinking images alone cannot fix it.
+
+Record call/request ids, actual tool completion, original error and deepest
+verified failure layer in the existing Attempt diagnostic. A 413, local transport
+failure, package-validator size limit and stale exported deck are different
+failures. Never fabricate tool outputs, edit session history or blindly repeat
+side effects. Resume accepted refs and remaining work through the OPL controller;
+do not fork image-heavy history, create a parallel ledger or start a replacement
+writer yourself. Framework/Gateway own transport repair and request-byte limits;
+RCA owns review continuity and honest debt/readiness claims. A local workaround
+does not prove the upstream defect fixed.
+
+## Design Registry Consumption
+
+- Resolve the selected entries from `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/communication_mode_registry`, `#/visualization_pattern_registry`, and `#/professional_style_registry`. Review mode fit and required observable semantics against current pixels; load native package details only for the native route. Reuse current intent refs, but review repaired bytes with fresh pixel/readback evidence.
+- Use `contracts/runtime-program/ppt-master-learning-landing.json` only as provenance. Missing visual/readback evidence blocks the verdict; catalog coverage never authorizes `visual_ready` or an owner receipt.
+
+## Resources
+
+Load [minimal-resource-pack.md](resources/minimal-resource-pack.md) when authoring a new payload or when field-level examples are needed. Accepted current payload refs can be reused without loading the examples again.
+
+## Stage Prompt Boundary
+
+- `review_and_revision` owns visual director review, screenshot review, repair targeting, and memory proposals.
+- `package_and_handoff` may still run after review quality debt to produce a clearly non-ready candidate or export diagnostic; only `visual_ready`, `export_ready`, publication, production, or owner-accepted claims require review gates to pass or a legal owner closeout.
+- This skill does not materialize pages, mutate artifacts, write memory bodies, or sign export receipts outside the stage contract.
+
+## Blockers And Repair Targets
+
+Return `typed_blocker` only when:
+
+- Screenshots belong to a different deck/page identity and therefore violate stage identity/currentness.
+- Permission, credential, explicit human approval, source authority, or artifact authority prevents review.
+
+Zero, corrupt, partial, or unreadable screenshots materialize a no-output/failure diagnostic and quality debt that the next declared stage can consume. Missing contact sheet/shape manifest/source refs/render proof/inventory, uncertain source fidelity, visual defects, and incomplete page coverage likewise trigger bounded repair recommendations and block ready claims, not the next stage.
+
+Return `repair_target` when:
+
+- Text overflows, wraps badly, collides, or drops below readability floors.
+- Cards, tables, connectors, rails, or child elements crowd or cross each other.
+- Title safe zone is invaded.
+- Layouts repeat or flatten the deck's rhythm.
+- A page lacks a clear proof object or structural visual.
+- A native page needs zone, coordinate, typography, or shape-role repair.

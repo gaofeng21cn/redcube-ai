@@ -1,0 +1,68 @@
+{
+  "surface_kind": "domain_agent_descriptor",
+  "schema_version": 2,
+  "lifecycle_state": "domain_specific_descriptor_after_generic_surface_cutover",
+  "domain_id": "redcube_ai",
+  "domain_label": "RedCube AI",
+  "package_id": "rca",
+  "package_role": "opl_compatible_visual_deliverable_domain_agent",
+  "agent_kind": "visual_deliverable_agent",
+  "owner": "redcube_ai",
+  "generic_surface_owner": "one-person-lab",
+  "domain_repo_can_own_generated_surface": false,
+  "foundry_agent_profile_ref": "contracts/foundry_agent_series.json",
+  "domain_specific_profile": {
+    "profile_id": "rca_domain_specific_series_profile.v1",
+    "stage_pack_role": "declarative_visual_pack",
+    "default_visual_routes": [
+      "ppt_deck",
+      "xiaohongshu",
+      "poster_onepager"
+    ],
+    "input_profile": "visual_materials_sources_brand_assets_images_documents_and_delivery_brief",
+    "output_profile": "visual_deliverables_ppt_pdf_png_export_bundle_and_handoff_refs"
+  },
+  "standard_contract_refs": {
+    "domain_manifest_registration": "contracts/opl_domain_manifest_registration.json",
+    "action_target_refs": "contracts/action_catalog.json",
+    "source_closure_audit": "contracts/source_closure_audit.json",
+    "stage_refs": "agent/stages/manifest.json",
+    "pack_refs": "contracts/pack_compiler_input.json",
+    "agent_lab_handoff": "contracts/agent_lab_handoff.json",
+    "agent_lab_cost_profile": "contracts/agent_lab_cost_profile.json",
+    "generated_surface_handoff": "contracts/generated_surface_handoff.json",
+    "opl_ledger_artifact_registration": "contracts/opl_ledger_artifact_registration.json",
+    "visual_authority_kernel": "contracts/foundry-agent-os-domain-kernel-manifest.json"
+  },
+  "standard_agent_interface": {
+    "version": "opl_standard_agent_interface.v1",
+    "ref_kind": "repo_json_pointer",
+    "ref": "contracts/standard_agent_interface.json#/standard_agent_interface",
+    "projection_ref": "opl_generated:standard_agent_interface",
+    "stage_catalog": {
+      "source_kind": "agent_repo_relative_json",
+      "relative_path": "agent/stages/manifest.json",
+      "items_pointer": "/stages",
+      "field_map": {
+        "stage_id": "stage_id",
+        "display_name": "title",
+        "display_names": "display_names"
+      }
+    }
+  },
+  "authority_boundary": {
+    "redcube_ai_owns_visual_truth": true,
+    "redcube_ai_owns_route_truth": true,
+    "redcube_ai_owns_review_export_verdict": true,
+    "redcube_ai_owns_artifact_authority": true,
+    "redcube_ai_owns_visual_memory_body": true,
+    "redcube_ai_owns_owner_receipt": true,
+    "opl_owns_generated_interfaces": true,
+    "opl_owns_generic_control_plane": true,
+    "opl_can_write_domain_truth": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_quality_or_export": false,
+    "opl_can_mutate_artifacts": false,
+    "provider_completion_is_domain_ready": false
+  }
+}

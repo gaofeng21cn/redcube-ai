@@ -74,8 +74,10 @@ currentness, final-copy fidelity and native-viewer evidence remain distinct.
 
 ## References
 
-Resolve these package refs through the installed RCA package/hosted owner. The
-Codex plugin carries this entrypoint only; its directory is not the package root.
+Resolve these refs from the installed RCA carrier root, two directories above
+this installed Skill. It contains the owner-projected declarative pack, contracts,
+native helpers, and reference docs. Edit the canonical owner sources when
+maintaining RCA, then regenerate the carrier with `scripts/sync_carrier.py`.
 Load the contract or professional resource for the selected action and stage,
 and reuse accepted refs while their source, user constraints, and scope remain current.
 

@@ -7,11 +7,10 @@ Machine boundary: 人读边界说明。机器真相继续归 `contracts/capabili
 
 本文说明 RCA rich primary skill 与 Codex plugin skill 的职责区别。它只解释为什么两处 skill 文本同时存在，不把二者写成两套业务能力，也不把 plugin carrier 写成 RCA visual truth owner。该模式是 OPL standard-agent carrier pattern：repo-local canonical source 与 Codex install carrier 同时保留，但权威只归 canonical source 和 RCA owner surfaces。
 
-RCA 是 executor-neutral 的完整 `OPL Package(kind=agent)`。Plugin 目录只是当前 Codex
-carrier projection；它不定义 Package identity，也不能单独证明包含 declarative pack、
-contracts 和 native helpers 的完整 RCA Package installed/callable。未来替换 carrier
-只替换 projection/materialization，不改变 RCA capability、task、typed view 或领域
-authority。
+RCA 是 executor-neutral 的完整 `OPL Package(kind=agent)`。Plugin 目录是当前 Codex
+carrier projection，自包含 declarative pack、contracts、native helpers 和引用文档。
+它不定义 Package identity；实际 installed/callable 状态仍由平台 fresh readback 确认。
+未来替换 carrier 只替换资源投影，不改变 RCA capability、task、typed view 或领域 authority。
 
 ## 当前读法
 
@@ -26,7 +25,7 @@ authority。
 
 RCA 目标态是标准 OPL Agent：`Declarative Visual Pack + OPL generated/hosted surfaces + minimal authority functions`。`agent/primary_skill/SKILL.md` 属于这个 repo-local semantic pack，是 Rich App / OPL primary skill source 的标准位置。
 
-Codex plugin 安装和发现需要 plugin 目录下的真实 `SKILL.md` carrier surface。`plugins/redcube-ai/` 因此保留 `.codex-plugin/plugin.json`、图标和 `skills/redcube-ai/SKILL.md`，让 Codex Developer Mode / plugin Flow 能定位和安装 `redcube-ai`。这个 carrier channel 只解决 metadata、source locator、安装发现和 transport，不改变 RCA domain owner。
+Codex plugin 安装和发现需要 plugin 目录下的真实 `SKILL.md` carrier surface。`plugins/redcube-ai/` 包含 `.codex-plugin/plugin.json`、图标、入口 Skill、安装根描述文件和 Mini App adapter，并保留领域资源原有相对布局。`scripts/sync_carrier.py` 从 tracked `agent/`、`contracts/`、`python/`、`runtime/`、`docs/` 以及 Python 项目声明、README 和其品牌资源生成资源副本；不分发 helper 测试、运行数据或私有凭据。安装描述文件的 carrier refs 相对于安装根。源码维护后运行生成器，再用 `--check` 检查；生成器不负责安装、版本求解或运行调度。
 
 ## 权威边界
 

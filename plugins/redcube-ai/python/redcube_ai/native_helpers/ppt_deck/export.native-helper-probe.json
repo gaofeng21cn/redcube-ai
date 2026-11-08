@@ -1,0 +1,43 @@
+{
+  "surface_kind": "opl_pack_native_helper_probe_descriptor",
+  "schema_version": 1,
+  "helper_id": "ppt_deck_export",
+  "owner": "rca",
+  "entrypoint_ref": "export.py",
+  "runtime_command": "python3",
+  "required_commands": [],
+  "source_closure": {
+    "surface_kind": "opl_native_helper_source_closure",
+    "version": "opl-native-helper-source-closure.v1",
+    "effect_slots": [
+      {
+        "slot_id": "build_pptx_artifact_write",
+        "source_ref": "export.py",
+        "symbol": "build_pptx",
+        "source_digest": "sha256:f4fee95c2c64c0c2220acc4a502197d5f31363358927819812ab34cb02256410",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "build_pdf_artifact_write",
+        "source_ref": "export.py",
+        "symbol": "build_pdf",
+        "source_digest": "sha256:f4fee95c2c64c0c2220acc4a502197d5f31363358927819812ab34cb02256410",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      }
+    ]
+  },
+  "authority_boundary": {
+    "can_write_domain_truth": false,
+    "can_mutate_artifact_body": false,
+    "can_sign_owner_receipt": false,
+    "can_create_typed_blocker": false,
+    "can_authorize_quality_verdict": false,
+    "can_authorize_export_readiness": false,
+    "can_claim_domain_ready": false,
+    "can_claim_production_ready": false
+  }
+}

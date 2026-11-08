@@ -1,0 +1,168 @@
+{
+  "surface_kind": "opl_pack_native_helper_probe_descriptor",
+  "schema_version": 1,
+  "helper_id": "ppt_deck_native",
+  "owner": "rca",
+  "entrypoint_ref": "native.py",
+  "runtime_command": "python3",
+  "required_commands": [
+    "officecli",
+    "soffice",
+    "pdftoppm"
+  ],
+  "source_closure": {
+    "surface_kind": "opl_native_helper_source_closure",
+    "version": "opl-native-helper-source-closure.v1",
+    "effect_slots": [
+      {
+        "slot_id": "renderer_version_process",
+        "source_ref": "native_render_proof.py",
+        "symbol": "command_version",
+        "source_digest": "sha256:6fe8ec7cff2a16924b9b60ac9f1bc1eff7401b1b65d7deef3d06b2fd44019998",
+        "effect_kind": "process_spawn",
+        "target_policy": "declared_command_set",
+        "allowed_targets": [
+          "soffice",
+          "pdftoppm"
+        ]
+      },
+      {
+        "slot_id": "render_cleanup_artifact_write",
+        "source_ref": "native_render_proof.py",
+        "symbol": "clean_render_outputs",
+        "source_digest": "sha256:6fe8ec7cff2a16924b9b60ac9f1bc1eff7401b1b65d7deef3d06b2fd44019998",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "render_pdf_artifact_write",
+        "source_ref": "native_render_proof.py",
+        "symbol": "render_pptx_to_pdf",
+        "source_digest": "sha256:6fe8ec7cff2a16924b9b60ac9f1bc1eff7401b1b65d7deef3d06b2fd44019998",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "render_pdf_process",
+        "source_ref": "native_render_proof.py",
+        "symbol": "render_pptx_to_pdf",
+        "source_digest": "sha256:6fe8ec7cff2a16924b9b60ac9f1bc1eff7401b1b65d7deef3d06b2fd44019998",
+        "effect_kind": "process_spawn",
+        "target_policy": "declared_command_set",
+        "allowed_targets": [
+          "soffice"
+        ]
+      },
+      {
+        "slot_id": "render_png_process",
+        "source_ref": "native_render_proof.py",
+        "symbol": "render_png_from_pdf",
+        "source_digest": "sha256:6fe8ec7cff2a16924b9b60ac9f1bc1eff7401b1b65d7deef3d06b2fd44019998",
+        "effect_kind": "process_spawn",
+        "target_policy": "declared_command_set",
+        "allowed_targets": [
+          "pdftoppm"
+        ]
+      },
+      {
+        "slot_id": "native_result_artifact_write",
+        "source_ref": "native.py",
+        "symbol": "main",
+        "source_digest": "sha256:c020ca9ff57f78bc328f01a7fd2f5c5fbc63974ee0fca023062e19e6ef3ae476",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "officecli_materializer_process",
+        "source_ref": "native_layouts_parts/materializer_commands.py",
+        "symbol": "_run_officecli",
+        "source_digest": "sha256:a4362843efc651609bebd0545f3bb889431d649ff68feac45920e9b06d9cda9d",
+        "effect_kind": "process_spawn",
+        "target_policy": "declared_command_set",
+        "allowed_targets": [
+          "officecli"
+        ]
+      },
+      {
+        "slot_id": "officecli_materializer_artifact_write",
+        "source_ref": "native_layouts_parts/materializer_commands.py",
+        "symbol": "materialize_native_pptx",
+        "source_digest": "sha256:a4362843efc651609bebd0545f3bb889431d649ff68feac45920e9b06d9cda9d",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "svg_ir_artifact_write",
+        "source_ref": "native_layouts_parts/svg_ir.py",
+        "symbol": "render_slide_svg_ir",
+        "source_digest": "sha256:162855fbbc43566b6da34d5c09b2cb7cac44563e175d533d804f371399eabafb",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "template_copy_artifact_write",
+        "source_ref": "native_package.py",
+        "symbol": "copy_template_source",
+        "source_digest": "sha256:654d83239c53f47db50c5c466ff919954b58ee4cf80b20f1aa59cc2f04b618e6",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "chart_patch_artifact_write",
+        "source_ref": "native_package.py",
+        "symbol": "patch_chart_data",
+        "source_digest": "sha256:654d83239c53f47db50c5c466ff919954b58ee4cf80b20f1aa59cc2f04b618e6",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "custom_path_patch_artifact_write",
+        "source_ref": "native_package.py",
+        "symbol": "patch_custom_paths",
+        "source_digest": "sha256:654d83239c53f47db50c5c466ff919954b58ee4cf80b20f1aa59cc2f04b618e6",
+        "effect_kind": "filesystem_write",
+        "target_policy": "declared_artifact_write_slot",
+        "allowed_targets": []
+      },
+      {
+        "slot_id": "officecli_picture_readback_process",
+        "source_ref": "officecli_readback.py",
+        "symbol": "_picture_payload",
+        "source_digest": "sha256:e1929cf2c4bb7a62c053650c9561eb6bc610627c0ac377b678e4c670bde52cc2",
+        "effect_kind": "process_spawn",
+        "target_policy": "declared_command_set",
+        "allowed_targets": [
+          "officecli"
+        ]
+      },
+      {
+        "slot_id": "officecli_readback_process",
+        "source_ref": "officecli_readback.py",
+        "symbol": "_run",
+        "source_digest": "sha256:e1929cf2c4bb7a62c053650c9561eb6bc610627c0ac377b678e4c670bde52cc2",
+        "effect_kind": "process_spawn",
+        "target_policy": "declared_command_set",
+        "allowed_targets": [
+          "officecli"
+        ]
+      }
+    ]
+  },
+  "authority_boundary": {
+    "can_write_domain_truth": false,
+    "can_mutate_artifact_body": false,
+    "can_sign_owner_receipt": false,
+    "can_create_typed_blocker": false,
+    "can_authorize_quality_verdict": false,
+    "can_authorize_export_readiness": false,
+    "can_claim_domain_ready": false,
+    "can_claim_production_ready": false
+  }
+}

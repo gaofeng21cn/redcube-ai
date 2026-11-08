@@ -1,0 +1,571 @@
+{
+  "surface_kind": "external_learning_landing_audit",
+  "contract_id": "ppt-master-learning-landing",
+  "projection_id": "redcube-ai.ppt-master-learning-landing.v1",
+  "date_anchor": "2026-09-06",
+  "owner": "redcube_ai",
+  "audit_status": "non_live_functional_landing_complete",
+  "claims_live_evidence_complete": false,
+  "claims_visual_ready": false,
+  "claims_owner_receipt": false,
+  "external_source": {
+    "repository": "https://github.com/hugohe3/ppt-master",
+    "commit": "d3d81fe3cf4cc642de225159586308bbe98eeb4d",
+    "skill_version": "6.3.0",
+    "inspected_date": "2026-09-06",
+    "role": "pattern_source_only",
+    "inspected_paths": [
+      "skills/ppt-master/SKILL.md",
+      "skills/ppt-master/references/native-data-interface.md",
+      "skills/ppt-master/references/native-formula.md",
+      "skills/ppt-master/references/native-hyperlinks.md",
+      "skills/ppt-master/references/native-shape-authoring.md"
+    ],
+    "historical_baseline_commit": "b0beba5b659c664bdbf0c07227fbdee313698dd7",
+    "comparison_method": "independent_commit_trees_and_content_no_common_ancestor",
+    "historical_baseline_inspected_paths": [
+      "skills/ppt-master/SKILL.md",
+      "skills/ppt-master/templates/spec_lock_reference.md",
+      "skills/ppt-master/templates/design_spec_reference.md",
+      "skills/ppt-master/references/modes/_index.md",
+      "skills/ppt-master/references/visual-styles/_index.md",
+      "skills/ppt-master/templates/charts/charts_index.json",
+      "skills/ppt-master/templates/charts/README.md",
+      "skills/ppt-master/workflows/index.md",
+      "skills/ppt-master/workflows/topic-research.md",
+      "skills/ppt-master/workflows/template-fill-pptx.md",
+      "skills/ppt-master/workflows/beautify-pptx.md",
+      "skills/ppt-master/workflows/create-template.md",
+      "skills/ppt-master/workflows/create-brand.md",
+      "skills/ppt-master/workflows/resume-execute.md",
+      "skills/ppt-master/workflows/refine-spec.md",
+      "skills/ppt-master/workflows/verify-charts.md",
+      "skills/ppt-master/workflows/customize-animations.md",
+      "skills/ppt-master/workflows/native-enhance-pptx.md",
+      "skills/ppt-master/workflows/native-narration-pptx.md",
+      "skills/ppt-master/workflows/live-preview.md",
+      "skills/ppt-master/workflows/visual-review.md",
+      "skills/ppt-master/workflows/failure-recovery.md",
+      "skills/ppt-master/workflows/routing.md",
+      "skills/ppt-master/workflows/generate-audio.md"
+    ]
+  },
+  "local_destination": {
+    "design_pack_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+    "stage_owner": "existing_ppt_deck_stage_chain",
+    "professional_owner": "existing_rca_ppt_professional_skills",
+    "tool_owner": "existing_native_ppt_helpers",
+    "authority_owner": "redcube_ai",
+    "new_runtime_created": false,
+    "new_skill_created": false,
+    "new_authority_created": false
+  },
+  "prohibited_imports": [
+    "runtime",
+    "claude_specific_protocol",
+    "template_assets",
+    "icon_corpus",
+    "svg_template_bodies"
+  ],
+  "refresh_20260906": {
+    "scope": "Astra_skill_routing_candidate_quality_semantics_and_current_native_object_patterns",
+    "resource_ref": "agent/professional_skills/rca-native-ppt-designer/resources/native-object-semantics.md",
+    "adopted": [
+      {"topic":"conditional_native_interfaces","landing":"selected_registry_entries_and_route_conditional_resources","evidence":"contracts/runtime-program/ppt-native-ai-first-design-pack.json#/visualization_pattern_registry"},
+      {"topic":"object_local_data_fidelity","landing":"explicit_native_data_or_stable_drawingml_intent_with_source_value_and_package_readback","evidence":"tests/ppt-native-quality-package-readback.test.js"},
+      {"topic":"native_hyperlinks","landing":"authored_shape_and_inline_run_links_with_exact_target_preflight_and_readback","evidence":"tests/ppt-native-editability-regression.test.js"},
+      {"topic":"semantic_shape_selection","landing":"relationship_fit_and_independently_editable_components_using_existing_preset_connector_group_and_path_helpers","evidence":"agent/professional_skills/rca-native-ppt-designer/resources/native-object-semantics.md"}
+    ],
+    "evaluated_without_runtime_import": [
+      {"topic":"native_formula_compiler","reason":"upstream_owns_a_full_Microsoft_LaTeX_mhchem_compiler_and_PowerPoint_only_contract_not_exposed_by_RCA","landing":"exact_math_source_and_height_intent_preserved_no_false_formula_editability_claim"},
+      {"topic":"semantic_table_v2_and_extended_chart_schemas","reason":"not_equivalent_to_the_current_RCA_OfficeCLI_payload","landing":"preserve_source_with_explicit_supported_object_or_scoped_diagnostic_never_simplify_data"},
+      {"topic":"preset_and_boolean_svg_engines","reason":"RCA_already_materializes_native_presets_connectors_groups_and_custom_paths","landing":"adopt_geometry_intent_and_editability_boundaries_without_copying_tools_or_assets"}
+    ],
+    "rejected": ["mandatory_full_shape_vocabulary_scan", "forced_serial_executor", "per_stage_human_approval", "foreign_runtime_and_role_protocol", "template_assets_and_svg_bodies"],
+    "historical_catalog_scope": "source_catalog_coverage_and_original_workflow_coverage_remain_bound_to_historical_baseline_commit",
+    "parity_boundary": "historical_blind_benchmark_pin_is_unchanged_no_current_upstream_noninferiority_claim",
+    "claims_new_formula_or_full_extended_chart_support": false,
+    "claims_live_visual_ready": false
+  },
+  "source_catalog_coverage": {
+    "communication_modes": {
+      "source_ref": "skills/ppt-master/references/modes/_index.md",
+      "owner_skill": "rca-ppt-story-architect",
+      "consumer_field": "slide_blueprint.communication_mode_id",
+      "entries": [
+        {"source_id":"pyramid","classification":"adapt","local_target_id":"decision_pyramid","owner_skill":"rca-ppt-story-architect","consumer_field":"slide_blueprint.communication_mode_id"},
+        {"source_id":"narrative","classification":"adapt","local_target_id":"narrative_arc","owner_skill":"rca-ppt-story-architect","consumer_field":"slide_blueprint.communication_mode_id"},
+        {"source_id":"instructional","classification":"adapt","local_target_id":"instructional_sequence","owner_skill":"rca-ppt-story-architect","consumer_field":"slide_blueprint.communication_mode_id"},
+        {"source_id":"showcase","classification":"adapt","local_target_id":"visual_showcase","owner_skill":"rca-ppt-story-architect","consumer_field":"slide_blueprint.communication_mode_id"},
+        {"source_id":"briefing","classification":"adapt","local_target_id":"neutral_briefing","owner_skill":"rca-ppt-story-architect","consumer_field":"slide_blueprint.communication_mode_id"}
+      ],
+      "custom_escape": {"source_id":"custom","classification":"adapt","local_target_id":"custom","owner_skill":"rca-ppt-story-architect","consumer_field":"slide_blueprint.communication_mode_behavior","stop_condition":"a preset fits or the custom behavior is not stated in plain language"}
+    },
+    "visual_styles": {
+      "source_ref": "skills/ppt-master/references/visual-styles/_index.md",
+      "owner_skill": "rca-ppt-visual-director",
+      "consumer_field": "editable_shape_plan.design_spec_lock.professional_design_brief.design_register",
+      "entries": [
+        {"source_id":"swiss-minimal","classification":"adapt","local_target_id":"rca_swiss_system_brief","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.design_register"},
+        {"source_id":"soft-rounded","classification":"adapt","local_target_id":"rca_executive_proof_board","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.design_register"},
+        {"source_id":"glassmorphism","classification":"adapt","local_target_id":"custom","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.custom_style_behavior"},
+        {"source_id":"dark-tech","classification":"adapt","local_target_id":"rca_technical_blueprint","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.design_register"},
+        {"source_id":"blueprint","classification":"adapt","local_target_id":"rca_technical_blueprint","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.design_register"},
+        {"source_id":"editorial","classification":"adapt","local_target_id":"rca_data_editorial_report","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.design_register"},
+        {"source_id":"photo-editorial","classification":"adapt","local_target_id":"rca_photo_editorial_story","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.design_register"},
+        {"source_id":"data-journalism","classification":"adapt","local_target_id":"rca_data_editorial_report","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.design_register"},
+        {"source_id":"brutalist","classification":"adapt","local_target_id":"rca_data_editorial_report","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.design_register"},
+        {"source_id":"memphis","classification":"adapt","local_target_id":"custom","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.custom_style_behavior"},
+        {"source_id":"zine","classification":"adapt","local_target_id":"custom","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.custom_style_behavior"},
+        {"source_id":"vintage-poster","classification":"adapt","local_target_id":"custom","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.custom_style_behavior"},
+        {"source_id":"paper-cut","classification":"adapt","local_target_id":"custom","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.custom_style_behavior"},
+        {"source_id":"sketch-notes","classification":"adapt","local_target_id":"custom","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.custom_style_behavior"},
+        {"source_id":"ink-notes","classification":"adapt","local_target_id":"custom","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.custom_style_behavior"},
+        {"source_id":"chalkboard","classification":"adapt","local_target_id":"custom","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.custom_style_behavior"},
+        {"source_id":"ink-wash","classification":"adapt","local_target_id":"custom","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.custom_style_behavior"},
+        {"source_id":"pixel-art","classification":"adapt","local_target_id":"custom","owner_skill":"rca-ppt-visual-director","consumer_field":"professional_design_brief.custom_style_behavior"}
+      ]
+    },
+    "visualizations": {
+      "source_ref": "skills/ppt-master/templates/charts/charts_index.json",
+      "owner_skill": "rca-ppt-visual-director",
+      "consumer_field": "slide_blueprint.slides[].visualization_pattern_id",
+      "selection_policy": "scan_all_local_pattern_summaries_then_record_selection_rationale",
+      "no_match_policy": "author_bespoke_composition_without_copying_upstream_svg",
+      "entries": [
+        {"source_id":"agenda_list","classification":"adapt","local_target_id":"list_showcase","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"arc_anchored_list","classification":"adapt","local_target_id":"list_showcase","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"area_chart","classification":"adapt","local_target_id":"quantitative_trend","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"bar_of_pie_chart","classification":"adapt","local_target_id":"part_to_whole","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"basic_table","classification":"adapt","local_target_id":"tabular_evidence","owner_skill":"rca-template-profiler","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"box_plot_chart","classification":"adapt","local_target_id":"distribution_relationship","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"bubble_chart","classification":"adapt","local_target_id":"distribution_relationship","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"bullet_chart","classification":"adapt","local_target_id":"target_progress","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"butterfly_chart","classification":"adapt","local_target_id":"category_comparison","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"chevron_chain_with_tail","classification":"adapt","local_target_id":"sequential_process","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"chevron_process","classification":"adapt","local_target_id":"sequential_process","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"circular_stages","classification":"adapt","local_target_id":"cycle_feedback","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"client_server_flow","classification":"adapt","local_target_id":"dependency_system_map","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"column_chart","classification":"adapt","local_target_id":"category_comparison","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"comparison_columns","classification":"adapt","local_target_id":"comparison_decision","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"comparison_table","classification":"adapt","local_target_id":"comparison_decision","owner_skill":"rca-template-profiler","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"concentric_circles","classification":"adapt","local_target_id":"hierarchy_architecture","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"consulting_table","classification":"adapt","local_target_id":"tabular_evidence","owner_skill":"rca-template-profiler","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"donut_chart","classification":"adapt","local_target_id":"part_to_whole","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"dual_axis_line_chart","classification":"adapt","local_target_id":"quantitative_trend","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"dumbbell_chart","classification":"adapt","local_target_id":"category_comparison","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"feature_matrix_table","classification":"adapt","local_target_id":"comparison_decision","owner_skill":"rca-template-profiler","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"financial_statement_table","classification":"adapt","local_target_id":"tabular_evidence","owner_skill":"rca-template-profiler","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"fishbone_diagram","classification":"adapt","local_target_id":"root_cause","owner_skill":"rca-ppt-story-architect","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"funnel_chart","classification":"adapt","local_target_id":"magnitude_flow","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"gantt_chart","classification":"adapt","local_target_id":"time_schedule","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"gauge_chart","classification":"adapt","local_target_id":"target_progress","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"grouped_bar_chart","classification":"adapt","local_target_id":"category_comparison","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"harvey_balls_table","classification":"adapt","local_target_id":"matrix_quadrant","owner_skill":"rca-template-profiler","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"heatmap_chart","classification":"adapt","local_target_id":"matrix_quadrant","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"histogram_chart","classification":"adapt","local_target_id":"distribution_relationship","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"horizontal_bar_chart","classification":"adapt","local_target_id":"category_comparison","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"hub_inward_arrows","classification":"adapt","local_target_id":"hub_network","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"hub_spoke","classification":"adapt","local_target_id":"hub_network","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"icon_grid","classification":"adapt","local_target_id":"list_showcase","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"isometric_stairs","classification":"adapt","local_target_id":"hierarchy_architecture","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"journey_map","classification":"adapt","local_target_id":"time_schedule","owner_skill":"rca-ppt-story-architect","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"kpi_cards","classification":"adapt","local_target_id":"target_progress","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"labeled_card","classification":"adapt","local_target_id":"list_showcase","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"layered_architecture","classification":"adapt","local_target_id":"hierarchy_architecture","owner_skill":"rca-template-profiler","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"line_chart","classification":"adapt","local_target_id":"quantitative_trend","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"matrix_2x2","classification":"adapt","local_target_id":"matrix_quadrant","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"mind_map","classification":"adapt","local_target_id":"hub_network","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"module_composition","classification":"adapt","local_target_id":"hierarchy_architecture","owner_skill":"rca-template-profiler","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"numbered_steps","classification":"adapt","local_target_id":"sequential_process","owner_skill":"rca-ppt-story-architect","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"pareto_chart","classification":"adapt","local_target_id":"category_comparison","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"pie_chart","classification":"adapt","local_target_id":"part_to_whole","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"pie_of_pie_chart","classification":"adapt","local_target_id":"part_to_whole","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"pipeline_with_stages","classification":"adapt","local_target_id":"sequential_process","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"process_flow","classification":"adapt","local_target_id":"sequential_process","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"progress_bar_chart","classification":"adapt","local_target_id":"target_progress","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"project_schedule_table","classification":"adapt","local_target_id":"time_schedule","owner_skill":"rca-template-profiler","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"pros_cons_chart","classification":"adapt","local_target_id":"comparison_decision","owner_skill":"rca-ppt-story-architect","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"pyramid_chart","classification":"adapt","local_target_id":"hierarchy_architecture","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"pyramid_isometric","classification":"adapt","local_target_id":"hierarchy_architecture","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"quadrant_bubble_scatter","classification":"adapt","local_target_id":"matrix_quadrant","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"quadrant_text_bullets","classification":"adapt","local_target_id":"matrix_quadrant","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"radar_chart","classification":"adapt","local_target_id":"target_progress","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"roadmap_vertical","classification":"adapt","local_target_id":"time_schedule","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"sankey_chart","classification":"adapt","local_target_id":"magnitude_flow","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"scatter_chart","classification":"adapt","local_target_id":"distribution_relationship","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"segmented_wheel","classification":"adapt","local_target_id":"hub_network","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"snake_flow","classification":"adapt","local_target_id":"sequential_process","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"stacked_area_chart","classification":"adapt","local_target_id":"quantitative_trend","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"stacked_bar_chart","classification":"adapt","local_target_id":"category_comparison","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"stock_chart","classification":"adapt","local_target_id":"quantitative_trend","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"sunburst_chart","classification":"adapt","local_target_id":"part_to_whole","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"team_roster","classification":"adapt","local_target_id":"list_showcase","owner_skill":"rca-template-profiler","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"timeline","classification":"adapt","local_target_id":"time_schedule","owner_skill":"rca-ppt-story-architect","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"top_down_tree","classification":"adapt","local_target_id":"hierarchy_architecture","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"treemap_chart","classification":"adapt","local_target_id":"part_to_whole","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"venn_diagram","classification":"adapt","local_target_id":"set_overlap","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"vertical_list","classification":"adapt","local_target_id":"list_showcase","owner_skill":"rca-template-profiler","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"vertical_pillars","classification":"adapt","local_target_id":"list_showcase","owner_skill":"rca-template-profiler","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"waterfall_chart","classification":"adapt","local_target_id":"variance_bridge","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"},
+        {"source_id":"word_cloud","classification":"adapt","local_target_id":"portfolio_density","owner_skill":"rca-ppt-visual-director","consumer_field":"slides[].visualization_pattern_id"}
+      ]
+    }
+  },
+  "workflow_coverage": [
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/index.md"],
+      "classification": "no_code_needed",
+      "reason": "the upstream registry is provenance inventory; this landing contract owns local discoverability",
+      "local_owner_surface": "contracts/runtime-program/ppt-master-learning-landing.json",
+      "acceptance_evidence": ["contract:all_pinned_workflows_classified"],
+      "authority_boundary": "the external registry cannot become an RCA route authority"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/topic-research.md"],
+      "classification": "no_code_needed",
+      "reason": "shared Source Readiness already owns research triggers, augmentation, source audit, and planning readiness",
+      "local_owner_surface": "OPL shared Source Readiness; RCA consumes the canonical source readiness pack",
+      "acceptance_evidence": ["contracts/source_closure_audit.json", "tests/opl-agent-pack-contracts-semantic-pack.test.js"],
+      "authority_boundary": "research cannot move into Storyline or create an RCA-private acquisition workflow"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/create-brand.md"],
+      "classification": "adapt",
+      "reason": "consume source-backed brand constraints in the professional design brief without claiming reusable brand-package authoring",
+      "local_owner_surface": "rca-ppt-visual-director + rca-template-profiler",
+      "acceptance_evidence": ["tests/ppt-native-quality-package-gates.test.js", "skill_resource_pack_readback"],
+      "authority_boundary": "the adaptation consumes supplied brand constraints only; it does not extract or publish a reusable identity package",
+      "stop_condition": "current source-backed brand constraints are missing or cannot be bound to the design brief",
+      "excluded_watch_only_capability": {
+        "capability_id": "reusable_brand_identity_package_authoring",
+        "classification": "watch_only",
+        "source_behavior": "extract identity from a logo, site, PPTX, or PDF and generate a reusable brand package",
+        "local_owner_surface": "future Template Profiler + Visual Memory proposal + OPL asset surface",
+        "acceptance_evidence": ["typed_future_requirement"],
+        "authority_boundary": "do not infer reusable brand authoring from brand-constraint consumption",
+        "stop_condition": "remain watch-only until an explicit reusable-brand requirement and admitted asset owner exist"
+      }
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/create-template.md"],
+      "classification": "watch_only",
+      "reason": "Template Profiler covers intake and preservation, but RCA does not currently author a reusable global template package",
+      "local_owner_surface": "future Template Profiler + Visual Memory proposal + OPL asset surface",
+      "acceptance_evidence": ["typed_future_requirement"],
+      "authority_boundary": "do not infer template creation from template profiling or create an RCA-private template library",
+      "stop_condition": "remain watch-only until an explicit reusable-template authoring requirement and admitted asset owner exist"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/refine-spec.md"],
+      "classification": "no_code_needed",
+      "reason": "explicit user revisions already update Stage artifacts; a second blocking confirmation plane is unnecessary",
+      "local_owner_surface": "existing Storyline, outline, blueprint, and visual Stage artifacts",
+      "acceptance_evidence": ["tests/opl-agent-pack-contracts-semantic-pack.test.js", "contracts/stage_run_kernel_profile.json"],
+      "authority_boundary": "progress-first execution stops only for a real source, scope, approval, or authority decision"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/template-fill-pptx.md"],
+      "classification": "adapt",
+      "candidate_ref": "template_profile_and_fill",
+      "local_owner_surface": "rca-template-profiler + native helper",
+      "acceptance_evidence": ["tests/ppt-native-template-preservation.test.js"]
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/beautify-pptx.md"],
+      "classification": "adapt",
+      "reason": "adapt only page-scoped targeted repair for an RCA-generated native deck, with blocked-page scope and preserved-slide hashes",
+      "local_owner_surface": "existing repair_pptx_native Stage route",
+      "acceptance_evidence": ["tests/ppt-native-editability-regression.test.js", "tests/ppt-native-quality-package-gates.test.js"],
+      "authority_boundary": "this does not cover arbitrary imported PPTX, verbatim 1:1 content preservation, or full-deck re-layout",
+      "stop_condition": "a current RCA native artifact, blocked slide ids, review evidence, or preserved-slide hash proof is missing",
+      "excluded_watch_only_capability": {
+        "capability_id": "arbitrary_imported_pptx_verbatim_full_deck_beautify",
+        "classification": "watch_only",
+        "local_owner_surface": "future explicit imported-deck workflow under RCA review/export authority",
+        "acceptance_evidence": ["typed_future_requirement"],
+        "authority_boundary": "do not infer arbitrary source-deck beautification from targeted RCA repair",
+        "stop_condition": "remain watch-only until an explicit imported-deck requirement and end-to-end fidelity evidence exist"
+      }
+    },
+    {
+      "workflow_refs": [
+        "skills/ppt-master/workflows/native-enhance-pptx.md",
+        "skills/ppt-master/workflows/native-narration-pptx.md",
+        "skills/ppt-master/workflows/customize-animations.md"
+      ],
+      "classification": "adapt",
+      "candidate_ref": "notes_transition_timing_animation",
+      "local_owner_surface": "rca-native-ppt-designer + native helper",
+      "acceptance_evidence": ["tests/ppt-native-benchmark-fixture-preservation.test.js", "tests/ppt-native-quality-package-readback.test.js"]
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/failure-recovery.md"],
+      "classification": "no_code_needed",
+      "reason": "typed blockers, route-back receipts, and page-scoped repair already resume from the owning failed Stage",
+      "local_owner_surface": "existing Stage route-back, repair, and artifact refs",
+      "acceptance_evidence": ["tests/ppt-native-editability-regression.test.js", "tests/ppt-native-quality-package-gates.test.js"],
+      "authority_boundary": "required evidence never silently downgrades to a convenience path"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/resume-execute.md"],
+      "classification": "no_code_needed",
+      "reason": "OPL-hosted StageRun artifacts, durable invocation identity, and current stage pointers provide continuation",
+      "local_owner_surface": "OPL-hosted StageRun invocation and pointer lifecycle",
+      "acceptance_evidence": ["contracts/stage_run_kernel_profile.json", "contracts/temporal_stage_run_consumption_policy.json"],
+      "authority_boundary": "no custom baton, project-local session runtime, or duplicate progress ledger"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/routing.md"],
+      "classification": "reject",
+      "reason": "the upstream route matrix would duplicate the admitted OPL-generated action, family profile, and Stage chain",
+      "local_owner_surface": "OPL-generated action + existing RCA PPT family profile",
+      "acceptance_evidence": ["tests/opl-agent-pack-contracts-semantic-pack.test.js", "contracts/action_catalog.json"],
+      "authority_boundary": "external workflow routing remains provenance only"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/verify-charts.md"],
+      "classification": "adapt",
+      "reason": "Office native chart geometry remains engine-owned while RCA validates chart type, categories, series, relationships, package readback, and true render fail-closed",
+      "local_owner_surface": "native helper + RCA PPT quality evaluator",
+      "acceptance_evidence": ["tests/ppt-native-benchmark-fixture-preservation.test.js", "tests/ppt-native-quality-package-readback.test.js"],
+      "authority_boundary": "do not copy the upstream SVG coordinate calculator or manual receipt workflow, and do not claim coverage of hand-authored data-driven SVG geometry",
+      "stop_condition": "chart type, categories, series, relationship binding, package readback, or true-render evidence is missing or drifts"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/live-preview.md", "skills/ppt-master/workflows/visual-review.md"],
+      "classification": "adapt",
+      "candidate_ref": "existing_preview_review_calibration_reexport",
+      "local_owner_surface": "true-render proof + rca-ppt-reviewer + export Stage artifacts",
+      "acceptance_evidence": ["tests/ppt-native-python-render-preview.test.js", "tests/ppt-native-quality-package-gates.test.js", "tests/opl-agent-pack-contracts-semantic-pack.test.js"],
+      "authority_boundary": "adopt render-backed preview and review evidence only; do not copy the interactive private editor or annotation UI"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/generate-audio.md"],
+      "classification": "watch_only",
+      "reason": "speaker notes are landed, but provider-backed audio generation is outside the current visual-deliverable requirement",
+      "local_owner_surface": "future OPL generated media surface if a measured product requirement is admitted",
+      "acceptance_evidence": ["typed_future_requirement"],
+      "authority_boundary": "no provider keys, audio runtime, or narration authority is imported into RCA",
+      "stop_condition": "remain watch-only until an explicit audio deliverable and supported owner slot exist"
+    }
+  ],
+  "skill_consumption_bindings": [
+    {
+      "skill_id": "rca-ppt-story-architect",
+      "resource_pack_ref": "skill_resource:rca-ppt-story-architect:minimal-resource-pack",
+      "design_pack_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+      "consumes": ["#/communication_mode_registry", "#/visualization_pattern_registry"],
+      "emits": ["slide_blueprint.communication_mode_id", "slide_blueprint.communication_mode_behavior", "slide_blueprint.slides[].visualization_pattern_id", "slide_blueprint.slides[].visualization_selection_rationale"],
+      "stop_condition": "source truth cannot support the argument or no honest proof object can be named"
+    },
+    {
+      "skill_id": "rca-ppt-visual-director",
+      "resource_pack_ref": "skill_resource:rca-ppt-visual-director:minimal-resource-pack",
+      "design_pack_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+      "consumes": ["#/communication_mode_registry", "#/visualization_pattern_registry", "#/professional_style_registry"],
+      "emits": ["visual_manifest.communication_mode_id", "visual_manifest.style_profile_id", "semantic_composition_map[].visualization_pattern_id", "semantic_composition_map[].selection_rationale"],
+      "stop_condition": "blueprint, style, density, or route choice cannot produce observable semantics"
+    },
+    {
+      "skill_id": "rca-template-profiler",
+      "resource_pack_ref": "skill_resource:rca-template-profiler:minimal-resource-pack",
+      "design_pack_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+      "consumes": ["#/visualization_pattern_registry", "#/layout_archetype_taxonomy", "#/professional_style_registry"],
+      "emits": ["template_profile.pattern_compatibility", "template_profile.semantic_zones", "template_profile.capacity"],
+      "stop_condition": "template placeholders or inherited package structures cannot carry the selected pattern honestly"
+    },
+    {
+      "skill_id": "rca-native-ppt-designer",
+      "resource_pack_ref": "skill_resource:rca-native-ppt-designer:minimal-resource-pack",
+      "design_pack_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+      "consumes": ["#/visualization_pattern_registry", "#/professional_style_registry", "#/connector_semantics"],
+      "emits": ["editable_shape_plan.slides[].visualization_pattern_id", "editable_shape_plan.slides[].observable_semantics", "editable_shape_plan.slides[].materialization_mode"],
+      "stop_condition": "selected semantics cannot be materialized as supported typed objects without fallback rectangles"
+    },
+    {
+      "skill_id": "rca-ppt-reviewer",
+      "resource_pack_ref": "skill_resource:rca-ppt-reviewer:minimal-resource-pack",
+      "design_pack_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+      "consumes": ["#/communication_mode_registry", "#/visualization_pattern_registry", "#/professional_style_registry"],
+      "emits": ["semantic_composition_review[].communication_mode_fit", "semantic_composition_review[].visualization_pattern_id", "semantic_composition_review[].observable_semantics_verdict"],
+      "stop_condition": "current screenshots or package readback do not prove the selected pattern semantics"
+    }
+  ],
+  "learning_candidates": [
+    {
+      "candidate_id": "spec_lock_and_per_page_rhythm",
+      "source_ref": "skills/ppt-master/SKILL.md#global-execution-discipline",
+      "classification": "adopt",
+      "reason": "stable design choices and page rhythm resist long-deck drift",
+      "local_owner_surface": "rca-ppt-story-architect + rca-ppt-visual-director",
+      "consumer_fields": ["communication_mode_id", "rhythm_curve", "style_profile_id"],
+      "acceptance_evidence": ["tests/ppt-native-quality-package-readback.test.js", "skill_resource_pack_readback"],
+      "authority_boundary": "stage artifacts remain canonical and RCA keeps visual verdict authority",
+      "stop_condition": "the user changes source, outline, brand, or page constraints"
+    },
+    {
+      "candidate_id": "mode_style_independent_lock",
+      "source_ref": "skills/ppt-master/references/modes/_index.md",
+      "classification": "adapt",
+      "reason": "argument structure and aesthetic are orthogonal professional decisions",
+      "local_owner_surface": "rca-ppt-story-architect + rca-ppt-visual-director",
+      "consumer_fields": ["communication_mode_id", "design_register", "custom_style_behavior"],
+      "acceptance_evidence": ["contract:communication_mode_registry", "contract:professional_style_registry"],
+      "authority_boundary": "registries guide AI judgment and do not mechanically choose the story or style",
+      "stop_condition": "a custom behavior is unstated or a user-supplied outline would be reordered"
+    },
+    {
+      "candidate_id": "semantic_visualization_selection",
+      "source_ref": "skills/ppt-master/templates/charts/charts_index.json",
+      "classification": "adapt",
+      "reason": "selection by content shape prevents card-grid substitution",
+      "local_owner_surface": "rca-ppt-visual-director",
+      "consumer_fields": ["visualization_pattern_id", "visualization_selection_rationale"],
+      "acceptance_evidence": ["contract:76_source_ids_to_local_patterns", "tests/ppt-native-quality-package-readback.test.js"],
+      "authority_boundary": "RCA uses local semantic families and does not copy upstream SVG bodies",
+      "stop_condition": "no local pattern fits; author a bespoke composition and record why"
+    },
+    {
+      "candidate_id": "typed_native_materialization",
+      "source_ref": "skills/ppt-master/templates/charts/README.md#native-editable-export-markers",
+      "classification": "adapt",
+      "reason": "stable DrawingML and native data objects serve different editability needs",
+      "local_owner_surface": "rca-native-ppt-designer + native helper",
+      "consumer_fields": ["materialization_mode", "editable_payload", "package_readback_expectation"],
+      "acceptance_evidence": ["tests/ppt-native-benchmark-fixture-preservation.test.js", "tests/ppt-native-quality-package-readback.test.js"],
+      "authority_boundary": "helper materializes selected typed objects; it does not choose the visual pattern",
+      "stop_condition": "an object kind is unsupported or package readback disagrees with the plan"
+    },
+    {
+      "candidate_id": "template_profile_and_fill",
+      "source_ref": "skills/ppt-master/workflows/template-fill-pptx.md",
+      "classification": "adapt",
+      "reason": "masters, layouts, placeholders, and capacity are layout intelligence",
+      "local_owner_surface": "rca-template-profiler + native helper",
+      "consumer_fields": ["pattern_compatibility", "semantic_zones", "placeholder_capacity"],
+      "acceptance_evidence": ["tests/ppt-native-template-preservation.test.js"],
+      "authority_boundary": "source package structure is preserved without making the template visual authority",
+      "stop_condition": "the selected pattern exceeds real placeholder or inherited object capacity"
+    },
+    {
+      "candidate_id": "notes_transition_timing_animation",
+      "source_ref": "skills/ppt-master/workflows/native-narration-pptx.md + customize-animations.md",
+      "classification": "adapt",
+      "reason": "presentation semantics belong to stable slide and object ids",
+      "local_owner_surface": "rca-native-ppt-designer + native helper",
+      "consumer_fields": ["speaker_notes", "transition", "timing", "animation_timeline"],
+      "acceptance_evidence": ["tests/ppt-native-benchmark-fixture-preservation.test.js", "tests/ppt-native-quality-package-readback.test.js"],
+      "authority_boundary": "optional motion cannot make a statically unreadable slide acceptable",
+      "stop_condition": "the animation target is unstable, unsupported, or missing from package readback"
+    },
+    {
+      "candidate_id": "screenshot_and_semantic_review",
+      "source_ref": "skills/ppt-master/workflows/visual-review.md",
+      "classification": "adapt",
+      "reason": "pixels and semantic relations must be inspected before any visual claim",
+      "local_owner_surface": "rca-ppt-reviewer",
+      "consumer_fields": ["semantic_composition_review", "repair_target_row", "draft_label_check"],
+      "acceptance_evidence": ["tests/ppt-native-quality-semantic-gates.test.js", "skill_resource_pack_readback"],
+      "authority_boundary": "only RCA review/export authority may issue fresh verdict receipts",
+      "stop_condition": "screenshots, package readback, or source truth is missing or stale"
+    },
+    {
+      "candidate_id": "existing_preview_review_calibration_reexport",
+      "source_ref": "skills/ppt-master/workflows/live-preview.md + visual-review.md + verify-charts.md + failure-recovery.md",
+      "classification": "adapt",
+      "reason": "adapt the useful render-backed preview, per-page review, coordinate calibration, SHA-bound repair/export, and backup-slide behavior without copying the interactive browser editor",
+      "local_owner_surface": "native helper + rca-ppt-reviewer + repair/export Stage artifacts",
+      "consumer_fields": ["preview_screenshot_sha256", "coordinate_determinism_hash", "source_pptx_sha256", "export_artifact_refs", "include_backup_slides"],
+      "acceptance_evidence": ["tests/ppt-native-python-render-preview.test.js", "tests/ppt-native-quality-package-gates.test.js", "tests/ppt-native-editability-regression.test.js", "tests/opl-agent-pack-contracts-semantic-pack.test.js"],
+      "authority_boundary": "the interactive private editor and annotation UI are rejected; these executable surfaces do not claim fresh cross-viewer parity, visual_ready, or owner receipt",
+      "stop_condition": "a current source SHA, rendered preview, package readback, or review/export artifact ref is missing"
+    },
+    {
+      "candidate_id": "strict_per_page_serial_authoring",
+      "source_ref": "skills/ppt-master/SKILL.md#serial-execution",
+      "classification": "adapt",
+      "reason": "preserve claim and design continuity without forcing a human stop or banning safe parallel work",
+      "local_owner_surface": "existing Stage chain",
+      "consumer_fields": ["claim_spine_lock", "accepted_upstream_artifact_refs", "current_stage_artifact"],
+      "acceptance_evidence": ["tests/opl-agent-pack-contracts-semantic-pack.test.js"],
+      "authority_boundary": "progress-first Stage execution continues automatically when prerequisites are met",
+      "stop_condition": "a real source, scope, approval, or authority decision is required"
+    },
+    {
+      "candidate_id": "copy_18_style_documents",
+      "source_ref": "skills/ppt-master/references/visual-styles/",
+      "classification": "reject",
+      "reason": "local profiles and custom behavior cover visual intent without duplicating prose authority",
+      "local_owner_surface": "none",
+      "consumer_fields": ["none"],
+      "acceptance_evidence": ["contract:18_source_ids_mapped_without_body_copy"],
+      "authority_boundary": "upstream style ids are provenance only",
+      "stop_condition": "always reject verbatim style prose import"
+    },
+    {
+      "candidate_id": "copy_76_svg_templates",
+      "source_ref": "skills/ppt-master/templates/charts/",
+      "classification": "reject",
+      "reason": "semantic coverage is useful; template bodies and assets would create a second corpus",
+      "local_owner_surface": "none",
+      "consumer_fields": ["none"],
+      "acceptance_evidence": ["contract:76_source_ids_mapped_without_svg_copy"],
+      "authority_boundary": "RCA authors compositions against local contracts and helpers",
+      "stop_condition": "always reject SVG body or template asset import"
+    },
+    {
+      "candidate_id": "foreign_runtime_and_claude_protocol",
+      "source_ref": "skills/ppt-master/SKILL.md#pipeline-runtime",
+      "classification": "reject",
+      "reason": "RCA already has Stage, executor, helper, and authority owners",
+      "local_owner_surface": "none",
+      "consumer_fields": ["none"],
+      "acceptance_evidence": ["contract:new_runtime_created_false"],
+      "authority_boundary": "no second runtime, queue, confirmation plane, or artifact authority",
+      "stop_condition": "always reject without a separately approved OPL integration slot"
+    },
+    {
+      "candidate_id": "large_icon_corpus",
+      "source_ref": "skills/ppt-master/templates/icons/",
+      "classification": "reject",
+      "reason": "bulk icon copying adds weight and provenance cost without proving deck quality",
+      "local_owner_surface": "none",
+      "consumer_fields": ["none"],
+      "acceptance_evidence": ["contract:icon_corpus_prohibited"],
+      "authority_boundary": "use already admitted local assets or explicit generation routes",
+      "stop_condition": "always reject bulk corpus import"
+    },
+    {
+      "candidate_id": "additional_image_backends",
+      "source_ref": "skills/ppt-master/references/image-generator.md",
+      "classification": "watch_only",
+      "reason": "no current local requirement proves that more providers improve the PPT route",
+      "local_owner_surface": "OPL generated surface when justified",
+      "consumer_fields": ["none"],
+      "acceptance_evidence": ["typed_future_requirement"],
+      "authority_boundary": "provider choice cannot become visual truth or review authority",
+      "stop_condition": "remain watch-only until a measured local failure requires a supported provider slot"
+    },
+    {
+      "candidate_id": "browser_confirmation_ui",
+      "source_ref": "skills/ppt-master/SKILL.md#confirm-ui",
+      "classification": "watch_only",
+      "reason": "progress-first does not add a blocking UI before local demand is proven",
+      "local_owner_surface": "OPL generated surface when justified",
+      "consumer_fields": ["none"],
+      "acceptance_evidence": ["typed_future_requirement"],
+      "authority_boundary": "a generated UI may transport choices but cannot own story or visual verdicts",
+      "stop_condition": "remain watch-only until repeated user decisions cannot be handled by existing stage inputs"
+    }
+  ],
+  "closeout": {
+    "scope": "historical_20260710_landing_not_the_20260906_release",
+    "planned": ["source catalogs mapped", "all pinned workflows classified", "local registries landed", "five Skill consumers bound", "runtime and asset imports rejected"],
+    "done": ["5 modes plus custom escape mapped", "18 style ids mapped", "76 visualization ids mapped", "17 workflow files inspected and classified", "existing preview review calibration and re-export behavior bound", "adopt/adapt/watch_only/reject/no_code_needed audit recorded"],
+    "deferred": ["live same-source blind comparison", "cross-render application readback", "fresh RCA visual_ready receipt"],
+    "skipped": ["upstream runtime", "upstream template and icon assets", "upstream SVG bodies"],
+    "verification": ["focused contract test", "TypeScript typecheck", "JSON parse", "resource pack readback", "git diff check"],
+    "commit_push_state": "main_absorbed_remote_readback_verified"
+  }
+}

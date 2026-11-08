@@ -1,0 +1,301 @@
+{
+  "surface_kind": "opl_stage_artifact_kernel_adoption",
+  "version": "opl-stage-artifact-kernel-adoption.v1",
+  "owner": "redcube_ai",
+  "domain_id": "redcube_ai",
+  "package_id": "rca",
+  "conformance_entrypoint": "contracts/stage_artifact_kernel_adoption.json",
+  "kernel_contract_ref": "contracts/opl-framework/stage-artifact-runtime-contract.json",
+  "stage_control_plane_ref": "opl-generated:family_stage_control_plane",
+  "artifact_locator_contract_ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
+  "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
+  "conformance_validator": {
+    "surface_kind": "rca_stage_artifact_kernel_adoption_conformance_validator",
+    "validator_ref": "tests/opl-agent-pack-contracts-semantic-pack.test.js",
+    "test_name": "RCA semantic pack exposes OPL-hosted StageRun artifact and authority refs",
+    "validates": [
+      "root_contract_discoverability",
+      "stage_folder_manifest_receipt_current_pointer_unit",
+      "stage_output_role_interface",
+      "review_repair_export_receipts",
+      "native_helper_manifest",
+      "artifact_gallery_handoff_shell",
+      "hosted_stage_run_pointer_visibility",
+      "false_domain_readiness_and_false_visual_export_authority_claims"
+    ]
+  },
+  "stage_folder_unit": [
+    "Stage Folder",
+    "Manifest",
+    "Receipt",
+    "current pointer"
+  ],
+  "terminal_states": [
+    "success",
+    "blocked",
+    "skipped",
+    "deferred"
+  ],
+  "required_ref_fields": [
+    "stage_folder_contract_ref",
+    "stage_json_ref",
+    "attempt_json_ref",
+    "manifest_ref",
+    "receipt_ref",
+    "current_pointer_ref",
+    "canonical_artifact_ref",
+    "export_ref",
+    "lineage_ref",
+    "retention_ref"
+  ],
+  "conformance_gate": {
+    "surface_kind": "opl_stage_artifact_runtime_conformance",
+    "strict_units": [
+      "Stage Folder",
+      "Manifest",
+      "Receipt",
+      "content_hashes",
+      "latest_pointer",
+      "current_pointer",
+      "lineage_events",
+      "role_manifest",
+      "stage_receipts",
+      "helper_output_refs"
+    ],
+    "fails_on": [
+      "missing_deliverable_json",
+      "missing_stage_json",
+      "missing_required_attempt_entry",
+      "missing_latest_pointer",
+      "latest_pointer_missing_attempt",
+      "missing_current_pointer",
+      "missing_manifest_hash_entry",
+      "manifest_content_hash_mismatch",
+      "missing_required_output_role",
+      "missing_owner_receipt_or_typed_blocker_ref",
+      "attempt_broken",
+      "attempt_orphan"
+    ],
+    "domain_readiness_claim": false
+  },
+  "kernel_refs": {
+    "physical_stage_folder_source_of_truth": true,
+    "derived_index_rebuildable": true,
+    "manifest_receipt_hash_required": true,
+    "status_source_of_truth": "physical_stage_folder",
+    "orphan_artifact_is_completion": false,
+    "readable_orphan_artifact_is_progress_input": true,
+    "conformance_failure_blocks_stage_progress": false
+  },
+  "stage_artifact_runtime_ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
+  "stage_artifact_runtime_contract_id": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
+  "stage_output_role_interface": {
+    "surface_kind": "rca_stage_output_role_interface",
+    "version": "rca-stage-output-role-interface.v1",
+    "canonical_roles": [
+      "source_truth_pack",
+      "material_inventory",
+      "strategy_brief",
+      "visual_direction",
+      "render_manifest",
+      "review_verdict",
+      "export_bundle",
+      "handoff_manifest"
+    ],
+    "file_name_is_interface": false,
+    "role_manifest_receipt_is_interface": true,
+    "manifest_fields": [
+      "required_output_roles",
+      "present_output_roles",
+      "output_refs",
+      "stage_receipts",
+      "helper_output_refs"
+    ]
+  },
+  "review_repair_export_receipts": {
+    "required": true,
+    "routes": [
+      "visual_director_review",
+      "screenshot_review",
+      "repair_image_pages",
+      "export_pptx"
+    ],
+    "success_shape": "domain_owner_receipt",
+    "blocked_shape": "domain_typed_blocker",
+    "stage_manifest_field": "stage_receipts",
+    "completion_interpretation_owner": "redcube_ai"
+  },
+  "stage_folder_writer_closeout_authority": {
+    "closeout_ref_signer": "authority-function-ref:rca/owner-receipt-signer",
+    "rca_authority_function_may_issue_owner_receipt_refs": true,
+    "rca_authority_function_may_issue_typed_blocker_refs": true,
+    "writer_role": "opl_stage_run_controller_consumes_explicit_owner_receipt_or_typed_blocker_refs",
+    "status_success_requires_non_empty_owner_receipt_refs": true,
+    "status_blocked_requires_non_empty_typed_blocker_refs": true,
+    "writer_may_synthesize_owner_receipt_refs": false,
+    "writer_may_synthesize_typed_blocker_refs": false,
+    "opl_stage_run_controller_may_synthesize_owner_receipt_refs": false,
+    "opl_stage_run_controller_may_synthesize_typed_blocker_refs": false,
+    "missing_terminal_refs_policy": "fail_closed_without_current_or_latest_pointer",
+    "readable_output_progress_without_terminal_refs": true,
+    "route_run_completed_or_current_stage_is_terminal_acceptance": false,
+    "projection_writer_is_terminal_acceptance": false
+  },
+  "native_helper_manifest": {
+    "required_for_canonical_current_or_ready_claim": true,
+    "required_for_progress": false,
+    "manifest_field": "helper_output_refs",
+    "required_fields": [
+      "role",
+      "output_ref",
+      "sha256",
+      "evidence_ref",
+      "review_receipt_ref"
+    ],
+    "failure_shape": "quality_debt_or_hard_stop_only_when_no_readable_artifact",
+    "helper_output_is_completion_without_stage_receipt": false
+  },
+  "artifact_gallery_handoff_shell": {
+    "owner": "one-person-lab",
+    "rca_role": "artifact_authority_and_export_authorization_refs",
+    "rca_may_project": [
+      "artifact_refs",
+      "hashes",
+      "route",
+      "review_export_metadata",
+      "current_export_authorization"
+    ],
+    "opl_owns": [
+      "gallery_shell",
+      "handoff_shell",
+      "retention",
+      "restore",
+      "garbage_collection"
+    ],
+    "gallery_or_handoff_is_first_truth": false
+  },
+  "opl_state_index_kernel_adoption": {
+    "surface_kind": "opl_state_index_kernel_sidecar_adoption",
+    "version": "opl-state-index-kernel-sidecar-adoption.v1",
+    "owner": "one-person-lab",
+    "consumer": "redcube_ai",
+    "adoption_status": "deferred_until_measured_trigger",
+    "sqlite_enabled_now": false,
+    "index_backend": "sqlite_sidecar_index",
+    "sidecar_owner": "one-person-lab",
+    "sidecar_is_domain_runtime": false,
+    "trigger_conditions": [
+      "measured artifact or session file-count growth",
+      "cross-deliverable query pressure",
+      "operator need for global artifact inventory",
+      "JSON retention ledger maintenance cost"
+    ],
+    "allowed_index_entities": [
+      "session",
+      "deliverable",
+      "route",
+      "artifact",
+      "review",
+      "export"
+    ],
+    "allowed_payload_classes": [
+      "locator",
+      "hash",
+      "provenance",
+      "manifest_ref",
+      "receipt_ref",
+      "route_ref",
+      "lineage_ref"
+    ],
+    "canonical_truth_sources": [
+      "physical_stage_folder",
+      "stage_manifest",
+      "artifact_locator_contract",
+      "RCA file authority",
+      "RCA artifact index",
+      "RCA owner receipt refs"
+    ],
+    "rebuild_policy": {
+      "rebuildable": true,
+      "delete_safe": true,
+      "source_of_rebuild": "RCA file authority plus Stage Folder manifests and artifact refs",
+      "git_tracked": false
+    },
+    "forbidden_storage": [
+      "PNG body",
+      "PPTX body",
+      "PDF body",
+      "visual artifact blob",
+      "canonical artifact truth",
+      "visual-domain truth",
+      "review/export judgment",
+      "owner receipt body",
+      "visual memory body"
+    ],
+    "authority_boundary": {
+      "opl_owns_state_index_kernel": true,
+      "opl_can_store_refs_hashes_provenance": true,
+      "opl_can_rebuild_sidecar_index": true,
+      "rca_owns_file_authority": true,
+      "rca_owns_artifact_index_truth": true,
+      "rca_owns_visual_truth": true,
+      "rca_owns_review_export_verdict": true,
+      "rca_owns_artifact_authority": true,
+      "sqlite_can_be_truth_source": false,
+      "sqlite_can_store_visual_artifact_body": false,
+      "sqlite_can_store_review_export_judgment": false
+    }
+  },
+  "domain_pack_binding": {
+    "accepted_source_refs": [
+      "opl-generated:family_stage_control_plane",
+      "contracts/foundry_agent_series.json",
+      "docs/architecture.md"
+    ],
+    "domain_output_roles_are_interface": true,
+    "file_name_is_not_interface": true,
+    "domain_truth_owner": "redcube_ai"
+  },
+  "projection_boundary": {
+    "derived_projection_refs": [
+      "stage_artifact_index",
+      "artifact_locator_contract",
+      "opl_generated_stage_artifact_projection",
+      "opl_generated_hosted_action_readback",
+      "app_workbench_artifact_drilldown"
+    ],
+    "file_presence_only_counts_as": "orphan_or_historical",
+    "readable_file_counts_as_progress_input": true,
+    "provider_completion_counts_as_progress": false,
+    "derived_index_authority": "refs_only_visual_artifact_projection"
+  },
+  "authority_boundary": {
+    "opl_can_index_refs": true,
+    "opl_can_rebuild_projection": true,
+    "opl_can_provide_gallery_handoff_shell": true,
+    "opl_can_create_domain_owner_receipt": false,
+    "opl_can_write_domain_truth": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_mutate_domain_artifact_body": false,
+    "opl_can_authorize_quality_or_export": false,
+    "opl_can_declare_visual_or_quality_verdict": false
+  },
+  "domain_authority_retained": [
+    "visual_truth",
+    "layout_review_verdict",
+    "export_verdict",
+    "artifact_mutation_authority",
+    "visual_memory_accept_reject",
+    "owner_receipt",
+    "typed_blocker"
+  ],
+  "notes": [
+    "The OPL-hosted StageRun controller materializes Stage Folder Contract attempts; RCA authority functions return only domain receipt, blocker, artifact, and review/export refs.",
+    "Required outputs plus valid manifest and pointers make an RCA visual stage canonical/current. Any readable output remains Codex progress input even when structure is incomplete; structure debt only blocks canonical, quality, export, or ready claims."
+  ],
+  "visual_ready_claimed": false,
+  "exportable_claimed": false,
+  "handoffable_claimed": false,
+  "domain_ready_claimed": false,
+  "production_ready_claimed": false
+}

@@ -8,7 +8,7 @@
 
 ## Package 身份独立于分发和执行
 
-Codex Plugin 适合分发入口 Skill，但不能表示完整 Package bytes；Codex CLI 是当前产品路径，也不应定义领域 identity。把 Package、carrier、executor 分开，才能在平台替换时保留能力、偏好、任务和领域数据。真实安装状态由实际 carrier 读回，不能由源码版本推断。
+Codex Plugin 分发自包含的入口和领域资源，Codex CLI 提供当前执行路径；两者均不定义领域 identity。把 Package、carrier、executor 分开，才能在平台替换时保留能力、偏好、任务和领域数据。carrier 中的资源由 canonical source 确定性投影，真实安装状态仍由实际 carrier 读回，不能由源码版本推断。
 
 ## AI 负责创作，Helper 负责物化
 

@@ -1,0 +1,69 @@
+{
+  "surface_kind": "opl_standard_agent_conformance_profile",
+  "version": "opl.standard-agent-conformance-profile.v1",
+  "profile_id": "rca.standard-agent-conformance.v1",
+  "target_domain_id": "redcube_ai",
+  "golden_path": {
+    "required_stage_ids": [
+      "source_intake",
+      "communication_strategy",
+      "visual_direction",
+      "artifact_creation",
+      "review_and_revision",
+      "package_and_handoff"
+    ],
+    "allowed_stage_ids": [
+      "source_intake",
+      "communication_strategy",
+      "visual_direction",
+      "artifact_creation",
+      "review_and_revision",
+      "package_and_handoff"
+    ],
+    "default_stage_id": "source_intake",
+    "forbidden_owner_tokens": []
+  },
+  "physical_morphology": {
+    "scan_roots": [
+      "agent/",
+      "contracts/",
+      "python/"
+    ],
+    "allowed_residue_prefixes": [
+      "contracts/",
+      "tests/"
+    ],
+    "required_surface_ids": [
+      "declarative_visual_pack",
+      "visual_authority_contracts",
+      "native_helper_implementation"
+    ],
+    "surface_classifications": [
+      {
+        "surface_id": "declarative_visual_pack",
+        "classification": "declarative_domain_pack",
+        "source_refs": ["agent/"]
+      },
+      {
+        "surface_id": "visual_authority_contracts",
+        "classification": "declarative_domain_pack",
+        "source_refs": [
+          "contracts/owner_receipt_contract.json",
+          "contracts/artifact_locator_contract.json",
+          "contracts/stage_quality_cycle_policy.json"
+        ]
+      },
+      {
+        "surface_id": "native_helper_implementation",
+        "classification": "domain_native_helper_implementation",
+        "source_refs": ["python/redcube_ai/native_helpers/"]
+      }
+    ],
+    "forbidden_name_tokens": [],
+    "required_parity_gates": [
+      "opl_generated_surface_default_caller",
+      "opl_native_helper_execution_envelope",
+      "rca_visual_authority_no_forbidden_write"
+    ]
+  }
+}

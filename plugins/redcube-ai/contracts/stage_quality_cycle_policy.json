@@ -1,0 +1,543 @@
+{
+  "surface_kind": "opl_domain_stage_quality_cycle_profile",
+  "version": "domain-stage-quality-cycle-profile.v1",
+  "profile_id": "rca.official_high_value_visual_deliverable.v1",
+  "target_domain_id": "redcube_ai",
+  "shared_contract_ref": "opl-framework:contracts/opl-framework/stage-quality-cycle-contract.json",
+  "route_selection_contract_ref": "opl-framework:contracts/opl-framework/stage-quality-cycle-contract.json#/cross_stage_route_selection",
+  "cross_stage_route_selection": {
+    "primary_only_decisive_attempt_role": "producer",
+    "formal_review_decisive_attempt_roles": ["reviewer", "re_reviewer"],
+    "repairer_can_be_decisive_attempt": false,
+    "producer_can_be_decisive_attempt_in_formal_review": false,
+    "repair_required_review_or_re_review_may_select_cross_stage_route_back_before_budget_exhaustion": true,
+    "repair_required_cross_stage_route_back_requires_target_different_from_current_stage": true,
+    "repair_required_review_or_re_review_may_select_other_terminal_route_before_budget_exhaustion": false,
+    "repair_required_review_or_re_review_may_select_terminal_route_after_budget_exhaustion": true,
+    "same_stage_repair_required_with_budget_remaining_continues_quality_loop": true,
+    "cross_stage_route_back_requires_narrowest_canonical_owner_stage": true
+  },
+  "attempt_roles": [
+    "producer",
+    "reviewer",
+    "repairer",
+    "re_reviewer"
+  ],
+  "handoff_authority_sequence": {
+    "steps": [
+      "terminal_reviewer_or_re_reviewer_outcome",
+      "opl_controller_formal_review_receipt",
+      "rca_domain_owner_receipt",
+      "ready_projection"
+    ],
+    "attempt_can_materialize_review_receipt": false,
+    "attempt_can_materialize_owner_receipt": false,
+    "route_helper_can_set_ready_claim": false
+  },
+  "context_isolation": {
+    "required_for_formal_review": true,
+    "new_stage_attempt_required": true,
+    "new_executor_session_required": true,
+    "no_context_inheritance": true,
+    "producer_session_must_differ_from_reviewer_session": true,
+    "repairer_session_must_differ_from_reviewer_session": true,
+    "re_reviewer_session_must_differ_from_repairer_session": true,
+    "same_thread_refinement_name": "in_thread_refinement",
+    "same_thread_refinement_is_review": false,
+    "same_thread_refinement_can_issue_review_receipt": false,
+    "allowed_reviewer_context": [
+      "stage_goal_ref",
+      "exact_artifact_refs_and_hashes",
+      "epistemic_review_scope_refs_and_declared_dependencies",
+      "source_refs_and_fingerprint",
+      "quality_rubric_refs",
+      "required_artifact_lineage",
+      "prior_finding_refs_for_re_review"
+    ],
+    "forbidden_reviewer_context": [
+      "producer_conversation_history",
+      "producer_thread_resume",
+      "producer_reasoning_trace",
+      "undeclared_transient_context"
+    ]
+  },
+  "epistemic_review_currentness": {
+    "surface_kind": "rca_epistemic_review_currentness_adoption",
+    "version": "rca-epistemic-review-currentness-adoption.v1",
+    "framework_contract_ref": "opl-framework:contracts/opl-framework/epistemic-review-currentness-contract.json",
+    "framework_scope_schema_ref": "opl-framework:contracts/opl-framework/epistemic-review-scope-v2.schema.json",
+    "evidence_profile": "epistemic_provenance",
+    "trust_model": "trusted_local_workspace",
+    "stage_attempt_reuse": {
+      "formal_review_uses_existing_opl_stage_attempt_roles": true,
+      "fresh_re_review_uses_opl_stage_attempt": true,
+      "currentness_evaluation_creates_stage_attempt": false,
+      "rca_parallel_attempt_runtime_allowed": false,
+      "quality_budget_ref": "#/quality_budget",
+      "finding_and_repair_contract_ref": "#/finding_and_repair_contract"
+    },
+    "currentness_policy": {
+      "unit": "reviewed_node_and_transitive_declared_dependencies",
+      "semantic_change_required_for_invalidation": true,
+      "hash_change_alone_invalidates_review": false,
+      "hash_role": "optional_locator_stale_hint_and_deduplication_only",
+      "layout_render_export_or_package_only_delta_invalidates_content_or_reference": false,
+      "content_claim_or_reference_change_invalidates_only_declared_dependents": true
+    },
+    "integrity_separation": {
+      "release_integrity_is_separate_contract": true,
+      "exact_hash_is_transport_identity": true,
+      "exact_hash_is_content_claim_or_reference_authority": false,
+      "release_integrity_can_replace_epistemic_review": false,
+      "epistemic_review_can_replace_release_integrity": false
+    },
+    "review_scopes": [
+      {
+        "surface_kind": "opl_epistemic_review_scope",
+        "version": "opl-epistemic-review-scope.v2",
+        "scope_id": "rca.slide_content",
+        "scope_kind": "content",
+        "evidence_profile": "epistemic_provenance",
+        "trust_model": "trusted_local_workspace",
+        "reviewed_node_refs": ["rca:slide_content"],
+        "nodes": [
+          {"node_ref": "rca:reference_source", "node_kind": "artifact", "role": "reference_source"},
+          {"node_ref": "rca:citation_linkage", "node_kind": "provenance", "role": "citation_linkage"},
+          {"node_ref": "rca:slide_claim", "node_kind": "claim", "role": "claim"},
+          {"node_ref": "rca:slide_content", "node_kind": "artifact", "role": "context"}
+        ],
+        "dependency_edges": [
+          {"source_ref": "rca:reference_source", "dependent_ref": "rca:citation_linkage", "relation": "cites"},
+          {"source_ref": "rca:citation_linkage", "dependent_ref": "rca:slide_claim", "relation": "supports"},
+          {"source_ref": "rca:slide_claim", "dependent_ref": "rca:slide_content", "relation": "supports"}
+        ],
+        "authority_boundary": {
+          "hash_is_locator_or_stale_hint_only": true,
+          "hash_is_content_authority": false,
+          "release_integrity_is_separate": true,
+          "framework_can_issue_domain_verdict": false
+        }
+      },
+      {
+        "surface_kind": "opl_epistemic_review_scope",
+        "version": "opl-epistemic-review-scope.v2",
+        "scope_id": "rca.slide_references",
+        "scope_kind": "reference",
+        "evidence_profile": "epistemic_provenance",
+        "trust_model": "trusted_local_workspace",
+        "reviewed_node_refs": ["rca:slide_claim"],
+        "nodes": [
+          {"node_ref": "rca:reference_source", "node_kind": "artifact", "role": "reference_source"},
+          {"node_ref": "rca:citation_linkage", "node_kind": "provenance", "role": "citation_linkage"},
+          {"node_ref": "rca:slide_claim", "node_kind": "claim", "role": "claim"}
+        ],
+        "dependency_edges": [
+          {"source_ref": "rca:reference_source", "dependent_ref": "rca:citation_linkage", "relation": "cites"},
+          {"source_ref": "rca:citation_linkage", "dependent_ref": "rca:slide_claim", "relation": "supports"}
+        ],
+        "authority_boundary": {
+          "hash_is_locator_or_stale_hint_only": true,
+          "hash_is_content_authority": false,
+          "release_integrity_is_separate": true,
+          "framework_can_issue_domain_verdict": false
+        }
+      },
+      {
+        "surface_kind": "opl_epistemic_review_scope",
+        "version": "opl-epistemic-review-scope.v2",
+        "scope_id": "rca.visual_layout_and_render",
+        "scope_kind": "display",
+        "evidence_profile": "epistemic_provenance",
+        "trust_model": "trusted_local_workspace",
+        "reviewed_node_refs": ["rca:rendered_slide"],
+        "nodes": [
+          {"node_ref": "rca:reference_source", "node_kind": "artifact", "role": "reference_source"},
+          {"node_ref": "rca:citation_linkage", "node_kind": "provenance", "role": "citation_linkage"},
+          {"node_ref": "rca:slide_claim", "node_kind": "claim", "role": "claim"},
+          {"node_ref": "rca:slide_content", "node_kind": "artifact", "role": "context"},
+          {"node_ref": "rca:visual_layout", "node_kind": "provenance", "role": "layout"},
+          {"node_ref": "rca:render_template", "node_kind": "provenance", "role": "render_template"},
+          {"node_ref": "rca:rendered_slide", "node_kind": "artifact", "role": "visual_content"}
+        ],
+        "dependency_edges": [
+          {"source_ref": "rca:reference_source", "dependent_ref": "rca:citation_linkage", "relation": "cites"},
+          {"source_ref": "rca:citation_linkage", "dependent_ref": "rca:slide_claim", "relation": "supports"},
+          {"source_ref": "rca:slide_claim", "dependent_ref": "rca:slide_content", "relation": "supports"},
+          {"source_ref": "rca:slide_content", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:visual_layout", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:render_template", "dependent_ref": "rca:rendered_slide", "relation": "renders"}
+        ],
+        "authority_boundary": {
+          "hash_is_locator_or_stale_hint_only": true,
+          "hash_is_content_authority": false,
+          "release_integrity_is_separate": true,
+          "framework_can_issue_domain_verdict": false
+        }
+      },
+      {
+        "surface_kind": "opl_epistemic_review_scope",
+        "version": "opl-epistemic-review-scope.v2",
+        "scope_id": "rca.export_artifact",
+        "scope_kind": "package",
+        "evidence_profile": "epistemic_provenance",
+        "trust_model": "trusted_local_workspace",
+        "reviewed_node_refs": ["rca:export_artifact"],
+        "nodes": [
+          {"node_ref": "rca:reference_source", "node_kind": "artifact", "role": "reference_source"},
+          {"node_ref": "rca:citation_linkage", "node_kind": "provenance", "role": "citation_linkage"},
+          {"node_ref": "rca:slide_claim", "node_kind": "claim", "role": "claim"},
+          {"node_ref": "rca:slide_content", "node_kind": "artifact", "role": "context"},
+          {"node_ref": "rca:visual_layout", "node_kind": "provenance", "role": "layout"},
+          {"node_ref": "rca:render_template", "node_kind": "provenance", "role": "render_template"},
+          {"node_ref": "rca:rendered_slide", "node_kind": "artifact", "role": "visual_content"},
+          {"node_ref": "rca:export_artifact", "node_kind": "artifact", "role": "package_content"}
+        ],
+        "dependency_edges": [
+          {"source_ref": "rca:reference_source", "dependent_ref": "rca:citation_linkage", "relation": "cites"},
+          {"source_ref": "rca:citation_linkage", "dependent_ref": "rca:slide_claim", "relation": "supports"},
+          {"source_ref": "rca:slide_claim", "dependent_ref": "rca:slide_content", "relation": "supports"},
+          {"source_ref": "rca:slide_content", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:visual_layout", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:render_template", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:rendered_slide", "dependent_ref": "rca:export_artifact", "relation": "packages"}
+        ],
+        "authority_boundary": {
+          "hash_is_locator_or_stale_hint_only": true,
+          "hash_is_content_authority": false,
+          "release_integrity_is_separate": true,
+          "framework_can_issue_domain_verdict": false
+        }
+      },
+      {
+        "surface_kind": "opl_epistemic_review_scope",
+        "version": "opl-epistemic-review-scope.v2",
+        "scope_id": "rca.delivery_package",
+        "scope_kind": "package",
+        "evidence_profile": "epistemic_provenance",
+        "trust_model": "trusted_local_workspace",
+        "reviewed_node_refs": ["rca:delivery_package"],
+        "nodes": [
+          {"node_ref": "rca:reference_source", "node_kind": "artifact", "role": "reference_source"},
+          {"node_ref": "rca:citation_linkage", "node_kind": "provenance", "role": "citation_linkage"},
+          {"node_ref": "rca:slide_claim", "node_kind": "claim", "role": "claim"},
+          {"node_ref": "rca:slide_content", "node_kind": "artifact", "role": "context"},
+          {"node_ref": "rca:visual_layout", "node_kind": "provenance", "role": "layout"},
+          {"node_ref": "rca:render_template", "node_kind": "provenance", "role": "render_template"},
+          {"node_ref": "rca:rendered_slide", "node_kind": "artifact", "role": "visual_content"},
+          {"node_ref": "rca:export_artifact", "node_kind": "artifact", "role": "package_content"},
+          {"node_ref": "rca:delivery_package", "node_kind": "artifact", "role": "package_wrapper"}
+        ],
+        "dependency_edges": [
+          {"source_ref": "rca:reference_source", "dependent_ref": "rca:citation_linkage", "relation": "cites"},
+          {"source_ref": "rca:citation_linkage", "dependent_ref": "rca:slide_claim", "relation": "supports"},
+          {"source_ref": "rca:slide_claim", "dependent_ref": "rca:slide_content", "relation": "supports"},
+          {"source_ref": "rca:slide_content", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:visual_layout", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:render_template", "dependent_ref": "rca:rendered_slide", "relation": "renders"},
+          {"source_ref": "rca:rendered_slide", "dependent_ref": "rca:export_artifact", "relation": "packages"},
+          {"source_ref": "rca:export_artifact", "dependent_ref": "rca:delivery_package", "relation": "packages"}
+        ],
+        "authority_boundary": {
+          "hash_is_locator_or_stale_hint_only": true,
+          "hash_is_content_authority": false,
+          "release_integrity_is_separate": true,
+          "framework_can_issue_domain_verdict": false
+        }
+      }
+    ]
+  },
+  "attempt_route_execution_policy": {
+    "route_is_stage_internal_operation": true,
+    "attempt_role_round_and_context_validation_owner": "opl_stage_run_controller",
+    "attempt_role_is_never_inferred_or_validated_from_route_name": true,
+    "all_quality_attempts_require_fresh_context": true,
+    "rca_route_handler_consumes_attempt_metadata_passively": true,
+    "rca_route_handler_can_reject_role_round_or_review_context_shape": false,
+    "missing_attempt_metadata_result": "completed_with_quality_debt",
+    "explicit_owner_or_identity_mismatch_result": "hard_stop",
+    "missing_attempt_metadata_blocks_stage_transition": false,
+    "professional_route_sequence_remains_domain_owned": true,
+    "stage_transition_authority_is_not_granted_by_route_execution": true
+  },
+  "quality_budget": {
+    "max_repair_rounds": 3,
+    "initial_production_counts_as_repair_round": false,
+    "round_definition": "repairer_attempt_plus_fresh_re_reviewer_attempt",
+    "provider_retry_consumes_quality_budget": false,
+    "protocol_closeout_resume_consumes_quality_budget": false,
+    "on_exhaustion_with_consumable_artifact": "completed_with_quality_debt",
+    "on_exhaustion_without_consumable_artifact": "typed_blocker",
+    "repair_required_outcome_is_preserved_at_exhaustion": true,
+    "repair_required_at_exhaustion_with_consumable_artifact_is_terminal_decisive": true,
+    "zero_repair_round_budget_makes_initial_review_terminal": true
+  },
+  "budget_separation": {
+    "stage_quality_revision_budget_owner": "opl_stage_run_controller",
+    "per_route_repeat_budget_owner": "redcube_ai_route_handler",
+    "per_route_repeat_budget_consumes_stage_quality_budget": false,
+    "provider_retry_consumes_stage_quality_budget": false,
+    "only_repairer_plus_fresh_re_reviewer_closes_one_stage_quality_round": true
+  },
+  "finding_and_repair_contract": {
+    "review_findings_required": true,
+    "attempt_outcome_field": "route_impact.stage_quality_cycle.outcome",
+    "review_attempt_outcomes": [
+      "pass",
+      "repair_required",
+      "quality_debt",
+      "blocked",
+      "human_gate"
+    ],
+    "attempt_outcome_authorized_roles": [
+      "reviewer",
+      "re_reviewer"
+    ],
+    "producer_may_emit_attempt_outcome": false,
+    "repairer_may_emit_attempt_outcome": false,
+    "review_receipt_materialization": {
+      "owner": "opl_stage_run_controller",
+      "receipt_field": "verdict",
+      "outcome_to_verdict": {
+        "pass": "pass",
+        "repair_required": "repair_required",
+        "quality_debt": "quality_debt",
+        "blocked": "hard_stop",
+        "human_gate": "hard_stop"
+      }
+    },
+    "quality_debt_stage_run_projection": "completed_with_quality_debt",
+    "blocked_or_human_gate_can_emit_stage_route_decision": false,
+    "route_output_policy": {
+      "pass": "terminal_stage_route_decision",
+      "quality_debt": "terminal_stage_route_decision",
+      "same_stage_repair_required": "continue_quality_loop_with_stage_route_recommendation",
+      "cross_stage_route_back_before_budget_exhaustion": "terminal_stage_route_decision",
+      "repair_required_at_budget_exhaustion_with_consumable_artifact": "terminal_stage_route_decision_and_completed_with_quality_debt",
+      "repair_required_at_budget_exhaustion_without_consumable_artifact": "no_stage_route_decision_and_typed_blocker",
+      "blocked_or_human_gate": "no_stage_route_decision"
+    },
+    "reviewer_required_outputs": [
+      "finding_refs",
+      "outcome",
+      "evidence_refs",
+      "repair_expectation_refs"
+    ],
+    "finding_fields": [
+      "finding_id",
+      "severity",
+      "required",
+      "evidence_refs",
+      "repair_expectation"
+    ],
+    "repairer_required_outputs": [
+      "artifact_identity",
+      "repair_map"
+    ],
+    "repair_map_required_for_each_required_finding": true,
+    "repair_map_fields": [
+      "finding_id",
+      "repair_status",
+      "changed_artifact_refs",
+      "repair_evidence_refs"
+    ],
+    "re_review_closure_required": true,
+    "re_reviewer_required_outputs": [
+      "finding_closures",
+      "outcome",
+      "evidence_refs",
+      "remaining_quality_debt_refs"
+    ],
+    "re_review_closure_fields": [
+      "finding_id",
+      "status",
+      "evidence_refs"
+    ],
+    "closure_status_values": [
+      "closed",
+      "partially_closed",
+      "still_open"
+    ],
+    "next_repair_round_triggers": [
+      "required_finding_not_closed",
+      "repair_regression",
+      "critical_new_finding"
+    ],
+    "next_round_required_finding_sources": [
+      "required_finding_not_closed",
+      "repair_regression",
+      "critical_new_finding"
+    ],
+    "reopened_finding_id_must_be_unique_across_cycle": true,
+    "repair_regression_or_critical_new_finding_becomes_required": true,
+    "ordinary_new_suggestion_policy": "optional_observation_without_reopening_loop",
+    "pass_with_optional_observations_allowed": true,
+    "optional_observation_alone_forces_quality_debt": false
+  },
+  "professional_sequence": {
+    "ppt_visual_quality_loop": [
+      "candidate",
+      "render_and_mechanical_evidence",
+      "visual_director_route_qa_evidence",
+      "screenshot_route_qa_evidence",
+      "targeted_repair",
+      "rerender",
+      "fresh_re_review"
+    ],
+    "sequence_is_domain_required": true,
+    "tool_choice_within_step_is_executor_autonomous": true
+  },
+  "stage_policies": {
+    "source_intake": {
+      "surface_kind": "opl_stage_quality_cycle_policy",
+      "version": "stage-quality-cycle-policy.v1",
+      "enabled": true,
+      "stage_prompt_ref": "agent/prompts/source_intake.md",
+      "role_prompt_refs": {
+        "producer": "agent/prompts/stage-quality-cycle-roles.md#producer",
+        "reviewer": "agent/prompts/stage-quality-cycle-roles.md#reviewer",
+        "repairer": "agent/prompts/stage-quality-cycle-roles.md#repairer",
+        "re_reviewer": "agent/prompts/stage-quality-cycle-roles.md#re-reviewer"
+      },
+      "quality_rubric_refs": [
+        "agent/quality_gates/source_and_truth.md",
+        "agent/quality_gates/visual_authority_boundaries.md"
+      ],
+      "in_thread_refinement": {"allowed": true, "authoritative": false},
+      "formal_review": {"required": true, "risk_tier": "medium", "review_depth": "full", "context_isolation_required": true, "max_repair_rounds": 3},
+      "budget_exhaustion": "complete_with_quality_debt_if_consumable",
+      "attempt_boundary": {"inherits_stage_goal_scope_authority": true, "role_overlay_may_only_narrow": true, "controller_creates_next_attempt": true, "attempt_is_not_sub_stage": true}
+    },
+    "communication_strategy": {
+      "surface_kind": "opl_stage_quality_cycle_policy",
+      "version": "stage-quality-cycle-policy.v1",
+      "enabled": true,
+      "stage_prompt_ref": "agent/prompts/communication_strategy.md",
+      "role_prompt_refs": {
+        "producer": "agent/prompts/stage-quality-cycle-roles.md#producer",
+        "reviewer": "agent/prompts/stage-quality-cycle-roles.md#reviewer",
+        "repairer": "agent/prompts/stage-quality-cycle-roles.md#repairer",
+        "re_reviewer": "agent/prompts/stage-quality-cycle-roles.md#re-reviewer"
+      },
+      "quality_rubric_refs": [
+        "agent/quality_gates/communication_and_direction.md",
+        "agent/quality_gates/visual_authority_boundaries.md"
+      ],
+      "in_thread_refinement": {"allowed": true, "authoritative": false},
+      "formal_review": {"required": true, "risk_tier": "high", "review_depth": "multi_axis", "context_isolation_required": true, "max_repair_rounds": 3},
+      "budget_exhaustion": "complete_with_quality_debt_if_consumable",
+      "attempt_boundary": {"inherits_stage_goal_scope_authority": true, "role_overlay_may_only_narrow": true, "controller_creates_next_attempt": true, "attempt_is_not_sub_stage": true}
+    },
+    "visual_direction": {
+      "surface_kind": "opl_stage_quality_cycle_policy",
+      "version": "stage-quality-cycle-policy.v1",
+      "enabled": true,
+      "stage_prompt_ref": "agent/prompts/visual_direction.md",
+      "role_prompt_refs": {
+        "producer": "agent/prompts/stage-quality-cycle-roles.md#producer",
+        "reviewer": "agent/prompts/stage-quality-cycle-roles.md#reviewer",
+        "repairer": "agent/prompts/stage-quality-cycle-roles.md#repairer",
+        "re_reviewer": "agent/prompts/stage-quality-cycle-roles.md#re-reviewer"
+      },
+      "quality_rubric_refs": [
+        "agent/quality_gates/communication_and_direction.md",
+        "agent/quality_gates/visual_authority_boundaries.md"
+      ],
+      "in_thread_refinement": {"allowed": true, "authoritative": false},
+      "formal_review": {"required": true, "risk_tier": "high", "review_depth": "multi_axis", "context_isolation_required": true, "max_repair_rounds": 3},
+      "budget_exhaustion": "complete_with_quality_debt_if_consumable",
+      "attempt_boundary": {"inherits_stage_goal_scope_authority": true, "role_overlay_may_only_narrow": true, "controller_creates_next_attempt": true, "attempt_is_not_sub_stage": true}
+    },
+    "artifact_creation": {
+      "surface_kind": "opl_stage_quality_cycle_policy",
+      "version": "stage-quality-cycle-policy.v1",
+      "enabled": true,
+      "stage_prompt_ref": "agent/prompts/artifact_creation.md",
+      "role_prompt_refs": {
+        "producer": "agent/prompts/stage-quality-cycle-roles.md#producer",
+        "reviewer": "agent/prompts/stage-quality-cycle-roles.md#reviewer",
+        "repairer": "agent/prompts/stage-quality-cycle-roles.md#repairer",
+        "re_reviewer": "agent/prompts/stage-quality-cycle-roles.md#re-reviewer"
+      },
+      "quality_rubric_refs": [
+        "agent/quality_gates/artifact_authority.md",
+        "agent/quality_gates/review_export_memory.md",
+        "agent/quality_gates/visual_authority_boundaries.md",
+        "contracts/stage_quality_cycle_policy.json#/epistemic_review_currentness"
+      ],
+      "in_thread_refinement": {"allowed": true, "authoritative": false},
+      "formal_review": {"required": true, "risk_tier": "high", "review_depth": "multi_axis", "context_isolation_required": true, "max_repair_rounds": 3},
+      "budget_exhaustion": "complete_with_quality_debt_if_consumable",
+      "attempt_boundary": {"inherits_stage_goal_scope_authority": true, "role_overlay_may_only_narrow": true, "controller_creates_next_attempt": true, "attempt_is_not_sub_stage": true}
+    },
+    "review_and_revision": {
+      "surface_kind": "opl_stage_quality_cycle_policy",
+      "version": "stage-quality-cycle-policy.v1",
+      "enabled": true,
+      "stage_prompt_ref": "agent/prompts/review_and_revision.md",
+      "role_prompt_refs": {
+        "producer": "agent/prompts/stage-quality-cycle-roles.md#producer",
+        "reviewer": "agent/prompts/stage-quality-cycle-roles.md#reviewer",
+        "repairer": "agent/prompts/stage-quality-cycle-roles.md#repairer",
+        "re_reviewer": "agent/prompts/stage-quality-cycle-roles.md#re-reviewer"
+      },
+      "quality_rubric_refs": [
+        "agent/quality_gates/review_export_memory.md",
+        "agent/quality_gates/source_and_truth.md",
+        "agent/quality_gates/communication_and_direction.md",
+        "agent/quality_gates/artifact_authority.md",
+        "contracts/stage_quality_cycle_policy.json#/epistemic_review_currentness"
+      ],
+      "in_thread_refinement": {"allowed": true, "authoritative": false},
+      "formal_review": {"required": false, "risk_tier": "high", "review_depth": "multi_axis", "context_isolation_required": true, "max_repair_rounds": 0},
+      "budget_exhaustion": "complete_with_quality_debt_if_consumable",
+      "attempt_boundary": {"inherits_stage_goal_scope_authority": true, "role_overlay_may_only_narrow": true, "controller_creates_next_attempt": true, "attempt_is_not_sub_stage": true}
+    },
+    "package_and_handoff": {
+      "surface_kind": "opl_stage_quality_cycle_policy",
+      "version": "stage-quality-cycle-policy.v1",
+      "enabled": true,
+      "stage_prompt_ref": "agent/prompts/package_and_handoff.md",
+      "role_prompt_refs": {
+        "producer": "agent/prompts/stage-quality-cycle-roles.md#producer",
+        "reviewer": "agent/prompts/stage-quality-cycle-roles.md#reviewer",
+        "repairer": "agent/prompts/stage-quality-cycle-roles.md#repairer",
+        "re_reviewer": "agent/prompts/stage-quality-cycle-roles.md#re-reviewer"
+      },
+      "quality_rubric_refs": [
+        "agent/quality_gates/artifact_authority.md",
+        "agent/quality_gates/review_export_memory.md",
+        "contracts/stage_quality_cycle_policy.json#/epistemic_review_currentness"
+      ],
+      "in_thread_refinement": {"allowed": true, "authoritative": false},
+      "formal_review": {"required": true, "risk_tier": "high", "review_depth": "multi_axis", "context_isolation_required": true, "max_repair_rounds": 3},
+      "budget_exhaustion": "complete_with_quality_debt_if_consumable",
+      "attempt_boundary": {"inherits_stage_goal_scope_authority": true, "role_overlay_may_only_narrow": true, "controller_creates_next_attempt": true, "attempt_is_not_sub_stage": true}
+    }
+  },
+  "meta_review_policy": {
+    "stage_id": "review_and_revision",
+    "stage_role": "cross_stage_meta_review",
+    "independent_stage_run_required": true,
+    "primary_attempt_role": "producer",
+    "no_context_inheritance": true,
+    "max_route_back_rounds": 3,
+    "terminal_route_output": "route_impact.stage_route_decision",
+    "terminal_route_owner": "producer",
+    "allowed_verdicts": [
+      "pass",
+      "route_back",
+      "completed_with_quality_debt",
+      "human_gate",
+      "typed_blocker"
+    ],
+    "route_back_targets": [
+      "source_intake",
+      "communication_strategy",
+      "visual_direction",
+      "artifact_creation"
+    ],
+    "multiple_defect_policy": "route_to_earliest_stage_that_can_close_root_cause",
+    "downstream_review_currentness_policy": "declared_epistemic_dependency_closure_only",
+    "downstream_release_integrity_policy": "separate_exact_byte_contract"
+  }
+}

@@ -1,0 +1,119 @@
+---
+name: rca-ppt-visual-director
+description: "Use when RedCube AI needs a PPT visual direction specialist to convert an approved slide blueprint into visual language, rhythm, density controls, layout variety, and anti-template constraints before artifact creation."
+---
+
+# RCA PPT Visual Director
+
+## Runtime Summary
+
+Consume the current story/blueprint and any current template profile to set a visual thesis, hierarchy, semantic composition, rhythm, typography, and continuity for the whole deck. Adapt layout to the claim and proof object, not a fixed archetype quota. Return an exact route-back when content or template capacity cannot support the intended visual argument.
+
+Operate as the visual direction specialist between blueprint approval and page authoring. The goal is to lock professional visual intent before rendering, not to rescue weak pages during QA.
+
+## AI-First / Contract-Light Boundary
+
+- Use AI judgment here for visual language, rhythm, density ceilings, proof-object choice, peak-page emphasis, style-boundary interpretation, and whether a blueprint can survive artifact creation.
+- Use AI judgment here for route-local visual feasibility, not for native admission. Native admission is a whole-request semantic decision owned by the decisive Codex Attempt; this skill only verifies its recorded current-user evidence. Keep image-first unless that evidence explicitly requires editable PowerPoint objects, DrawingML, editable master semantics, or the native authoring route. A `.pptx` deliverable, attached/reference deck, template, notes, quality target, or Agent preference cannot justify native PPTX, and literal keyword matching is forbidden.
+- Use AI judgment here when repeated visual failures show a direction problem: contact-sheet sameness, overloaded density, weak peak pages, stale style refs, or a route choice that fights the content.
+- Treat contracts, quality gates, and `contracts/capability_map.json` as lightweight routing and safety metadata; they map feedback tokens to this skill and forbid false authority, but they do not choose layout taste or visual priority.
+- Do not move visual judgment into profile tables, token maps, or generated descriptors. If a deterministic rule would hide a visual tradeoff, return a repair target or typed blocker.
+
+## Inputs
+
+- Approved `slide_blueprint` with real slide ids, page roles, visible claims, evidence points, and source boundaries.
+- Audience, brand or style constraints, route policy, page budget, any reference deck or template profile, and the current-request native admission evidence when native is selected.
+- Existing visual direction or review feedback when this is a repair.
+- RCA refs:
+  - `agent/prompts/visual_direction.md`
+  - `prompts/ppt_deck/visual_direction.md`
+  - `agent/quality_gates/visual_pack_discipline.md`
+  - `agent/quality_gates/communication_and_direction.md`
+  - `docs/references/native-ppt-open-source-design-discipline.md`
+
+## Outputs
+
+- `visual_manifest`: the deck's design thesis in audience and topic context.
+- `rhythm_curve`: one entry for every real slide id.
+- `peak_pages`, layout family ceilings, visual density rules, typography plan, spacing rules, and forbidden regressions.
+- Template/profile guidance: layout archetypes, semantic zones, placeholder capacity, and reference-deck discipline when native PPTX or template-aware authoring is selected.
+- `visual_proof_plan`: per-slide screenshot/contact-sheet checks, source-fidelity risks, density proof, and native QA evidence expected from downstream routes.
+- `semantic_composition_map`: bind each action-title promise and page role to an observable visual encoding such as dependency edges, time order, decision gates, quantitative axes, table hierarchy, or image evidence.
+- `visual_route_feasibility`: locked image-first, HTML, or admitted native PPTX route; native admission evidence readback or `not_admitted`; route risks, required proof packet, and route-back owner. This output cannot admit native.
+- Typed blockers or repair targets for blueprint, density, template, or visual-risk problems.
+
+## Execution Rules
+
+1. Start from the approved blueprint. Do not invent slide ids, compress the deck into a default rhythm, or copy seed examples.
+2. Define shared palette, typography, material, mark-making and visual anchors before rendering. Let grids, title placement, grouping and spatial composition follow each page's claim and proof needs; style consistency does not require identical layouts.
+3. Use layout rhythm as a quality gate. Consecutive pages need changing first-glance structure, not just changed wording.
+4. Use show-don't-tell visual planning. Name the proof object on each page: timeline, system map, status board, decision rail, evidence band, chart, table, or comparison.
+5. Treat templates as layout intelligence. A template profile is semantic zones, placeholder capacity, spacing, and hierarchy, not a background skin.
+6. Keep the title safe zone clear. Section chips, badges, tags, and decorative labels cannot crowd the main title area.
+7. Define readable floors. Titles, body text, labels, tables, captions, and auxiliary metadata need explicit typography and spacing rules.
+8. Identify repair risk before artifact creation: overloaded pages, repeated card grids, weak peak pages, text-heavy proof pages, or missing structural visuals.
+9. Keep RCA authority clear. Adopt professional PPT discipline as RCA rules; do not cite external tools as the owner of visual decisions.
+10. If the task requires profiling a template or reference deck, consume `rca-template-profiler` output instead of re-profiling it here.
+11. Treat a template/reference deck as visual and structural guidance under image-first by default. It activates native only when the current user request explicitly requires editable native objects or preservation of editable master/layout/placeholder/theme semantics.
+12. If native was selected without explicit current-request admission evidence, reject that selection and restore image-first before page authoring; do not ask the user to choose between internal implementation routes.
+13. Route back early when blueprint, source, template capacity, or route selection would make visual proof fail; name the owner stage and the smallest repair.
+14. For admitted native PPTX, name the QA evidence expected later: editable shape manifest, rendered screenshots, hyperlink/text editability checks, and blocked-slide repair scope.
+15. Use contact sheets as direction evidence: repeated layout families, flat rhythm, title-safe-zone pressure, or density overload are visual-direction repairs, not page-helper failures.
+16. Do not convert image-first success into a native claim. A later native route must consume approved direction, contact-sheet findings, and explicit editability targets.
+17. Make title promises visible. A dependency map needs relationships, a timeline needs ordered events, a decision ladder needs gates or branches, and a data claim needs an honest chart/table encoding; decorative lines, dots, or equal cards do not satisfy these roles.
+18. Choose chart/table materialization intent with the native designer only after native admission: use stable DrawingML when cross-render fidelity dominates, and native data objects when editable data semantics dominate. Record the tradeoff instead of letting the helper infer it.
+19. Keep review internal to the stage chain. Emit complete direction and route-specific proof expectations in one pass when inputs are sufficient; do not add user-by-user layout confirmations.
+
+## Workbench Lessons To Preserve
+
+- Visual direction for image-first decks must be page-by-page, not only deck-level. Each real slide id needs first-glance hook, composition, visible text budget, style reference, and image-prompt intent before image prompts are written.
+- A reference deck must be version-locked. Record the current source path/ref, representative pages, and what may be borrowed. Do not silently reuse stale archive pages just because they are visually familiar.
+- A `.pptx` reference or requested `.pptx` output does not imply editable authoring. Extract its approved visual/template signals for image-first unless explicit native admission evidence says otherwise.
+- When the user asks to reuse a current deck style, profile the latest approved visual line first, then bind each slide to that style boundary. Treat older decks as historical references unless explicitly approved.
+- Check both insufficient and excessive information in image-first pages. Keep necessary objects, relationships, evidence, results and source attribution readable on the page; move supporting explanation to notes. Improve grouping or composition before removing proof. Do not impose a universal short-label count or density ratio.
+- Contact sheets are a visual rhythm gate. The reviewer should be able to spot story order, repeated layouts, and overloaded pages from the sheet before opening individual slides.
+
+## Accepted Style And Revision Calibration
+
+Use the user's latest accepted visual quality as the benchmark, including newly authored pages when preferred. Earlier pages are not automatically the aesthetic ceiling. Specify which palette relationships, midtones, transparent layers, fine linework, material cues and spatial depth to preserve; do not flatten better pages to match weaker ones. Representative pages should show that one visual language supports different page roles and information loads, without becoming another user approval gate.
+
+For an explicitly hand-drawn brief, typography is part of authorship: review headings, body text, Latin names, Arabic and Roman numerals, and publication labels for readable pen-pressure, width, baseline and stroke variation. Paper texture behind rigid print type does not satisfy that brief. This rule is style-conditional, not a hand-drawn default for all RCA decks.
+
+When the user requests whole-deck coherence, assess every current page, including previously passed/redrawn ones, then scope repairs from the new benchmark. Preserve pages that still meet the current intent. Record semantic information gaps and style defects separately in the existing direction payload; do not turn counts or a uniform card layout into the quality standard.
+
+## Design Registry Consumption
+
+- Preserve the current blueprint mode and independently select a local style profile or explicit custom behavior. Bind semantic compositions to a pattern id and rationale using the relevant entries in `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/communication_mode_registry`, `#/visualization_pattern_registry`, and `#/professional_style_registry`.
+- Load native object, connector, and template-binding details only for an admitted native route. Image-first and HTML use the shared communication/style vocabulary without inheriting native materialization work.
+- Reuse a current selection when source, meaning, style, and route constraints still fit. Consult relevant registry families for a new or changed decision; broaden only when no suitable match is found. A full registry scan is not required. A bespoke composition with an explicit rationale remains supported; `contracts/runtime-program/ppt-master-learning-landing.json` is provenance only.
+
+## Resources
+
+Load [minimal-resource-pack.md](resources/minimal-resource-pack.md) when authoring a new payload or when field-level examples are needed. Accepted current payload refs can be reused without loading the examples again.
+
+## Stage Prompt Boundary
+
+- `visual_direction` owns visual language, rhythm, page family ceilings, density controls, and forbidden regressions.
+- `rca-template-profiler` owns template/reference-deck profiling, semantic zones, and placeholder capacity; this skill consumes that profile.
+- `artifact_creation` consumes the approved visual direction; it must not rediscover the deck style from scratch.
+- `review_and_revision` judges rendered pages; this skill supplies the intended standard, not the final verdict.
+- Do not materialize PPTX/PNG/HTML, mutate artifacts, sign review/export receipts, or override route policy.
+
+## Blockers And Repair Targets
+
+If no consumable blueprint or visual-direction artifact is produced, return a no-output diagnostic and quality debt as the next stage input.
+
+Return `typed_blocker` only when:
+- A brand/template conflict requires an explicit owner decision before any direction can be selected.
+- Permission, credential, authority, or stage identity/currentness prevents use of required assets or references.
+
+Missing slide detail, unavailable optional assets, weak evidence/page roles, template-capacity limits, repetition, density, or inability to meet ideal readability within the page budget becomes quality debt plus repair guidance when a consumable visual direction exists. It must not block authoring; it blocks only visual/export readiness claims.
+
+Return `repair_target` when:
+
+- Rhythm repeats the same composition too often.
+- A page has no first-glance proof object.
+- Typography, table, or card density cannot pass the readability floor.
+- Visual direction contains internal route/operator wording.
+- Template/profile capacity is too low for planned content.
+- Native PPTX selection would require editable proof that the current visual direction cannot support.

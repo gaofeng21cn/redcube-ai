@@ -1,0 +1,91 @@
+{
+  "surface_kind": "rca_owner_chain_live_progress_evidence",
+  "schema_version": 2,
+  "domain_id": "redcube_ai",
+  "domain_agent_id": "rca",
+  "owner": "redcube_ai",
+  "state": "active_post_standardization_evidence_gate",
+  "status": "owner_typed_blocker_recorded_not_ready_claim",
+  "purpose": "Expose only the current owner-side evidence blocker after RCA private runtime retirement.",
+  "evidence_scope": "post_standardization_owner_chain_refs_only",
+  "controlled_fixture_is_live_progress": false,
+  "controlled_fixture_ref": "contracts/stage_run_canary_evidence.json",
+  "source_contract_refs": {
+    "stage_run_kernel_profile_ref": "contracts/stage_run_kernel_profile.json",
+    "temporal_stage_run_consumption_policy_ref": "contracts/temporal_stage_run_consumption_policy.json",
+    "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
+    "live_stage_run_progress_evidence_ref": "contracts/live_stage_run_progress_evidence.json"
+  },
+  "live_visual_owner_chain_canary": {
+    "status": "blocked_requires_fresh_opl_hosted_stage_run",
+    "observed_owner_receipt_refs": [],
+    "observed_review_export_receipt_refs": [],
+    "observed_typed_blocker_refs": [
+      "rca-typed-blocker:post-standardization-live-stage-evidence-required"
+    ]
+  },
+  "rca_owned_owner_action_canary": {
+    "status": "typed_blocker_recorded",
+    "observed_owner_receipt_ref": null,
+    "observed_typed_blocker_ref": "rca-typed-blocker:post-standardization-live-stage-evidence-required",
+    "observed_no_regression_evidence_ref": null
+  },
+  "remaining_evidence_gates": {
+    "fresh_opl_hosted_visual_artifact_generation": "blocked_by_domain_owned_typed_blocker",
+    "fresh_review_export_receipt_instance": "blocked_by_domain_owned_typed_blocker",
+    "fresh_owner_receipt_instance": "blocked_by_domain_owned_typed_blocker",
+    "temporal_controlled_visual_stage_long_soak": "blocked_by_domain_owned_typed_blocker",
+    "production_visual_ready": "not_claimed",
+    "domain_ready": "not_claimed",
+    "production_ready": "not_claimed"
+  },
+  "owner_chain_completion_audit": {
+    "audit_id": "rca.owner_chain_completion_audit.v2",
+    "source_policy_ref": "contracts/temporal_stage_run_consumption_policy.json#/owner_chain_completion_audit",
+    "completion_status": "blocked_requires_fresh_opl_hosted_visual_stage_owner_acceptance",
+    "accepted_terminal_evidence_refs": [
+      "progress_delta_receipt_ref",
+      "owner_receipt_ref",
+      "typed_blocker_ref",
+      "human_gate_ref",
+      "route_back_ref",
+      "review_export_receipt_ref",
+      "artifact_authority_receipt_ref",
+      "no_regression_evidence_ref"
+    ],
+    "forbidden_completion_substitutes": [
+      "provider_completion",
+      "generated_surface_ready",
+      "stage_run_terminal_state",
+      "queue_empty",
+      "attempt_ledger_written",
+      "controlled_canary",
+      "conformance_pass",
+      "read_model_current",
+      "pre_standardization_evidence_snapshot"
+    ],
+    "requires_real_visual_stage_owner_acceptance": true,
+    "requires_review_export_acceptance_for_export_claim": true,
+    "declares_owner_chain_complete": false,
+    "declares_visual_ready": false,
+    "declares_exportable": false,
+    "declares_domain_ready": false,
+    "declares_production_ready": false
+  },
+  "authority_boundary": {
+    "declares_visual_ready": false,
+    "declares_exportable": false,
+    "declares_handoffable": false,
+    "declares_domain_ready": false,
+    "declares_production_ready": false,
+    "provider_completion_counts_as_visual_progress": false,
+    "generated_surface_ready_counts_as_visual_progress": false,
+    "stage_run_terminal_counts_as_live_progress": false,
+    "conformance_pass_counts_as_live_progress": false,
+    "controlled_canary_counts_as_live_progress": false,
+    "writes_visual_truth": false,
+    "writes_artifact_body": false,
+    "writes_memory_body": false,
+    "writes_review_export_verdict_body": false
+  }
+}

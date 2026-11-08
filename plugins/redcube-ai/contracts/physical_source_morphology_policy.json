@@ -1,0 +1,130 @@
+{
+  "surface_kind": "rca_physical_source_morphology_policy",
+  "schema_version": 2,
+  "domain_id": "redcube_ai",
+  "owner": "redcube_ai",
+  "consumer": "one-person-lab",
+  "status": "standard_agent_source_roots_only",
+  "canonical_pack_root": "agent/",
+  "allowed_surface_classes": [
+    "declarative_visual_pack",
+    "visual_authority_contract",
+    "visual_native_helper_implementation",
+    "codex_plugin_carrier",
+    "developer_proof",
+    "repo_verification"
+  ],
+  "active_surface_classifications": [
+    {
+      "surface_id": "declarative_visual_pack",
+      "classification": "declarative_visual_pack",
+      "source_refs": [
+        "agent/"
+      ],
+      "active_caller": "OPL Pack compiler and hosted StageRun"
+    },
+    {
+      "surface_id": "visual_authority_contracts",
+      "classification": "visual_authority_contract",
+      "source_refs": [
+        "contracts/action_catalog.json",
+        "contracts/artifact_locator_contract.json",
+        "contracts/owner_receipt_contract.json",
+        "contracts/stage_quality_cycle_policy.json"
+      ],
+      "active_caller": "OPL generated interfaces and decisive Codex Attempts"
+    },
+    {
+      "surface_id": "python_native_helpers",
+      "classification": "visual_native_helper_implementation",
+      "source_refs": [
+        "python/redcube_ai/native_helpers/"
+      ],
+      "active_caller": "OPL native-helper execution envelope"
+    },
+    {
+      "surface_id": "codex_plugin_carrier",
+      "classification": "codex_plugin_carrier",
+      "source_refs": [
+        "plugins/redcube-ai/"
+      ],
+      "active_caller": "OPL Packages carrier projection"
+    },
+    {
+      "surface_id": "developer_proofs",
+      "classification": "developer_proof",
+      "source_refs": [
+        "tools/image-ppt-proof/",
+        "tools/native-ppt-proof/"
+      ],
+      "active_caller": "explicit developer and CI proof lanes only"
+    },
+    {
+      "surface_id": "repo_verification",
+      "classification": "repo_verification",
+      "source_refs": [
+        "scripts/"
+      ],
+      "active_caller": "repo-local development verification only"
+    }
+  ],
+  "retired_private_source_roots": [
+    "apps/redcube-cli",
+    "packages/redcube-domain-entry",
+    "packages/redcube-governance",
+    "packages/redcube-overlay-core",
+    "packages/redcube-runtime",
+    "packages/redcube-runtime-protocol"
+  ],
+  "source_ref_integrity_gate": {
+    "state": "all_active_source_refs_resolve",
+    "missing_source_ref_allowed": false,
+    "compatibility_alias_allowed": false,
+    "retired_private_source_root_allowed": false,
+    "docs_are_machine_source": false
+  },
+  "forbidden_generic_owner_flags": {
+    "rca_owns_generic_scheduler": false,
+    "rca_owns_generic_runner": false,
+    "rca_owns_generic_attempt_ledger": false,
+    "rca_owns_generic_session_store": false,
+    "rca_owns_generic_workspace_source_intake": false,
+    "rca_owns_generic_artifact_lifecycle": false,
+    "rca_owns_generic_review_repair_transport": false,
+    "rca_owns_generic_generated_wrapper": false,
+    "rca_owns_generic_domain_entry_runtime": false,
+    "rca_owns_generic_status_workbench": false
+  },
+  "new_surface_admission_gate": {
+    "must_classify_before_active_caller": true,
+    "allowed_new_rca_roles": [
+      "declarative_visual_pack",
+      "visual_authority_contract",
+      "visual_native_helper_implementation"
+    ],
+    "developer_only_roles": [
+      "developer_proof",
+      "repo_verification"
+    ],
+    "forbidden_new_rca_roles": [
+      "generic_scheduler_owner",
+      "generic_runner_owner",
+      "generic_attempt_ledger_owner",
+      "generic_session_store_owner",
+      "generic_workspace_source_intake_owner",
+      "generic_artifact_lifecycle_owner",
+      "generic_review_repair_transport_owner",
+      "generic_generated_wrapper_owner",
+      "generic_domain_entry_runtime_owner",
+      "generic_status_workbench_owner"
+    ]
+  },
+  "authority_boundary": {
+    "policy_can_write_visual_truth": false,
+    "policy_can_mutate_artifact_body": false,
+    "policy_can_issue_review_or_export_verdict": false,
+    "policy_can_sign_owner_receipt": false,
+    "policy_can_claim_domain_ready": false,
+    "policy_can_claim_production_ready": false
+  }
+}

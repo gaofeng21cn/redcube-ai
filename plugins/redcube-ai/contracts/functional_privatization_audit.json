@@ -1,0 +1,158 @@
+{
+  "surface_kind": "functional_privatization_audit",
+  "schema_version": 1,
+  "defaults_profile": "opl.standard-functional-privatization-audit.v1",
+  "domain_id": "redcube_ai",
+  "target_domain_id": "redcube_ai",
+  "owner": "redcube_ai",
+  "status": "standard_domain_pack_and_authority_functions_only",
+  "classification_policy": {
+    "rule": "RCA declares only non-declarative domain authority implementations; OPL owns every generic runtime and generated surface",
+    "accepted_migration_classes": [
+      "minimal_authority_function"
+    ]
+  },
+  "physical_source_morphology_policy": {
+    "policy_id": "redcube_ai.physical-source-morphology.v2",
+    "source_ref": "contracts/physical_source_morphology_policy.json",
+    "state": "domain_morphology_declared_by_ref",
+    "authority_boundary": {
+      "domain_can_claim_generic_runtime_owner": false,
+      "domain_repo_can_own_generated_surface": false
+    }
+  },
+  "modules": [
+    {
+      "module_id": "rca.visual_authority_decisions",
+      "classification": "minimal_authority_function",
+      "code_paths": [
+        "agent/quality_gates/visual_authority_boundaries.md",
+        "agent/quality_gates/review_export_memory.md",
+        "agent/prompts/stage-quality-cycle-roles.md",
+        "contracts/artifact_locator_contract.json",
+        "contracts/owner_receipt_contract.json"
+      ],
+      "active_callers": [
+        "OPL-hosted decisive Codex Attempt"
+      ],
+      "active_caller_status": "domain_authority_consumed_through_opl_hosted_stage_contract",
+      "migration_action": "retain RCA visual truth, review/export, artifact mutation, memory accept/reject, typed blocker, and owner receipt authority behind OPL StageRun",
+      "retention_reason": "OPL may transport refs and materialize transitions but cannot make RCA visual or review/export decisions",
+      "cannot_absorb_reason": "Absorbing these decisions would transfer domain truth and verdict authority to the framework",
+      "retained_domain_authority": [
+        "source_readiness_verdict",
+        "communication_visual_direction_decision",
+        "review_export_verdict",
+        "artifact_mutation_authorization",
+        "visual_memory_accept_reject",
+        "typed_blocker",
+        "owner_receipt"
+      ],
+      "semantic_equivalence_status": "cleared_by_boundary"
+    },
+    {
+      "module_id": "rca.python_native_helpers",
+      "classification": "minimal_authority_function",
+      "code_paths": [
+        "python/redcube_ai/native_helpers/ppt_deck/review.py",
+        "python/redcube_ai/native_helpers/ppt_deck/review.native-helper-probe.json",
+        "python/redcube_ai/native_helpers/ppt_deck/export.py",
+        "python/redcube_ai/native_helpers/ppt_deck/export.native-helper-probe.json",
+        "python/redcube_ai/native_helpers/ppt_deck/native.py",
+        "python/redcube_ai/native_helpers/ppt_deck/native.native-helper-probe.json"
+      ],
+      "active_callers": [
+        "OPL native-helper execution envelope"
+      ],
+      "active_caller_status": "exact_descriptor_bound_domain_native_helper",
+      "migration_action": "retain deterministic RCA visual artifact implementation behind OPL-owned execution, identity, currentness, and receipt envelopes",
+      "retention_reason": "The helper implements RCA-specific editable PPT, render, review, and export mechanics without owning execution lifecycle or verdict authority",
+      "cannot_absorb_reason": "The implementation is domain-specific artifact machinery; its generic process and receipt envelope already belongs to OPL",
+      "retained_domain_authority": [
+        "visual_artifact_materialization",
+        "visual_artifact_inspection"
+      ],
+      "semantic_equivalence_status": "cleared_by_boundary"
+    }
+  ],
+  "retired_generated_surface_provenance": [
+    {
+      "surface_id": "rca_private_cli",
+      "replacement_ref": "opl_generated:standard_agent_cli",
+      "provenance_refs": [
+        "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
+      ]
+    },
+    {
+      "surface_id": "rca_private_domain_entry",
+      "replacement_ref": "opl_hosted:standard_agent_stage_binding",
+      "provenance_refs": [
+        "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
+      ]
+    },
+    {
+      "surface_id": "rca_private_runtime",
+      "replacement_ref": "opl_hosted:stage_run_controller",
+      "provenance_refs": [
+        "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
+      ]
+    },
+    {
+      "surface_id": "rca_private_runtime_protocol",
+      "replacement_ref": "opl_hosted:runway_ledger_contracts",
+      "provenance_refs": [
+        "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
+      ]
+    },
+    {
+      "surface_id": "rca_private_governance",
+      "replacement_ref": "agent/quality_gates/",
+      "provenance_refs": [
+        "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
+      ]
+    },
+    {
+      "surface_id": "rca_private_overlay_core",
+      "replacement_ref": "agent/",
+      "provenance_refs": [
+        "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
+      ]
+    }
+  ],
+  "bridge_exit_gate": {
+    "physical_delete_authorization_refs": [
+      "https://github.com/gaofeng21cn/redcube-ai/blob/471039cf8306589928f3b5ee5077dff025655bb5/docs/history/process/standard-agent-private-platform-retirement-20260714.md"
+    ],
+    "no_forbidden_write_refs": [
+      "contracts/standard_agent_conformance_profile.json#/physical_morphology/required_parity_gates"
+    ],
+    "provenance_refs": [
+      "https://github.com/gaofeng21cn/redcube-ai/blob/55ffc859c0e595c0831331cca0c35802d4a328e7/docs/history/process/retired-surface-provenance.md"
+    ]
+  },
+  "default_surface_boundary": {
+    "state": "physically_absent",
+    "owner": "one-person-lab",
+    "domain_repo_can_own_default_surface": false,
+    "verification_ref": "scripts/check-private-platform-retirement.ts"
+  },
+  "retired_default_surface_ids": [
+    "cli",
+    "mcp",
+    "skill",
+    "product_entry",
+    "product_status",
+    "product_session",
+    "domain_handler",
+    "workbench"
+  ],
+  "authority_boundary": {
+    "opl_can_write_domain_truth": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_mutate_domain_artifact_body_without_rca_authority": false,
+    "opl_can_authorize_quality_or_export": false,
+    "domain_can_claim_generic_runtime_owner": false,
+    "domain_repo_can_own_generated_surface": false,
+    "provider_completion_is_domain_completion": false
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "surface_kind": "domain_live_stage_run_progress_evidence",
+  "schema_version": 1,
+  "domain_id": "redcube_ai",
+  "domain_agent_id": "rca",
+  "owner": "redcube_ai",
+  "state": "active_post_standardization_evidence_gate",
+  "status": "owner_typed_blocker_recorded_not_ready_claim",
+  "purpose": "Record the owner-side blocker for fresh OPL-hosted RCA StageRun evidence after retirement of the repo-local control plane.",
+  "refs": {
+    "owner_receipt_refs": [],
+    "typed_blocker_refs": [
+      "rca-typed-blocker:post-standardization-live-stage-evidence-required"
+    ],
+    "human_gate_refs": [],
+    "quality_or_export_receipt_refs": [],
+    "no_regression_refs": [],
+    "long_soak_refs": [],
+    "doc_refs": [
+      "docs/status.md",
+      "docs/architecture.md"
+    ],
+    "next_verification_command_refs": [
+      "command:opl agents conformance --family-defaults --json",
+      "command:opl agents run --domain redcube_ai --action invoke_product_entry --workspace <workspace>"
+    ]
+  },
+  "evidence_items": [
+    {
+      "ref_shape": "typed_blocker_ref",
+      "ref": "rca-typed-blocker:post-standardization-live-stage-evidence-required"
+    }
+  ],
+  "typed_blocker_kind": "post_standardization_live_stage_evidence_required",
+  "non_claims": {
+    "domain_ready": false,
+    "production_ready": false
+  },
+  "authority_boundary": {
+    "refs_only": true,
+    "opl_can_write_domain_truth": false,
+    "opl_can_sign_owner_receipt": false,
+    "opl_can_create_typed_blocker": false,
+    "opl_can_authorize_quality_or_export": false,
+    "opl_can_claim_domain_ready": false,
+    "opl_can_claim_production_ready": false,
+    "provider_completion_counts_as_domain_ready": false,
+    "structural_conformance_counts_as_live_progress": false
+  }
+}

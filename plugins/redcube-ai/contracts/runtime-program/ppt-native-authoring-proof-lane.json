@@ -1,0 +1,362 @@
+{
+  "contract_id": "ppt-native-authoring-proof-lane",
+  "date_anchor": "2026-04-25",
+  "status": "developer_proof_contract_landed",
+  "owner": "redcube_ai",
+  "deliverable_family": "ppt_deck",
+  "professional_design_pack_contract_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+  "scope": {
+    "goal": "Evaluate direct native PPTX authoring and repair as an opt-in replacement for the current image-first authoring stages when editable PPTX is explicitly requested.",
+    "default_mainline_changed": false,
+    "default_visual_route": "author_image_pages",
+    "previous_html_default_visual_route": "render_html",
+    "replaces_routes": [
+      "author_image_pages",
+      "repair_image_pages"
+    ],
+    "legacy_html_replaces_routes": [
+      "render_html",
+      "fix_html"
+    ],
+    "preserved_upstream_routes": [
+      "storyline",
+      "detailed_outline",
+      "slide_blueprint",
+      "visual_direction"
+    ],
+    "preserved_gate_routes": [
+      "visual_director_review",
+      "screenshot_review",
+      "export_pptx"
+    ],
+    "out_of_scope": [
+      "new public skill",
+      "new repo-local runtime or generated-surface wrapper semantics",
+      "bypassing RedCube review/export gates",
+      "replacing source truth, storyline, blueprint, or visual direction"
+    ]
+  },
+  "candidate_route_model": {
+    "lane_id": "ppt_deck_native_ppt_authoring_v0",
+    "status": "production_selectable_optional",
+    "default_enabled": false,
+    "production_selectable": true,
+    "runnable_routes": [
+      "author_pptx_native",
+      "repair_pptx_native"
+    ],
+    "author_route": "author_pptx_native",
+    "repair_route": "repair_pptx_native",
+    "author_route_replaces": "author_image_pages",
+    "repair_route_replaces": "repair_image_pages",
+    "legacy_author_route_replaced": "render_html",
+    "legacy_repair_route_replaced": "fix_html",
+    "authoring_artifact": "native_pptx_file",
+    "editable_artifact_required": true,
+    "ai_first_editing_contract": {
+      "contract_id": "ppt_native_ai_first_editing_contract_v1",
+      "creative_owner": "llm_agent",
+      "editable_shape_plan_required": true,
+      "editable_shape_manifest_required": true,
+      "python_helper_role": "execute_validate_export_only",
+      "template_substitution_allowed": false,
+      "design_spec_lock_required": true,
+      "professional_design_brief_required": true,
+      "shape_quality_role_required": true,
+      "layout_intent_required": true,
+      "composition_signature_required": true,
+      "structural_visual_required": true,
+      "reference_design_profile_required": true,
+      "semantic_layout_selection_required": true,
+      "placeholder_capacity_required": true,
+      "action_title_required": true,
+      "per_page_visual_plan_required": true,
+      "ppt_master_style_discipline_adopted": [
+        "spec_lock",
+        "template_layout_grammar",
+        "template_profile",
+        "semantic_layout_selection",
+        "reference_deck_analysis",
+        "per_page_visual_plan",
+        "svg_qa_before_export",
+        "rendered_quality_gate"
+      ],
+      "preserved_gates": [
+        "visual_director_review",
+        "screenshot_review",
+        "export_pptx"
+      ],
+      "template_layout_grammar_required": true,
+      "per_slide_layout_binding_required": true,
+      "professional_design_pack_required": true,
+      "professional_design_pack_contract_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+      "required_design_pack_sections": [
+        "layout_archetype_taxonomy",
+        "capacity_budgets",
+        "font_floors",
+        "connector_semantics",
+        "layout_rhythm",
+        "non_text_visual_requirements",
+        "reference_discipline",
+        "professional_style_registry"
+      ]
+    },
+    "unit_repair_scope": {
+      "repair_route": "repair_pptx_native",
+      "scope": "page",
+      "target_source": "screenshot_review.blocked_slide_ids",
+      "passed_slides_reused": true,
+      "preserved_slide_policy": "do_not_reauthor_passed_slides"
+    },
+    "review_input_surface": "rendered_pptx_screenshots",
+    "engine_capabilities": {
+      "authoring_ir": "redcube_svg_ir",
+      "pptx_writer": "officecli_pptx_materializer",
+      "editable_pptx": true,
+      "strict_svg_preflight": true,
+      "true_render_proof_required": true,
+      "true_render_proof_renderer": "libreoffice_headless",
+      "cross_platform_render_required": true,
+      "screenshot_packaging": false,
+      "native_object_families": [
+        "text_box",
+        "shape",
+        "connector",
+        "picture",
+        "group",
+        "path",
+        "chart",
+        "table"
+      ],
+      "package_readback": true,
+      "template_intake": true,
+      "speaker_notes": true,
+      "slide_transitions": true,
+      "timing_and_animation": true
+    },
+    "officecli_materializer_policy": {
+      "policy_id": "ppt_native_officecli_materializer_quality_gate_v1",
+      "adoption_status": "qa_materializer_discipline_only",
+      "rca_main_workflow_owner": "redcube_stage_review_export",
+      "skill_authoring_loop_adopted": false,
+      "materializer_role": "default_editable_pptx_materializer_and_qa_gate",
+      "current_pptx_writer": "officecli_pptx_materializer",
+      "officecli_writer_adapter_default_enabled": true,
+      "required_gate_refs": [
+        "officecli_save_before_close",
+        "officecli_validate",
+        "officecli_view_issues",
+        "officecli_view_text"
+      ],
+      "save_before_close_required": true,
+      "validate_required": true,
+      "view_issues_required": true,
+      "quality_issue_policy": "record_and_continue_with_ready_claims_closed_when_allow_quality_debt_otherwise_reject",
+      "view_text_required": true,
+      "true_render_proof_required_after_officecli_gate": true,
+      "true_render_proof_substitute_allowed": false,
+      "deterministic_cjk_font_family": "Noto Sans CJK SC",
+      "default_visual_route_changed": false,
+      "default_executor_changed": false
+    },
+    "true_render_proof": {
+      "required": true,
+      "source_surface_kind": "native_pptx",
+      "renderer_selection_policy": "opl_probe_then_helper_capability_bind",
+      "user_preinstalled_libreoffice_required": false,
+      "renderer_kind": "libreoffice_headless",
+      "renderer_pipeline": "libreoffice_headless_pdf_png_v1",
+      "runtime": "libreoffice_headless",
+      "supported_renderers": [
+        {
+          "renderer_kind": "libreoffice_headless",
+          "renderer_stack": "libreoffice_headless_plus_poppler",
+          "renderer_pipeline": "libreoffice_headless_pdf_png_v1",
+          "runtime": "libreoffice_headless",
+          "components": [
+            "LibreOffice headless",
+            "Poppler pdftoppm"
+          ],
+          "proof_chain": [
+            "pptx_to_pdf",
+            "pdf_to_png"
+          ],
+          "required_capabilities": [
+            "soffice_headless",
+            "pdftoppm"
+          ]
+        }
+      ],
+      "bootstrap_policy": {
+        "capability_probe": "opl pack native-helper probe",
+        "automatic_bootstrap_allowed": false,
+        "user_preinstall_required": false,
+        "dependency_provisioning_owner": "opl_connect_or_operator",
+        "developer_proof_installer": "tools/native-ppt-proof/install-deps.sh",
+        "proof_container": "tools/native-ppt-proof/Dockerfile"
+      },
+      "cross_platform_render_required": true,
+      "synthetic_preview_allowed": false,
+      "html_render_substitute_allowed": false,
+      "officecli_validate_substitute_allowed": false,
+      "disallowed_substitutes": [
+        "synthetic_preview",
+        "html_render",
+        "officecli_validate",
+        "desktop_powerpoint_automation",
+        "apple_script_preview"
+      ],
+      "required_for_ready_claim": true,
+      "missing_policy": "completed_with_quality_debt_when_pptx_is_consumable",
+      "no_output_policy": "diagnostic_and_quality_debt"
+    },
+    "native_ppt_quality_surface": {
+      "quality_model": "shape_manifest_layout_metrics_v1",
+      "source_surface_kind": "native_pptx",
+      "required_per_slide_metrics": [
+        "bounds",
+        "text_char_count",
+        "primary_points",
+        "min_body_font_pt",
+        "body_text_readability_ok",
+        "typography_hierarchy_ratio",
+        "typography_hierarchy_ok",
+        "title_core_overlap_count",
+        "layout_variant",
+        "expected_slot_count",
+        "filled_slot_count",
+        "slot_fill_ok",
+        "audience_label_readability_ok",
+        "content_depth_ok",
+        "grid_balance_ok",
+        "visual_structure_present",
+        "non_text_visual_specific_ok",
+        "mechanical_card_template_absent",
+        "panel_text_safe_area_ok",
+        "text_card_internal_padding_ok",
+        "short_label_wrap_ok",
+        "title_underline_absent_ok",
+        "composition_signature",
+        "occupied_ratio",
+        "edge_clearance",
+        "overlap_pairs",
+        "structural_text_collision_count",
+        "structural_text_collisions",
+        "decorative_shape_count",
+        "visual_support_shape_count",
+        "audience_content_slot_count",
+        "shape_kind_count",
+        "role_count",
+        "layout_richness_score",
+        "chart_bounds",
+        "table_bounds",
+        "metric_grid_bounds",
+        "chart_metrics",
+        "table_metrics",
+        "metric_grid_metrics",
+        "axis_label_count",
+        "legend_label_count",
+        "table_cell_fit_ok",
+        "table_cell_fit_failures",
+        "numeric_label_overflow_count",
+        "numeric_label_overflows",
+        "coordinate_determinism_hash",
+        "preview_screenshot_sha256",
+        "preview_screenshot_dimensions"
+      ],
+      "quality_debt_when_missing": true,
+      "review_behavior": "screenshot_review consumes native shape manifest metrics; missing or failing quality checks record non-blocking quality debt and block ready claims",
+      "chart_table_metric_grid_review_behavior": "missing editable chart/table/metric-grid metrics record page quality debt and repair targets while a readable PPTX continues"
+    },
+    "hosted_stage_native_helper_proof": {
+      "hosted_action_id": "run_native_ppt_proof",
+      "hosted_action_catalog_ref": "contracts/action_catalog.json",
+      "author_helper_source": "python/redcube_ai/native_helpers/ppt_deck/native.py",
+      "author_helper_probe_descriptor": "python/redcube_ai/native_helpers/ppt_deck/native.native-helper-probe.json",
+      "native_writer_package_module": "redcube_ai.native_helpers.ppt_deck.native",
+      "native_writer_module_command": "python -m redcube_ai.native_helpers.ppt_deck.native",
+      "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",
+      "route_surface": "opl_hosted_stage_run_action",
+      "stage_sequence_model": "explicit_selectable_alternate_stages",
+      "default_stage_sequence_changed": false,
+      "engine_capabilities": {
+        "authoring_ir": "redcube_svg_ir",
+        "pptx_writer": "officecli_pptx_materializer",
+        "true_render_proof_required": true,
+        "true_render_proof_renderer": "libreoffice_headless",
+        "cross_platform_render_required": true,
+        "native_object_model_ref": "contracts/runtime-program/ppt-native-python-engine-contract.json#/native_object_model",
+        "template_intake_ref": "contracts/runtime-program/ppt-native-python-engine-contract.json#/template_intake",
+        "presentation_semantics_ref": "contracts/runtime-program/ppt-native-python-engine-contract.json#/presentation_semantics"
+      },
+      "officecli_materializer_policy_ref": "contracts/runtime-program/ppt-native-python-engine-contract.json#/officecli_materializer_policy",
+      "officecli_skill_authoring_loop_adopted": false,
+      "officecli_validate_substitutes_true_render_proof": false,
+      "export_behavior": "export_pptx copies the editable native source PPTX when the latest reviewed visual artifact is native PPTX and records operator-facing proof summary, source/final hashes, renderer provenance, shape manifest, repair log, and PNG proof refs"
+    },
+    "developer_proof": {
+      "native_helper_contract_test": "tests/python-native-helper-catalog.test.js",
+      "native_fixture_contract_test": "tests/native-ppt-proof-fixture-contract.test.js",
+      "proof_scope": "exact_helper_contract_fixture_materialization_and_true_render_proof",
+      "mock_codex_test_double_policy": {
+        "allowed": true,
+        "purpose": "deterministic_contract_route_plumbing_and_fail_closed_tests",
+        "can_claim_visual_design_quality": false,
+        "display_as_visual_sample_allowed": false
+      },
+      "proof_runner": "tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof",
+      "ci_manual_lane": ".github/workflows/ci.yml workflow_dispatch native-ppt-proof",
+      "ci_proof_lane_v2": ".github/workflows/ci.yml workflow_dispatch + schedule + pull_request label native-ppt-proof",
+      "proof_artifact_index": "artifacts/native-ppt-proof/artifact-index.json",
+      "visual_benchmark_fixture": "tests/fixtures/ppt-native-visual-benchmark/benchmark.json",
+      "visual_benchmark_fixture_id": "ppt_native_visual_benchmark_v2",
+      "visual_benchmark_suites": [
+        "business_review",
+        "academic_lecture",
+        "data_charts",
+        "chinese_long_text"
+      ],
+      "editable_structural_shapes": [
+        "chart",
+        "table",
+        "metric_grid"
+      ],
+      "repair_evidence_surface": "native_ppt_repair_evidence_v1",
+      "export_operator_proof_summary": "native_export_bundle_operator_proof_summary_v1",
+      "export_operator_artifact_gallery": "native_export_operator_artifact_gallery_v1",
+      "hosted_action_id": "run_native_ppt_proof"
+    },
+    "required_export_fields": [
+      "export_bundle.source_pptx",
+      "export_bundle.native_ppt_shape_manifest",
+      "export_bundle.native_ppt_repair_log",
+      "export_bundle.source_artifacts",
+      "export_bundle.evidence_hashes",
+      "export_bundle.renderer_proof",
+      "export_bundle.shape_manifest_summary",
+      "export_bundle.operator_proof_summary",
+      "export_bundle.artifact_gallery.index_file"
+    ],
+    "required_repair_evidence_fields": [
+      "native_ppt_repair_log.repair_evidence.evidence_surface",
+      "native_ppt_repair_log.repair_evidence.per_slide_hashes",
+      "native_ppt_repair_log.repair_evidence.preserved_slide_hashes",
+      "native_ppt_repair_log.repair_evidence.repair_units",
+      "native_ppt_repair_log.repair_evidence.non_blocking_slide_reuse_ok"
+    ]
+  },
+  "promotion_gates": [
+    "same topic/profile can run through image-first mainline, explicit HTML lane, and native-PPT proof lane without identity drift",
+    "native PPTX produces editable slides rather than screenshot-only wrappers",
+    "screenshot_review judges rendered PPTX screenshots as the final visible artifact",
+    "repair route consumes review feedback and updates only the blocked PPTX pages when possible",
+    "RCA review/export authority refs remain authoritative",
+    "OPL-hosted StageRun currentness, identity, and route gates remain fail-closed"
+  ],
+  "rollback_policy": {
+    "default_mainline_impact": "none; native remains explicit selectable while image-first stays the default visual route",
+    "disable_action": "do not select the native PPT proof lane",
+    "image_first_mainline_required_to_remain_green": true,
+    "html_selectable_lane_required_to_remain_green": true
+  }
+}

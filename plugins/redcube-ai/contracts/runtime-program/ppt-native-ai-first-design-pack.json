@@ -1,0 +1,752 @@
+{
+  "surface_kind": "ppt_native_ai_first_design_pack",
+  "contract_id": "ppt-native-ai-first-design-pack",
+  "projection_id": "redcube-ai.ppt-native-ai-first-design-pack.v1",
+  "date_anchor": "2026-05-29",
+  "owner": "redcube_ai",
+  "consumer": "author_pptx_native_shape_plan",
+  "status": "active_design_pack_contract",
+  "deliverable_family": "ppt_deck",
+  "route_scope": [
+    "author_pptx_native",
+    "repair_pptx_native"
+  ],
+  "claims_visual_ready": false,
+  "claims_exportable": false,
+  "claims_handoffable": false,
+  "claims_production_ready": false,
+  "design_pack_boundary": {
+    "creative_owner": "llm_agent",
+    "python_helper_role": "execute_selected_archetype_zones_validate_materialize_only",
+    "helper_template_layout_allowed": false,
+    "helper_can_select_layout_archetype": false,
+    "helper_can_replace_design_profile": false,
+    "new_runtime_dependency_allowed": false,
+    "third_party_code_copied": false,
+    "third_party_template_asset_copied": false,
+    "discipline_adoption_mode": "clean_room_design_discipline_only"
+  },
+  "native_object_semantics": {
+    "resource_ref": "agent/professional_skills/rca-native-ppt-designer/resources/native-object-semantics.md",
+    "source_owner": "approved_source_and_ai_authored_object_plan",
+    "data_fidelity": "reconcile_declared_chart_series_categories_and_table_cells_with_package_readback_and_pixels",
+    "hyperlinks": {
+      "object_field": "native_shapes[].link",
+      "inline_field": "native_shapes[].paragraphs[].runs[].link",
+      "supported_carriers": ["text_box", "shape", "path"],
+      "external_schemes": ["https", "http", "mailto", "tel"],
+      "internal_target": "slide[N]_within_final_one_based_roster",
+      "readback": "exact_object_target_and_inline_text_span_target"
+    },
+    "structural_math": "exact_source_preserved_but_no_validated_native_formula_materializer_claim",
+    "unsupported_payload": "preserve_source_and_emit_scoped_diagnostic_without_silent_simplification"
+  },
+  "layout_archetype_taxonomy": {
+    "required": true,
+    "selection_owner": "llm_agent",
+    "selected_archetype_field": "editable_shape_plan.slides[].template_layout_binding.selected_archetype",
+    "helper_selection_allowed": false,
+    "archetype_catalog": [
+      {
+        "archetype_id": "professional_system_map",
+        "use_when": "workflow, route, system, gate, or evidence flow needs first-glance structure",
+        "layout_description": "A title and claim sit above an editable system map with route lanes, gate stack, evidence band, and connector lanes kept outside readable text.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "system_map_zone",
+          "gate_zone",
+          "evidence_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "system_map_panel",
+            "route_label",
+            "gate_card",
+            "evidence_item"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "structural_visual",
+            "gate_or_route_label",
+            "evidence_or_metric_text"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/archetype_budgets/professional_system_map"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements",
+        "prohibited": [
+          "connector crossing readable text",
+          "labels placed on rails",
+          "route labels without explanatory audience text"
+        ]
+      },
+      {
+        "archetype_id": "executive_status_board",
+        "use_when": "status proof, executive readout, or low-density route outcome summary",
+        "layout_description": "Large status panels occupy the middle, supported by a separate proof or takeaway band and a visible hierarchy object.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "status_zone",
+          "evidence_zone",
+          "takeaway_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "content_panel",
+            "point_text",
+            "evidence_item",
+            "takeaway"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "content_container",
+            "audience_body_text",
+            "evidence_or_metric_text",
+            "takeaway_text"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/archetype_budgets/executive_status_board"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements",
+        "prohibited": [
+          "receipt label pile",
+          "empty four-card grid",
+          "tiny KPI badges"
+        ]
+      },
+      {
+        "archetype_id": "evidence_timeline",
+        "use_when": "sequence, milestone, causal evolution, or proof chronology",
+        "layout_description": "A timeline rail with milestone nodes and off-rail labels, with evidence and takeaway zones separated from the sequence.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "timeline_zone",
+          "evidence_zone",
+          "takeaway_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "timeline_panel",
+            "point_text",
+            "evidence_item",
+            "takeaway"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "timeline_marker",
+            "audience_body_text",
+            "evidence_or_metric_text"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/archetype_budgets/evidence_timeline"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements",
+        "prohibited": [
+          "timeline rail through labels",
+          "milestone text below floor",
+          "more milestones than the selected zone capacity"
+        ]
+      },
+      {
+        "archetype_id": "risk_control_matrix",
+        "use_when": "risks, controls, gates, criteria, or comparative quality readout",
+        "layout_description": "A matrix or comparison field with filled cells, clear row and column grammar, and a separate signal or takeaway area.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "matrix_zone",
+          "signal_zone",
+          "takeaway_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "compare_panel",
+            "point_text",
+            "metric",
+            "takeaway"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "matrix_or_compare_container",
+            "audience_body_text",
+            "evidence_or_metric_text"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/archetype_budgets/risk_control_matrix"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements",
+        "prohibited": [
+          "unfilled matrix cell",
+          "four-card template for fewer than four facts",
+          "flat equal panels without comparison semantics"
+        ]
+      },
+      {
+        "archetype_id": "decision_dashboard",
+        "use_when": "decision, recommendation, operating readout, or proof dashboard",
+        "layout_description": "A decision or recommendation zone creates first-glance hierarchy, with proof objects and takeaway separated by zones.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "decision_zone",
+          "proof_zone",
+          "takeaway_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "content_panel",
+            "point_text",
+            "metric",
+            "takeaway"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "content_container",
+            "audience_body_text",
+            "evidence_or_metric_text",
+            "takeaway_text"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/archetype_budgets/decision_dashboard"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements",
+        "prohibited": [
+          "all content in equal cards",
+          "no first-glance hierarchy",
+          "decision hidden below proof details"
+        ]
+      },
+      {
+        "archetype_id": "sample_status_proof_board",
+        "use_when": "native_visual_sample true with one-slide route status proof",
+        "layout_description": "One title, one claim, one wide input hub, three status cards, three vertical connector drops, and one proof band.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "status_zone",
+          "proof_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "input_hub",
+            "content_panel",
+            "point_text",
+            "flow_connector",
+            "proof_band"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "structural_input_hub",
+            "status_card_triplet",
+            "vertical_connector_triplet",
+            "single_proof_sentence"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/sample_budgets/sample_status_proof_board"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics/sample_status_proof_board",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements/sample_status_proof_board",
+        "prohibited": [
+          "horizontal bus",
+          "separate takeaway zone",
+          "artifact inventory",
+          "more or fewer than three status cards"
+        ]
+      },
+      {
+        "archetype_id": "sample_decision_proof_split",
+        "use_when": "native_visual_sample true with one-slide decision and proof split",
+        "layout_description": "One title, one claim, left decision panel, right proof stack, visible rail, and bottom takeaway band.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "decision_zone",
+          "proof_zone",
+          "takeaway_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "content_panel",
+            "decision_rail",
+            "proof_rail",
+            "takeaway"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "decision_panel",
+            "proof_stack",
+            "structural_rail",
+            "takeaway_band"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/sample_budgets/sample_decision_proof_split"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements/sample_decision_proof_split",
+        "prohibited": [
+          "status-board geometry",
+          "three equal route cards",
+          "missing decision or proof rail"
+        ]
+      }
+    ]
+  },
+  "capacity_budgets": {
+    "global": {
+      "min_filled_required_zone_share": 0.8,
+      "max_audience_text_shapes_per_slide": 14,
+      "max_primary_points_per_slide": 5,
+      "min_edge_margin_in": 0.6,
+      "min_zone_gap_in": 0.32,
+      "min_zone_inset_in": 0.15,
+      "fit_strategy_order": [
+        "select_lower_density_archetype",
+        "reduce_slot_count",
+        "shorten_copy",
+        "resize_zones",
+        "emit_coordinates"
+      ],
+      "font_shrink_to_fit_allowed": false
+    },
+    "archetype_budgets": {
+      "professional_system_map": {
+        "max_route_labels": 5,
+        "max_gate_cards": 4,
+        "max_evidence_items": 3
+      },
+      "executive_status_board": {
+        "max_status_cards": 4,
+        "min_card_width_in": 3.3,
+        "min_card_height_in": 1.55
+      },
+      "evidence_timeline": {
+        "max_milestone_count": 4,
+        "max_evidence_items": 3
+      },
+      "risk_control_matrix": {
+        "max_matrix_cells": 9,
+        "empty_cell_allowed": false
+      },
+      "decision_dashboard": {
+        "max_proof_objects": 4,
+        "first_glance_hierarchy_required": true
+      }
+    },
+    "samples": {
+      "max_audience_text_shapes_per_slide": 12,
+      "max_status_card_count": 3,
+      "max_proof_text_count": 1,
+      "artifact_inventory_visible_allowed": false
+    },
+    "sample_budgets": {
+      "sample_status_proof_board": {
+        "status_card_count": 3,
+        "min_input_hub_width_in": 10.4,
+        "min_input_hub_height_in": 0.82,
+        "min_status_zone_height_in": 3.45,
+        "min_proof_zone_height_in": 1.35,
+        "connector_count": 3
+      },
+      "sample_decision_proof_split": {
+        "max_decision_points": 2,
+        "max_proof_items": 3,
+        "min_takeaway_zone_height_in": 1.2
+      }
+    }
+  },
+  "font_floors": {
+    "title_pt_min": 36,
+    "sample_title_pt_min": 40,
+    "body_pt_min": 18,
+    "core_sentence_pt_min": 18,
+    "point_index_pt_min": 16,
+    "table_body_pt_min": 11,
+    "input_hub_pt_min": 22,
+    "title_to_body_ratio_min": 2,
+    "font_floor_repair_policy": "change_geometry_copy_or_archetype_before_lowering_font"
+  },
+  "connector_semantics": {
+    "layout_zone_binding_required": true,
+    "connector_quality_role": "structural",
+    "text_collision_allowed": false,
+    "connector_crosses_readable_text_allowed": false,
+    "connector_lane_must_be_claimed_by_zone": true,
+    "required_connector_roles": [
+      "flow_connector",
+      "merge_connector",
+      "bridge_connector",
+      "decision_rail",
+      "proof_rail",
+      "evidence_axis"
+    ],
+    "sample_status_proof_board": {
+      "vertical_drop_count": 3,
+      "horizontal_bus_allowed": false,
+      "max_vertical_drop_width_in": 0.04,
+      "min_vertical_drop_height_in": 0.66,
+      "directional_arrow_required": true
+    }
+  },
+  "layout_rhythm": {
+    "deck_layout_rhythm_plan_required": true,
+    "no_three_consecutive_same_archetype": true,
+    "no_three_consecutive_same_primary_grid": true,
+    "repeated_concrete_composition_limit": 2,
+    "min_distinct_composition_share": 0.75,
+    "composition_signature_must_describe_geometry": true,
+    "repair_must_change_repeated_concrete_geometry": true
+  },
+  "non_text_visual_requirements": {
+    "structural_visual_required": true,
+    "cards_alone_satisfy_requirement": false,
+    "min_structural_shape_count_per_slide": 1,
+    "structural_shape_roles": [
+      "proof_band",
+      "decision_rail",
+      "input_hub",
+      "evidence_axis",
+      "gate_stack_panel",
+      "flow_connector",
+      "bridge_connector",
+      "metric_grid",
+      "timeline_panel",
+      "system_map_panel"
+    ],
+    "sample_status_proof_board": {
+      "required_non_text_objects": [
+        "input_hub",
+        "flow_connector",
+        "proof_band"
+      ],
+      "cards_alone_satisfy_requirement": false
+    },
+    "sample_decision_proof_split": {
+      "required_non_text_objects": [
+        "decision_rail",
+        "proof_rail",
+        "takeaway_band"
+      ],
+      "cards_alone_satisfy_requirement": false
+    }
+  },
+  "reference_discipline": {
+    "clean_room_only": true,
+    "runtime_dependency_adoption_allowed": false,
+    "third_party_code_copy_allowed": false,
+    "third_party_template_copy_allowed": false,
+    "reference_projects": [
+      {
+        "project_id": "ppt-master",
+        "adopted_discipline": [
+          "spec_lock",
+          "per_page_visual_plan",
+          "rendered_quality_gate"
+        ],
+        "not_adopted": [
+          "runtime code",
+          "template assets"
+        ]
+      },
+      {
+        "project_id": "PPTAgent",
+        "adopted_discipline": [
+          "semantic_layout_selection",
+          "template_profile",
+          "reference_deck_analysis"
+        ],
+        "not_adopted": [
+          "agent runtime",
+          "template corpus"
+        ]
+      },
+      {
+        "project_id": "officecli-pptx",
+        "adopted_discipline": [
+          "font_floor",
+          "validate_before_close",
+          "editable_shape_manifest"
+        ],
+        "not_adopted": [
+          "authoring loop owner",
+          "visual verdict authority"
+        ]
+      },
+      {
+        "project_id": "Presenton",
+        "adopted_discipline": [
+          "slide_archetype_catalog",
+          "non_text_visual_first_glance",
+          "export_preview_check"
+        ],
+        "not_adopted": [
+          "runtime dependency",
+          "theme pack"
+        ]
+      },
+      {
+        "project_id": "ppt-agent-skills",
+        "adopted_discipline": [
+          "professional_design_profile",
+          "capacity_budget_before_coordinates",
+          "repair_against_visible_artifact"
+        ],
+        "not_adopted": [
+          "skill runtime",
+          "third_party prompt text"
+        ]
+      }
+    ]
+  },
+  "communication_mode_registry": {
+    "selection_owner": "rca-ppt-story-architect",
+    "selection_field": "slide_blueprint.communication_mode_id",
+    "mode_behavior_field": "slide_blueprint.communication_mode_behavior",
+    "mode_and_style_locked_independently": true,
+    "user_supplied_outline_overrides_mode_reordering": true,
+    "source_coverage_ref": "contracts/runtime-program/ppt-master-learning-landing.json#/source_catalog_coverage/communication_modes",
+    "modes": [
+      {
+        "mode_id": "decision_pyramid",
+        "use_when": "the audience must decide from a recommendation and its mutually exclusive support",
+        "argument_sequence": ["recommendation", "supporting_arguments", "evidence", "decision"],
+        "title_voice": "conclusion_first_action_titles",
+        "notes_register": "concise_executive_reasoning",
+        "forbidden": ["topic_only_titles", "uncompared_numbers", "recommendation_after_appendix"]
+      },
+      {
+        "mode_id": "narrative_arc",
+        "use_when": "the conclusion earns force through situation, tension, proof, and resolution",
+        "argument_sequence": ["situation", "tension", "turning_evidence", "resolution"],
+        "title_voice": "progressive_claim_titles",
+        "notes_register": "spoken_story_with_explicit_turns",
+        "forbidden": ["spoiling_every_turn_on_cover", "chronology_without_tension", "unsupported_emotional_claim"]
+      },
+      {
+        "mode_id": "instructional_sequence",
+        "use_when": "the audience must build understanding or capability step by step",
+        "argument_sequence": ["learning_goal", "concept_decomposition", "worked_proof", "application"],
+        "title_voice": "learning_progress_titles",
+        "notes_register": "clear_explanatory_scaffolding",
+        "forbidden": ["undefined_terms", "steps_without_dependency", "assessment_before_explanation"]
+      },
+      {
+        "mode_id": "visual_showcase",
+        "use_when": "presence, demonstration, or a small number of memorable proof objects leads",
+        "argument_sequence": ["hook", "hero_proof", "contrast_or_reveal", "call_to_action"],
+        "title_voice": "short_high_contrast_claims",
+        "notes_register": "presenter_led_minimal_on_slide_copy",
+        "forbidden": ["dense_exposition", "equal_weight_card_wall", "imagery_without_claim"]
+      },
+      {
+        "mode_id": "neutral_briefing",
+        "use_when": "the audience needs complete, scannable information without a forced thesis",
+        "argument_sequence": ["scope", "organized_topics", "status_or_reference", "next_actions"],
+        "title_voice": "precise_topic_or_status_titles",
+        "notes_register": "neutral_complete_reference",
+        "forbidden": ["manufactured_drama", "hidden_status", "recommendation_presented_as_fact"]
+      }
+    ],
+    "custom_escape": {
+      "mode_id": "custom",
+      "use_only_when_no_single_preset_has_a_dominant_spine": true,
+      "mode_behavior_required": true,
+      "behavior_must_name": ["act_or_posture_sequence", "title_voice", "page_rhythm", "notes_register"],
+      "bare_custom_token_allowed": false
+    }
+  },
+  "visualization_pattern_registry": {
+    "selection_owner": "rca-ppt-visual-director",
+    "selection_field": "slide_blueprint.slides[].visualization_pattern_id",
+    "selection_rationale_field": "slide_blueprint.slides[].visualization_selection_rationale",
+    "full_registry_scan_required": false,
+    "selection_policy": "reuse_current_selections_or_read_relevant_families_then_broaden_on_no_match",
+    "reselection_triggers": ["source_or_claim_change", "style_or_route_constraint_change", "observed_semantic_mismatch", "capability_change"],
+    "native_materialization_details": "load_only_for_admitted_native_route",
+    "no_match_policy": "author_bespoke_composition_and_record_selection_rationale",
+    "copy_upstream_svg_body_allowed": false,
+    "source_coverage_ref": "contracts/runtime-program/ppt-master-learning-landing.json#/source_catalog_coverage/visualizations",
+    "patterns": [
+      {"pattern_id":"quantitative_trend","content_shape":"values over ordered time","use_when":"direction, cumulative volume, or multi-series movement is the message","skip_when":"time order is absent or category ranking is primary","accepted_object_families":["chart","path","text_box"],"required_observable_semantics":["ordered_axis","series_encoding","source_note"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
+      {"pattern_id":"category_comparison","content_shape":"named categories with comparable values","use_when":"rank, magnitude, or side-by-side differences matter","skip_when":"composition or continuous time is the message","accepted_object_families":["chart","table"],"required_observable_semantics":["shared_scale","category_labels","value_encoding"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
+      {"pattern_id":"part_to_whole","content_shape":"parts of one whole or nested composition","use_when":"share, allocation, or hierarchy composition matters","skip_when":"parts do not share a valid denominator","accepted_object_families":["chart","shape","text_box"],"required_observable_semantics":["whole_definition","part_encoding","total_consistency"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"distribution_relationship","content_shape":"observations, ranges, correlation, or outliers","use_when":"spread, cluster, association, or distribution shape matters","skip_when":"only aggregate category values are available","accepted_object_families":["chart","path"],"required_observable_semantics":["quantitative_axes","observation_encoding","outlier_or_range_legibility"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
+      {"pattern_id":"target_progress","content_shape":"actual, target, completion, or capability scores","use_when":"goal attainment or multi-axis capability is the message","skip_when":"there is no declared baseline or comparable scale","accepted_object_families":["chart","metric_grid"],"required_observable_semantics":["baseline_or_target","actual_value","unit_or_scale"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"variance_bridge","content_shape":"additive and subtractive contributors between two totals","use_when":"the audience must explain how a start becomes an end","skip_when":"contributors do not form a running total","accepted_object_families":["chart","shape","connector"],"required_observable_semantics":["start_total","signed_steps","end_total"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
+      {"pattern_id":"magnitude_flow","content_shape":"flow with splits, merges, or volume loss","use_when":"magnitude through a system or conversion stages is material","skip_when":"steps have no quantity or branching semantics","accepted_object_families":["chart","path","connector"],"required_observable_semantics":["source_nodes","directed_flow","magnitude_encoding"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"sequential_process","content_shape":"ordered steps, phases, or pipeline outputs","use_when":"sequence and handoff logic matter more than time scale","skip_when":"the relation is cyclical or durations need an axis","accepted_object_families":["shape","connector","group"],"required_observable_semantics":["ordered_steps","directional_edges","stage_outputs"],"owner_skills":["rca-ppt-story-architect","rca-ppt-visual-director"]},
+      {"pattern_id":"time_schedule","content_shape":"milestones, durations, or roadmap states","use_when":"time position, duration, or delivery order is the message","skip_when":"steps are timeless or cyclical","accepted_object_families":["shape","connector","table"],"required_observable_semantics":["time_axis","event_or_duration_binding","status_legibility"],"owner_skills":["rca-ppt-story-architect","rca-ppt-visual-director"]},
+      {"pattern_id":"cycle_feedback","content_shape":"closed-loop stages or compounding feedback","use_when":"the final stage returns to or strengthens the first","skip_when":"the process is one-way","accepted_object_families":["shape","connector","path"],"required_observable_semantics":["closed_loop","ordered_stages","feedback_direction"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"hierarchy_architecture","content_shape":"layers, containment, maturity, or reporting hierarchy","use_when":"levels and parent-child structure are the message","skip_when":"items are peers without containment or rank","accepted_object_families":["shape","group","connector"],"required_observable_semantics":["level_encoding","parent_child_relation","layer_labels"],"owner_skills":["rca-ppt-visual-director","rca-template-profiler"]},
+      {"pattern_id":"hub_network","content_shape":"one core with outward capabilities or inward forces","use_when":"core-periphery relation and edge direction matter","skip_when":"a strict hierarchy or sequence is required","accepted_object_families":["shape","connector","group"],"required_observable_semantics":["core_node","spokes_or_forces","edge_direction"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"matrix_quadrant","content_shape":"two axes, grid cells, or named quadrants","use_when":"position, priority, intensity, or cross-classification matters","skip_when":"there is only one comparison dimension","accepted_object_families":["chart","table","shape"],"required_observable_semantics":["axis_or_row_column_grammar","cell_or_point_binding","quadrant_meaning"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
+      {"pattern_id":"comparison_decision","content_shape":"options, pros and cons, tiers, or decision gates","use_when":"the audience must compare alternatives and land a choice","skip_when":"items are unrelated facts without decision criteria","accepted_object_families":["table","shape","connector"],"required_observable_semantics":["options","criteria_or_tradeoffs","decision_signal"],"owner_skills":["rca-ppt-story-architect","rca-ppt-visual-director"]},
+      {"pattern_id":"tabular_evidence","content_shape":"rectangular facts, metrics, statements, or schedules","use_when":"precise row-column lookup is more honest than a chart","skip_when":"the message is a visible quantitative shape","accepted_object_families":["table","text_box"],"required_observable_semantics":["headers","cell_alignment","units_and_sources"],"owner_skills":["rca-template-profiler","rca-native-ppt-designer"]},
+      {"pattern_id":"portfolio_density","content_shape":"many weighted topics, modules, or nested areas","use_when":"coverage and relative emphasis matter more than sequence","skip_when":"each item needs a detailed sentence or exact position","accepted_object_families":["chart","shape","group"],"required_observable_semantics":["item_set","weight_or_group_encoding","label_legibility"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"root_cause","content_shape":"effect with grouped causal branches","use_when":"the audience must diagnose causes rather than follow a process","skip_when":"causal evidence is unavailable or the relation is merely sequential","accepted_object_families":["shape","connector","path"],"required_observable_semantics":["effect","cause_groups","causal_edges"],"owner_skills":["rca-ppt-story-architect","rca-ppt-visual-director"]},
+      {"pattern_id":"dependency_system_map","content_shape":"systems, components, routes, or actors connected by typed relationships","use_when":"the promise depends on topology, dependency, or information flow","skip_when":"items are merely grouped or sequential without meaningful edges","accepted_object_families":["shape","connector","group"],"required_observable_semantics":["typed_nodes","meaningful_edges","direction_or_dependency_legend"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"set_overlap","content_shape":"two or three sets whose overlap is the message","use_when":"shared membership or intersection carries the claim","skip_when":"sets do not overlap or need quantitative area accuracy","accepted_object_families":["shape","path","text_box"],"required_observable_semantics":["named_sets","visible_intersection","intersection_meaning"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"list_showcase","content_shape":"parallel items, agenda, roster, principles, or hero evidence","use_when":"the message is scannable parallel coverage or one dominant proof object","skip_when":"sequence, hierarchy, or comparison must be encoded","accepted_object_families":["shape","picture","text_box","group"],"required_observable_semantics":["item_or_hero_identity","intentional_emphasis","reading_order"],"owner_skills":["rca-ppt-visual-director","rca-template-profiler"]}
+    ]
+  },
+  "professional_style_registry": {
+    "active_profile_id": "rca_executive_proof_board",
+    "selection_field": "editable_shape_plan.design_spec_lock.professional_design_brief.design_register",
+    "custom_escape": {
+      "profile_id": "custom",
+      "style_behavior_field": "editable_shape_plan.design_spec_lock.professional_design_brief.custom_style_behavior",
+      "style_behavior_required": true,
+      "bare_custom_token_allowed": false
+    },
+    "profiles": [
+      {
+        "profile_id": "rca_executive_proof_board",
+        "use_when": "operator proof, executive status, or route evidence board",
+        "palette": {
+          "canvas": "#F6F2EA",
+          "ink": "#171C24",
+          "muted": "#5B6570",
+          "accent": "#B94624",
+          "panel": "#EFE6D6"
+        },
+        "typography": {
+          "title_family": "Noto Sans CJK SC",
+          "body_family": "Noto Sans CJK SC",
+          "title_weight": 700,
+          "body_weight": 400
+        },
+        "layout_motif": "warm canvas, strong action title, proof band, restrained connector rails",
+        "forbidden_patterns": [
+          "generic equal-card grid",
+          "decorative title underline",
+          "visible artifact receipt inventory"
+        ]
+      },
+      {
+        "profile_id": "rca_clinical_evidence_timeline",
+        "use_when": "academic or evidence chronology deck",
+        "palette": {
+          "canvas": "#F7FAF9",
+          "ink": "#1B2430",
+          "muted": "#64748B",
+          "accent": "#0F766E",
+          "panel": "#E5F2EF"
+        },
+        "typography": {
+          "title_family": "Noto Sans CJK SC",
+          "body_family": "Noto Sans CJK SC",
+          "title_weight": 700,
+          "body_weight": 400
+        },
+        "layout_motif": "quiet evidence field, timeline rail, proof notes outside the rail",
+        "forbidden_patterns": [
+          "rail crossing label text",
+          "dense citation receipt wall",
+          "body text under floor"
+        ]
+      },
+      {
+        "profile_id": "rca_decision_control_matrix",
+        "use_when": "risk, gate, control, or tradeoff deck",
+        "palette": {
+          "canvas": "#F8F7F3",
+          "ink": "#1F2937",
+          "muted": "#667085",
+          "accent": "#315C7A",
+          "panel": "#E8EDF0"
+        },
+        "typography": {
+          "title_family": "Noto Sans CJK SC",
+          "body_family": "Noto Sans CJK SC",
+          "title_weight": 700,
+          "body_weight": 400
+        },
+        "layout_motif": "decision-first hierarchy, matrix field, explicit gate rail",
+        "forbidden_patterns": [
+          "flat dashboard cards",
+          "empty matrix cells",
+          "unexplained stage labels"
+        ]
+      },
+      {
+        "profile_id": "rca_swiss_system_brief",
+        "use_when": "consulting, architecture, or type-led system explanation",
+        "palette": {"canvas":"#FAFAF8","ink":"#151515","muted":"#626262","accent":"#D62F2F","panel":"#EDEDEA"},
+        "typography": {"title_family":"Noto Sans CJK SC","body_family":"Noto Sans CJK SC","title_weight":700,"body_weight":400},
+        "layout_motif": "strict grid, sharp rules, large whitespace, asymmetric proof anchors",
+        "forbidden_patterns": ["soft floating card wall", "ornamental gradients", "uncontrolled alignment"]
+      },
+      {
+        "profile_id": "rca_data_editorial_report",
+        "use_when": "market review, finance, research, or data-led long-form analysis",
+        "palette": {"canvas":"#FCFBF7","ink":"#202124","muted":"#70757A","accent":"#006B5B","panel":"#E8EEE9"},
+        "typography": {"title_family":"Noto Serif CJK SC","body_family":"Noto Sans CJK SC","title_weight":700,"body_weight":400},
+        "layout_motif": "editorial columns, source lines, annotated charts, strong typographic hierarchy",
+        "forbidden_patterns": ["dashboard chrome everywhere", "source-free charts", "equal emphasis on every number"]
+      },
+      {
+        "profile_id": "rca_technical_blueprint",
+        "use_when": "engineering, architecture, or annotated technical walkthrough",
+        "palette": {"canvas":"#10202B","ink":"#F4F7F8","muted":"#A8BBC5","accent":"#46C2B3","panel":"#173441"},
+        "typography": {"title_family":"Noto Sans CJK SC","body_family":"Noto Sans Mono CJK SC","title_weight":700,"body_weight":400},
+        "layout_motif": "schematic line work, explicit nodes, measured annotations, restrained depth",
+        "forbidden_patterns": ["glow as structure", "unlabeled edges", "decorative pseudo-code"]
+      },
+      {
+        "profile_id": "rca_photo_editorial_story",
+        "use_when": "architecture, culture, product, or brand story led by inspectable imagery",
+        "palette": {"canvas":"#F5F3EF","ink":"#161616","muted":"#66615A","accent":"#B43C32","panel":"#E7E1D8"},
+        "typography": {"title_family":"Noto Serif CJK SC","body_family":"Noto Sans CJK SC","title_weight":700,"body_weight":400},
+        "layout_motif": "large inspectable image fields, editorial captions, quiet text blocks, deliberate crop rhythm",
+        "forbidden_patterns": ["dark blurred stock image", "text covering the subject", "thumbnail mosaic without hierarchy"]
+      }
+    ]
+  },
+  "shape_plan_required_fields": {
+    "design_pack_contract_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+    "deck_layout_rhythm_plan_required": true,
+    "design_spec_lock_required": true,
+    "professional_design_brief_required": true,
+    "template_layout_grammar_required": true,
+    "template_layout_binding_required": true,
+    "layout_zone_id_required_for_visible_non_auxiliary_shapes": true,
+    "selected_archetype_must_be_from_catalog": true,
+    "style_profile_must_be_from_registry": true,
+    "communication_mode_must_be_from_registry_or_custom_escape": true,
+    "visualization_pattern_must_be_from_registry_or_bespoke_no_match": true
+  },
+  "quality_claim_boundary": {
+    "contract_presence_claims_design_assets_available": true,
+    "contract_presence_claims_visual_ready": false,
+    "contract_presence_claims_production_ready": false,
+    "visual_quality_requires_live_shape_plan_render_review_export": true
+  }
+}

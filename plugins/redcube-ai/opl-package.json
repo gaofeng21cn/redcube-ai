@@ -1,9 +1,7 @@
 {
   "surface_kind": "opl_agent_package_manifest.v1",
-  "kind": "agent",
   "agent_id": "rca",
   "package_id": "rca",
-  "domain_id": "redcube_ai",
   "display_name": "RedCube AI",
   "presentation": {
     "display_name_i18n": {
@@ -35,21 +33,18 @@
     ]
   },
   "publisher": "one-person-lab",
-  "version": "0.2.21",
+  "version": "0.2.22",
   "source": "first_party_repo_local",
   "carrier_source_role": "codex_plugin_default_carrier_not_package_truth",
   "source_repo": "https://github.com/gaofeng21cn/redcube-ai.git",
   "schema_ref": "one-person-lab/contracts/opl-framework/agent-package-manifest.schema.json",
   "domain_descriptor_ref": "contracts/domain_descriptor.json",
-  "task_provider_ref": "contracts/domain_descriptor.json#/standard_agent_interface/stage_catalog",
-  "action_catalog_ref": "contracts/action_catalog.json",
-  "view_refs": [],
   "entrypoints": [
     {
       "entrypoint_id": "codex_primary_skill",
       "entrypoint_kind": "codex_skill",
       "source_ref": "agent/primary_skill/SKILL.md",
-      "carrier_ref": "plugins/redcube-ai/skills/redcube-ai/SKILL.md",
+      "carrier_ref": "skills/redcube-ai/SKILL.md",
       "authority": "carrier_only_not_domain_truth"
     },
     {
@@ -59,30 +54,6 @@
       "authority": "opl_hosted_runtime_rca_domain_semantics"
     }
   ],
-  "codex_surface": {
-    "plugin_id": "redcube-ai",
-    "plugin_source_path": ".",
-    "configured_codex_plugin_carrier": {
-      "kind": "codex_plugin_manager",
-      "plugin_selector": "redcube-ai@redcube-ai",
-      "executor_route": "codex_cli",
-      "marketplace_source": "gaofeng21cn/redcube-ai",
-      "publication_ref": "ghcr.io/gaofeng21cn/one-person-lab-packages/rca:latest-stable"
-    },
-    "required_skill_ids": [
-      "redcube-ai"
-    ],
-    "app_contribution_abi": {
-      "schema_version": "opl-package-app-contribution-cli.v1",
-      "transport": "stdin_json_stdout_json",
-      "argv": ["opl", "app", "contribution", "adapter", "--stdin"],
-      "request_schema": "opl-package-app-contribution-request.v1",
-      "response_schema": "opl-package-app-contribution-response.v1"
-    },
-    "app_contribution_adapter": {
-      "manifest": "app-contribution-adapter.json"
-    }
-  },
   "app_contributions": {
     "schema_version": "opl-app-contributions.v1",
     "views": [
@@ -138,6 +109,41 @@
       }
     ]
   },
+  "kind": "agent",
+  "domain_id": "redcube_ai",
+  "task_provider_ref": "contracts/domain_descriptor.json#/standard_agent_interface/stage_catalog",
+  "action_catalog_ref": "contracts/action_catalog.json",
+  "view_refs": [],
   "requires": [],
-  "capability_dependencies": []
+  "capability_dependencies": [],
+  "codex_surface": {
+    "plugin_id": "redcube-ai",
+    "configured_codex_plugin_carrier": {
+      "kind": "codex_plugin_manager",
+      "plugin_selector": "redcube-ai@redcube-ai",
+      "executor_route": "codex_cli",
+      "marketplace_source": "gaofeng21cn/redcube-ai",
+      "publication_ref": "ghcr.io/gaofeng21cn/one-person-lab-packages/rca:latest-stable"
+    },
+    "required_skill_ids": [
+      "redcube-ai"
+    ],
+    "app_contribution_abi": {
+      "schema_version": "opl-package-app-contribution-cli.v1",
+      "transport": "stdin_json_stdout_json",
+      "argv": [
+        "opl",
+        "app",
+        "contribution",
+        "adapter",
+        "--stdin"
+      ],
+      "request_schema": "opl-package-app-contribution-request.v1",
+      "response_schema": "opl-package-app-contribution-response.v1"
+    },
+    "app_contribution_adapter": {
+      "manifest": "app-contribution-adapter.json"
+    },
+    "plugin_source_path": "."
+  }
 }

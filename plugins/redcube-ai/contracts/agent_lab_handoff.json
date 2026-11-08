@@ -1,0 +1,121 @@
+{
+  "surface_kind": "domain_agent_lab_evaluation_fixture_handoff",
+  "schema_version": 2,
+  "domain_id": "redcube_ai",
+  "domain_agent_id": "rca",
+  "domain_label": "RedCube AI",
+  "owner": "redcube_ai",
+  "agent_lab_owner": "one-person-lab",
+  "handoff_status": "ready_for_opl_agent_lab_refs_only_evaluation",
+  "capability_map_ref": "contracts/capability_map.json",
+  "evaluation_fixture_refs": [
+    "contracts/stage_run_canary_evidence.json",
+    "contracts/capability_map.json#/dry_run_token_mapping_check",
+    "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture"
+  ],
+  "external_suite_seed": {
+    "suite_id": "rca.standard-agent.controlled-evaluation.v1",
+    "suite_kind": "refs_only_domain_evaluation_fixture",
+    "fixture_ref": "contracts/stage_run_canary_evidence.json",
+    "execution_owner": "one-person-lab",
+    "domain_repo_can_execute_suite": false,
+    "required_return_shapes": [
+      "owner_receipt_ref",
+      "typed_blocker_ref",
+      "no_regression_evidence_ref"
+    ]
+  },
+  "feedback_self_evolution_trigger": {
+    "surface_kind": "opl_foundry_agent_feedback_self_evolution_trigger",
+    "schema_version": 1,
+    "policy_ref": "contracts/opl-framework/foundry-agent-series-contract.json#/standard_feedback_self_evolution_trigger_policy",
+    "policy_id": "standard_agent_feedback_self_evolution_trigger.v1",
+    "target_agent_id": "rca",
+    "target_domain_id": "redcube_ai",
+    "adapter_kind": "domain_refs_only_feedback_fixture",
+    "external_suite_ref": "contracts/agent_lab_handoff.json#/external_suite_seed",
+    "status_projection_ref": "contracts/opl-framework/agent-lab-contract.json#domain_feedback_self_evolution_surface",
+    "contract_can_trigger_execution": false,
+    "authority_boundary": {
+      "refs_only": true,
+      "can_write_domain_truth": false,
+      "can_mutate_artifact_body": false,
+      "can_authorize_quality_or_export": false,
+      "can_create_owner_receipt": false,
+      "can_create_typed_blocker": false,
+      "can_execute_repo_patch_without_developer_mode": false
+    }
+  },
+  "change_ref_mappings": {
+    "summary_kind": "refs_only_consumer_summary",
+    "source_of_truth_ref": "contracts/capability_map.json#/feedback_token_index",
+    "supported_tokens_ref": "contracts/capability_map.json#/ppt_visual_failure_token_contract/all_supported_tokens",
+    "dry_run_token_cases_ref": "contracts/capability_map.json#/dry_run_token_mapping_check/token_cases",
+    "per_token_mappings_in_handoff": false,
+    "handoff_carries_patch_target_authority": false,
+    "owner_closeout_boundary_ref": "contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary",
+    "verification_refs": [
+      "contracts/capability_map.json#/feedback_token_index",
+      "tests/opl-agent-pack-contracts-semantic-pack.test.js#RCA capability map routes visual feedback fixtures through declarative professional skills"
+    ]
+  },
+  "visual_feedback_failure_fixture": {
+    "fixture_id": "agent-lab-fixture:rca/visual-feedback-to-capability-closeout.v2",
+    "fixture_kind": "visual_negative_feedback_to_capability_hit_and_owner_closeout_boundary",
+    "tokens": [
+      "storyline",
+      "outline",
+      "visual_direction",
+      "style",
+      "page_authoring",
+      "visual_review",
+      "native_pptx_editability",
+      "template_profile",
+      "placeholder_capacity"
+    ],
+    "capability_index_ref": "contracts/capability_map.json#/feedback_token_index",
+    "verification_refs": [
+      "contracts/capability_map.json#/ppt_visual_failure_token_contract",
+      "contracts/capability_map.json#/feedback_token_index",
+      "tests/opl-agent-pack-contracts-semantic-pack.test.js#RCA capability map routes visual feedback fixtures through declarative professional skills"
+    ],
+    "owner_closeout_boundary": {
+      "boundary_kind": "refs_only_work_order_or_typed_blocker_candidate_until_rca_owner_closeout",
+      "rca_holds": [
+        "visual_truth",
+        "review_export_verdict",
+        "artifact_authority",
+        "owner_receipt",
+        "typed_blocker"
+      ],
+      "opl_agent_lab_allowed_outputs": [
+        "refs_only_evaluation_report",
+        "verification_ref",
+        "no_regression_evidence_ref",
+        "typed_blocker_candidate"
+      ]
+    }
+  },
+  "dry_run_token_mapping_check": {
+    "capability_map_ref": "contracts/capability_map.json#/dry_run_token_mapping_check",
+    "feedback_token_index_ref": "contracts/capability_map.json#/feedback_token_index",
+    "token_mappings_in_handoff": false,
+    "verification_refs": [
+      "tests/opl-agent-pack-contracts-semantic-pack.test.js#RCA capability map dry-run tokens resolve without private runtime callers"
+    ]
+  },
+  "authority_boundary": {
+    "refs_only": true,
+    "opl_agent_lab_can_execute_evaluation": true,
+    "domain_repo_can_own_agent_lab_runtime": false,
+    "domain_repo_can_own_agent_lab_session_or_queue": false,
+    "opl_agent_lab_can_write_rca_visual_truth": false,
+    "opl_agent_lab_can_write_memory_body": false,
+    "opl_agent_lab_can_mutate_artifact_body": false,
+    "opl_agent_lab_can_authorize_quality_or_export": false,
+    "opl_agent_lab_can_write_owner_receipt": false,
+    "opl_agent_lab_can_create_typed_blocker": false,
+    "rca_owner_receipt_or_typed_blocker_required": true,
+    "handoff_carries_patch_target_authority": false
+  }
+}

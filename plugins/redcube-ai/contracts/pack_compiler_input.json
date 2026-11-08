@@ -1,0 +1,336 @@
+{
+  "surface_kind": "opl_domain_pack_compiler_input",
+  "implementation_profile": {
+    "base_profile_ref": "contracts/opl-framework/standard-agent-implementation-profile.schema.json",
+    "helpers": {
+      "entries": [
+        {
+          "language": "python",
+          "role": "native_helper",
+          "source_roots": [
+            "python/redcube_ai/native_helpers/"
+          ]
+        }
+      ]
+    }
+  },
+  "schema_version": 2,
+  "lifecycle_state": "refs_only_anchor_after_private_pack_compiler_input_retirement",
+  "domain_id": "redcube_ai",
+  "canonical_agent_id": "rca",
+  "domain_pack_owner": "redcube_ai",
+  "pack_compiler_owner": "one-person-lab",
+  "projection_mode": "repo_source_refs_only",
+  "source_of_truth_boundary": "agent/ is the RCA declarative visual pack source; OPL pack compiler owns generated package/control surfaces",
+  "retired_private_surface": "rca_private_opl_pack_compiler_input_body",
+  "canonical_semantic_pack_root": "agent/",
+  "canonical_semantic_pack_role": "repo_source_declarative_visual_pack",
+  "required_domain_pack_paths": [
+    "agent/prompts/source_intake.md",
+    "agent/prompts/communication_strategy.md",
+    "agent/prompts/visual_direction.md",
+    "agent/prompts/artifact_creation.md",
+    "agent/prompts/review_and_revision.md",
+    "agent/prompts/package_and_handoff.md",
+    "agent/prompts/stage-quality-cycle-roles.md",
+    "agent/stages/source_intake.md",
+    "agent/stages/communication_strategy.md",
+    "agent/stages/visual_direction.md",
+    "agent/stages/artifact_creation.md",
+    "agent/stages/review_and_revision.md",
+    "agent/stages/package_and_handoff.md",
+    "agent/stages/manifest.json",
+    "agent/skills/visual_deliverable_authoring.md",
+    "agent/skills/native_helper_policy.md",
+    "agent/skills/visual_memory_policy.md",
+    "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+    "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+    "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+    "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+    "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+    "agent/professional_skills/rca-template-profiler/SKILL.md",
+    "agent/quality_gates/visual_authority_boundaries.md",
+    "agent/quality_gates/source_and_truth.md",
+    "agent/quality_gates/communication_and_direction.md",
+    "agent/quality_gates/visual_pack_discipline.md",
+    "agent/quality_gates/package_distribution.md",
+    "agent/quality_gates/artifact_authority.md",
+    "agent/quality_gates/review_export_memory.md",
+    "agent/knowledge/visual_truth_boundaries.md",
+    "agent/knowledge/communication_visual_direction.md",
+    "agent/knowledge/artifact_and_export_authority.md",
+    "agent/knowledge/review_export_memory.md",
+    "agent/policies/markdown-route-policy.md",
+    "agent/knowledge/owner_receipt_policy.md",
+    "agent/tools/domain_affordances.md",
+    "agent/policies/visual-authority-policy.md"
+  ],
+  "minimal_authority_surface_ids": [
+    "source_readiness_verdict",
+    "communication_visual_direction_decision",
+    "review_export_verdict",
+    "visual_memory_accept_reject",
+    "artifact_mutation_authorization",
+    "owner_receipt_signer",
+    "native_helper_implementation"
+  ],
+  "source_refs": {
+    "domain_descriptor": "contracts/domain_descriptor.json",
+    "action_target_refs": "contracts/action_catalog.json",
+    "stage_refs": "agent/stages/manifest.json",
+    "artifact_locator": "contracts/artifact_locator_contract.json",
+    "visual_authority_kernel": "contracts/foundry-agent-os-domain-kernel-manifest.json",
+    "stage_graph_source_ref": "agent/stages/manifest.json",
+    "quality_gate_source_ref": "agent/quality_gates/visual_pack_discipline.md",
+    "executor_policy_source_ref": "opl-generated:family_stage_control_plane#/stages/*/selected_executor",
+    "owner_receipt_schema_source_ref": "contracts/owner_receipt_contract.json",
+    "authority_functions_source_ref": "runtime/authority_functions/README.md",
+    "source_closure_audit_source_ref": "contracts/source_closure_audit.json",
+    "agent_lab_cost_profile_source_ref": "contracts/agent_lab_cost_profile.json",
+    "functional_privatization_audit_source_ref": "contracts/functional_privatization_audit.json",
+    "generated_surface_handoff_source_ref": "contracts/generated_surface_handoff.json",
+    "capability_map_source_ref": "contracts/capability_map.json"
+  },
+  "authority_boundary": {
+    "opl_can_write_domain_truth": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_quality_or_export": false,
+    "domain_can_claim_generated_surface_owner": false,
+    "provider_completion_is_visual_ready": false
+  },
+  "stage_pack_required_sections": [
+    "prompt_refs",
+    "skill_refs",
+    "tool_refs",
+    "tool_affordance_boundary",
+    "knowledge_refs",
+    "quality_gate_refs",
+    "strategy_refs",
+    "candidate_pool_policy",
+    "independent_gate_policy",
+    "handoff_policy"
+  ],
+  "cognitive_kernel_adoption_ref": "contracts/cognitive_kernel_adoption.json",
+  "golden_path_profile_ref": "contracts/golden_path_profile.json",
+  "declarative_domain_pack": [
+    "domain_descriptor",
+    "deliverable_family_graph",
+    "stage_action_metadata",
+    "source_readiness_policy",
+    "ai_route_policy",
+    "review_export_policy",
+    "artifact_locator_policy",
+    "memory_locator_policy",
+    "receipt_schema",
+    "authority_function_manifest",
+    "agent_lab_cost_profile",
+    "tool_affordance_catalog",
+    "cognitive_kernel_adoption_contract",
+    "golden_path_profile"
+  ],
+  "tool_refs": [
+    {
+      "ref": "agent/tools/domain_affordances.md",
+      "ref_kind": "repo_path",
+      "role": "domain_tool_affordance_catalog",
+      "catalog_role": "available_affordance_catalog_not_workflow_script"
+    }
+  ],
+  "cognitive_stage_pack_contract": {
+    "owner": "redcube_ai",
+    "consumer": "opl_pack_compiler",
+    "contract_ref": "contracts/opl-framework/cognitive-computation-kernel.json",
+    "stage_control_plane_ref": "opl-generated:family_stage_control_plane",
+    "cognitive_kernel_adoption_ref": "contracts/cognitive_kernel_adoption.json",
+    "golden_path_profile_ref": "contracts/golden_path_profile.json",
+    "domain_affordance_catalog_ref": {
+      "ref": "agent/tools/domain_affordances.md",
+      "ref_kind": "repo_path",
+      "role": "domain_tool_affordance_catalog",
+      "catalog_role": "available_affordance_catalog_not_workflow_script"
+    },
+    "refs_only": true,
+    "user_visible_flow_changed": false,
+    "launch_hard_gate": false,
+    "required_stage_sections": [
+      "prompt_refs",
+      "skill_refs",
+      "tool_refs",
+      "tool_affordance_boundary",
+      "knowledge_refs",
+      "quality_gate_refs",
+      "strategy_refs",
+      "candidate_pool_policy",
+      "independent_gate_policy",
+      "handoff_policy"
+    ],
+    "stage_strategy_owner": "selected_codex_executor_with_rca_owned_gates",
+    "tool_affordance_policy": "available_affordance_catalog_not_workflow_script",
+    "tool_affordance_boundary": {
+      "catalog_role": "available_affordance_catalog_not_workflow_script",
+      "capability_refs": [
+        {
+          "ref": "source_context_and_visual_brief_reading",
+          "ref_kind": "policy_ref",
+          "role": "capability_boundary"
+        },
+        {
+          "ref": "visual_direction_and_candidate_generation_support",
+          "ref_kind": "policy_ref",
+          "role": "capability_boundary"
+        },
+        {
+          "ref": "native_ppt_render_screenshot_and_export_helpers",
+          "ref_kind": "policy_ref",
+          "role": "capability_boundary"
+        },
+        {
+          "ref": "visual_review_repair_and_artifact_lineage_support",
+          "ref_kind": "policy_ref",
+          "role": "capability_boundary"
+        }
+      ],
+      "permission_scope_refs": [
+        {
+          "ref": "repo_context_read",
+          "ref_kind": "policy_ref",
+          "role": "permission_scope_boundary"
+        },
+        {
+          "ref": "declared_domain_workspace_read",
+          "ref_kind": "policy_ref",
+          "role": "permission_scope_boundary"
+        },
+        {
+          "ref": "bounded_domain_artifact_write_when_owner_authorized",
+          "ref_kind": "policy_ref",
+          "role": "permission_scope_boundary"
+        },
+        {
+          "ref": "receipt_or_typed_blocker_return",
+          "ref_kind": "policy_ref",
+          "role": "permission_scope_boundary"
+        }
+      ],
+      "credential_boundary_refs": [
+        {
+          "ref": "no_secret_material_in_stage_pack",
+          "ref_kind": "policy_ref",
+          "role": "credential_boundary_boundary"
+        },
+        {
+          "ref": "executor_must_resolve_active_codex_provider_config_before_missing_image_generation_credential_gate",
+          "ref_kind": "policy_ref",
+          "role": "credential_boundary_boundary"
+        },
+        {
+          "ref": "selected_rca_image_first_route_authorizes_config_backed_gpt_image_2_without_additional_human_gate",
+          "ref_kind": "policy_ref",
+          "role": "credential_boundary_boundary"
+        },
+        {
+          "ref": "executor_must_request_human_gate_for_missing_credentials",
+          "ref_kind": "policy_ref",
+          "role": "credential_boundary_boundary"
+        }
+      ],
+      "write_scope_refs": [
+        {
+          "ref": "visual_workspace_refs_only",
+          "ref_kind": "policy_ref",
+          "role": "write_scope_boundary"
+        },
+        {
+          "ref": "deliverable_artifact_mutation_only_with_rca_artifact_authority_receipt",
+          "ref_kind": "policy_ref",
+          "role": "write_scope_boundary"
+        }
+      ],
+      "side_effect_risk_refs": [
+        {
+          "ref": "selected_rca_image_first_route_authorizes_bounded_image_generation_provider_call",
+          "ref_kind": "policy_ref",
+          "role": "side_effect_risk_boundary"
+        },
+        {
+          "ref": "external_network_or_portal_side_effect_requires_explicit_stage_permission",
+          "ref_kind": "policy_ref",
+          "role": "side_effect_risk_boundary"
+        },
+        {
+          "ref": "artifact_or_package_mutation_requires_domain_owner_receipt",
+          "ref_kind": "policy_ref",
+          "role": "side_effect_risk_boundary"
+        }
+      ],
+      "forbidden_authority_refs": [
+        {
+          "ref": "visual_truth_write_by_opl",
+          "ref_kind": "policy_ref",
+          "role": "forbidden_authority_boundary"
+        },
+        {
+          "ref": "review_verdict_without_rca_owner_receipt",
+          "ref_kind": "policy_ref",
+          "role": "forbidden_authority_boundary"
+        },
+        {
+          "ref": "export_verdict_without_rca_owner_receipt",
+          "ref_kind": "policy_ref",
+          "role": "forbidden_authority_boundary"
+        },
+        {
+          "ref": "artifact_body_write_without_artifact_authority_receipt",
+          "ref_kind": "policy_ref",
+          "role": "forbidden_authority_boundary"
+        },
+        {
+          "ref": "visual_memory_body_write_by_opl",
+          "ref_kind": "policy_ref",
+          "role": "forbidden_authority_boundary"
+        }
+      ],
+      "executor_autonomy": {
+        "executor_can_choose_tools": true,
+        "executor_can_skip_tools": true,
+        "executor_can_substitute_tools_within_boundary": true,
+        "executor_can_choose_order_and_parallelism": true,
+        "executor_can_request_missing_context_or_human_gate": true,
+        "tool_catalog_can_prescribe_tool_sequence": false,
+        "tool_catalog_can_define_cognitive_strategy": false,
+        "tool_catalog_can_override_stage_goal": false,
+        "tool_catalog_can_authorize_forbidden_write": false
+      },
+      "policy": "redcube_ai tool refs declare available affordances and safety boundaries only; they do not prescribe executor order, stage strategy, stage goal, or forbidden writes."
+    },
+    "candidate_pool_policy": "stage_internal_refs_with_lineage_no_user_flow_expansion",
+    "independent_gate_policy": "execution_and_review_attempts_must_be_separable_for_quality_progression",
+    "authority_boundary": {
+      "opl_can_write_visual_truth": false,
+      "opl_can_write_artifact_body": false,
+      "opl_can_authorize_review_export_verdict": false,
+      "opl_can_sign_owner_receipt": false,
+      "provider_completion_is_visual_ready": false,
+      "same_attempt_self_review_can_close_quality_gate": false
+    }
+  },
+  "generated_surface_owner": "one-person-lab",
+  "domain_repo_can_own_generated_surface": false,
+  "standard_stage_pack_conformance": {
+    "version": "standard-stage-pack.v2",
+    "required": true,
+    "enforcement_ref": "agent/stages/manifest.json"
+  },
+  "standard_agent_pack_abi": {
+    "authority_ref": "contracts/opl-framework/standard-domain-agent-skeleton-contract.json#/agent_pack_contract/standard_agent_pack_abi"
+  },
+  "generated_surfaces_requested": [
+    "cli",
+    "mcp",
+    "skill",
+    "product_entry_manifest",
+    "domain_handler",
+    "status_read_model",
+    "workbench_drilldown"
+  ]
+}
