@@ -4,6 +4,20 @@
   "consumer": "one-person-lab",
   "standard_agent_interface": {
     "version": "opl_standard_agent_interface.v1",
+    "inventory_projection": {
+      "source_kind": "workspace_relative_json",
+      "relative_path": "workspace_index.json",
+      "items_pointer": "/projects",
+      "field_map": {
+        "work_item_id": "project_id",
+        "work_item_root": "project_root",
+        "business_status": "business_status",
+        "current_stage_id": "current_stage_id",
+        "current_stage_status": "current_stage_status",
+        "package_status": "package_status",
+        "lifecycle_ref": "lifecycle_ref"
+      }
+    },
     "workspace_binding": {
       "locator_surface_kind": "redcube_workspace",
       "default_profile_id": "series",

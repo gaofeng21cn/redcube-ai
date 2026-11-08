@@ -194,8 +194,8 @@
         "data_ref": "rca.workspace.v1#status",
         "command_ids": [],
         "empty_state_i18n": {
-          "zh-CN": "选择一个视觉项目状态后读取当前阶段",
-          "en-US": "Select a visual project status to inspect its stage"
+          "zh-CN": "选择当前工作区中的视觉任务，查看阶段与下一步",
+          "en-US": "Select a visual task in the current workspace to inspect progress and next actions"
         }
       },
       {
@@ -208,8 +208,8 @@
         "data_ref": "rca.workspace.v1#artifacts",
         "command_ids": [],
         "empty_state_i18n": {
-          "zh-CN": "选择一个产物清单后读取视觉交付物",
-          "en-US": "Select an artifact manifest to inspect visual deliverables"
+          "zh-CN": "选择视觉任务，查看已登记的产物与证据",
+          "en-US": "Select a visual task to inspect its registered artifacts and evidence"
         }
       }
     ],
@@ -227,10 +227,10 @@
       },
       {
         "contribution_id": "rca.workspace.artifacts",
-        "slot": "settings.section",
+        "slot": "runtime.detail",
         "contribution_kind": "view",
         "trust_tier": "declarative",
-        "scope": "root",
+        "scope": "work_item",
         "sort_order": 611,
         "view_id": "rca.workspace.artifacts"
       }
