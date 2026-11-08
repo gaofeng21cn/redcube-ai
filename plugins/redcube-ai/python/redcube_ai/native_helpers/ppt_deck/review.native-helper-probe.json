@@ -14,7 +14,7 @@
         "slot_id": "collect_review_artifact_write",
         "source_ref": "review.py",
         "symbol": "collect_review",
-        "source_digest": "sha256:438df56271fe2b3ba0d31a1ac6086c8d7a97a815041703d02536dd3031cc33fd",
+        "source_digest": "sha256:67857b78879375b3d720a5f32e3861b59a031cdd69682fb98146f54fc10feed9",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
