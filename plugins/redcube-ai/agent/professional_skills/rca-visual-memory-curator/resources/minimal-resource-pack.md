@@ -6,6 +6,13 @@ Boundary: refs-only professional method resource. This file is not visual truth,
 
 ## Template
 
+This template is the RCA candidate envelope. The Framework writeback CLI proposal
+JSON contains exactly `source_refs`, `target_scope`, `content_kind`,
+`proposed_rule_or_mechanism`, `evidence_class` and `review_requirement` extracted
+from it. Keep the other fields in the RCA envelope and pass operation-specific
+identity/revision/review inputs separately. Validate against the Framework-owned
+proposal schema; do not send the whole candidate as the CLI proposal.
+
 ```text
 proposal_generation:
   status: skip | proposal_candidate
@@ -18,7 +25,7 @@ memory_proposal_candidate:
   stage:
   audience:
   proposed_rule_or_mechanism:
-  source_refs:
+  source_refs: ["source-evidence-ref"]
   evidence_refs:
   review_refs:
   provenance:
@@ -61,7 +68,7 @@ deliverable_family: ppt_deck
 stage: review_and_revision
 audience: clinical operations buyer
 proposed_rule_or_mechanism: decision pages work better when the proof object is visible before feature naming
-source_refs: screenshot_review:S06, contact_sheet:deck-v1
+source_refs: ["screenshot_review:S06", "contact_sheet:deck-v1"]
 evidence_refs: screenshot_review:S06, contact_sheet:deck-v1
 review_refs: visual_director_review:v1
 target_scope: { kind: topic, id: clinical-operations-communication }
@@ -82,6 +89,7 @@ caveat: do not turn this into a fixed two-column layout recipe
 - Accept/reject decision returns an RCA owner receipt ref.
 - OPL public transport carries source/proposal/receipt refs only; private snapshots contain the exact selected source bytes.
 - Bind one editable source per knowledge identity. Existing personal notes and project Markdown can be used together without a duplicate body store.
+- The CLI proposal has only the six declared common fields; `source_refs` is an array and visual context remains in the RCA candidate envelope.
 - Accepted writeback uses the Framework's version checks; source changes, expiry and revocation also invalidate affected derived summaries.
 - Memory never replaces screenshot review, review/export verdict, artifact authority, or owner receipt.
 - Native PPT lessons require both rendered evidence and package readback; unresolved degeneration or viewer drift routes back to repair.

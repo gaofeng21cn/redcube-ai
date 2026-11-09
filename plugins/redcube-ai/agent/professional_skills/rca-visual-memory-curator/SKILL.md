@@ -35,6 +35,7 @@ During review summary, derive at most one small evidence-backed reusable-pattern
 ## Outputs
 
 - Proposal generation returns `skip` or one non-authority `visual_memory_writeback_proposal` candidate. Its common knowledge fields are `source_refs`, `target_scope` with `kind` and `id`, `content_kind`, `proposed_rule_or_mechanism`, `evidence_class` and `review_requirement`; rendered evidence and visual context accompany the candidate.
+- For the Framework writeback CLI, project only those six common fields into the proposal JSON. `source_refs` is a non-empty array of strings. Keep audience, stage, evidence/review refs, provenance, knowledge identity, source revision and other visual metadata in the RCA candidate envelope; do not submit that entire envelope as the CLI proposal. The exact CLI payload contract belongs to Framework's `contracts/opl-framework/knowledge-writeback-proposal.schema.json`.
 - Owner accept/reject returns `visual_memory_accept_receipt` or `visual_memory_reject_receipt` refs from the RCA owner surface.
 - Rejection reasons when the proposal is artifact body, review/export verdict, route logic, stale evidence, or hidden template material.
 - `memory_route_back_target` when a proposed lesson is really an unresolved story, visual direction, page authoring, native PPT, or review defect.
@@ -64,6 +65,7 @@ images or promote an unresolved defect as a successful repair pattern.
 12. Accept reusable native-PPT lessons only when both pixels and package readback support them. Viewer-specific drift, object-kind degeneration, notes/motion loss, and semantic-composition failures remain live repair evidence until resolved.
 13. Bind the lesson to a stable knowledge identity, intended product/owner/topic/project scope, content kind and exact source revision. Existing personal-library Markdown remains its editable source; workspace Markdown serves the same role without a library. Preserve one source per item and reuse Framework source/writeback operations instead of creating a private storage route.
 14. Recheck source validity and derived-summary dependencies. Changed or revoked source content cannot remain current through an accepted older summary. A missing optional pattern can return `skip`; required source authorization and action-critical constraints must be resolved before the dependent action.
+15. Before submitting a private-source proposal, build the six-field CLI payload from the RCA candidate and validate it against the Framework proposal schema. Keep source identity, base revision and acceptance evidence in the separately declared operation inputs and review records. The private writeback CLI accepts owner, topic and project scopes; product knowledge changes follow the product repository's review path.
 
 ## Contract Foldback Map
 
