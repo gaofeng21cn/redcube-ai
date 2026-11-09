@@ -42,7 +42,57 @@ test('real-file measurements retain first failure, unknown cost and refinement s
   assert.equal(x.known_cost_usd, null);
   assert.equal(x.uncosted_generation_count, 2);
   assert.equal(report.bound_pages[0].images.length, 2);
+  assert.equal(report.bound_pages[0].images[0].image_ref, 'first.png');
+  assert.equal(report.bound_pages[0].first_review.style, 'fail');
+  assert.equal(report.bound_pages[0].first_review.image_sha256, report.bound_pages[0].images[0].sha256);
+  assert.equal(report.bound_pages[0].selected_image_sha256, report.bound_pages[0].images[1].sha256);
+  assert.match(report.revision, /^[a-f0-9]{64}$/);
   assert.equal(Object.hasOwn(report, 'visual_ready'), false);
+});
+
+test('reopening preserves the reviewed bytes and human observations without writing the manifest', () => {
+  const report = scenario(`
+before=json.dumps(m,sort_keys=True)
+first=collect_evidence(m,root)
+reopened=collect_evidence(m,root,first['revision'])
+assert first==reopened
+assert json.dumps(m,sort_keys=True)==before
+print(json.dumps(reopened))`);
+  assert.equal(report.bound_pages[0].first_review.reviewer_ref, 'test-observation');
+  assert.equal(report.bound_pages[0].selected_image_sha256, report.bound_pages[0].images[1].sha256);
+});
+
+test('review and selection changes require a fresh evidence revision before continuation', () => scenario(`
+first=collect_evidence(m,root)
+page['selected_image_sha256']=sha('first.png')
+review['style']='pass'
+try:
+ collect_evidence(m,root,first['revision'])
+except ValueError as error:
+ assert 'changed' in str(error)
+else:
+ raise AssertionError('Stale review selection was accepted')
+current=collect_evidence(m,root)
+assert current['revision']!=first['revision']
+assert current['bound_pages'][0]['selected_image_sha256']==sha('first.png')
+assert current['bound_pages'][0]['first_review']['style']=='pass'
+`));
+
+test('unselected and unreviewed candidates remain explicit in the review projection', () => {
+  const report = scenario(`del page['selected_image_sha256']; del page['first_review']; print(json.dumps(collect_evidence(m,root)))`);
+  assert.equal(report.bound_pages[0].selected_image_sha256, null);
+  assert.equal(report.bound_pages[0].first_review, null);
+});
+
+test('selection by image hash does not invent a unique attempt when generation bytes match', () => {
+  const report = scenario(`
+(root/'repair.png').write_bytes((root/'first.png').read_bytes())
+page['generations'][1]['sha256']=sha('repair.png')
+page['selected_image_sha256']=sha('repair.png')
+print(json.dumps(collect_evidence(m,root)))`);
+  const page = report.bound_pages[0];
+  assert.equal(page.images.filter((image) => image.sha256 === page.selected_image_sha256).length, 2);
+  assert.deepEqual(page.images.map((image) => image.attempt_id), ['initial', 'repair']);
 });
 
 test('unassessed dimensions never become a first-attempt pass', () => {

@@ -18,6 +18,10 @@ stage-scoped知识。逐页提示词消费当前语言、认可画法与参考�
 profile是可选示例。`ppt_review_evidence`通过现有OPL helper目录读取真实图片，
 绑定首轮与回修观察并计算次数、耗时和已知成本；它不作语义、美术或ready判定。
 方法、行为案例与使用方式见[PPT工作台经验](delivery/ppt-workbench-learning.md)。
+审阅证据输出保留原图引用、真实哈希、首轮观察及精确选中项，并提供可复核的
+manifest revision；后续读取可拒绝旧意见或旧选择。共享产物页仍使用原任务的
+artifact locators，人的决定通过 Framework 当前任务动作提交并回读，投递信号
+与后续 Attempt 已运行分别记录。
 这些源码和工具能力不代表已经完成真实新版/基线首稿盲评或正式版本激活。
 
 ## 领域证据

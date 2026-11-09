@@ -35,12 +35,16 @@ def image_evidence(asset, root):
     with Image.open(path) as image:
         image.load()
         width, height = image.size
-    return {'sha256': digest, 'width': width, 'height': height, 'bytes': path.stat().st_size}
+    return {'image_ref': name, 'sha256': digest, 'width': width, 'height': height, 'bytes': path.stat().st_size}
 
 
-def collect_evidence(manifest, root):
+def collect_evidence(manifest, root, expected_revision=None):
     if manifest.get('schema_version') != 'rca.ppt-review-evidence.v1' or manifest.get('evidence_kind') != 'rendered_images':
         raise ValueError('Real rendered-image evidence manifest required; placeholders are not visual evidence')
+    revision = hashlib.sha256(json.dumps(manifest, sort_keys=True, ensure_ascii=False,
+                                        separators=(',', ':'), allow_nan=False).encode()).hexdigest()
+    if expected_revision is not None and expected_revision != revision:
+        raise ValueError('Review evidence changed; read the current manifest before continuing')
     pages = manifest.get('pages', [])
     if not pages:
         raise ValueError('No page evidence')
@@ -92,7 +96,12 @@ def collect_evidence(manifest, root):
         group = groups.setdefault(variant, [])
         group.append({'review': review, 'calls': len(generations), 'elapsed': sum(elapsed),
                       'costs': costs, 'selected': selected is not None})
-        bound.append({'slide_id': slide_id, 'variant': variant, 'source_page_ids': mapping, 'images': identities, 'references': references})
+        bound.append({
+            'slide_id': slide_id, 'variant': variant, 'source_page_ids': mapping,
+            'images': identities, 'references': references,
+            'first_review': dict(review) if review is not None else None,
+            'selected_image_sha256': selected,
+        })
     metrics = {}
     for variant, items in groups.items():
         reviewed = [i['review'] for i in items if i['review'] is not None]
@@ -111,7 +120,8 @@ def collect_evidence(manifest, root):
             'costed_generation_count': len(costs), 'uncosted_generation_count': calls - len(costs),
             'calls_per_selected_page': sum(i['calls'] for i in selected) / len(selected) if selected else None,
         }
-    return {'schema_version': 'rca.ppt-review-measurements.v1', 'evidence_integrity': 'verified',
+    return {'schema_version': 'rca.ppt-review-measurements.v1', 'revision': revision,
+            'evidence_integrity': 'verified',
             'claim_boundary': 'Image identity/decoding and arithmetic over supplied RCA observations only. No provenance, semantic, aesthetic, review/export or readiness verdict.',
             'metrics': metrics, 'bound_pages': bound}
 
@@ -120,9 +130,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--manifest', type=Path, required=True)
     parser.add_argument('--asset-root', type=Path)
+    parser.add_argument('--expected-revision', help='Revision returned by the previously inspected evidence')
     args = parser.parse_args()
     try:
-        result = collect_evidence(json.loads(args.manifest.read_text()), (args.asset_root or args.manifest.parent).resolve())
+        result = collect_evidence(json.loads(args.manifest.read_text()),
+                                  (args.asset_root or args.manifest.parent).resolve(), args.expected_revision)
     except (ValueError, KeyError, TypeError, OSError, ZeroDivisionError) as error:
         parser.exit(2, f'Evidence rejected: {error}\n')
     print(json.dumps(result, ensure_ascii=False, indent=2))

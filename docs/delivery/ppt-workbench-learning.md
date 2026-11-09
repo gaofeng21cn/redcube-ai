@@ -18,6 +18,10 @@ still selects the narrative, language, style, page constraints and authoring lan
 native-helper envelope. It decodes physical images, checks declared hashes and
 source collections, binds RCA first-image observations, and computes generation
 counts, elapsed time and known costs. It never judges content, taste or readiness.
+The output retains each image's relative reference and hash, the supplied
+first-image observations, and the selected image hash. Identical bytes in more than one generation retain
+all their recorded attempts; the hash does not invent a selected attempt. Missing reviews
+and selections remain `null`, so reopening cannot imply an accepted candidate.
 
 A manifest uses `schema_version: rca.ppt-review-evidence.v1`,
 `evidence_kind: rendered_images`, and a nonempty `pages` array. Each page has:
@@ -65,9 +69,25 @@ accepted handoff. For the OPL helper request, pass the module arguments:
 --manifest <manifest.json> --asset-root <authorized evaluation asset root>
 ```
 
+The returned `revision` identifies the complete inspected manifest with
+deterministic JSON serialization. Carry it with a review handoff and pass
+`--expected-revision <revision>` when the Stage reads the decision again. A
+changed observation, source mapping or selected candidate rejects that old
+revision; image bytes are independently rehashed. This is a currentness check
+on the inspected evidence, not a semantic verdict on whether a change invalidates
+an independent Review.
+
 Invoke through `opl pack native-helper run` using
 `contracts/runtime-program/python-native-helper-catalog.json` and helper id
 `ppt_review_evidence`. Tool-only tests may call its Python module with `PYTHONPATH=python`.
+
+The shared `rca.workspace.artifacts` view continues to consume the registered
+task's artifact locators. The image-review manifest and its measurements are
+owner artifacts on that same task; they do not create another task or a notes
+database. Human decisions use the current Framework item action and its payload
+schema. Read back the same task after submission: a recorded `human_gate` signal
+alone does not prove the controller started a subsequent Attempt. Professional
+editing remains in the selected image, slide or document application.
 
 ## Evaluation and evidence boundary
 
