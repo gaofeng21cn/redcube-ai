@@ -60,7 +60,12 @@ fallback 镜像跟随 Node 26 的受支持更新；容器与 hosted CI 分别验
 docker build -f tools/native-ppt-proof/Dockerfile -t redcube-native-ppt-proof .
 docker run --rm redcube-native-ppt-proof
 docker run --rm -v "$PWD:/workspace" --mount type=volume,target=/workspace/node_modules -w /workspace redcube-native-ppt-proof bash -c "npm ci && tools/native-ppt-proof/run.sh --skip-system-deps --output-dir artifacts/image-native-ppt-proof"
+docker run --rm -v "$PWD:/workspace" redcube-native-ppt-proof chown -R "$(id -u):$(id -g)" /workspace/artifacts/image-native-ppt-proof
 ```
+
+容器以 root 生成产物，OfficeCLI 可能将 PPTX 保存为仅 owner 可读；最后一条命令
+只把本次输出目录交还给宿主用户，便于读取和打包。即使 proof 失败，也应在查看已有
+产物前执行该命令；Qualification 对该目录执行相同的 ownership 交接后再上传。
 
 镜像构建会按 Docker `TARGETARCH` 选择 OfficeCLI 的 x64 或 arm64 官方资产，并把
 `contracts/` 复制到镜像，使默认 doctor 命令在不挂载源码时也能完成自身诊断。
