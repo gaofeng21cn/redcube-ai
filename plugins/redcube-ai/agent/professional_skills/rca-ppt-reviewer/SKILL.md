@@ -82,6 +82,21 @@ Independently review the exact rendered pixels and route-specific package/readba
 
 ## Evidence, Density And Long-Deck Readback
 
+Use [source adaptation](../../knowledge/ppt_source_adaptation.md) to compare
+actual page duties, [style calibration](../../knowledge/ppt_style_calibration.md)
+to compare the old/new page and its neighbors, and
+[production reuse](../../knowledge/ppt_production_reuse.md) for final-file
+equivalence and recovery. The [workbench cases](resources/workbench-cases.md)
+show these failure distinctions without prescribing a style or deck structure.
+Keep content correspondence, factual/object fidelity, individual craft and
+deck continuity as separate findings; a strong result on one cannot erase a
+failure on another. Record the first generation before refinement when comparing
+initial quality. Real-image metrics support review, not a readiness verdict. Use catalog helper
+`ppt_review_evidence` for exact image binding and arithmetic; its manifest and
+invocation are documented in `docs/delivery/ppt-workbench-learning.md`. The
+[behavior cases](resources/workbench-evaluation.json) are optional inputs to the
+existing standard suite, not keyword tests or a new workflow gate.
+
 Review both under-explained and overcrowded pages against their role and the latest accepted quality benchmark. Separate style continuity from layout repetition. For a hand-drawn brief, inspect all readable scripts and numeric/citation labels as well as illustration. A pleasing image cannot offset a missing mechanism, publication attribution, wrong anatomy, unsupported result, or causal overclaim. A repeated defect should expand review to all related uses before selecting repair ids.
 
 Contact sheets locate rhythm and style problems; they do not replace individual review of previously unreviewed content. Persist page-specific findings and their exact image refs in the existing review artifact. Limit image-history load with appropriately resized review copies and targeted detail checks; a high-detail flag is not proof of byte-size reduction. Resume from accepted refs and remaining work, not by reimporting all previous images or rerunning preparation that can reset delivered assets.

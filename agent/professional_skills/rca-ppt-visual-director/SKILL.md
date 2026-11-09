@@ -75,6 +75,13 @@ Operate as the visual direction specialist between blueprint approval and page a
 
 ## Accepted Style And Revision Calibration
 
+Consume [PPT Style Calibration](../../knowledge/ppt_style_calibration.md) for a
+new visual direction or a changed benchmark. Label reference roles and make the
+actual palette, lettering, material and object treatment actionable. A style
+directory, named tradition or generic aesthetic adjective is not the direction
+itself. Set a small risk-driven calibration scope; current accepted pages may
+already satisfy it. Continue authorized production without adding a human gate.
+
 Use the user's latest accepted visual quality as the benchmark, including newly authored pages when preferred. Earlier pages are not automatically the aesthetic ceiling. Specify which palette relationships, midtones, transparent layers, fine linework, material cues and spatial depth to preserve; do not flatten better pages to match weaker ones. Representative pages should show that one visual language supports different page roles and information loads, without becoming another user approval gate.
 
 For an explicitly hand-drawn brief, typography is part of authorship: review headings, body text, Latin names, Arabic and Roman numerals, and publication labels for readable pen-pressure, width, baseline and stroke variation. Paper texture behind rigid print type does not satisfy that brief. This rule is style-conditional, not a hand-drawn default for all RCA decks.

@@ -44,6 +44,16 @@ Produce page plans or artifacts from the accepted upstream refs, with enough det
 
 ## Execution Rules
 
+For an existing-deck adaptation, use
+[PPT Source Adaptation](../../knowledge/ppt_source_adaptation.md); for style or
+object fidelity, use [PPT Style Calibration](../../knowledge/ppt_style_calibration.md).
+Use [PPT Production Reuse](../../knowledge/ppt_production_reuse.md) for long decks,
+targeted repair and recovery. Load only the relevant card. Include the current
+page's source duty, exact content, object meanings and role-labeled references
+in the generation brief. A style-only reference must not donate facts or anatomy.
+Inspect calibration pages before scaling, and the whole changed page after a
+local edit. Preserve unchanged media and notes instead of rebuilding passed pages.
+
 1. Consume the available source, story, blueprint, and visual direction for the page. Missing inputs produce bounded assumptions, repair targets, or a no-output diagnostic under the quality policy below.
 2. Work from each page's current contract and check it against deck-level rhythm and style. Reuse already-read refs until an upstream change invalidates them.
 3. Preserve approved claims and evidence. Do not rewrite the story to fit a convenient layout unless returning a repair target.

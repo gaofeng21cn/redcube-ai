@@ -19,7 +19,7 @@ HTML 与 native editable PPTX 继续保留为显式二线路线。用户明确�
 - 内置 tool 不依赖 `OPENAI_API_KEY`。若 tool 不存在或在零图片产出前不可用，已选择的 RCA image-first route 自动授权同模型 API fallback：结构化读取当前 Codex `config.toml` 的 active provider、`base_url` 与 credential，通过已安装 `imagegen` CLI 调用 `gpt-image-2`；当前 Python 缺少 OpenAI SDK 时用临时 `uv run --with openai`，不再向用户确认、要求安装依赖或另配 key。RCA 不修改 Codex 配置，也不持有或持久化 provider token。
 - artifact-producing 主链路证据必须通过安装后的 OPL-generated `invoke_product_entry` 或 `run_image_ppt_proof` action 进入 hosted StageRun；Agent Lab/OPL Meta Agent 的 refs-only evaluation 或 handoff 不能替代真实 artifact、review/export 与 owner evidence。
 - token 不进入 artifact；provenance 只记录实际执行 route（Codex built-in tool 或 config-backed `gpt-image-2` API）、executor run/session id、tool options、image call id、revised prompt、prompt hash、style hash、cache key、cache hit/miss、source image hash、generation cost proxy、image hash 与生成时间。
-- 默认风格 profile 位于 `prompts/ppt_deck/image-first-default-style-profile.json`；用户给 `style_reference_dir` 时优先使用用户参考目录，并复制参考图到 deliverable artifact store。
+- 可选笔记马克笔示例 profile 位于 `prompts/ppt_deck/image-first-default-style-profile.json`；用户给 `style_reference_dir` 时优先使用用户参考目录，并复制参考图到 deliverable artifact store。
 - `author_image_pages` 默认复用相同 slide blueprint / visual direction / prompt / style reference / model options cache key 的 PNG 与 provenance；用户显式重绘或 repair target 才重新调用 image generation。
 - `screenshot_review` 对 image-first PNG 执行 16:9、非空、重复 hash、低信息密度、边缘裁切、标题区域裁切、碎片化、字段泄漏与可选 OCR 检查；有任意可读页面时，缺页、manifest 或视觉 QA finding 都记录质量债并继续到下一 stage，只关闭 visual/export-ready 声明。
 - `repair_image_pages` 在预算内只重绘需要修复的页面并复用其余 hashes；缺 prior PNG 时回到完整 image authoring route，预算耗尽后携带现有最佳页面继续推进。零可读页面、文件损坏或图片生成失败都物化 failure/no-output diagnostic 并继续；只有 built-in 与 config-backed API 两条 executor 路线均不可用、权限/安全/authority、identity/currentness、不可逆动作或明确 human gate 才硬停。
@@ -60,3 +60,5 @@ Developer proof 使用 6 页以内 lightweight fixture，也不调用 Codex exec
 ## 验证边界
 
 本文只解释当前路线。机器字段由 `contracts/runtime-program/ppt-image-first-production-route.json` 与 `tools/image-ppt-proof/ci-contract.json` 持有；过程记录使用 Git 追溯。真实 artifact-producing owner receipt、review/export acceptance 与 long-soak 的验收要求见 [未完成验收](../active/rca-ideal-state-gap-plan.md)。
+
+专业方法、风格优先级与真实图像评测见 [PPT工作台经验沉淀](ppt-workbench-learning.md)。现行用户要求与认可导演稿决定画法和语言；示例profile不得覆盖。

@@ -37,6 +37,7 @@ test('Python native helper catalog exposes only RCA artifact helpers behind OPL 
     'ppt_deck_review',
     'ppt_deck_export',
     'ppt_deck_native',
+    'ppt_review_evidence',
   ]);
   assert.doesNotMatch(pyproject, /\[project\.scripts\]/);
   for (const helper of catalog.helpers) {
@@ -101,7 +102,7 @@ test('native helper doctor reports registered entrypoints and optional dependenc
   assert.equal(doctorResult.status, 0, doctorResult.stderr || doctorResult.stdout);
   const report = JSON.parse(doctorResult.stdout);
   assert.equal(report.surface_kind, 'python_native_helper_doctor');
-  assert.equal(report.helper_count, 3);
+  assert.equal(report.helper_count, 4);
   assert.equal(report.renderer_availability.executes_generation, false);
   assert.equal(report.renderer_availability.executes_review_export_gates, false);
   assert.equal(report.helpers.every((helper) => helper.entrypoint.public_launcher === false), true);

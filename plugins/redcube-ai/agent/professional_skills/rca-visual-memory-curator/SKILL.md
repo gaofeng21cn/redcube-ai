@@ -42,6 +42,14 @@ During review summary, derive at most one small evidence-backed reusable-pattern
 
 ## Execution Rules
 
+Distinguish a reusable method from a personal/project choice. General lessons
+such as semantic page mapping, reference-role separation, relative visual review
+and media equivalence may inform a small stage-scoped proposal. A specific ink
+palette, patient fact, deck page number, absolute path or preferred product order
+stays in authorized project/owner memory unless separately approved for wider
+use. Link to the accepted outcome and evidence; do not vendor private slide
+images or promote an unresolved defect as a successful repair pattern.
+
 1. Select exactly one mode. Screenshot-review summary generates or skips a candidate; the later RCA memory-owner action accepts or rejects. Do not collapse both into one call.
 2. In proposal-generation mode, start from rendered review evidence. If no reusable pattern is distinct from the current artifact, return `skip`; missing optional memory never blocks review or export.
 3. Keep each candidate small, prose-first, and stage-scoped. Prefer one reusable lesson over a global rulebook.

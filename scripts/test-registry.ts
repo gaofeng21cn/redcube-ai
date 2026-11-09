@@ -31,6 +31,7 @@ const TEST_REGISTRY: readonly TestRegistryEntry[] = Object.freeze([
   { file: 'tests/opl-agent-pack-contracts-semantic-pack.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/opl-agent-package-manifest.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/ppt-image-first-style-benchmark.test.js', lane: 'meta', fast: true },
+  { file: 'tests/ppt-review-evidence.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/python-native-helper-catalog.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/rca-foundry-agent-os-domain-kernel-manifest.test.ts', lane: 'meta', fast: true },
   { file: 'tests/rca-functional-audit-retirement.test.js', lane: 'meta', smoke: true, fast: true },

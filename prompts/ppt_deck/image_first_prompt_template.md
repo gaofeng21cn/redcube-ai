@@ -1,34 +1,43 @@
-# PPT Deck Image-First Full-Slide Prompt Template
+# PPT Image-First Page Prompt
 
-Use this template when a `ppt_deck` page should be generated as a complete GPT-image-2 full-slide bitmap and later assembled by HTML/PPTX tooling.
+Use the current accepted blueprint and visual direction. The complete-page
+container does not select an aesthetic, language, title formula or density quota.
 
-## Unified Style Profile
+## Reference And Content Binding
 
-Profile: `ppt_deck_image_first_handdrawn_medical_default_v1`
+Keep the current page's stable id, source-page refs, role, argument, required
+comparisons and transition in the authoring record. For translation/restyling,
+preserve those duties; for a concise adaptation, bind the source-page collection
+and explain any merge or new bridge. Do not give the model an entire deck's
+unfiltered content when only one page is being authored.
 
-Keep the default style constraints active even when `style_reference_dir` is supplied by the user:
+Label supplied images by role: content baseline, style, anatomy, verified asset,
+or neighboring-page continuity. Borrow only what that role permits. State the
+meaning of unfamiliar objects and the direction of each important relationship.
 
-- White dotted notebook paper background with subtle paper texture.
-- Bold black hand-drawn sketch outlines and hand-drawn arrows.
-- Pastel marker blocks in mint green, sky blue, soft yellow, with small red only for risk or boundary emphasis.
-- Sticker tape corners, a few medical/system icons, large Chinese main title, few short Chinese labels, minimal small text.
-- Avoid forbidden styles from the profile.
-
-## Per-Slide Prompt Shape
+## Prompt Body
 
 ```text
-Use case: <teaching-medical-concept | medical-platform-architecture | governance-boundary | summary>
-Asset type: Full 16:9 PPT slide page image, 1920x1080.
-Primary request: Create a complete 16:9 PPT slide page image in Chinese, full page, as one single finished lecture slide, not separate elements.
-Exact main title: <short Chinese title>
-Content structure: <one core judgement, full-page layout, major diagram parts, arrows, callouts, and limited labels>
-Style: white dotted notebook paper background, bold black sketch outlines, pastel marker blocks, hand-drawn arrows, sticker tape, small medical/system icons, large readable Chinese title, few short labels.
-Facts: only use whitelisted shared source truth, approved slide blueprint text, and verified operator assets; if source support is missing, use general wording.
-Avoid: dark futuristic console, cyberpunk dashboard, glassmorphism, photo collage, 3D dashboard, dense data table, excessive gradient, logo watermark, screenshot collage, English-heavy labels, tiny unreadable paragraphs, isolated icon sets, separate components, page numbers, slide numbers, chapter tabs, fake QR codes, fake download links, fake DOI, fake logo, unverified hospital names, unverified patient demographics, unverified publication status.
+Asset: one complete 16:9 PPT slide page image, target 1920x1080, full uncropped page.
+Audience and language: <current brief; preserve required names and numeral forms>.
+Page purpose: <the audience-facing argument or explanation this page must carry>.
+Exact visible copy: <current title, labels, numbers, units and compact sources>.
+Composition: <first-glance object; spatial relationships; meaningful connectors>.
+Object semantics: <what each object represents; verified anatomy/modality where relevant>.
+Evidence: <only this page's supported claims and approved assets>.
+Style: <accepted palette relationships, lettering, marks, material, depth and whitespace>.
+References: <role and allowed borrowing for each supplied image>.
+Preserve: <required comparisons, facts and neighboring-page continuity>.
+Avoid: <page-specific factual and visual failure modes; internal production copy>.
 ```
 
-## Override Policy
+The notebook/marker profile is an optional example, not a mandatory style
+prefix. User instructions and accepted direction replace its aesthetic and
+language choices while retaining source fidelity, legibility and complete-page
+requirements. Necessary evidence stays visible; do not enforce a universal
+label count, whitespace ratio or card layout.
 
-`style_reference_dir` may point to user-supplied local reference images for inspiration. It must not relax the full-slide contract, Chinese lecture readability, medical boundary defaults, fragmentation controls, or forbidden style list.
-
-Verified QR/download/UI/paper/logo assets are handled after generation through a deterministic overlay manifest and machine checks when applicable. Do not use PIL, Canvas, or HTML rebuilds to patch model-composed page errors; redraw blocked pages through `repair_image_pages`.
+Verified QR/download/UI/paper/logo assets retain their real bytes under the
+verified-asset policy. Correct ordinary text, object and composition errors by
+prompted redraw, not a deterministic cover-up. Inspect the entire repaired page:
+a local edit can change another number, arrow, word or organ.

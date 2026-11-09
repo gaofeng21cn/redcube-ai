@@ -8,3 +8,5 @@
 - [Native PPT proof](./native-ppt-proof-environment.md)：可编辑 PPT 的本地依赖、运行和证据读法。
 
 长期原生能力目标见 [native spec](../specs/native-ppt-ppt-master-parity.md)，当前验收缺口见 [未完成验收](../active/rca-ideal-state-gap-plan.md)。Developer fixture、Agent Lab 分数和机械 QA 不能替代真实 artifact、RCA review/export receipt 或 owner acceptance。
+
+- [PPT工作台经验、技能与真实图像评测](ppt-workbench-learning.md)

@@ -33,7 +33,7 @@ function assertNoForbiddenTermsInPositiveFields(page, forbiddenStyles) {
   }
 }
 
-test('image-first default style profile captures full-slide handdrawn medical lecture constraints', () => {
+test('optional notebook example keeps complete-page constraints without selecting every deck style', () => {
   const profile = readJson(STYLE_PROFILE);
 
   assert.equal(profile.profile_id, 'ppt_deck_image_first_handdrawn_medical_default_v1');
@@ -54,6 +54,7 @@ test('image-first default style profile captures full-slide handdrawn medical le
   assert.equal(profile.style_system.decorative_grammar.includes('small system icons'), true);
   assert.equal(profile.style_system.typography.includes('large Chinese main title'), true);
   assert.equal(profile.style_system.typography.includes('minimal small text'), true);
+  assert.equal(profile.profile_role, 'optional_notebook_marker_example_not_universal_default');
   assert.equal(profile.whole_page_requirements.includes('state that the output is a complete 16:9 PPT slide page image'), true);
   assert.equal(profile.forbidden_styles.includes('dark futuristic console'), true);
   assert.equal(profile.forbidden_styles.includes('glassmorphism'), true);
@@ -151,7 +152,7 @@ test('image manifest fixture simulates PNG evidence without vendoring external i
   }
 });
 
-test('style_reference_dir override is visual-reference-only and cannot relax default profile policy', () => {
+test('style selection replaces example aesthetics while preserving content and container obligations', () => {
   const profile = readJson(STYLE_PROFILE);
   const fixture = readJson(BENCHMARK_FIXTURE);
   const manifest = readJson(MANIFEST_FIXTURE);
@@ -159,8 +160,11 @@ test('style_reference_dir override is visual-reference-only and cannot relax def
   assert.equal(profile.style_reference_policy.user_override_field, 'style_reference_dir');
   assert.equal(fixture.style_reference_dir_policy.user_override_allowed, true);
   assert.equal(fixture.style_reference_dir_policy.override_scope, 'visual_reference_only');
-  assert.equal(fixture.style_reference_dir_policy.must_preserve_profile_constraints, true);
-  assert.equal(manifest.style_reference_override_case.expected_effect, 'replace_reference_directory_only');
+  assert.equal(fixture.style_reference_dir_policy.must_preserve_profile_constraints, false);
+  assert.equal(fixture.style_reference_dir_policy.must_preserve_invariant_obligations, true);
+  assert.equal(manifest.style_reference_override_case.expected_effect, 'replace_aesthetic_and_language_choices_preserve_invariants');
+  assert.equal(profile.style_reference_policy.mandatory_constraints_after_override.includes('style_system.typography'), false);
+  assert.equal(profile.style_reference_policy.mandatory_constraints_after_override.includes('forbidden_styles'), false);
 
   for (const field of manifest.style_reference_override_case.must_not_change) {
     assert.equal(

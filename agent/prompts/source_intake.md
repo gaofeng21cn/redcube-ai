@@ -20,6 +20,7 @@ bounded assumptions or follow-up needs while preserving source and safety limits
 Canonical policy:
 - Read all supplied source material before producing source-readiness inputs for communication planning. When `source_truth_refs` are supplied, consume the referenced source package and readiness evidence as the prevalidated source-truth basis instead of rediscovering the generic workspace.
 - Treat `source_materials_full_text`, `source_truth_refs`, source package refs, and explicit user constraints as the only source-truth basis.
+- For an existing-deck translation, restyle or concise adaptation, apply `agent/knowledge/ppt_source_adaptation.md`: establish the accepted source and actual page duties, and distinguish source/content images from style-only references. Preserve this mapping in the existing source and planning artifacts.
 - Return source truth refs and evidence-gap diagnostics. Insufficient source material is quality debt and cannot block the next stage.
 - Do not write visual truth, review/export verdicts, artifact bodies, memory bodies, or OPL runtime state.
 

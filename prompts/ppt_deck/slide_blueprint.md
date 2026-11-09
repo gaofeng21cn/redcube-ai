@@ -18,4 +18,6 @@ The blueprint must be consumable before claim-bearing materialization. It can co
 
 ## Handoff
 
+For an existing-deck adaptation, bind each target page's source-page refs, page duty, essential comparison/mechanism and transition inside the existing content/source fields. Translation or restyling preserves the source duties; concise adaptation may bind multiple pages or add a necessary bridge. Verify the actual source page, not merely its number or a historical alignment label.
+
 Return the slide-blueprint object required by the attached output contract. The result must give visual direction and each authoring route enough content, source, hierarchy, and transition detail without prescribing sample geometry.

@@ -77,7 +77,10 @@
     "agent_lab_suite_input_refs": [
       "contracts/runtime-program/ppt-image-first-quality-nonregression.json#/agent_lab_suite_input",
       "workspace-runtime-ref:author-image-pages:<run-id>#/quality_non_regression_read_model/agent_lab_suite_input"
-    ]
+    ],
+    "workbench_casebook_ref": "agent/professional_skills/rca-ppt-reviewer/resources/workbench-cases.md",
+    "workbench_evaluation_ref": "agent/professional_skills/rca-ppt-reviewer/resources/workbench-evaluation.json",
+    "real_image_evidence_helper_ref": "contracts/runtime-program/python-native-helper-catalog.json#/helpers/helper_id=ppt_review_evidence"
   },
   "fact_governance_policy": {
     "fact_whitelist_ref": "contracts/runtime-program/ppt-image-first-production-route.json#/fact_governance/fact_whitelist_surface",
@@ -149,7 +152,8 @@
     "page_local_parallel_or_batch_sizing_telemetry_allowed": true,
     "blocked_page_only_repair_refs_allowed": true,
     "export_preview_cache_refs_allowed": true,
-    "quality_nonregression_score_refs_allowed": true
+    "quality_nonregression_score_refs_allowed": true,
+    "first_attempt_vs_refinement_measurements_allowed": true
   },
   "forbidden_authority_flags": {
     "no_forbidden_write": true,

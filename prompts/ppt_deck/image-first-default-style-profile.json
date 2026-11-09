@@ -39,10 +39,8 @@
       "clear readable lecture lettering"
     ],
     "content_density": {
-      "max_main_title_count": 1,
-      "max_label_words_per_node": 8,
-      "small_text_policy": "avoid_unless_structural_label",
-      "speaker_notes_policy": "long sentences stay outside the image prompt"
+      "policy": "Judge sufficiency and overload by page role; retain necessary evidence and relationships. Example label lengths are not limits.",
+      "speaker_notes_policy": "Explanatory prose belongs in notes; essential visible evidence remains on the page."
     }
   },
   "required_prompt_fields": [
@@ -97,15 +95,21 @@
   "style_reference_policy": {
     "default_reference_dir": "operator_supplied_style_refs",
     "user_override_field": "style_reference_dir",
-    "override_semantics": "User style references may replace the reference-image directory for visual inspiration only.",
+    "override_semantics": "Current user instructions and accepted visual direction replace example palette, lettering, material, language and forbidden aesthetic choices; reference roles constrain what may be borrowed.",
     "mandatory_constraints_after_override": [
       "default_canvas",
       "whole_page_requirements",
-      "style_system.typography",
-      "fragmentation_risk_controls",
-      "forbidden_styles",
-      "medical_boundary_defaults"
+      "fragmentation_risk_controls"
     ],
-    "repo_vendor_policy": "Do not vendor external reference images into the repo. Use manifest metadata and hashes for benchmark fixtures."
-  }
+    "repo_vendor_policy": "Do not vendor external reference images into the repo. Use manifest metadata and hashes for benchmark fixtures.",
+    "invariant_obligations": [
+      "source_fidelity",
+      "audience_language_from_current_brief",
+      "legibility_by_page_role",
+      "verified_asset_identity",
+      "review_and_export_authority"
+    ]
+  },
+  "profile_role": "optional_notebook_marker_example_not_universal_default",
+  "selection_policy": "Use only when consistent with the current brief; current user intent and accepted visual direction replace all aesthetic and language choices."
 }

@@ -35,7 +35,7 @@ Keep the stage prompt as the schema owner. On continuation or repair, reuse acce
 
 - A source-grounded narrative spine: audience problem, claim sequence, evidence placement, and decision path.
 - A detailed outline that preserves approved source truth and page budget.
-- A slide blueprint with one page goal, one action title, core claim, evidence points, public sources, speaker notes, and transition sentence per slide.
+- A slide blueprint with one page goal, a clear title, core claim, evidence points, public sources, speaker notes, and transition sentence per slide.
 - `claim_spine_lock`: a stable claim id, supporting evidence refs, first-use naming, and the exact slides that introduce, prove, and resolve each claim.
 - `story_risk_map`: pages likely to fail visual proof because the claim, evidence, page role, or transition is overloaded.
 - `repeated_visual_failure_story_triage`: whether repeated pixel/contact-sheet failures should repair source/story, visual direction, page authoring, native design, or route policy.
@@ -46,7 +46,7 @@ Keep the stage prompt as the schema owner. On continuation or repair, reuse acce
 
 1. Freeze the source first. If the source package is partial, conflicting, or too thin for the requested claim, preserve the gap as quality debt and continue with a bounded candidate or no-output diagnostic instead of inventing story material; reserve typed blockers for the explicit hard-stop whitelist.
 2. Build a claim spine before slide count. Each slide must earn its place by advancing the audience from problem to evidence to decision. When the user allows structural adjustment, optimize the story before preserving the old page count.
-3. Use action titles. Do not write chapter labels as slide titles unless the stage explicitly asks for divider pages.
+3. Use a title that fits the page: a clear subject for an explanation, a supported finding for a result, or the accepted chapter label for a divider. Preserve exact titles when requested. Do not force every page into an action slogan or replace an accepted source duty to fit a title formula.
 4. Keep visible slide fields audience-facing. Rewrite internal names, route labels, operator requirements, prompt names, and file paths into project-facing language.
 5. Design page sequence serially. For every page, bind page role, claim, evidence, visual intent, and transition before moving to the next page.
 6. Preserve hard constraints from the user or approved outline. Treat source suggestions and runtime seeds as references, not approved truth.
@@ -68,6 +68,14 @@ Keep the stage prompt as the schema owner. On continuation or repair, reuse acce
 - If a live talk or user review says a middle chapter causes a break, treat that as a story-architecture defect. Merge, demote, or split the chapter before sending the deck to visual direction.
 
 ## Revising An Accepted Lecture
+
+For translation, restyling or concise adaptation, consume
+[PPT Source Adaptation](../../knowledge/ppt_source_adaptation.md). Bind each
+target page to its actual source-page duty, essential comparison/mechanism and
+transition in the existing blueprint fields. Read source pixels, not just an old
+alignment label. Translation/restyling preserves duties; concise adaptation may
+merge source pages or add bridges under the current brief. Keep these decisions
+in current stage artifacts rather than a parallel planning schema.
 
 Approval of the narrative preserves its claim spine, key evidence, and speaker-led concept progression; it does not freeze every sentence or diagram. Within the current revision scope, inspect necessity, repetition, mechanism, figure-text agreement, and practical value, including pages already redrawn. For a deck-wide request, record each page's role, transition, evidence needs, defect, and keep/rewrite/restructure decision in the existing blueprint before grouped repairs. A local fix need not become a deck-wide rewrite.
 
@@ -104,7 +112,7 @@ Missing detail, contradictory evidence, unsupported conclusions, page-count ambi
 Return `repair_target` when:
 
 - A slide repeats another slide's job.
-- A title is a topic label instead of a claim.
+- A title obscures the page's subject or makes an unsupported claim.
 - Evidence is present in notes but missing from visible slide fields.
 - A page is too dense for later layout or placeholder capacity.
 - Internal RCA/operator wording appears in audience-facing fields.

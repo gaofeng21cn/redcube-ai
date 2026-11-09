@@ -63,7 +63,10 @@
     "agent/policies/markdown-route-policy.md",
     "agent/knowledge/owner_receipt_policy.md",
     "agent/tools/domain_affordances.md",
-    "agent/policies/visual-authority-policy.md"
+    "agent/policies/visual-authority-policy.md",
+    "agent/knowledge/ppt_source_adaptation.md",
+    "agent/knowledge/ppt_style_calibration.md",
+    "agent/knowledge/ppt_production_reuse.md"
   ],
   "minimal_authority_surface_ids": [
     "source_readiness_verdict",

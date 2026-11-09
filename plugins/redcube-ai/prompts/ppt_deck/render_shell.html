@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>__PPT_DECK_TITLE__</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" referrerpolicy="no-referrer" />
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; overflow: hidden; background: #e2e8f0; }
+    body { display: flex; align-items: center; justify-content: center; padding: 24px; color: #0F172A; font-family: 'Noto Sans CJK SC', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+    #app-container { width: min(1280px, 96vw); }
+    #slide-display-area { width: 100%; aspect-ratio: 16 / 9; position: relative; overflow: hidden; border-radius: 28px; background: #FFFFFF; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.14); }
+    #control-panel { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(255,255,255,0.92); border-radius: 20px; padding: 12px 18px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.10); }
+    button { border: 0; cursor: pointer; border-radius: 14px; padding: 12px 20px; font-weight: 700; background: #0F172A; color: white; }
+    button:disabled { opacity: 0.5; cursor: default; }
+    .slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 180ms ease; display: flex; align-items: center; justify-content: center; }
+    .slide.visible { opacity: 1; visibility: visible; }
+    .slide-content-wrapper { width: 1152px; height: 648px; overflow: hidden; position: relative; }
+    .rca-cjk-token { display: inline-block; white-space: nowrap; }
+  </style>
+</head>
+<body data-render-strategy="__REDCUBE_RENDER_STRATEGY__">
+  <div id="app-container">
+    <div id="slide-display-area"></div>
+    <div id="control-panel">
+      <button id="prev-btn">上一页</button>
+      <div id="progress-indicator"></div>
+      <button id="next-btn">下一页</button>
+    </div>
+  </div>
+  <script id="redcube-render-plan" type="application/json">__REDCUBE_RENDER_PLAN__</script>
+  <script>
+    const slidesData = __PPT_DECK_SLIDES_DATA__;
+    const slideDisplayArea = document.getElementById('slide-display-area');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const progressIndicator = document.getElementById('progress-indicator');
+    const CJK_KEEP_TOKENS = [
+      '资料同步推进',
+      '自动推进',
+      '质量边界',
+      '署名责任',
+      '医生监督',
+      '医生确认',
+      'PI确认',
+      '科研路径',
+      '研究边界',
+      '统计计划',
+      '变量终点',
+      '质量门禁',
+      '阶段产物',
+      '阶段产物可审查',
+      '可执行任务',
+      '任务组织',
+      '一次问答',
+      '拆解任务',
+      '持续推进',
+      '审查意见',
+      '待确认',
+      '自动化',
+      '推进经验',
+      '待处理',
+      '已完成',
+      '一致性',
+      '证据边界',
+      '专业确认',
+      '目标同向',
+      '有依据',
+      '不越界',
+      '证据包',
+      '可审查',
+      '可追踪',
+      '可复核',
+      '工作流',
+      '流程',
+      '线索',
+      '问题',
+      '走向',
+      '对齐',
+      '推进',
+    ].sort((a, b) => b.length - a.length);
+    const CJK_KEEP_TOKEN_PATTERN = new RegExp(
+      '(' + CJK_KEEP_TOKENS.map((token) => token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')',
+      'g',
+    );
+    let currentSlide = 0;
+    function protectCjkShortTokens(root) {
+      const textNodes = [];
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          const text = node.nodeValue || '';
+          const parent = node.parentElement;
+          if (!parent || !text.trim()) return NodeFilter.FILTER_REJECT;
+          if (parent.closest('script, style, noscript, .rca-cjk-token')) return NodeFilter.FILTER_REJECT;
+          return CJK_KEEP_TOKENS.some((token) => text.includes(token))
+            ? NodeFilter.FILTER_ACCEPT
+            : NodeFilter.FILTER_REJECT;
+        },
+      });
+      while (walker.nextNode()) {
+        textNodes.push(walker.currentNode);
+      }
+      for (const node of textNodes) {
+        const text = node.nodeValue || '';
+        const parts = text.split(CJK_KEEP_TOKEN_PATTERN).filter((part) => part.length > 0);
+        if (parts.length <= 1) continue;
+        const fragment = document.createDocumentFragment();
+        for (const part of parts) {
+          if (CJK_KEEP_TOKENS.includes(part)) {
+            const token = document.createElement('span');
+            token.className = 'rca-cjk-token';
+            token.textContent = part;
+            fragment.appendChild(token);
+          } else {
+            fragment.appendChild(document.createTextNode(part));
+          }
+        }
+        node.parentNode.replaceChild(fragment, node);
+      }
+    }
+    function setupSlides() {
+      slideDisplayArea.innerHTML = '';
+      slidesData.forEach((slide) => {
+        const element = document.createElement('div');
+        element.className = 'slide';
+        element.innerHTML = '<div class="slide-content-wrapper">' + slide.content + '</div>';
+        protectCjkShortTokens(element);
+        slideDisplayArea.appendChild(element);
+      });
+    }
+    function updateView() {
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      slides.forEach((slide, index) => slide.classList.toggle('visible', index === currentSlide));
+      progressIndicator.textContent = (currentSlide + 1) + ' / ' + slidesData.length;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === slidesData.length - 1;
+    }
+    function roundMetric(value) {
+      return Math.round((Number(value) || 0) * 100) / 100;
+    }
+    function normalizeText(value) {
+      return String(value || '')
+        .replace(/\s+/g, '')
+        .replace(/[：:]/g, '')
+        .trim();
+    }
+    function isVisibleElement(node) {
+      if (!(node instanceof Element)) return false;
+      const style = window.getComputedStyle(node);
+      if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity || 1) === 0) {
+        return false;
+      }
+      const rect = node.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
+    }
+    function rectRelativeToBounds(rect, bounds) {
+      const left = rect.left - bounds.left;
+      const top = rect.top - bounds.top;
+      const width = rect.width;
+      const height = rect.height;
+      return {
+        left: roundMetric(left),
+        top: roundMetric(top),
+        width: roundMetric(width),
+        height: roundMetric(height),
+        right: roundMetric(left + width),
+        bottom: roundMetric(top + height),
+        area: roundMetric(width * height),
+      };
+    }
+    function buildEdgeClearance(rect, bounds) {
+      return {
+        left: roundMetric(rect.left - bounds.left),
+        top: roundMetric(rect.top - bounds.top),
+        right: roundMetric(bounds.right - rect.right),
+        bottom: roundMetric(bounds.bottom - rect.bottom),
+      };
+    }
+    function hasDecorativeSurface(node, style, rect) {
+      if (rect.width < 12 || rect.height < 12) return false;
+      const backgroundColor = style.backgroundColor || '';
+      const hasBackground = !['rgba(0, 0, 0, 0)', 'transparent'].includes(backgroundColor);
+      const hasBorder = ['Top', 'Right', 'Bottom', 'Left'].some((side) => Number.parseFloat(style[`border${side}Width`] || '0') > 0);
+      const hasShadow = style.boxShadow && style.boxShadow !== 'none';
+      const hasRadius = Number.parseFloat(style.borderTopLeftRadius || '0') > 0;
+      return hasBackground || hasBorder || hasShadow || hasRadius;
+    }
+    function hasOwnReadableText(node) {
+      return Array.from(node.childNodes || [])
+        .filter((child) => child.nodeType === Node.TEXT_NODE)
+        .some((child) => normalizeText(child.textContent || '').length > 0);
+    }
+    function collectMeaningfulDescendants(node, blockNode) {
+      return Array.from(node.querySelectorAll('*'))
+        .filter((child) => child !== blockNode && isVisibleElement(child))
+        .filter((child) => child.getAttribute('aria-hidden') !== 'true')
+        .filter((child) => {
+          const rect = child.getBoundingClientRect();
+          const style = window.getComputedStyle(child);
+          const carriesOwnText = hasOwnReadableText(child);
+          const carriesTextAndSurface = normalizeText(child.textContent || '').length > 0 && hasDecorativeSurface(child, style, rect);
+          return carriesOwnText || carriesTextAndSurface;
+        });
+    }
+    function unionRelativeRect(nodes, bounds) {
+      const rects = nodes
+        .map((node) => rectRelativeToBounds(node.getBoundingClientRect(), bounds))
+        .filter((rect) => rect.width > 0 && rect.height > 0);
+      if (rects.length === 0) return null;
+      const left = Math.min(...rects.map((rect) => rect.left));
+      const top = Math.min(...rects.map((rect) => rect.top));
+      const right = Math.max(...rects.map((rect) => rect.right));
+      const bottom = Math.max(...rects.map((rect) => rect.bottom));
+      return {
+        left: roundMetric(left),
+        top: roundMetric(top),
+        width: roundMetric(right - left),
+        height: roundMetric(bottom - top),
+        right: roundMetric(right),
+        bottom: roundMetric(bottom),
+      };
+    }
+    function inspectQaBlock(node, index, bounds) {
+      const rect = node.getBoundingClientRect();
+      const blockRect = rectRelativeToBounds(rect, bounds);
+      const blockStyle = window.getComputedStyle(node);
+      const meaningfulDescendants = collectMeaningfulDescendants(node, node);
+      const contentRect = unionRelativeRect(meaningfulDescendants, bounds);
+      return {
+        id: node.getAttribute('data-qa-block') || ('block-' + (index + 1)),
+        left: blockRect.left,
+        top: blockRect.top,
+        width: blockRect.width,
+        height: blockRect.height,
+        right: blockRect.right,
+        bottom: blockRect.bottom,
+        area: blockRect.area,
+        isLeaf: !node.querySelector('[data-qa-block]'),
+        hasSurfaceFrame: hasDecorativeSurface(node, blockStyle, rect),
+        edgeClearance: buildEdgeClearance(rect, bounds),
+        contentRect,
+        internalPadding: contentRect ? {
+          left: roundMetric(contentRect.left - blockRect.left),
+          top: roundMetric(contentRect.top - blockRect.top),
+          right: roundMetric(blockRect.right - contentRect.right),
+          bottom: roundMetric(blockRect.bottom - contentRect.bottom),
+        } : null,
+        textNodeCount: meaningfulDescendants.length,
+      };
+    }
+    function estimateLineCount(node, rect) {
+      const style = window.getComputedStyle(node);
+      const fontSize = Number.parseFloat(style.fontSize || '0') || 0;
+      const lineHeight = style.lineHeight === 'normal'
+        ? fontSize * 1.2
+        : (Number.parseFloat(style.lineHeight || '0') || fontSize * 1.2);
+      if (!lineHeight || !rect.height) return 1;
+      return Math.max(1, Math.round(rect.height / lineHeight));
+    }
+    function resolveTitleMeta(root, wrapper, bounds) {
+      const normalizedTitle = normalizeText(root?.dataset.title || slidesData[currentSlide]?.title || '');
+      const candidates = Array.from(root?.querySelectorAll('h1, h2, h3, h4, div, p, span') || [])
+        .filter((node) => isVisibleElement(node))
+        .map((node) => {
+          const rect = node.getBoundingClientRect();
+          const style = window.getComputedStyle(node);
+          const normalizedText = normalizeText(node.textContent || '');
+          return {
+            node,
+            rect,
+            normalizedText,
+            fontSize: Number.parseFloat(style.fontSize || '0') || 0,
+          };
+        })
+        .filter((item) => item.normalizedText.length > 0 && item.rect.top - bounds.top < wrapper.clientHeight * 0.42);
+      const exactMatch = candidates
+        .filter((item) => item.normalizedText === normalizedTitle)
+        .sort((a, b) => {
+          if (b.fontSize !== a.fontSize) return b.fontSize - a.fontSize;
+          return a.rect.top - b.rect.top;
+        })[0];
+      const closeMatch = candidates
+        .filter((item) => normalizedTitle && (item.normalizedText.includes(normalizedTitle) || normalizedTitle.includes(item.normalizedText)))
+        .sort((a, b) => {
+          if (b.fontSize !== a.fontSize) return b.fontSize - a.fontSize;
+          return a.rect.top - b.rect.top;
+        })[0];
+      const fallback = candidates
+        .filter((item) => item.fontSize >= 24)
+        .sort((a, b) => {
+          if (a.rect.top !== b.rect.top) return a.rect.top - b.rect.top;
+          return b.fontSize - a.fontSize;
+        })[0];
+      const chosen = exactMatch || closeMatch || fallback || null;
+      if (!chosen) {
+        return {
+          titleText: root?.dataset.title || slidesData[currentSlide]?.title || '',
+          titleRect: null,
+          titleFontSize: 0,
+          titleLineCount: 0,
+          titleBlockId: null,
+          headerRect: null,
+        };
+      }
+      const titleBlock = chosen.node.closest('[data-qa-block]');
+      return {
+        titleText: root?.dataset.title || slidesData[currentSlide]?.title || '',
+        titleRect: rectRelativeToBounds(chosen.rect, bounds),
+        titleFontSize: roundMetric(chosen.fontSize),
+        titleLineCount: estimateLineCount(chosen.node, chosen.rect),
+        titleBlockId: titleBlock?.getAttribute('data-qa-block') || null,
+        headerRect: titleBlock ? rectRelativeToBounds(titleBlock.getBoundingClientRect(), bounds) : null,
+      };
+    }
+    function inspectCurrentSlide() {
+      const wrapper = document.querySelector('.slide.visible .slide-content-wrapper');
+      const root = wrapper?.querySelector('[data-slide-root]');
+      const bounds = wrapper?.getBoundingClientRect();
+      const auditBlocks = Array.from(wrapper?.querySelectorAll('[data-qa-block]') || [])
+        .map((node, index) => inspectQaBlock(node, index, bounds));
+      const blocks = auditBlocks.filter((block) => block.isLeaf);
+      const titleMeta = resolveTitleMeta(root, wrapper, bounds);
+      return {
+        slideId: root?.dataset.slideId || slidesData[currentSlide]?.slideId || '',
+        title: root?.dataset.title || slidesData[currentSlide]?.title || '',
+        layoutFamily: root?.dataset.layoutFamily || slidesData[currentSlide]?.layoutFamily || '',
+        speakerSeconds: Number(root?.dataset.speakerSeconds || slidesData[currentSlide]?.speakerSeconds || 0),
+        primaryPoints: wrapper?.querySelectorAll('[data-primary-point="true"]').length || 0,
+        wrapper: {
+          clientWidth: wrapper?.clientWidth || 1152,
+          clientHeight: wrapper?.clientHeight || 648,
+          scrollWidth: wrapper?.scrollWidth || 1152,
+          scrollHeight: wrapper?.scrollHeight || 648,
+        },
+        bodyScroll: false,
+        blocks,
+        auditBlocks,
+        titleMeta,
+      };
+    }
+    prevBtn.addEventListener('click', () => { if (currentSlide > 0) { currentSlide -= 1; updateView(); } });
+    nextBtn.addEventListener('click', () => { if (currentSlide < slidesData.length - 1) { currentSlide += 1; updateView(); } });
+    window.redcubeDeckReview = {
+      totalSlides: slidesData.length,
+      showSlide(index) {
+        currentSlide = index;
+        updateView();
+        return inspectCurrentSlide();
+      },
+      inspectCurrentSlide,
+    };
+    setupSlides();
+    updateView();
+  </script>
+</body>
+</html>

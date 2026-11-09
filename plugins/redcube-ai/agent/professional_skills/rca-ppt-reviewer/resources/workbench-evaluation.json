@@ -1,0 +1,52 @@
+{
+  "suite_id": "rca-ppt-workbench-behavior",
+  "suite_kind": "standard",
+  "scope": "Behavior cases for RCA's existing quality nonregression suite; not a new control plane or automatic visual verdict",
+  "execution": "Use the current approved route, matched source briefs and role-labeled references for baseline and candidate. Preserve the first generated page before refinement. Review actual images independently in blinded order. Do not replace semantic or aesthetic review with phrase checks.",
+  "evidence_helper": "ppt_review_evidence",
+  "private_asset_policy": "Supply authorized images at evaluation time; never vendor private project slides or patient facts into this fixture",
+  "cases": [
+    {
+      "case_id": "restyle-pivot",
+      "brief": "Translate and restyle an accepted page whose argument is: general AI is improving rapidly; compare repeated specialist retraining with integrating expertise into evolving general AI, then lead into a clinical orchestrator. A later source page separately discusses sharing finished work.",
+      "expected_behavior": "The translated pixels retain both alternatives and the strategic transition without replacing them with the later page's reuse argument.",
+      "assess": ["content", "facts", "style", "readability"]
+    },
+    {
+      "case_id": "preserve-comparison",
+      "brief": "Create an English version of a page that contrasts medical capability with healthcare delivery. Preserve the source comparison and relation; change only language and painting treatment.",
+      "expected_behavior": "Both sides of the comparison remain visible; a generic healthcare heading or notes-only explanation is insufficient.",
+      "assess": ["content", "facts", "style", "readability"]
+    },
+    {
+      "case_id": "ink-style-without-decoration",
+      "brief": "Use supplied accepted ink references for a modern medical mechanism page. Preserve the supplied argument and English labels. Style references are brushwork/material references only.",
+      "expected_behavior": "The page follows the actual palette, lettering, ink volume and thin washes without unrelated mountains/bamboo, marker panels or facts copied from style examples.",
+      "assess": ["content", "facts", "style", "readability"]
+    },
+    {
+      "case_id": "medical-object-fidelity",
+      "brief": "Show an exchangeable AI foundation connected to specialist tools and evidence. The clinical display must use the supplied colon/rectum reference. Exact source labels and model generations are provided separately.",
+      "expected_behavior": "An object communicates exchangeable AI modules rather than generic laboratory equipment; the medical screen retains correct anatomy. A local fix does not corrupt other labels or arrows.",
+      "assess": ["content", "facts", "style", "readability"]
+    },
+    {
+      "case_id": "concise-causal-chain",
+      "brief": "Shorten a lecture within an approximate time budget. Retain the clinical motivation, why AI is needed, essential evidence and the transition to deployment. Source pages may be merged; the requested count is approximate.",
+      "expected_behavior": "The plan and resulting page sequence preserve causal prerequisites, declare many-to-one sources and add a bridge when needed. Timing remains an estimate until measured.",
+      "assess": ["content", "facts", "style", "readability"]
+    },
+    {
+      "case_id": "evidence-density-and-publication",
+      "brief": "Make paired method/result slides from supplied studies with different cohorts and task conditions. Preserve key comparisons, task/metric labels and compact verified publication attribution. Use notes for full records.",
+      "expected_behavior": "Evidence is neither removed for whitespace nor merged into unsupported results; no invented plots, error bars, anatomy or clinical-benefit claims appear.",
+      "assess": ["content", "facts", "style", "readability"]
+    },
+    {
+      "case_id": "local-repair-final-parity",
+      "brief": "Repair a named page's color/material while preserving all visible copy and notes. Retain all other accepted page bytes and synchronize the preview, final PPTX and declared handoff copy.",
+      "expected_behavior": "Changed page is reviewed old/new and with neighbors; untouched media and all notes remain equal in actual final order. Recovery resumes existing work and never resets approved assets.",
+      "assess": ["content", "facts", "style", "readability"]
+    }
+  ]
+}

@@ -279,6 +279,35 @@
         "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
         "contracts/runtime-program/ppt-native-python-engine-contract.json"
       ]
+    },
+    {
+      "helper_id": "ppt_review_evidence",
+      "source_ref": "python/redcube_ai/native_helpers/ppt_deck/review_evidence.py",
+      "probe_descriptor_ref": "python/redcube_ai/native_helpers/ppt_deck/review_evidence.native-helper-probe.json",
+      "package_module": "redcube_ai.native_helpers.ppt_deck.review_evidence",
+      "preferred_invocation": {
+        "kind": "package_module",
+        "argv": [
+          "-m",
+          "redcube_ai.native_helpers.ppt_deck.review_evidence"
+        ]
+      },
+      "owner": "python_native_helper",
+      "deliverable_family": "ppt_deck",
+      "runtime_surface": "review_evidence_measurements",
+      "routes": [],
+      "gates": [],
+      "purpose": "Read real image identities and summarize supplied RCA first-attempt observations; no quality or readiness verdict.",
+      "requires": [
+        "Pillow"
+      ],
+      "outputs": [
+        "stdout_measurements_json"
+      ],
+      "contract_refs": [
+        "contracts/owner_receipt_contract.json",
+        "contracts/runtime-program/ppt-image-first-quality-nonregression.json"
+      ]
     }
   ]
 }

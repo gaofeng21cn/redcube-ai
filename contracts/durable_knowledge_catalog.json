@@ -150,6 +150,99 @@
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
       }
+    },
+    {
+      "surface_kind": "opl_durable_knowledge_item",
+      "version": "durable-knowledge-item.v1",
+      "knowledge_id": "redcube_ai.ppt_source_adaptation",
+      "title": "PPT Source Adaptation",
+      "layer": "agent_pack",
+      "owner": "redcube_ai",
+      "body_ref": {
+        "kind": "repo_path",
+        "ref": "agent/knowledge/ppt_source_adaptation.md",
+        "sha256": "sha256:d8708888657558c04f1ccdaa38ce306bc8ee899b332f8912de6d3a5bd02ed74e"
+      },
+      "applicability": {
+        "domains": [
+          "redcube_ai"
+        ],
+        "stages": [
+          "source_intake",
+          "communication_strategy",
+          "review_and_revision"
+        ]
+      },
+      "status": "active",
+      "reviewed_at": "2026-11-09T00:00:00+08:00",
+      "next_review_at": "2027-05-09T00:00:00+08:00",
+      "freshness_policy": "review_when_sources_or_applicability_change; exclude_after_next_review_at",
+      "authority_boundary": {
+        "semantic_body_owner": "redcube_ai",
+        "opl_role": "catalog_recall_and_receipt_projection_only"
+      }
+    },
+    {
+      "surface_kind": "opl_durable_knowledge_item",
+      "version": "durable-knowledge-item.v1",
+      "knowledge_id": "redcube_ai.ppt_style_calibration",
+      "title": "PPT Style Calibration",
+      "layer": "agent_pack",
+      "owner": "redcube_ai",
+      "body_ref": {
+        "kind": "repo_path",
+        "ref": "agent/knowledge/ppt_style_calibration.md",
+        "sha256": "sha256:989fa7296851060ee6c901183990d0614d267b3686fedde7a4828906edaf0055"
+      },
+      "applicability": {
+        "domains": [
+          "redcube_ai"
+        ],
+        "stages": [
+          "visual_direction",
+          "artifact_creation",
+          "review_and_revision"
+        ]
+      },
+      "status": "active",
+      "reviewed_at": "2026-11-09T00:00:00+08:00",
+      "next_review_at": "2027-05-09T00:00:00+08:00",
+      "freshness_policy": "review_when_sources_or_applicability_change; exclude_after_next_review_at",
+      "authority_boundary": {
+        "semantic_body_owner": "redcube_ai",
+        "opl_role": "catalog_recall_and_receipt_projection_only"
+      }
+    },
+    {
+      "surface_kind": "opl_durable_knowledge_item",
+      "version": "durable-knowledge-item.v1",
+      "knowledge_id": "redcube_ai.ppt_production_reuse",
+      "title": "PPT Production Reuse And Readback",
+      "layer": "agent_pack",
+      "owner": "redcube_ai",
+      "body_ref": {
+        "kind": "repo_path",
+        "ref": "agent/knowledge/ppt_production_reuse.md",
+        "sha256": "sha256:fd4bdaa850cdcc82fae39c9ed614732e97b9556ad005b3f91d49c1168bf074c7"
+      },
+      "applicability": {
+        "domains": [
+          "redcube_ai"
+        ],
+        "stages": [
+          "artifact_creation",
+          "review_and_revision",
+          "package_and_handoff"
+        ]
+      },
+      "status": "active",
+      "reviewed_at": "2026-11-09T00:00:00+08:00",
+      "next_review_at": "2027-05-09T00:00:00+08:00",
+      "freshness_policy": "review_when_sources_or_applicability_change; exclude_after_next_review_at",
+      "authority_boundary": {
+        "semantic_body_owner": "redcube_ai",
+        "opl_role": "catalog_recall_and_receipt_projection_only"
+      }
     }
   ]
 }

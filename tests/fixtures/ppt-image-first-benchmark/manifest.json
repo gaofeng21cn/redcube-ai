@@ -52,14 +52,11 @@
   "hash_semantics": "Hashes are deterministic fixture placeholders for manifest integrity tests; they are not generated-image evidence.",
   "style_reference_override_case": {
     "style_reference_dir": "/abs/operator/style_refs",
-    "expected_effect": "replace_reference_directory_only",
+    "expected_effect": "replace_aesthetic_and_language_choices_preserve_invariants",
     "must_not_change": [
-      "profile_id",
       "default_canvas",
       "whole_page_requirements",
-      "forbidden_styles",
-      "fragmentation_risk_controls",
-      "medical_boundary_defaults"
+      "fragmentation_risk_controls"
     ]
   }
 }

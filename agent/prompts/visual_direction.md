@@ -20,6 +20,7 @@ list or a Skill referral alone is not an actionable visual direction.
 
 Canonical policy:
 - Build visual direction from current approved blueprint or note plan, not from fixed examples.
+- For PPT work, apply `agent/knowledge/ppt_style_calibration.md`: bind reference roles, specify the accepted mark-making/material/lettering, and calibrate representative risks before scaling. Existing current accepted pages may suffice. Do not turn calibration into an additional approval gate.
 - Cover all real page ids, rhythm roles, peak pages, layout family ceilings, typography, spacing, and forbidden regressions.
 - Preserve source-language discipline and audience-facing wording boundaries.
 - Return visual direction refs and blockers; do not write final artifact blobs.

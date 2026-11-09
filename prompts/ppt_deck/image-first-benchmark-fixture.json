@@ -11,12 +11,16 @@
     "user_override_allowed": true,
     "override_field": "style_reference_dir",
     "override_scope": "visual_reference_only",
-    "must_preserve_profile_constraints": true
+    "must_preserve_profile_constraints": false,
+    "must_preserve_invariant_obligations": true
   },
   "benchmark_pages": [
     {
       "slide_id": "slide-01-cn-lecture-framing",
-      "coverage": ["Chinese lecture", "opening concept"],
+      "coverage": [
+        "Chinese lecture",
+        "opening concept"
+      ],
       "prompt": {
         "use_case": "teaching-medical-concept",
         "asset_type": "Full 16:9 PPT slide page image, 1920x1080.",
@@ -29,7 +33,10 @@
     },
     {
       "slide_id": "slide-02-medical-concept-map",
-      "coverage": ["medical concept diagram", "clinical loop"],
+      "coverage": [
+        "medical concept diagram",
+        "clinical loop"
+      ],
       "prompt": {
         "use_case": "teaching-medical-concept",
         "asset_type": "Full 16:9 PPT slide page image, 1920x1080.",
@@ -42,7 +49,10 @@
     },
     {
       "slide_id": "slide-03-platform-architecture",
-      "coverage": ["platform architecture", "system diagram"],
+      "coverage": [
+        "platform architecture",
+        "system diagram"
+      ],
       "prompt": {
         "use_case": "medical-platform-architecture",
         "asset_type": "Full 16:9 PPT slide page image, 1920x1080.",
@@ -55,7 +65,10 @@
     },
     {
       "slide_id": "slide-04-disease-package-boundary",
-      "coverage": ["governance and boundary", "disease package"],
+      "coverage": [
+        "governance and boundary",
+        "disease package"
+      ],
       "prompt": {
         "use_case": "governance-boundary",
         "asset_type": "Full 16:9 PPT slide page image, 1920x1080.",
@@ -68,7 +81,10 @@
     },
     {
       "slide_id": "slide-05-governance-human-gate",
-      "coverage": ["governance and boundary", "human gate"],
+      "coverage": [
+        "governance and boundary",
+        "human gate"
+      ],
       "prompt": {
         "use_case": "governance-boundary",
         "asset_type": "Full 16:9 PPT slide page image, 1920x1080.",
@@ -81,7 +97,10 @@
     },
     {
       "slide_id": "slide-06-summary-bridge",
-      "coverage": ["summary page", "closing judgement"],
+      "coverage": [
+        "summary page",
+        "closing judgement"
+      ],
       "prompt": {
         "use_case": "summary",
         "asset_type": "Full 16:9 PPT slide page image, 1920x1080.",
@@ -92,5 +111,6 @@
         "avoid": "dark futuristic console, cyberpunk dashboard, glassmorphism, photo collage, 3D dashboard, dense data table, excessive gradient, logo watermark, screenshot collage, English-heavy labels, tiny unreadable paragraphs, isolated icon sets, separate components."
       }
     }
-  ]
+  ],
+  "scope": "Notebook-marker example and structural fixture, not universal aesthetic policy or rendered quality proof"
 }

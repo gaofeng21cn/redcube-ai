@@ -8,7 +8,7 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 CARRIER = ROOT / 'plugins/redcube-ai'
-RESOURCE_ROOTS = ('agent', 'contracts', 'python', 'runtime', 'docs')
+RESOURCE_ROOTS = ('agent', 'contracts', 'python', 'runtime', 'docs', 'prompts/ppt_deck')
 
 
 def json_bytes(value):
