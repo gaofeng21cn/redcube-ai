@@ -53,14 +53,26 @@ runner 通过 exact helper/probe contract 物化 `data_charts` fixture，输出
 doctor、helper output、package readback、quality verdict、proof summary、
 artifact index、PPTX/PDF、shape manifest 与 PNG screenshots。
 
-也可以使用隔离容器：
+也可以使用隔离容器。当前源码 CI 基线是 `.nvmrc` 的 Node 26.13.0 LTS，
+fallback 镜像跟随 Node 26 的受支持更新；容器与 hosted CI 分别验证：
 
 ```bash
 docker build -f tools/native-ppt-proof/Dockerfile -t redcube-native-ppt-proof .
-docker run --rm -it -v "$PWD:/workspace" -w /workspace redcube-native-ppt-proof bash -lc "npm ci && tools/native-ppt-proof/run.sh --skip-system-deps --output-dir /tmp/rca-native-ppt-proof"
+docker run --rm redcube-native-ppt-proof
+docker run --rm -v "$PWD:/workspace" --mount type=volume,target=/workspace/node_modules -w /workspace redcube-native-ppt-proof bash -c "npm ci && tools/native-ppt-proof/run.sh --skip-system-deps --output-dir artifacts/image-native-ppt-proof"
+docker run --rm -v "$PWD:/workspace" redcube-native-ppt-proof chown -R "$(id -u):$(id -g)" /workspace/artifacts/image-native-ppt-proof
 ```
 
-需要保留容器产物时，将外部输出目录单独挂载到容器的输出路径。
+容器以 root 生成产物，OfficeCLI 可能将 PPTX 保存为仅 owner 可读；最后一条命令
+只把本次输出目录交还给宿主用户，便于读取和打包。即使 proof 失败，也应在查看已有
+产物前执行该命令；Qualification 对该目录执行相同的 ownership 交接后再上传。
+
+镜像构建会按 Docker `TARGETARCH` 选择 OfficeCLI 的 x64 或 arm64 官方资产，并把
+`contracts/` 复制到镜像，使默认 doctor 命令在不挂载源码时也能完成自身诊断。
+Qualification 的 `image-native-ppt-proof` job 在原生 amd64 与 arm64 runner 上
+先真实 build 镜像，再运行默认 doctor 并检查 helper 与 renderer 可用，
+最后在源码挂载和独立 `node_modules` volume 中执行 native proof；其 artifact 只证明
+该镜像的构建与容器内 proof，不替代 hosted native proof、视觉审查、发布或业务验收。
 
 ## 结果解读
 
@@ -81,5 +93,5 @@ review/export 或 owner receipt authority。尚未闭合的 live 与跨 viewer �
 node --test tests/python-native-helper-catalog.test.js tests/native-ppt-proof-fixture-contract.test.js tests/ppt-native-quality-package-gates.test.js
 ```
 
-原生 true-render CI job 只在 workflow dispatch、nightly 或带
-`native-ppt-proof` label 的 PR 中运行；默认快测不声明 renderer 或生产验收完成。
+原生 true-render 与容器 proof CI job 在 Qualification 的 workflow dispatch 或
+每周定时运行；默认快测不声明 renderer 或生产验收完成。

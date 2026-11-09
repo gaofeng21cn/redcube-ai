@@ -11,6 +11,8 @@
 - `contracts/functional_privatization_audit.json` 仅保留 visual authority decisions 与 Python native helpers；物理源码归属由 `contracts/physical_source_morphology_policy.json` 声明。旧私有 CLI、domain-entry、runtime、governance 和 overlay roots 已不存在。
 - 当前 manifest 仍包含 source-contract、carrier、health/proof 与 clean-runner metadata。它们不能单独证明完整 installed truth、发布 currentness 或 executor readiness；跨仓 consumer 的现状必须由其 owner fresh 读取。
 
+图片 API 回退通过 `agent/tools/generate-image.mjs` 调用 Framework 公共模型入口；它不再解析宿主配置或寻找独立图片客户端。隔离测试覆盖请求字段边界、生成与编辑调用、脱敏错误和未知结果不重试；真实 provider、安装载体和视觉质量仍分别由对应 owner 验收。
+
 ## PPT工作台经验
 
 已有专业技能现接入源页语义改编、画法校准、增量生产与交付核验三组

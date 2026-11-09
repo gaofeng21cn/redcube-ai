@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const STYLE_PROFILE = 'prompts/ppt_deck/image-first-default-style-profile.json';
 const BENCHMARK_FIXTURE = 'prompts/ppt_deck/image-first-benchmark-fixture.json';
@@ -229,7 +229,7 @@ test('PPT authoring lane uses semantic prompt judgment and defaults to image-fir
   assert.equal(selection.lane_lock.agent_may_upgrade_image_first_to_native, false);
 });
 
-test('image-first generation prefers the real Codex tool and automatically falls back through active Codex provider config', () => {
+test('image-first generation prefers the real Codex tool and delegates API fallback to Framework', () => {
   const route = readJson(ROUTE_CONTRACT);
   const api = route.api_contract;
   const builtin = api.preferred_builtin_route;
@@ -258,48 +258,19 @@ test('image-first generation prefers the real Codex tool and automatically falls
     'selected_rca_image_first_route_authorizes_same_model_api_fallback_without_additional_user_confirmation',
   );
   assert.equal(fallback.must_not_ask_user_to_confirm_fallback, true);
-  assert.equal(fallback.must_not_request_new_openai_api_key_before_codex_config_resolution, true);
-  assert.deepEqual(fallback.config_path_precedence, ['$CODEX_HOME/config.toml', '~/.codex/config.toml']);
-  assert.equal(fallback.config_parser, 'toml');
-  assert.equal(fallback.active_provider_resolution, 'root.model_provider -> model_providers.<provider_id>');
-  assert.equal(fallback.base_url_field, 'base_url');
-  assert.deepEqual(fallback.credential_resolution_order, [
-    'model_providers.<provider_id>.experimental_bearer_token',
-    'model_providers.<provider_id>.api_key',
-    'environment value named by model_providers.<provider_id>.env_key',
-  ]);
-  assert.equal(fallback.preferred_client, 'installed_imagegen_skill_scripts_image_gen_py');
-  assert.deepEqual(fallback.client_path_precedence, [
-    'active_imagegen_skill_root/scripts/image_gen.py',
-    '$CODEX_HOME/skills/.system/imagegen/scripts/image_gen.py',
-    '~/.codex/skills/.system/imagegen/scripts/image_gen.py',
-  ]);
-  assert.equal(
-    fallback.client_dependency_policy,
-    'use_active_openai_sdk_else_ephemeral_uv_run_with_openai_without_user_prompt',
-  );
-  assert.deepEqual(fallback.request, {
-    api: 'openai_compatible_images',
-    path: '/images/generations',
-    model: 'gpt-image-2',
-    final_slide_size: '2048x1152',
-    output_format: 'png',
-  });
-  assert.deepEqual(fallback.child_process_env_mapping, {
-    OPENAI_BASE_URL: 'resolved_base_url',
-    OPENAI_API_KEY: 'resolved_credential',
-  });
-  for (const forbidden of [
-    'parse_toml_with_shell_sourcing_or_ad_hoc_regex',
-    'persist_token_in_prompt_artifact_manifest_or_receipt',
-    'require_OPENAI_API_KEY_to_already_exist',
-    'ask_user_to_install_openai_sdk_when_ephemeral_uv_is_available',
-    'ask_user_to_paste_or_configure_a_key_when_codex_provider_config_is_resolvable',
-  ]) {
-    assert.equal(fallback.forbidden.includes(forbidden), true, forbidden);
-  }
-
-  assert.equal(terminal.result, 'redacted_typed_blocker_with_attempted_route_and_config_path_only');
+  assert.equal(fallback.must_not_request_new_openai_api_key_before_framework_resolution, true);
+  assert.equal(fallback.execution_owner, 'one-person-lab');
+  assert.equal(fallback.public_module, 'opl-framework/domain-task-runtime');
+  assert.equal(fallback.public_function, 'runDomainImageGeneration');
+  assert.equal(fallback.consumer, 'agent/tools/generate-image.mjs');
+  assert.equal(existsSync(path.join(process.cwd(), fallback.consumer)), true);
+  assert.equal(fallback.credential_scope, 'framework_process_only');
+  assert.equal(fallback.request.model, 'gpt-image-2');
+  assert.equal(fallback.request.final_slide_size, '2048x1152');
+  assert.equal(fallback.request.output_format, 'png');
+  assert.equal(fallback.unknown_outcome_policy, 'return_typed_blocker_and_reconcile_before_another_request');
+  assert.equal(fallback.unknown_builtin_outcome_allows_fallback, false);
+  assert.equal(terminal.result, 'redacted_typed_blocker_with_failure_code_and_outcome');
   assert.equal(terminal.must_not_include_secret_values, true);
   assert.equal(terminal.must_not_offer_generic_openai_key_setup_as_first_remediation, true);
   assert.deepEqual(route.proof_runner.live_mode_requires, [
@@ -307,22 +278,22 @@ test('image-first generation prefers the real Codex tool and automatically falls
   ]);
   assert.deepEqual(route.proof_runner.live_mode_requires_any, [
     'codex_builtin_image_gen_tool_available',
-    'codex_config_gpt_image_2_fallback_resolvable',
+    'framework_gpt_image_2_fallback_callable',
   ]);
 
   assert.deepEqual(goldenPath.image_generation_resolution_precedence, {
     contract_ref: 'contracts/runtime-program/ppt-image-first-production-route.json#/api_contract',
     applies_before_generic_credential_stop_loss: true,
     missing_openai_api_key_alone_is_not_missing_credential: true,
-    resolve_builtin_tool_then_active_codex_provider_config: true,
+    resolve_builtin_tool_then_framework_image_generation: true,
     selected_image_first_route_authorizes_same_model_api_fallback: true,
     additional_human_confirmation_for_fallback: 'forbidden',
     terminal_unresolvable_result: 'redacted_typed_blocker_ref',
   });
 
   const requiredCredentialRefs = [
-    'executor_must_resolve_active_codex_provider_config_before_missing_image_generation_credential_gate',
-    'selected_rca_image_first_route_authorizes_config_backed_gpt_image_2_without_additional_human_gate',
+    'executor_must_call_framework_image_generation_before_missing_image_generation_credential_gate',
+    'selected_rca_image_first_route_authorizes_framework_gpt_image_2_without_additional_human_gate',
   ];
   const requiredSideEffectRef = 'selected_rca_image_first_route_authorizes_bounded_image_generation_provider_call';
   for (const contract of [compiler, cognitive]) {

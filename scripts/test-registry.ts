@@ -26,6 +26,7 @@ const TEST_REGISTRY: readonly TestRegistryEntry[] = Object.freeze([
   { file: 'tests/ci-workflow.test.js', lane: 'meta' },
   { file: 'tests/codex-plugin.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/image-ppt-proof-runner.test.js', lane: 'meta' },
+  { file: 'tests/image-generation-runtime.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/line-budget.test.js', lane: 'meta' },
   { file: 'tests/native-ppt-proof-fixture-contract.test.js', lane: 'meta' },
   { file: 'tests/opl-agent-pack-contracts-semantic-pack.test.js', lane: 'meta', smoke: true, fast: true },
