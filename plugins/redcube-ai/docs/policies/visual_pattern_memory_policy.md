@@ -49,7 +49,7 @@ Machine boundary: 人读 visual memory policy。机器真相继续归 `contracts
 
 ## 合同与状态
 
-条目身份、状态、适用范围和审阅期限见 `contracts/durable_knowledge_catalog.json`。旧 descriptor、seed 与私有 locator 已退役。当前实现状态见 [状态](../status.md)，live writeback 与 scaleout 验收见 [未完成验收](../active/rca-ideal-state-gap-plan.md)。本 policy 不另存当前证据清单。
+产品条目的身份、归属范围、内容性质和审阅期限见 `contracts/durable_knowledge_catalog.json`。用户与项目知识通过 Framework 来源绑定解析；通用理念以 [Framework 知识来源与记忆政策](https://github.com/gaofeng21cn/one-person-lab/blob/main/docs/policies/knowledge-source-and-memory-policy.md) 为唯一说明，机器模型以[知识生命周期合同](https://github.com/gaofeng21cn/one-person-lab/blob/main/contracts/opl-framework/durable-knowledge-lifecycle-contract.json) 为准。当前实现状态见 [状态](../status.md)，真实交付中的接受与持续复用证据见 [未完成验收](../active/rca-ideal-state-gap-plan.md)。本 policy 负责视觉知识的领域判断。
 
 ## Stage 使用
 
@@ -88,8 +88,21 @@ OPL 不能：
 - 授权 artifact authority、visual ready、exportable、handoffable、domain ready 或 production ready。
 - 把 visual pattern memory refs 做成 visual route scorer、layout controller、review-pass gate、export gate 或 artifact-ready signal。
 
-## 四层落位与召回
+## 知识归属、正文来源与召回
 
-通用视觉方法正文在 agent/knowledge/，随 Agent 包版本管理。团队偏好和跨项目经验进入 workspace shared/memory/；项目受众、风格取舍和决策进入授权项目 memory/；本次交付状态进入项目 state/。后三者各自使用 opl_durable_knowledge_catalog.json。正文是 Markdown，目录只管 metadata。
+| 归属范围 | RCA 中的例子 | 正文主源 |
+|---|---|---|
+| `product` | 通用视觉方法、证据与导出规则 | 产品 `agent/knowledge/`，按版本分发 |
+| `owner` | 用户或团队的协作偏好、公开分享政策 | 已有个人/团队资料库；无库时使用工作区 Markdown |
+| `topic` | 长期临床科普的表达经验、系列视觉偏好 | 用户维护的主题资料或工作目录中的主题正文 |
+| `project` | 一个讲课课件的受众、风格选择与决策 | 该项目已选定的知识正文位置 |
 
-OPL 在 StageRun 起点按范围、Stage、有效期选择知识，并为各质量角色固定同一份受控正文快照；公开状态只含引用、digest 和消费回执。路径、状态与过期校验归 OPL，RCA 决定经验是否成立、是否接受候选。单项目经验不会自动升级为通用规则。跨项目推广需脱敏、补齐来源和重新审阅；当前交付的事实和质量 verdict 仍留各自事实源。
+归属范围与 `mechanism`、`policy`、`state`、`decision` 内容性质分开。当前交付状态和历史决策可以属于同一个项目，但不能共用永久有效的假设；观察时间、审阅期限和取代关系独立维护。
+
+每个知识对象只有一个可编辑正文。已有 Obsidian 时按授权绑定现有笔记；没有个人库时直接绑定普通工作目录。来源可混合使用，不要求改造用户目录或先生成中间全文副本。讲稿、图片、PPTX、review artifacts 与不可再生的交付证据仍由项目保管，不随运行缓存清理。
+
+Framework 在 StageRun 起点按权限、范围、任务和有效性解析所需原文，并为各质量角色固定同一份精确快照；公开状态只含引用、digest 和消费回执。快照留在平台运行状态中，工作区保存来源引用、提案和回执。知识身份不随路径改变；正文移动应更新来源定位，不能凭同名文件自动重绑定。
+
+用户直接编辑主源后，受影响版本与派生摘要需要复核；已有维护授权可以承载常规复核。已撤销、过期或与当前源冲突的内容不以旧快照冒充当前事实。缺少可选视觉示例不阻断制作；若缺少任务必需的受众约束、允许公开的范围或来源许可，则暂停依赖这些信息的动作。真实发布或导出前重新核对其行动所需授权和关键约束。
+
+RCA 判断经验是否成立、值得复用、接受在哪个范围，并持有接受回执。Framework 提供通用来源解析、版本核验和可恢复写入机制；接受后写回唯一原文，不建立 RCA 专用写回服务。并发编辑保留冲突版本，不能以最后写入覆盖。单项目经验只有在脱敏、补齐来源并重新审阅后才扩大用途；当前视觉结果、导出 verdict 和 owner receipt 仍由各自领域事实源证明。

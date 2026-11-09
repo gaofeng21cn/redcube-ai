@@ -28,6 +28,8 @@
 
 `contracts/action_catalog.json` 声明动作及 hosted binding，`agent/stages/manifest.json` 声明阶段图，`contracts/generated_surface_handoff.json` 声明 generated surface owner 与领域写入边界。具体运行顺序见 [运行边界](./runtime/runtime_architecture.md)。
 
+三个 hosted action 都要求准确的 `project_id`，通过既有 `workspace_index.json#/projects` 解析项目根与执行范围。Framework 以该范围选择项目知识并冻结 StageRun 上下文；请求不接收任意项目路径，缺失或未知身份应在执行前拒绝。
+
 终局 decisive Attempt 返回 `stage_route_decision`；非终局 Attempt 最多返回 `stage_route_recommendation`。独立 Meta Review 不修改上游 artifact，也不递归启动 Stage 内正式 Review。具体 outcome、repair budget 和 route-back 规则由 `contracts/stage_quality_cycle_policy.json` 持有。
 
 ## Package、Carrier 与 Executor
@@ -42,7 +44,11 @@ RCA owner 持有 Package identity、能力和领域语义。实际 carrier 平�
 
 RCA 持有 visual truth、review/export verdict、artifact mutation authorization、visual memory accept/reject、typed blocker 和 owner receipt。平台可以传递 refs、验证身份、保存 execution receipt 和展示结果，但不能代签领域批准。
 
-运行 artifact、workspace、session、receipt instance、memory body 与日志保存在外部 workspace/runtime roots。源码只跟踪定义、schema、policy、locator 与隔离 developer fixtures。`tools/image-ppt-proof/` 和 `tools/native-ppt-proof/` 可验证 helper bytes，不能成为公开 runtime 或领域完成证据。
+产品知识正文由 `agent/knowledge/` 与 v2 catalog 维护；用户、主题和项目知识按稳定身份绑定到各自的唯一正文来源。已有 Obsidian 的用户继续在原库维护个人知识，无库时由普通工作目录承载，两种来源可以在一个任务中组合。归属范围与内容性质、有效期、物理位置分开，具体领域规则见 [视觉记忆政策](./policies/visual_pattern_memory_policy.md)。
+
+Framework 直接从获授权来源选择正文并冻结本次 StageRun 快照，不要求 RCA 工作区再存一套中间全文投影。业务工作区保存交付 artifact、修订提案与回执；平台运行状态保存快照和执行恢复记录。RCA 不建立个人知识数据库或通用来源解析器。项目源稿、图片和最终交付证据保持其业务保留周期，不能作为缓存清理。
+
+源码只跟踪定义、schema、policy、locator 与隔离 developer fixtures。`tools/image-ppt-proof/` 和 `tools/native-ppt-proof/` 可验证 helper bytes，不能成为公开 runtime 或领域完成证据。
 
 ## Mini App 工作入口
 

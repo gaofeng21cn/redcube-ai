@@ -4,13 +4,19 @@
   "title": "RCA hosted stage action input",
   "type": "object",
   "required": [
-    "workspace_root"
+    "workspace_root",
+    "project_id"
   ],
   "properties": {
     "workspace_root": {
       "type": "string",
       "minLength": 1,
       "pattern": "^/"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+      "description": "Exact visual work-item identity in the authorized workspace_index.json; Framework resolves its project root."
     },
     "source_truth_refs": {
       "type": "object",

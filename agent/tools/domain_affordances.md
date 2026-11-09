@@ -25,6 +25,6 @@ Tool affordances are advisory capabilities, not workflow control. They may expos
 ## Forbidden Authority
 
 - Tools do not declare visual-ready, review-ready, export-ready, handoff-ready, App release ready, or production ready.
-- Tools do not write visual truth, review verdict body, export verdict body, visual memory body, or artifact body without RCA artifact authority.
+- Tools do not write visual truth, review/export verdicts or artifact bodies without RCA authority. Knowledge writes require the corresponding source-owner acceptance and Framework version checks; tool completion never supplies semantic acceptance.
 - Tools do not prescribe executor order, candidate strategy, stage goal, or required parallelism.
 - Tools and visual memory refs do not become visual route scorers, winning-layout generators, review-pass gates, export gates, artifact-ready signals, or owner receipts.

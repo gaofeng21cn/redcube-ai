@@ -34,6 +34,9 @@ For a `ppt_deck`, decide the authoring lane from the complete current user reque
 ## Default Workflow
 
 1. Invoke `invoke_product_entry` once and preserve one StageRun lineage from source intake through handoff.
+   Bind the exact `project_id` from the authorized workspace inventory. All three
+   hosted actions resolve this identity to the registered project root; do not
+   substitute an arbitrary path or omit project-specific knowledge.
 2. For PPT decks, follow `storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_image_pages -> visual_director_review -> screenshot_review -> export_pptx` unless explicit native admission selected the locked native lane.
 3. Generate each image-first slide as a complete 16:9 page image, review the rendered pages, repair only identified slide ids, and package the accepted best pages into a valid `.pptx`.
 4. For long decks, keep source intake, plan, production, review, and package work in the same recoverable StageRun. Preserve approved storyline, outline, and slide-blueprint refs rather than recompressing them into a new prompt.
@@ -92,19 +95,38 @@ and reuse accepted refs while their source, user constraints, and scope remain c
 - `docs/architecture.md`
 - `docs/status.md`
 
-## Durable Knowledge And Workspace Memory
+## Durable Knowledge And User Sources
 
-Use OPL knowledge recall with --repo <agent-root> --domain <domain-id>
---stage <stage-id> and the authorized --workspace and --project roots.
-The hosted StageRun binds this selection once for producer, reviewer and
-repair roles. Read selected bodies and cite knowledge IDs, layers and digests.
-Agent knowledge lives in agent/knowledge/, indexed by
-contracts/durable_knowledge_catalog.json. Owner/team constraints and accepted
-cross-project lessons live in shared/memory/; project decisions and lessons
-live in the authorized project's memory/; dated facts live in its state/.
-Each workspace layer uses opl_durable_knowledge_catalog.json.
-Review freshness and keep superseded entries out of active recall. A project
-result is a candidate lesson until its domain or project owner accepts the
-evidence and scope. Private project content is never automatically promoted
-into the distributable Agent package. OPL owns validation, scoped recall and
-receipts; domain owners retain semantic acceptance.
+Use OPL knowledge recall for the current repository, domain, stage and
+authorized workspace/project context. The hosted StageRun binds one exact
+snapshot for producer, reviewer and repair roles. Cite selected knowledge IDs,
+scopes and digests; a frozen snapshot records what this task used.
+
+The product catalog at contracts/durable_knowledge_catalog.json indexes
+agent/knowledge/. Keep product, owner/team, topic and project scopes separate
+from mechanism, policy, state and decision content kinds. A person's visual
+preferences belong to their owner or topic source; one deck's audience and
+style decisions belong to its project. Current production state retains its
+observation time and validity instead of becoming a permanent style rule.
+
+Bind each private knowledge item to its single editable source through the
+Framework's authorized source bindings. Existing Obsidian notes remain there;
+without a personal library, ordinary workspace Markdown is the source. Both
+can be used in one task. Do not require an intermediate Markdown copy, move
+project artifacts into a personal library, or create an RCA-specific personal
+knowledge store. Runtime snapshots, proposals and receipts remain execution
+records, not alternate editable knowledge.
+
+Review currentness, permissions and source revisions before use. Missing
+optional pattern examples do not block production; missing required audience
+constraints or source authorization block the decisions that depend on them.
+Source changes invalidate affected derived summaries, and revoked access cannot
+be bypassed through a previous snapshot. Before a real publish/export action,
+recheck its required source authorization and action-critical constraints.
+
+Propose reusable lessons with source evidence, the intended scope and the base
+revision. RCA or the authorized knowledge owner accepts their semantic content;
+Framework provides shared version checks, scoped snapshots and recoverable
+write mechanics. Apply accepted updates to the original source and use the new
+version in the next task. Private experience requires explicit review and
+de-identification before entering the distributable product knowledge.

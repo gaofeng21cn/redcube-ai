@@ -24,7 +24,7 @@ codex plugin list --marketplace redcube-ai --available --json
 
 1. 从当前 OPL interface 和实际 carrier 读取完整 `rca` Package 的 installed/callable 状态以及 executor readiness；缺少 runtime 或完整 bytes 时交由对应平台 owner 处理。
 2. 普通交付选择 `invoke_product_entry`；仅做 image proof 时选 `run_image_ppt_proof`，明确 native proof 时选 `run_native_ppt_proof`。动作输入与输出以 `contracts/action_catalog.json` 为准。
-3. 提供目标、受众、source/artifact refs、交付格式和人工审阅意图，让同一 hosted StageRun 按 RCA 阶段图继续。
+3. 选择已授权工作区中登记的准确 `project_id`，提供目标、受众、source/artifact refs、交付格式和人工审阅意图，让同一 hosted StageRun 按 RCA 阶段图继续。Framework 从项目目录索引解析范围；不向动作传入任意项目路径。
 4. 从 OPL status/workbench 读取 artifact、review、blocker 和 owner refs。候选文件与质量债要明确说明，不能由文件存在推断正式接受。
 
 ## 人工审阅

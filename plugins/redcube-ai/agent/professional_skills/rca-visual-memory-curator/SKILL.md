@@ -34,7 +34,7 @@ During review summary, derive at most one small evidence-backed reusable-pattern
 
 ## Outputs
 
-- Proposal generation returns `skip` or one non-authority `visual_memory_writeback_proposal` candidate with evidence, scope, provenance, and proposed small-card body.
+- Proposal generation returns `skip` or one non-authority `visual_memory_writeback_proposal` candidate. Its common knowledge fields are `source_refs`, `target_scope` with `kind` and `id`, `content_kind`, `proposed_rule_or_mechanism`, `evidence_class` and `review_requirement`; rendered evidence and visual context accompany the candidate.
 - Owner accept/reject returns `visual_memory_accept_receipt` or `visual_memory_reject_receipt` refs from the RCA owner surface.
 - Rejection reasons when the proposal is artifact body, review/export verdict, route logic, stale evidence, or hidden template material.
 - `memory_route_back_target` when a proposed lesson is really an unresolved story, visual direction, page authoring, native PPT, or review defect.
@@ -56,12 +56,14 @@ images or promote an unresolved defect as a successful repair pattern.
 4. In owner accept/reject mode, require the existing candidate, rendered evidence, RCA review refs, terminal export closeout refs, and provenance. Export itself never invokes or signs this decision.
 5. Accept only reusable visual-pattern lessons: story rhythm, density caveat, style caveat, route caveat, recurring failure mode, or repair expectation.
 6. Reject current deliverable body, slide/page text, artifact state, export verdicts, readiness claims, deterministic layout recipes, and hidden templates.
-7. Keep authority explicit. RCA owns memory body, accept/reject judgment, owner receipt, and typed blockers; OPL owns common catalog validation, scoped recall, exact execution snapshots, and consumption receipts; RCA retains semantic acceptance.
+7. Keep authority explicit. RCA owns product knowledge and visual accept/reject judgment; the user, topic or project owner retains the corresponding private source. OPL owns source validation, scoped recall, exact execution snapshots, recoverable write mechanics and consumption receipts; it does not accept the semantic lesson.
 8. Route back unresolved defects instead of storing them. If a candidate says a specific page still needs repair, return the owner stage and evidence refs rather than accepting it as memory.
 9. For repeated visual failures, accept only the reusable pattern after the blocked slides have a clear review/repair outcome. Otherwise return `route_back` to story, visual direction, page authoring, native PPT design, template profiling, or reviewer.
 10. Reject route arbitration as memory unless it is a reusable route caveat backed by evidence. Do not store route scores, layout controllers, accepted review verdicts, or hidden template recipes.
 11. Return typed blockers for an invalid owner accept/reject attempt, unverifiable provenance, or forbidden authority write. Do not turn an absent or incomplete optional proposal into a review/export blocker; return `skip` instead.
 12. Accept reusable native-PPT lessons only when both pixels and package readback support them. Viewer-specific drift, object-kind degeneration, notes/motion loss, and semantic-composition failures remain live repair evidence until resolved.
+13. Bind the lesson to a stable knowledge identity, intended product/owner/topic/project scope, content kind and exact source revision. Existing personal-library Markdown remains its editable source; workspace Markdown serves the same role without a library. Preserve one source per item and reuse Framework source/writeback operations instead of creating a private storage route.
+14. Recheck source validity and derived-summary dependencies. Changed or revoked source content cannot remain current through an accepted older summary. A missing optional pattern can return `skip`; required source authorization and action-critical constraints must be resolved before the dependent action.
 
 ## Contract Foldback Map
 
@@ -74,7 +76,7 @@ images or promote an unresolved defect as a successful repair pattern.
 
 - `proposal_generation`: skip or non-authority candidate, family, stage, audience, reusable pattern, review evidence, provenance, scope, and caveat.
 - `accept_reject_review`: evidence sufficiency, reusability, authority boundary, stale-risk check, accept/reject verdict ref, and owner receipt ref.
-- `writeback_lifecycle`: propose -> RCA accept/reject -> receipt ref -> owner updates scoped Markdown and OPL catalog -> stage-scoped snapshot retrieval.
+- `writeback_lifecycle`: propose against source revision -> authorized RCA/knowledge-owner accept/reject -> receipt ref -> Framework version-checked write to the same Markdown source -> next stage-scoped snapshot retrieval.
 - `reject_reason`: artifact_body, verdict_body, route_logic, hidden_template, stale_evidence, global_rulebook, unsupported_provenance, or authority_bypass.
 - `memory_ai_judgment`: accept, reject, duplicate, stale, route_back, or typed_blocker with evidence refs and owner stage.
 - `repeated_visual_failure_memory_gate`: evidence refs, repair outcome, reusable lesson, unresolved defect check, accept/reject receipt ref, and route-back owner.

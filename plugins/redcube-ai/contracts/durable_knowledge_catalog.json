@@ -1,20 +1,19 @@
 {
   "surface_kind": "opl_durable_knowledge_catalog",
-  "version": "durable-knowledge-catalog.v1",
+  "version": "durable-knowledge-catalog.v2",
   "owner": "one-person-lab",
   "domain_id": "redcube_ai",
   "items": [
     {
       "surface_kind": "opl_durable_knowledge_item",
-      "version": "durable-knowledge-item.v1",
+      "version": "durable-knowledge-item.v2",
       "knowledge_id": "redcube_ai.visual_truth_boundaries",
       "title": "Visual Truth Boundaries",
-      "layer": "agent_pack",
       "owner": "redcube_ai",
       "body_ref": {
         "kind": "repo_path",
         "ref": "agent/knowledge/visual_truth_boundaries.md",
-        "sha256": "sha256:c37233f63d2bfacc2b491ac12547e7c289b3da9ecd70aa4fa0dd22699beb6b63"
+        "sha256": "sha256:d53edb671859df3893f22f6dcbf5878666aede24a06f421deb714d804a6b81ab"
       },
       "applicability": {
         "domains": [
@@ -31,14 +30,18 @@
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
-      }
+      },
+      "scope": {
+        "kind": "product",
+        "id": "redcube_ai"
+      },
+      "content_kind": "policy"
     },
     {
       "surface_kind": "opl_durable_knowledge_item",
-      "version": "durable-knowledge-item.v1",
+      "version": "durable-knowledge-item.v2",
       "knowledge_id": "redcube_ai.communication_visual_direction",
       "title": "Communication Visual Direction",
-      "layer": "agent_pack",
       "owner": "redcube_ai",
       "body_ref": {
         "kind": "repo_path",
@@ -61,14 +64,18 @@
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
-      }
+      },
+      "scope": {
+        "kind": "product",
+        "id": "redcube_ai"
+      },
+      "content_kind": "policy"
     },
     {
       "surface_kind": "opl_durable_knowledge_item",
-      "version": "durable-knowledge-item.v1",
+      "version": "durable-knowledge-item.v2",
       "knowledge_id": "redcube_ai.artifact_and_export_authority",
       "title": "Artifact And Export Authority",
-      "layer": "agent_pack",
       "owner": "redcube_ai",
       "body_ref": {
         "kind": "repo_path",
@@ -91,19 +98,23 @@
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
-      }
+      },
+      "scope": {
+        "kind": "product",
+        "id": "redcube_ai"
+      },
+      "content_kind": "policy"
     },
     {
       "surface_kind": "opl_durable_knowledge_item",
-      "version": "durable-knowledge-item.v1",
+      "version": "durable-knowledge-item.v2",
       "knowledge_id": "redcube_ai.review_export_memory",
       "title": "Review Export Memory",
-      "layer": "agent_pack",
       "owner": "redcube_ai",
       "body_ref": {
         "kind": "repo_path",
         "ref": "agent/knowledge/review_export_memory.md",
-        "sha256": "sha256:e18c858f2c016c393b18d024aefe068ea38d2903132458f36cf3e43380bd2590"
+        "sha256": "sha256:4a3f8ff0734be568b119b0a6bc2c1088259ba7736a4ad8365ded5aade8e667fa"
       },
       "applicability": {
         "domains": [
@@ -120,14 +131,18 @@
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
-      }
+      },
+      "scope": {
+        "kind": "product",
+        "id": "redcube_ai"
+      },
+      "content_kind": "policy"
     },
     {
       "surface_kind": "opl_durable_knowledge_item",
-      "version": "durable-knowledge-item.v1",
+      "version": "durable-knowledge-item.v2",
       "knowledge_id": "redcube_ai.owner_receipt_policy",
       "title": "Owner Receipt Policy",
-      "layer": "agent_pack",
       "owner": "redcube_ai",
       "body_ref": {
         "kind": "repo_path",
@@ -149,14 +164,18 @@
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
-      }
+      },
+      "scope": {
+        "kind": "product",
+        "id": "redcube_ai"
+      },
+      "content_kind": "policy"
     },
     {
       "surface_kind": "opl_durable_knowledge_item",
-      "version": "durable-knowledge-item.v1",
+      "version": "durable-knowledge-item.v2",
       "knowledge_id": "redcube_ai.ppt_source_adaptation",
       "title": "PPT Source Adaptation",
-      "layer": "agent_pack",
       "owner": "redcube_ai",
       "body_ref": {
         "kind": "repo_path",
@@ -180,14 +199,18 @@
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
-      }
+      },
+      "scope": {
+        "kind": "product",
+        "id": "redcube_ai"
+      },
+      "content_kind": "mechanism"
     },
     {
       "surface_kind": "opl_durable_knowledge_item",
-      "version": "durable-knowledge-item.v1",
+      "version": "durable-knowledge-item.v2",
       "knowledge_id": "redcube_ai.ppt_style_calibration",
       "title": "PPT Style Calibration",
-      "layer": "agent_pack",
       "owner": "redcube_ai",
       "body_ref": {
         "kind": "repo_path",
@@ -211,14 +234,18 @@
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
-      }
+      },
+      "scope": {
+        "kind": "product",
+        "id": "redcube_ai"
+      },
+      "content_kind": "mechanism"
     },
     {
       "surface_kind": "opl_durable_knowledge_item",
-      "version": "durable-knowledge-item.v1",
+      "version": "durable-knowledge-item.v2",
       "knowledge_id": "redcube_ai.ppt_production_reuse",
       "title": "PPT Production Reuse And Readback",
-      "layer": "agent_pack",
       "owner": "redcube_ai",
       "body_ref": {
         "kind": "repo_path",
@@ -242,7 +269,12 @@
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",
         "opl_role": "catalog_recall_and_receipt_projection_only"
-      }
+      },
+      "scope": {
+        "kind": "product",
+        "id": "redcube_ai"
+      },
+      "content_kind": "mechanism"
     }
   ]
 }

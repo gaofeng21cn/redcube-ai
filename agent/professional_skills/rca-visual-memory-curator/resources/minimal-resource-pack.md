@@ -17,11 +17,17 @@ memory_proposal_candidate:
   deliverable_family:
   stage:
   audience:
-  reusable_pattern:
+  proposed_rule_or_mechanism:
+  source_refs:
   evidence_refs:
   review_refs:
   provenance:
-  scope:
+  target_scope: { kind: topic, id: stable-topic-identity }
+  content_kind: mechanism | policy | state | decision
+  evidence_class:
+  review_requirement:
+  knowledge_id:
+  source_revision_ref:
   caveat:
 
 accept_reject_review:
@@ -38,7 +44,8 @@ writeback_lifecycle:
   proposal_ref:
   rca_accept_or_reject_ref:
   receipt_ref:
-  locator_projection_ref:
+  source_binding_ref:
+  original_and_accepted_revision_refs:
   stage_scoped_retrieval:
 
 reject_reason:
@@ -53,10 +60,14 @@ reject_reason:
 deliverable_family: ppt_deck
 stage: review_and_revision
 audience: clinical operations buyer
-reusable_pattern: decision pages work better when the proof object is visible before feature naming
+proposed_rule_or_mechanism: decision pages work better when the proof object is visible before feature naming
+source_refs: screenshot_review:S06, contact_sheet:deck-v1
 evidence_refs: screenshot_review:S06, contact_sheet:deck-v1
 review_refs: visual_director_review:v1
-scope: future clinical operations decks, decision-page pacing only
+target_scope: { kind: topic, id: clinical-operations-communication }
+content_kind: mechanism
+evidence_class: rendered_visual_review
+review_requirement: RCA owner review after terminal export, limited to decision-page pacing
 caveat: do not turn this into a fixed two-column layout recipe
 ```
 
@@ -69,7 +80,9 @@ caveat: do not turn this into a fixed two-column layout recipe
 - Accepted memory stays prose-first, small, stage-scoped, and provenance-linked.
 - Reject deterministic layout recipes, hidden templates, route scorers, and readiness claims.
 - Accept/reject decision returns an RCA owner receipt ref.
-- OPL transport carries locator/proposal/receipt/projection refs only.
+- OPL public transport carries source/proposal/receipt refs only; private snapshots contain the exact selected source bytes.
+- Bind one editable source per knowledge identity. Existing personal notes and project Markdown can be used together without a duplicate body store.
+- Accepted writeback uses the Framework's version checks; source changes, expiry and revocation also invalidate affected derived summaries.
 - Memory never replaces screenshot review, review/export verdict, artifact authority, or owner receipt.
 - Native PPT lessons require both rendered evidence and package readback; unresolved degeneration or viewer drift routes back to repair.
 - Accept/reject runs only at the RCA memory-owner surface after terminal export closeout; export never self-signs the receipt.
