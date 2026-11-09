@@ -22,7 +22,7 @@
     ],
     "next_verification_command_refs": [
       "command:opl agents conformance --family-defaults --json",
-      "command:opl agents run --domain redcube_ai --action invoke_product_entry --workspace <workspace>"
+      "command:opl agents run --domain redcube_ai --action invoke_product_entry --workspace <workspace> --payload '{\"project_id\":\"<registered-project-id>\"}'"
     ]
   },
   "evidence_items": [

@@ -8,6 +8,7 @@
       "source_kind": "workspace_relative_json",
       "relative_path": "workspace_index.json",
       "items_pointer": "/projects",
+      "work_item_root_template": "projects/{project_id}",
       "field_map": {
         "work_item_id": "project_id",
         "work_item_root": "project_root",

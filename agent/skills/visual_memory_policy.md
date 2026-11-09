@@ -6,10 +6,10 @@ State: `policy_ref_not_standalone_professional_skill`
 Machine boundary: 本文件是 Declarative Visual Pack 的 `agent/skills/*.md` policy ref，用来约束 stage 如何提出、接受、拒绝和投影 visual memory。它不是 standalone Codex professional skill，也不是 external skill repo。
 
 策略:
-- Memory body 和 accept/reject verdict 归 RCA。
+- 通用视觉知识正文与视觉经验的 accept/reject judgment 归 RCA；个人、主题与项目正文归对应知识 owner。
 - 当 rendered artifacts 与 review evidence 证明某个 visual pattern 时，review stage 可以提出 memory writeback refs。
 - 接受或拒绝必须经过 AI-first RCA judgment，并返回 owner receipt refs。
-- OPL 只接收 locator、proposal、receipt 和 operator projection refs；它不能读写 memory body。
+- OPL 按已授权来源读取明确版本、冻结阶段快照，并在知识 owner 接受后提供版本核验与可恢复写入；公开投影只含 refs，不接受语义或写入视觉 verdict。
 
 分工说明:
 - Stage prompt 决定 stage output boundary。

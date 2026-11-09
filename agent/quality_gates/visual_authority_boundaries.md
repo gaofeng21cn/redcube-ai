@@ -19,5 +19,5 @@ Forbidden substitutions:
 - File presence cannot become artifact acceptance.
 - Mechanical screenshot metrics cannot replace director review.
 - Queue, retry, lifecycle, or session state cannot become domain quality verdict.
-- OPL generated surfaces cannot write visual truth, artifact bodies, memory bodies, review/export verdicts, or owner receipts.
+- OPL generated surfaces cannot originate visual truth, artifact bodies, semantic knowledge changes, review/export verdicts or owner receipts. Framework may read authorized knowledge and apply a source-owner-accepted, version-checked update without taking semantic ownership.
 - Refs-only accounting, session currentness, workbench projection, naming cleanup, or compatibility guard cannot become production evidence progress.

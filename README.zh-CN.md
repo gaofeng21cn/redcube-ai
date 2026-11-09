@@ -100,6 +100,11 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 - AI 助手负责方向探索、生成、修订、重跑、导出和进度反馈。
 - 工作区持续保存任务、审阅状态、重跑记录、artifact refs 和导出结果，方便检查与回看。
 
+个人和团队知识继续在已有位置维护。RCA 可以按授权组合使用 Obsidian 笔记和
+项目 Markdown；没有个人资料库时，直接使用工作目录。通用产品方法、个人偏好、
+主题经验与项目决策分别管理，每次任务读取明确版本的快照，接受后的更新写回
+原文。具体见[视觉记忆政策](./docs/policies/visual_pattern_memory_policy.md)。
+
 ## 当前边界
 
 - `RedCube AI` 是独立的视觉交付 Foundry Agent。它对外第一身份是视觉交付：接收材料、分阶段完成视觉创作、审阅、回修、导出和文件交付。

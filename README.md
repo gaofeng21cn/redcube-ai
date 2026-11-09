@@ -103,6 +103,13 @@ You can start with prompts like:
 - The AI operator handles direction exploration, generation, revision, reruns, export, and progress reporting.
 - The workspace keeps sessions, review state, rerun history, artifact refs, and export outputs together for inspection.
 
+Personal and team knowledge stays in its existing home. RCA can use authorized
+Obsidian notes alongside project Markdown, or use the working directory alone
+when there is no personal library. Reusable product methods, owner preferences,
+topic experience and project decisions have distinct scopes; each task consumes
+a versioned snapshot, and accepted updates return to the original source. See
+the [visual memory policy](./docs/policies/visual_pattern_memory_policy.md).
+
 ## Current Boundary
 
 - `RedCube AI` is an independent visual-deliverable Foundry Agent. Its first public identity is visual delivery: source intake, staged visual authorship, review, repair, export, and file handoff.

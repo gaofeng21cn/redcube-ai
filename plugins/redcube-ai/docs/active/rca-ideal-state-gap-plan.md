@@ -8,7 +8,7 @@
 | 独立发布 currentness | RCA publication owner 核对 immutable revision 与 RCA 自己的 channel | `latest-stable` 对应 exact revision 与匿名 digest readback；不以 source version 或 tag 替代 |
 | Package 组合与 executor 解耦 | Framework/App/Shell owner 按各自真实 consumer 处理迁移；RCA 仅修改自身 descriptor | consumer 切换与无活跃调用证明；切换 route 后 identity、能力、偏好、Work Item、Temporal refs 和 typed views 保留 |
 | 真实视觉交付 | RCA owner 在真实 workspace 调用 `invoke_product_entry`，记录准确 source/artifact lineage | StageRun/Attempt、可读 artifact、独立 Review、RCA quality/export 与 owner receipt |
-| 真实 memory lifecycle | RCA memory owner 消费 review-grounded proposal，执行 accept/reject 与受控 writeback | body 留在领域存储的 receipt、locator projection、retention/restore 和 scaleout evidence |
+| 真实视觉经验接受与复用 | RCA 知识 owner 在真实交付后审阅 review-grounded proposal，通过 Framework 共用来源能力写回，再于后续任务消费 | 唯一正文来源的版本与写回回执、精确消费快照、RCA 语义接受及跨交付复用证据 |
 | 恢复与规模 | Hosted runtime owner 与 RCA 联合执行 restart/resume/retry、long-soak 和跨域回归 | provider recovery、受控 visual-stage soak、重复 no-regression refs；每个领域独立签验收 |
 | Native PPT 非劣效 | RCA owner 按 [native spec](../specs/native-ppt-ppt-master-parity.md) 运行固定来源的对照、真实编辑和跨 viewer 阅读 | 同源双跑、独立盲评、exact package/source identity、跨 viewer evidence 与 RCA parity receipt |
 
@@ -18,7 +18,7 @@
 
 ```bash
 opl agents conformance --family-defaults --json
-opl agents run --domain redcube_ai --action invoke_product_entry --workspace <workspace>
+opl agents run --domain redcube_ai --action invoke_product_entry --workspace <workspace> --payload '{"project_id":"<registered-project-id>"}'
 ```
 
 conformance 只证明结构投影。实际 StageRun 保留 input identity、artifact refs、

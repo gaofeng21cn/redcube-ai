@@ -29,8 +29,7 @@ owner、quality/export、long-soak 和 no-regression refs 尚为空，并明确
 
 原生 PPT 实现已提供 typed materialization、template preservation、package readback、编辑回归与 parity evaluator 的源码面。`contracts/runtime-program/ppt-master-learning-landing.json` 已区分当前上游学习和历史 blind benchmark pin；这些实现不证明跨 viewer 实测、同源双跑盲评或 RCA parity receipt 已完成。
 
-`contracts/durable_knowledge_catalog.json` 当前状态为
-`descriptor_proof_contract_landed_runtime_writeback_pending`。descriptor 和 refs-only fixture 不能证明真实 memory body migration、writeback 或 scaleout 已完成。
+`contracts/durable_knowledge_catalog.json` 使用 v2 知识模型，分别声明产品归属与方法、政策等内容性质。个人、主题和项目正文通过 Framework 的统一来源绑定消费，不强制复制进 RCA 工作区。领域提案与接受方法由 visual-memory-curator 持有，共用来源核验、冻结与写回机制由 Framework 实现。合同与 carrier 检查证明接入字节；真实交付中的记忆接受、后续复用和规模运行仍须相应 owner evidence。
 
 ## 验证边界
 

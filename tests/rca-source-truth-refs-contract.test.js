@@ -25,8 +25,10 @@ function validateInput(value) {
   assert.equal(typeof value.workspace_root, 'string');
   assert.equal(value.workspace_root.length > 0, true);
   assert.match(value.workspace_root, /^\//);
+  assert.equal(typeof value.project_id, 'string');
+  assert.match(value.project_id, /^[A-Za-z0-9][A-Za-z0-9._-]*$/);
 
-  const topLevelKeys = new Set(['workspace_root', 'source_truth_refs']);
+  const topLevelKeys = new Set(['workspace_root', 'project_id', 'source_truth_refs']);
   for (const key of Object.keys(value)) {
     assert.equal(topLevelKeys.has(key), true, `unexpected input field: ${key}`);
   }
@@ -53,9 +55,9 @@ function assertRejected(value, message) {
 }
 
 test('RCA stage action accepts absent or complete refs-only source truth input', () => {
-  assert.deepEqual(inputSchema.required, ['workspace_root']);
+  assert.deepEqual(inputSchema.required, ['workspace_root', 'project_id']);
   assert.equal(inputSchema.additionalProperties, false);
-  assert.deepEqual(Object.keys(inputSchema.properties), ['workspace_root', 'source_truth_refs']);
+  assert.deepEqual(Object.keys(inputSchema.properties), ['workspace_root', 'project_id', 'source_truth_refs']);
   assert.deepEqual(inputSchema.properties.source_truth_refs.required, [
     'manifest_ref',
     'readiness_ref',
@@ -68,9 +70,10 @@ test('RCA stage action accepts absent or complete refs-only source truth input',
   ]);
   assert.equal(inputSchema.properties.source_truth_refs.additionalProperties, false);
   assert.equal(inputSchema.properties.source_truth_refs.properties.source_package_digest_ref.type, 'string');
-  validateInput({ workspace_root: '/tmp/redcube-workspace' });
+  validateInput({ workspace_root: '/tmp/redcube-workspace', project_id: 'deck-001' });
   validateInput({
     workspace_root: '/tmp/redcube-workspace',
+    project_id: 'deck-001',
     source_truth_refs: validRefs,
   });
 });
@@ -78,6 +81,7 @@ test('RCA stage action accepts absent or complete refs-only source truth input',
 test('RCA stage action rejects incomplete or body-bearing source truth input', () => {
   assertRejected({
     workspace_root: '/tmp/redcube-workspace',
+    project_id: 'deck-001',
     source_truth_refs: {
       manifest_ref: validRefs.manifest_ref,
       readiness_ref: validRefs.readiness_ref,
@@ -85,6 +89,7 @@ test('RCA stage action rejects incomplete or body-bearing source truth input', (
   }, 'digest ref is required');
   assertRejected({
     workspace_root: '/tmp/redcube-workspace',
+    project_id: 'deck-001',
     source_truth_refs: {
       ...validRefs,
       source_materials_full_text: 'source body must stay out of refs-only input',
@@ -92,6 +97,7 @@ test('RCA stage action rejects incomplete or body-bearing source truth input', (
   }, 'source bodies are forbidden');
   assertRejected({
     workspace_root: '/tmp/redcube-workspace',
+    project_id: 'deck-001',
     source_truth_refs: {
       ...validRefs,
       digest: validRefs.source_package_digest_ref,
@@ -99,12 +105,18 @@ test('RCA stage action rejects incomplete or body-bearing source truth input', (
   }, 'unknown digest alias is forbidden');
 });
 
-test('all hosted RCA actions expose the same optional refs-only contract', () => {
+test('all hosted RCA actions require inventory-scoped project identity', () => {
   assert.deepEqual(
     actionCatalog.actions.map((action) => action.required_fields),
-    actionCatalog.actions.map(() => ['workspace_root']),
+    actionCatalog.actions.map(() => ['workspace_root', 'project_id']),
   );
   for (const action of actionCatalog.actions) {
     assert.deepEqual(action.optional_fields, ['source_truth_refs'], action.action_id);
+    assert.deepEqual(action.execution_scope, {
+      kind: 'work_item', alias_fields: ['project_id'],
+    }, action.action_id);
   }
+  assertRejected({ workspace_root: '/tmp/redcube-workspace' }, 'project identity is required');
+  assertRejected({ workspace_root: '/tmp/redcube-workspace', project_id: '../another-project' }, 'project identity is not a path');
+  assertRejected({ workspace_root: '/tmp/redcube-workspace', project_id: 'deck-001', project_root: '/tmp/arbitrary' }, 'caller cannot supply an arbitrary project root');
 });

@@ -38,7 +38,8 @@
       "input_schema_ref": "contracts/schemas/rca-stage-action.input.schema.json",
       "output_schema_ref": "contracts/schemas/rca-stage-action.output.schema.json",
       "required_fields": [
-        "workspace_root"
+        "workspace_root",
+        "project_id"
       ],
       "optional_fields": [
         "source_truth_refs"
@@ -96,6 +97,12 @@
         "opl_can_mutate_domain_artifact_body": false,
         "opl_can_authorize_quality_or_export": false,
         "provider_completion_is_domain_completion": false
+      },
+      "execution_scope": {
+        "kind": "work_item",
+        "alias_fields": [
+          "project_id"
+        ]
       }
     },
     {
@@ -119,7 +126,8 @@
       "input_schema_ref": "contracts/schemas/rca-stage-action.input.schema.json",
       "output_schema_ref": "contracts/schemas/rca-stage-action.output.schema.json",
       "required_fields": [
-        "workspace_root"
+        "workspace_root",
+        "project_id"
       ],
       "optional_fields": [
         "source_truth_refs"
@@ -170,6 +178,12 @@
         "opl_can_mutate_domain_artifact_body": false,
         "opl_can_authorize_quality_or_export": false,
         "provider_completion_is_domain_completion": false
+      },
+      "execution_scope": {
+        "kind": "work_item",
+        "alias_fields": [
+          "project_id"
+        ]
       }
     },
     {
@@ -193,7 +207,8 @@
       "input_schema_ref": "contracts/schemas/rca-stage-action.input.schema.json",
       "output_schema_ref": "contracts/schemas/rca-stage-action.output.schema.json",
       "required_fields": [
-        "workspace_root"
+        "workspace_root",
+        "project_id"
       ],
       "optional_fields": [
         "source_truth_refs"
@@ -244,6 +259,12 @@
         "opl_can_mutate_domain_artifact_body": false,
         "opl_can_authorize_quality_or_export": false,
         "provider_completion_is_domain_completion": false
+      },
+      "execution_scope": {
+        "kind": "work_item",
+        "alias_fields": [
+          "project_id"
+        ]
       }
     }
   ],
