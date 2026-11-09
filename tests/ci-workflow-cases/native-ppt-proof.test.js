@@ -52,8 +52,13 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   assert.match(runner, /suite_id"\)\s*==\s*"data_charts"|suite_id/);
   assert.match(runner, /synthetic_preview/);
   assert.match(dockerfile, /FROM ghcr\.io\/astral-sh\/uv:0\.9\.5 AS uv/);
+  assert.match(dockerfile, /FROM node:26-bookworm/);
+  assert.match(dockerfile, /ARG TARGETARCH/);
+  assert.match(dockerfile, /officecli-linux-arm64/);
+  assert.match(dockerfile, /officecli-linux-x64/);
   assert.match(dockerfile, /COPY --from=uv \/uv \/uvx \/bin\//);
   assert.match(dockerfile, /COPY pyproject\.toml uv\.lock/);
+  assert.match(dockerfile, /COPY contracts \.\/contracts/);
   assert.match(dockerfile, /PYTHONPATH=\/workspace\/python/);
   assert.match(dockerfile, /PYTHONDONTWRITEBYTECODE=1/);
   assert.match(dockerfile, /REDCUBE_NATIVE_PPT_PROOF_PYTHON=\/opt\/redcube-venv\/bin\/python/);
@@ -68,7 +73,7 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   }
 });
 
-test('native PPT proof V2 contract is ready for opt-in CI triggers and cache policy', () => {
+test('native PPT proof contract covers hosted and container CI triggers', () => {
   const contract = readRepoJson('tools/native-ppt-proof/ci-contract.json');
   const laneContract = readRepoJson('contracts/runtime-program/ppt-native-authoring-proof-lane.json');
   const runner = readRepoFile('tools/native-ppt-proof/run.sh');
@@ -90,6 +95,18 @@ test('native PPT proof V2 contract is ready for opt-in CI triggers and cache pol
   assert.equal(contract.proof_job.required_cache_layers[1].uses, 'astral-sh/setup-uv');
   assert.equal(contract.proof_job.artifact_index.path, 'artifacts/native-ppt-proof/artifact-index.json');
   assert.equal(contract.proof_job.artifact_index.schema_version, 'native_ppt_proof_artifact_index.v2');
+  assert.equal(contract.container_proof_job.job_id, 'image-native-ppt-proof');
+  assert.equal(contract.container_proof_job.dockerfile, 'tools/native-ppt-proof/Dockerfile');
+  assert.deepEqual(contract.container_proof_job.architectures, ['amd64', 'arm64']);
+  assert.deepEqual(contract.container_proof_job.required_steps, [
+    'docker build',
+    'docker run image doctor',
+    'docker run native PPT proof',
+  ]);
+  assert.equal(
+    contract.container_proof_job.artifact_index.path,
+    'artifacts/image-native-ppt-proof/artifact-index.json',
+  );
   assert.equal(laneContract.candidate_route_model.default_enabled, false);
   assert.deepEqual(laneContract.candidate_route_model.runnable_routes, ['author_pptx_native', 'repair_pptx_native']);
   assert.match(runner, /ppt-native-authoring-proof-lane\.json/);
@@ -98,6 +115,10 @@ test('native PPT proof V2 contract is ready for opt-in CI triggers and cache pol
   assert.doesNotMatch(workflow, /pull_request:/);
   assert.match(workflow, /native-ppt-proof:\n[\s\S]*?uses:\s*astral-sh\/setup-uv@[0-9a-f]{40}(?:\s+# v10\.0\.1)?[\s\S]*?enable-cache:\s*true[\s\S]*?cache-dependency-glob:\s*['"]uv\.lock['"]/);
   assert.match(workflow, /native-ppt-proof-playwright-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('uv\.lock'\) \}\}/);
+  assert.match(workflow, /image-native-ppt-proof:/);
+  assert.match(workflow, /docker build --file tools\/native-ppt-proof\/Dockerfile --tag redcube-native-ppt-proof \./);
+  assert.match(workflow, /docker run --rm redcube-native-ppt-proof/);
+  assert.match(workflow, /tools\/native-ppt-proof\/run\.sh --skip-system-deps --output-dir artifacts\/image-native-ppt-proof/);
   assert.match(runner, /artifact-index\.json/);
   assert.match(runner, /proof-artifact-index\.ts --profile native-ppt/);
 });
