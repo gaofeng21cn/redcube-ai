@@ -127,3 +127,51 @@ jobs:
           path: |
             artifacts/image-ppt-proof
             artifacts/image-ppt-proof/artifact-index.json
+
+  image-native-ppt-proof:
+    name: Container native PPT proof (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build proof image
+        run: docker build --file tools/native-ppt-proof/Dockerfile --tag redcube-native-ppt-proof .
+      - name: Run image doctor
+        run: |
+          mkdir -p artifacts/image-native-ppt-proof
+          docker run --rm redcube-native-ppt-proof > artifacts/image-native-ppt-proof/image-doctor.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('artifacts/image-native-ppt-proof/image-doctor.json').read_text())
+          assert report['status'] == 'ok', report
+          assert report['renderer_availability']['linux_native_proof']['available'], report
+          PY
+          docker run --rm redcube-native-ppt-proof node -p \
+            'JSON.stringify({node:process.version,arch:process.arch,platform:process.platform})' \
+            > artifacts/image-native-ppt-proof/image-runtime.json
+      - name: Run native PPT proof in image
+        run: |
+          docker run --rm \
+            --mount type=bind,source="$GITHUB_WORKSPACE",target=/workspace \
+            --mount type=volume,target=/workspace/node_modules \
+            --workdir /workspace \
+            redcube-native-ppt-proof \
+            bash -c 'npm ci && tools/native-ppt-proof/run.sh --skip-system-deps --output-dir artifacts/image-native-ppt-proof'
+      - name: Upload container proof artifacts
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: image-native-ppt-proof-${{ matrix.arch }}
+          path: |
+            artifacts/image-native-ppt-proof
+            artifacts/image-native-ppt-proof/artifact-index.json

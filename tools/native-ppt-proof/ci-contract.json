@@ -37,5 +37,23 @@
       "schema_version": "native_ppt_proof_artifact_index.v2",
       "required": true
     }
+  },
+  "container_proof_job": {
+    "job_id": "image-native-ppt-proof",
+    "runs_true_renderer": true,
+    "workflow": ".github/workflows/qualification.yml",
+    "dockerfile": "tools/native-ppt-proof/Dockerfile",
+    "image_tag": "redcube-native-ppt-proof",
+    "architectures": ["amd64", "arm64"],
+    "required_steps": [
+      "docker build",
+      "docker run image doctor",
+      "docker run native PPT proof"
+    ],
+    "artifact_index": {
+      "path": "artifacts/image-native-ppt-proof/artifact-index.json",
+      "schema_version": "native_ppt_proof_artifact_index.v2",
+      "required": true
+    }
   }
 }
