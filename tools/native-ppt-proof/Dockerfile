@@ -1,5 +1,5 @@
 FROM ghcr.io/astral-sh/uv:0.9.5 AS uv
-FROM node:24-bookworm
+FROM node:26-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /workspace
