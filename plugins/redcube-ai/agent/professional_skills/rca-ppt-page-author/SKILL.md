@@ -67,8 +67,8 @@ local edit. Preserve unchanged media and notes instead of rebuilding passed page
 11. Route back when the page failure belongs to story, visual direction, template capacity, or route selection; do not hide it with helper defaults, smaller text, or post-processing.
 12. When the same slide fails after a targeted repair, classify the repeated failure before another redraw: payload text budget, visual direction, story/claim overload, template capacity, native shape plan, helper output, or route mismatch.
 13. Keep route claims honest. Image-first pages need 16:9 image/page refs and contact-sheet membership; native pages need editable shape evidence and render proof; do not mix those evidence types to upgrade the route.
-14. For image-first materialization, follow `contracts/runtime-program/ppt-image-first-production-route.json#/api_contract`: prefer the active Codex built-in `image_gen` callable without checking `OPENAI_API_KEY`, then automatically use the current Codex provider's config-backed `gpt-image-2` fallback if the tool is unavailable before image output.
-15. Do not ask the user to approve the same-model fallback or configure a second key. Parse TOML structurally, scope resolved credentials to the image-generation child process, and return only redacted diagnostics if both routes fail.
+14. For image-first materialization, follow `contracts/runtime-program/ppt-image-first-production-route.json#/api_contract`: prefer the active Codex built-in `image_gen` callable without checking `OPENAI_API_KEY`, then automatically call `agent/tools/generate-image.mjs` for Framework's `gpt-image-2` fallback if the tool is unavailable before image output.
+15. Do not ask the user to approve the same-model fallback or configure a second key. Framework owns model connection and credential resolution; RCA sends only the image request and consumes the materialization receipt. Use a new output path for repairs, preserve approved pages, and reconcile an unknown outcome before another request.
 
 ## Workbench Lessons To Preserve
 

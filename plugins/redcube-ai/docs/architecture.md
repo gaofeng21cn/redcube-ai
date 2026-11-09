@@ -10,6 +10,7 @@
 | `contracts/` | identity、action、schema、authority、helper descriptor 与证据引用 | Framework 公开合同及领域实现 |
 | `python/redcube_ai/native_helpers/` | PPT/Office/render/review/export 确定性 mechanics | OPL native-helper envelope；隔离 developer proof |
 | `runtime/authority_functions/` | 最小领域 authority 声明 | RCA owner chain |
+| `agent/tools/generate-image.mjs` | 图片请求与结果的薄适配 | Framework 公共模型入口 |
 | `scripts/`、`tests/`、`tools/` | 开发验证与 proof | 开发者和 CI |
 
 `runtime/authority_functions/` 目前是声明目录，不实现通用 runtime。RCA 不包含 repo-local CLI、domain-handler dispatcher、scheduler、Attempt/session/workspace store 或 Package Manager。
@@ -31,6 +32,10 @@
 三个 hosted action 都要求准确的 `project_id`，通过既有 `workspace_index.json#/projects` 解析项目根与执行范围。Framework 以该范围选择项目知识并冻结 StageRun 上下文；请求不接收任意项目路径，缺失或未知身份应在执行前拒绝。
 
 终局 decisive Attempt 返回 `stage_route_decision`；非终局 Attempt 最多返回 `stage_route_recommendation`。独立 Meta Review 不修改上游 artifact，也不递归启动 Stage 内正式 Review。具体 outcome、repair budget 和 route-back 规则由 `contracts/stage_quality_cycle_policy.json` 持有。
+
+图片生成优先使用 executor 实际提供的 built-in tool。该能力在产物生成前不可用时，`agent/tools/generate-image.mjs` 通过 stdin 接受 JSON 请求，并调用 `opl-framework/domain-task-runtime` 的 `runDomainImageGeneration`。请求只包含 prompt、全新输出路径、可选参考图和图片参数；Framework 管理当前模型连接、凭证解析与一次生成或编辑调用。RCA 消费脱敏产物回执，继续负责视觉审阅、lineage 和导出判定。未知结果先核对，不自动重试。
+
+该 helper 随现有 carrier 投影，公共模块经 Framework 已有的 managed link 解析。缺少入口时由 Framework 安装或链接流程修复；RCA 不维护另一份配置解析器、模型 SDK、凭证库或 Framework 安装定位器。
 
 ## Package、Carrier 与 Executor
 

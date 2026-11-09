@@ -222,12 +222,12 @@
           "role": "credential_boundary_boundary"
         },
         {
-          "ref": "executor_must_resolve_active_codex_provider_config_before_missing_image_generation_credential_gate",
+          "ref": "executor_must_call_framework_image_generation_before_missing_image_generation_credential_gate",
           "ref_kind": "policy_ref",
           "role": "credential_boundary_boundary"
         },
         {
-          "ref": "selected_rca_image_first_route_authorizes_config_backed_gpt_image_2_without_additional_human_gate",
+          "ref": "selected_rca_image_first_route_authorizes_framework_gpt_image_2_without_additional_human_gate",
           "ref_kind": "policy_ref",
           "role": "credential_boundary_boundary"
         },
