@@ -21,10 +21,15 @@ updates:
       time: "03:00"
       timezone: Asia/Shanghai
     groups:
-      npm:
+      npm-minor-patch:
+        applies-to: version-updates
         patterns:
           - "*"
-    open-pull-requests-limit: 2
+        update-types:
+          - minor
+          - patch
+    # Major migrations and security updates are reviewed independently.
+    open-pull-requests-limit: 5
 
   - package-ecosystem: pip
     directory: /
@@ -34,10 +39,14 @@ updates:
       time: "03:00"
       timezone: Asia/Shanghai
     groups:
-      pip:
+      pip-minor-patch:
+        applies-to: version-updates
         patterns:
           - "*"
-    open-pull-requests-limit: 2
+        update-types:
+          - minor
+          - patch
+    open-pull-requests-limit: 5
 
   - package-ecosystem: docker
     directory: /tools/native-ppt-proof
@@ -46,4 +55,9 @@ updates:
       day: monday
       time: "03:00"
       timezone: Asia/Shanghai
+    # Node 25 reached EOL on 2026-06-01; supported newer majors remain eligible.
+    ignore:
+      - dependency-name: node
+        versions:
+          - ">= 25, < 26"
     open-pull-requests-limit: 1
