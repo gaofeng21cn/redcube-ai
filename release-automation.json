@@ -1,0 +1,24 @@
+{
+  "strategy": "daily_patch",
+  "prepare": [
+    [
+      "python3",
+      "scripts/sync_carrier.py"
+    ]
+  ],
+  "verify": [],
+  "version_files": [
+    {
+      "path": "package.json",
+      "kind": "json"
+    },
+    {
+      "path": "package-lock.json",
+      "kind": "json"
+    },
+    {
+      "path": "pyproject.toml",
+      "kind": "toml_project"
+    }
+  ]
+}
