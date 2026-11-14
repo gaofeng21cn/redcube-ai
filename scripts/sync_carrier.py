@@ -28,6 +28,7 @@ def projection():
         'app-contribution-adapter.json',
     )]
     expected = {}
+    expected[CARRIER / 'assets/icon.png'] = (ROOT / 'assets/branding/redcube-ai-logo.png').read_bytes()
     for relative in sources:
         source = ROOT / relative
         if source.is_symlink() or not source.is_file():
