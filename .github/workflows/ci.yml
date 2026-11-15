@@ -33,6 +33,6 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          python -m pip install Pillow
+          python -m pip install ".[ppt]"
       - name: Run source gate
         run: scripts/verify.sh ci
