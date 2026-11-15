@@ -120,10 +120,12 @@
       "gates": [
         "export_pptx"
       ],
-      "purpose": "Screenshot bundle export into PPTX/PDF publish artifacts.",
+      "purpose": "Explicit page manifest (or legacy screenshots) into real PPTX/PDF with notes, verified layers and mechanical package readback.",
       "requires": [
         "Pillow",
-        "python-pptx"
+        "python-pptx",
+        "pypdf",
+        "zxing-cpp"
       ],
       "outputs": [
         "publish_bundle.pptx",

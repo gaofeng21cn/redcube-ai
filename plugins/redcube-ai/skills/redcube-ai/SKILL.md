@@ -43,6 +43,29 @@ For a `ppt_deck`, decide the authoring lane from the complete current user reque
 5. Preserve user requests for plan review, approval, or staged continuation as a declared human-review intent. The hosted controller materializes the gate; RCA does not create a private pause/resume mechanism.
 6. Lock the selected image/native/HTML lane for the deliverable. Validator or repair failure cannot silently switch lanes.
 
+For image-first PPT production, the page author and reviewer consume the same
+exact-copy/object/relationship/quantity/verified-asset brief. Use explicit
+reference borrowing scopes and actual submitted-request snapshots. Package via
+the existing `ppt_deck_export` helper's explicit page manifest, notes and original
+asset layers; see `docs/delivery/image-deck-export.md`. Its mechanical readback
+supports review reuse and file verification without signing visual readiness.
+
+For a style-constrained PPT, select a `style_profile_id` from
+`prompts/ppt_deck/style_profiles.json` during `visual_direction`. The current
+profiles include hand-drawn lecture, Chinese ink lecture, Alariko-inspired
+editorial illustration, ukiyo-e woodblock lecture and warm hand-drawn animation lecture. Profiles are selectable
+visual layers, not story or layout templates: they cannot rewrite source facts,
+page duties, communication mode, visualization pattern or native admission.
+For a new style, calibrate its written visual recipe across representative page roles
+before scaling. Image anchors are optional and route-specific; accepted review
+examples do not automatically become generation inputs. Independent comparisons
+exclude corresponding finished pages, and first-pass quality remains distinct from usable-delivery work. Do not
+infer a one-attempt hard stop from a request for from-scratch authoring;
+continue authorized prompt/recipe improvements and independent regeneration
+until the deliverable is usable, retaining honest attempt evidence. If the result looks like an illustration with text attached,
+route back to composition and page authoring; do not repair the failure by
+adding decorative scenery.
+
 For HTML fidelity, use the page-author's actual-render method and the reviewer's
 actual-font/final-file evidence method. For image-heavy review, retain accepted
 page refs and remaining work in the existing StageRun artifacts, budget bytes

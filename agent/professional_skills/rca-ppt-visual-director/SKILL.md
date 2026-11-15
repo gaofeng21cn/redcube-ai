@@ -53,18 +53,32 @@ Operate as the visual direction specialist between blueprint approval and page a
 7. Define readable floors. Titles, body text, labels, tables, captions, and auxiliary metadata need explicit typography and spacing rules.
 8. Identify repair risk before artifact creation: overloaded pages, repeated card grids, weak peak pages, text-heavy proof pages, or missing structural visuals.
 9. Keep RCA authority clear. Adopt professional PPT discipline as RCA rules; do not cite external tools as the owner of visual decisions.
-10. If the task requires profiling a template or reference deck, consume `rca-template-profiler` output instead of re-profiling it here.
-11. Treat a template/reference deck as visual and structural guidance under image-first by default. It activates native only when the current user request explicitly requires editable native objects or preservation of editable master/layout/placeholder/theme semantics.
-12. If native was selected without explicit current-request admission evidence, reject that selection and restore image-first before page authoring; do not ask the user to choose between internal implementation routes.
-13. Route back early when blueprint, source, template capacity, or route selection would make visual proof fail; name the owner stage and the smallest repair.
-14. For admitted native PPTX, name the QA evidence expected later: editable shape manifest, rendered screenshots, hyperlink/text editability checks, and blocked-slide repair scope.
-15. Use contact sheets as direction evidence: repeated layout families, flat rhythm, title-safe-zone pressure, or density overload are visual-direction repairs, not page-helper failures.
-16. Do not convert image-first success into a native claim. A later native route must consume approved direction, contact-sheet findings, and explicit editability targets.
-17. Make title promises visible. A dependency map needs relationships, a timeline needs ordered events, a decision ladder needs gates or branches, and a data claim needs an honest chart/table encoding; decorative lines, dots, or equal cards do not satisfy these roles.
-18. Choose chart/table materialization intent with the native designer only after native admission: use stable DrawingML when cross-render fidelity dominates, and native data objects when editable data semantics dominate. Record the tradeoff instead of letting the helper infer it.
-19. Keep review internal to the stage chain. Emit complete direction and route-specific proof expectations in one pass when inputs are sufficient; do not add user-by-user layout confirmations.
+
+10. Resolve the selected `style_profile_id` from
+`prompts/ppt_deck/style_profiles.json` and bind it to the visual-direction
+output. The profile owns palette, lettering, material, prompt recipe and
+forbidden regressions; it does not own story, source truth, page duties or
+route admission. For image-first pages, reject any direction whose first-glance
+result is an illustration with text attached rather than a lecture slide.
+11. If the task requires profiling a template or reference deck, consume `rca-template-profiler` output instead of re-profiling it here.
+12. Treat a template/reference deck as visual and structural guidance under image-first by default. It activates native only when the current user request explicitly requires editable native objects or preservation of editable master/layout/placeholder/theme semantics.
+13. If native was selected without explicit current-request admission evidence, reject that selection and restore image-first before page authoring; do not ask the user to choose between internal implementation routes.
+14. Route back early when blueprint, source, template capacity, or route selection would make visual proof fail; name the owner stage and the smallest repair.
+15. For admitted native PPTX, name the QA evidence expected later: editable shape manifest, rendered screenshots, hyperlink/text editability checks, and blocked-slide repair scope.
+16. Use contact sheets as direction evidence: repeated layout families, flat rhythm, title-safe-zone pressure, or density overload are visual-direction repairs, not page-helper failures.
+17. Do not convert image-first success into a native claim. A later native route must consume approved direction, contact-sheet findings, and explicit editability targets.
+18. Make title promises visible. A dependency map needs relationships, a timeline needs ordered events, a decision ladder needs gates or branches, and a data claim needs an honest chart/table encoding; decorative lines, dots, or equal cards do not satisfy these roles.
+19. Choose chart/table materialization intent with the native designer only after native admission: use stable DrawingML when cross-render fidelity dominates, and native data objects when editable data semantics dominate. Record the tradeoff instead of letting the helper infer it.
+20. Keep review internal to the stage chain. Emit complete direction and route-specific proof expectations in one pass when inputs are sufficient; do not add user-by-user layout confirmations.
 
 ## Workbench Lessons To Preserve
+
+Bind one accepted shared craft prefix and profile revision across page families
+in actual submitted requests, including image-first routes beyond H3. For each
+reference, distinguish marks/material/lettering/light from permitted objects
+or composition. Calibrate this deck's difficult relationships and mixed objects;
+a simple scene cannot establish their stability. Keep geometry instructions
+outside exact visible copy and reserve verified evidence layers before drawing.
 
 - Visual direction for image-first decks must be page-by-page, not only deck-level. Each real slide id needs first-glance hook, composition, visible text budget, style reference, and image-prompt intent before image prompts are written.
 - A reference deck must be version-locked. Record the current source path/ref, representative pages, and what may be borrowed. Do not silently reuse stale archive pages just because they are visually familiar.
@@ -82,9 +96,32 @@ directory, named tradition or generic aesthetic adjective is not the direction
 itself. Set a small risk-driven calibration scope; current accepted pages may
 already satisfy it. Continue authorized production without adding a human gate.
 
+Image-reference policy is route-specific. A written recipe can be the full
+style input; do not require an image anchor when text-only calibration or the
+user's instruction selects otherwise. Clean animation contours and painted
+color planes can be the accepted aesthetic, without extra roughness. For an independent workflow comparison, exclude corresponding finished-page
+inputs and evaluate each first generation honestly. Keep that metric separate
+from a usable-delivery objective; continue authorized initial-recipe improvement
+and from-scratch authoring when a failed result does not meet that objective.
+
 Use the user's latest accepted visual quality as the benchmark, including newly authored pages when preferred. Earlier pages are not automatically the aesthetic ceiling. Specify which palette relationships, midtones, transparent layers, fine linework, material cues and spatial depth to preserve; do not flatten better pages to match weaker ones. Representative pages should show that one visual language supports different page roles and information loads, without becoming another user approval gate.
 
 For an explicitly hand-drawn brief, typography is part of authorship: review headings, body text, Latin names, Arabic and Roman numerals, and publication labels for readable pen-pressure, width, baseline and stroke variation. Paper texture behind rigid print type does not satisfy that brief. This rule is style-conditional, not a hand-drawn default for all RCA decks.
+
+For a from-scratch H3 full-slide route, the visual direction must expose one
+immutable shared style prefix and a structured page-payload schema. It must
+define the visible background, paper/material treatment, ink, lettering,
+English/numeric companion type, line weight, shadow, decoration policy and
+lecture-page guardrail. Page payloads may change claims, objects and reading
+relationships, but may not rewrite those shared signals. Review the generated
+pages as a batch; a single page's success cannot authorize page-local style
+drift or an undisclosed asset-composition substitution.
+
+For a selected warm animation brief, explicitly define adult character
+abstraction, selective contours and cream/cool painted planes across every
+object family. Do not translate richness into dense realistic line detail.
+Judge whole-set visual coherence separately from artist similarity and retain
+the user's actual acceptance scope as the next improvement baseline.
 
 When the user requests whole-deck coherence, assess every current page, including previously passed/redrawn ones, then scope repairs from the new benchmark. Preserve pages that still meet the current intent. Record semantic information gaps and style defects separately in the existing direction payload; do not turn counts or a uniform card layout into the quality standard.
 

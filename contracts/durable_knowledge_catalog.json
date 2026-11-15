@@ -215,7 +215,7 @@
       "body_ref": {
         "kind": "repo_path",
         "ref": "agent/knowledge/ppt_style_calibration.md",
-        "sha256": "sha256:989fa7296851060ee6c901183990d0614d267b3686fedde7a4828906edaf0055"
+        "sha256": "sha256:7a8ad05ce1a1e2cf8a0d554029708ecb8c1be50939a6bb2b3feb15319887b300"
       },
       "applicability": {
         "domains": [
@@ -228,8 +228,8 @@
         ]
       },
       "status": "active",
-      "reviewed_at": "2026-11-09T00:00:00+08:00",
-      "next_review_at": "2027-05-09T00:00:00+08:00",
+      "reviewed_at": "2026-11-14T00:00:00+08:00",
+      "next_review_at": "2027-05-14T00:00:00+08:00",
       "freshness_policy": "review_when_sources_or_applicability_change; exclude_after_next_review_at",
       "authority_boundary": {
         "semantic_body_owner": "redcube_ai",

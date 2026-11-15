@@ -11,6 +11,18 @@ Turn the current detailed outline into an executable page-by-page content and rh
 - Preserve source-backed numerical evidence and the accepted `claim_spine_lock` exactly; map its introduction, proof, and resolution roles to real slide ids.
 - Separate audience content from authoring/runtime metadata. Internal ids, route names, prompt names, operator instructions, and private notes must not become visible slide copy.
 - Let page composition vary with the claim and proof object. Template or canvas capacity may trigger a focused blueprint revision; do not force overloaded content into rendering.
+- In the existing per-page content/render fields, distinguish `exact_copy` from
+  `objects`, `required_relationships`, `quantity_bindings` and `verified_assets`.
+  Bind each quantity to its task, input condition, metric, unit and source;
+  describe important arrow endpoints/direction, mandatory decision gates and
+  any forbidden inference. Counts that carry meaning need an explicit visual
+  encoding (for example, four visible cells out of sixteen). Use empty lists
+  where a page has no such requirement; do not invent fields as visible copy.
+- Identify evidence that must retain original bytes before composition. Reserve
+  its region and source/crop, while keeping explanatory generated objects
+  recognizable as teaching diagrams. Keep coordinates and production guidance
+  outside `exact_copy`. AI checks whether the resulting explanation is coherent;
+  field presence alone cannot establish that.
 
 ## Professional Dependency
 

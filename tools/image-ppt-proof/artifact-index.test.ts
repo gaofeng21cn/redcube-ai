@@ -4,12 +4,14 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { resolveRedCubePythonCommand } from '../../scripts/run-test-group-lib.ts';
 
 const repoRoot = process.cwd();
 
-test('image PPT proof runner mock mode emits every retained artifact without a real API', () => {
+test('image PPT proof mocks generation but exports and parses real delivery files', (t) => {
   const outputDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-image-ppt-proof-'));
+  t.after(() => rmSync(outputDir, { recursive: true, force: true }));
   const result = spawnSync(
     'tools/image-ppt-proof/run.sh',
     ['--output-dir', outputDir, '--mock-image-generation'],
@@ -62,13 +64,32 @@ test('image PPT proof runner mock mode emits every retained artifact without a r
     assert.deepEqual(reference.dimensions, { width: 1536, height: 864, ratio: '16:9' });
     assert.match(reference.artifact_copy, /^style-references\/[^/]+\.png$/);
   }
-  assert.equal(reviewSummary.status, 'passed');
+  assert.equal(reviewSummary.status, 'not_reviewed');
+  assert.equal(reviewSummary.mechanical_status, 'passed');
   assert.equal(reviewSummary.image_count, 4);
   assert.equal(reviewSummary.style_reference_count, 1);
-  assert.equal(finalGalleryManifest.status, 'ready');
+  assert.equal(finalGalleryManifest.status, 'candidate');
   assert.equal(finalGalleryManifest.items.length, 4);
   assert.equal(exportBundle.source_visual_route, 'author_image_pages');
   assert.equal(exportBundle.editable, false);
+  const finalDelivery = JSON.parse(readFileSync(path.join(outputDir, 'export', 'final-delivery-manifest.json'), 'utf8'));
+  assert.equal(finalDelivery.delivery_status, 'candidate');
+  const receipt = JSON.parse(readFileSync(exportBundle.export_readback_file, 'utf8'));
+  assert.equal(receipt.package_readback.status, 'verified');
+  assert.equal(receipt.pdf_readback.status, 'verified');
+  assert.equal(receipt.package_readback.native_powerpoint_open, 'unverified');
+  // Parse actual final files independently of the receipt or artifact inventory.
+  const python = resolveRedCubePythonCommand();
+  const actual = spawnSync(python.command, [...python.args, '-c', `
+import sys
+from pptx import Presentation
+from pypdf import PdfReader
+p=Presentation(sys.argv[1])
+assert len(p.slides)==4
+assert all(s.has_notes_slide for s in p.slides)
+assert len(PdfReader(sys.argv[2],strict=True).pages)==4
+`, exportBundle.pptx_file, exportBundle.pdf_file], { encoding: 'utf8' });
+  assert.equal(actual.status, 0, actual.stderr || actual.stdout);
 
   for (const artifactId of [
     'run_manifest_json',
@@ -88,6 +109,8 @@ test('image PPT proof runner mock mode emits every retained artifact without a r
     'gallery_json',
     'gallery_final_manifest_json',
     'final_delivery_manifest_json',
+    'page_manifest_json',
+    'export_readback_json',
   ]) {
     assert.equal(requiredIds.has(artifactId), true, `${artifactId} must be retained`);
   }

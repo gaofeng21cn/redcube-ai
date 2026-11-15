@@ -33,8 +33,17 @@
     "hyperlinks": {
       "object_field": "native_shapes[].link",
       "inline_field": "native_shapes[].paragraphs[].runs[].link",
-      "supported_carriers": ["text_box", "shape", "path"],
-      "external_schemes": ["https", "http", "mailto", "tel"],
+      "supported_carriers": [
+        "text_box",
+        "shape",
+        "path"
+      ],
+      "external_schemes": [
+        "https",
+        "http",
+        "mailto",
+        "tel"
+      ],
       "internal_target": "slide[N]_within_final_one_based_roster",
       "readback": "exact_object_target_and_inline_text_span_target"
     },
@@ -537,49 +546,99 @@
       {
         "mode_id": "decision_pyramid",
         "use_when": "the audience must decide from a recommendation and its mutually exclusive support",
-        "argument_sequence": ["recommendation", "supporting_arguments", "evidence", "decision"],
+        "argument_sequence": [
+          "recommendation",
+          "supporting_arguments",
+          "evidence",
+          "decision"
+        ],
         "title_voice": "conclusion_first_action_titles",
         "notes_register": "concise_executive_reasoning",
-        "forbidden": ["topic_only_titles", "uncompared_numbers", "recommendation_after_appendix"]
+        "forbidden": [
+          "topic_only_titles",
+          "uncompared_numbers",
+          "recommendation_after_appendix"
+        ]
       },
       {
         "mode_id": "narrative_arc",
         "use_when": "the conclusion earns force through situation, tension, proof, and resolution",
-        "argument_sequence": ["situation", "tension", "turning_evidence", "resolution"],
+        "argument_sequence": [
+          "situation",
+          "tension",
+          "turning_evidence",
+          "resolution"
+        ],
         "title_voice": "progressive_claim_titles",
         "notes_register": "spoken_story_with_explicit_turns",
-        "forbidden": ["spoiling_every_turn_on_cover", "chronology_without_tension", "unsupported_emotional_claim"]
+        "forbidden": [
+          "spoiling_every_turn_on_cover",
+          "chronology_without_tension",
+          "unsupported_emotional_claim"
+        ]
       },
       {
         "mode_id": "instructional_sequence",
         "use_when": "the audience must build understanding or capability step by step",
-        "argument_sequence": ["learning_goal", "concept_decomposition", "worked_proof", "application"],
+        "argument_sequence": [
+          "learning_goal",
+          "concept_decomposition",
+          "worked_proof",
+          "application"
+        ],
         "title_voice": "learning_progress_titles",
         "notes_register": "clear_explanatory_scaffolding",
-        "forbidden": ["undefined_terms", "steps_without_dependency", "assessment_before_explanation"]
+        "forbidden": [
+          "undefined_terms",
+          "steps_without_dependency",
+          "assessment_before_explanation"
+        ]
       },
       {
         "mode_id": "visual_showcase",
         "use_when": "presence, demonstration, or a small number of memorable proof objects leads",
-        "argument_sequence": ["hook", "hero_proof", "contrast_or_reveal", "call_to_action"],
+        "argument_sequence": [
+          "hook",
+          "hero_proof",
+          "contrast_or_reveal",
+          "call_to_action"
+        ],
         "title_voice": "short_high_contrast_claims",
         "notes_register": "presenter_led_minimal_on_slide_copy",
-        "forbidden": ["dense_exposition", "equal_weight_card_wall", "imagery_without_claim"]
+        "forbidden": [
+          "dense_exposition",
+          "equal_weight_card_wall",
+          "imagery_without_claim"
+        ]
       },
       {
         "mode_id": "neutral_briefing",
         "use_when": "the audience needs complete, scannable information without a forced thesis",
-        "argument_sequence": ["scope", "organized_topics", "status_or_reference", "next_actions"],
+        "argument_sequence": [
+          "scope",
+          "organized_topics",
+          "status_or_reference",
+          "next_actions"
+        ],
         "title_voice": "precise_topic_or_status_titles",
         "notes_register": "neutral_complete_reference",
-        "forbidden": ["manufactured_drama", "hidden_status", "recommendation_presented_as_fact"]
+        "forbidden": [
+          "manufactured_drama",
+          "hidden_status",
+          "recommendation_presented_as_fact"
+        ]
       }
     ],
     "custom_escape": {
       "mode_id": "custom",
       "use_only_when_no_single_preset_has_a_dominant_spine": true,
       "mode_behavior_required": true,
-      "behavior_must_name": ["act_or_posture_sequence", "title_voice", "page_rhythm", "notes_register"],
+      "behavior_must_name": [
+        "act_or_posture_sequence",
+        "title_voice",
+        "page_rhythm",
+        "notes_register"
+      ],
       "bare_custom_token_allowed": false
     }
   },
@@ -589,37 +648,437 @@
     "selection_rationale_field": "slide_blueprint.slides[].visualization_selection_rationale",
     "full_registry_scan_required": false,
     "selection_policy": "reuse_current_selections_or_read_relevant_families_then_broaden_on_no_match",
-    "reselection_triggers": ["source_or_claim_change", "style_or_route_constraint_change", "observed_semantic_mismatch", "capability_change"],
+    "reselection_triggers": [
+      "source_or_claim_change",
+      "style_or_route_constraint_change",
+      "observed_semantic_mismatch",
+      "capability_change"
+    ],
     "native_materialization_details": "load_only_for_admitted_native_route",
     "no_match_policy": "author_bespoke_composition_and_record_selection_rationale",
     "copy_upstream_svg_body_allowed": false,
     "source_coverage_ref": "contracts/runtime-program/ppt-master-learning-landing.json#/source_catalog_coverage/visualizations",
     "patterns": [
-      {"pattern_id":"quantitative_trend","content_shape":"values over ordered time","use_when":"direction, cumulative volume, or multi-series movement is the message","skip_when":"time order is absent or category ranking is primary","accepted_object_families":["chart","path","text_box"],"required_observable_semantics":["ordered_axis","series_encoding","source_note"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
-      {"pattern_id":"category_comparison","content_shape":"named categories with comparable values","use_when":"rank, magnitude, or side-by-side differences matter","skip_when":"composition or continuous time is the message","accepted_object_families":["chart","table"],"required_observable_semantics":["shared_scale","category_labels","value_encoding"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
-      {"pattern_id":"part_to_whole","content_shape":"parts of one whole or nested composition","use_when":"share, allocation, or hierarchy composition matters","skip_when":"parts do not share a valid denominator","accepted_object_families":["chart","shape","text_box"],"required_observable_semantics":["whole_definition","part_encoding","total_consistency"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
-      {"pattern_id":"distribution_relationship","content_shape":"observations, ranges, correlation, or outliers","use_when":"spread, cluster, association, or distribution shape matters","skip_when":"only aggregate category values are available","accepted_object_families":["chart","path"],"required_observable_semantics":["quantitative_axes","observation_encoding","outlier_or_range_legibility"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
-      {"pattern_id":"target_progress","content_shape":"actual, target, completion, or capability scores","use_when":"goal attainment or multi-axis capability is the message","skip_when":"there is no declared baseline or comparable scale","accepted_object_families":["chart","metric_grid"],"required_observable_semantics":["baseline_or_target","actual_value","unit_or_scale"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
-      {"pattern_id":"variance_bridge","content_shape":"additive and subtractive contributors between two totals","use_when":"the audience must explain how a start becomes an end","skip_when":"contributors do not form a running total","accepted_object_families":["chart","shape","connector"],"required_observable_semantics":["start_total","signed_steps","end_total"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
-      {"pattern_id":"magnitude_flow","content_shape":"flow with splits, merges, or volume loss","use_when":"magnitude through a system or conversion stages is material","skip_when":"steps have no quantity or branching semantics","accepted_object_families":["chart","path","connector"],"required_observable_semantics":["source_nodes","directed_flow","magnitude_encoding"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
-      {"pattern_id":"sequential_process","content_shape":"ordered steps, phases, or pipeline outputs","use_when":"sequence and handoff logic matter more than time scale","skip_when":"the relation is cyclical or durations need an axis","accepted_object_families":["shape","connector","group"],"required_observable_semantics":["ordered_steps","directional_edges","stage_outputs"],"owner_skills":["rca-ppt-story-architect","rca-ppt-visual-director"]},
-      {"pattern_id":"time_schedule","content_shape":"milestones, durations, or roadmap states","use_when":"time position, duration, or delivery order is the message","skip_when":"steps are timeless or cyclical","accepted_object_families":["shape","connector","table"],"required_observable_semantics":["time_axis","event_or_duration_binding","status_legibility"],"owner_skills":["rca-ppt-story-architect","rca-ppt-visual-director"]},
-      {"pattern_id":"cycle_feedback","content_shape":"closed-loop stages or compounding feedback","use_when":"the final stage returns to or strengthens the first","skip_when":"the process is one-way","accepted_object_families":["shape","connector","path"],"required_observable_semantics":["closed_loop","ordered_stages","feedback_direction"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
-      {"pattern_id":"hierarchy_architecture","content_shape":"layers, containment, maturity, or reporting hierarchy","use_when":"levels and parent-child structure are the message","skip_when":"items are peers without containment or rank","accepted_object_families":["shape","group","connector"],"required_observable_semantics":["level_encoding","parent_child_relation","layer_labels"],"owner_skills":["rca-ppt-visual-director","rca-template-profiler"]},
-      {"pattern_id":"hub_network","content_shape":"one core with outward capabilities or inward forces","use_when":"core-periphery relation and edge direction matter","skip_when":"a strict hierarchy or sequence is required","accepted_object_families":["shape","connector","group"],"required_observable_semantics":["core_node","spokes_or_forces","edge_direction"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
-      {"pattern_id":"matrix_quadrant","content_shape":"two axes, grid cells, or named quadrants","use_when":"position, priority, intensity, or cross-classification matters","skip_when":"there is only one comparison dimension","accepted_object_families":["chart","table","shape"],"required_observable_semantics":["axis_or_row_column_grammar","cell_or_point_binding","quadrant_meaning"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
-      {"pattern_id":"comparison_decision","content_shape":"options, pros and cons, tiers, or decision gates","use_when":"the audience must compare alternatives and land a choice","skip_when":"items are unrelated facts without decision criteria","accepted_object_families":["table","shape","connector"],"required_observable_semantics":["options","criteria_or_tradeoffs","decision_signal"],"owner_skills":["rca-ppt-story-architect","rca-ppt-visual-director"]},
-      {"pattern_id":"tabular_evidence","content_shape":"rectangular facts, metrics, statements, or schedules","use_when":"precise row-column lookup is more honest than a chart","skip_when":"the message is a visible quantitative shape","accepted_object_families":["table","text_box"],"required_observable_semantics":["headers","cell_alignment","units_and_sources"],"owner_skills":["rca-template-profiler","rca-native-ppt-designer"]},
-      {"pattern_id":"portfolio_density","content_shape":"many weighted topics, modules, or nested areas","use_when":"coverage and relative emphasis matter more than sequence","skip_when":"each item needs a detailed sentence or exact position","accepted_object_families":["chart","shape","group"],"required_observable_semantics":["item_set","weight_or_group_encoding","label_legibility"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
-      {"pattern_id":"root_cause","content_shape":"effect with grouped causal branches","use_when":"the audience must diagnose causes rather than follow a process","skip_when":"causal evidence is unavailable or the relation is merely sequential","accepted_object_families":["shape","connector","path"],"required_observable_semantics":["effect","cause_groups","causal_edges"],"owner_skills":["rca-ppt-story-architect","rca-ppt-visual-director"]},
-      {"pattern_id":"dependency_system_map","content_shape":"systems, components, routes, or actors connected by typed relationships","use_when":"the promise depends on topology, dependency, or information flow","skip_when":"items are merely grouped or sequential without meaningful edges","accepted_object_families":["shape","connector","group"],"required_observable_semantics":["typed_nodes","meaningful_edges","direction_or_dependency_legend"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
-      {"pattern_id":"set_overlap","content_shape":"two or three sets whose overlap is the message","use_when":"shared membership or intersection carries the claim","skip_when":"sets do not overlap or need quantitative area accuracy","accepted_object_families":["shape","path","text_box"],"required_observable_semantics":["named_sets","visible_intersection","intersection_meaning"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
-      {"pattern_id":"list_showcase","content_shape":"parallel items, agenda, roster, principles, or hero evidence","use_when":"the message is scannable parallel coverage or one dominant proof object","skip_when":"sequence, hierarchy, or comparison must be encoded","accepted_object_families":["shape","picture","text_box","group"],"required_observable_semantics":["item_or_hero_identity","intentional_emphasis","reading_order"],"owner_skills":["rca-ppt-visual-director","rca-template-profiler"]}
+      {
+        "pattern_id": "quantitative_trend",
+        "content_shape": "values over ordered time",
+        "use_when": "direction, cumulative volume, or multi-series movement is the message",
+        "skip_when": "time order is absent or category ranking is primary",
+        "accepted_object_families": [
+          "chart",
+          "path",
+          "text_box"
+        ],
+        "required_observable_semantics": [
+          "ordered_axis",
+          "series_encoding",
+          "source_note"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-native-ppt-designer"
+        ]
+      },
+      {
+        "pattern_id": "category_comparison",
+        "content_shape": "named categories with comparable values",
+        "use_when": "rank, magnitude, or side-by-side differences matter",
+        "skip_when": "composition or continuous time is the message",
+        "accepted_object_families": [
+          "chart",
+          "table"
+        ],
+        "required_observable_semantics": [
+          "shared_scale",
+          "category_labels",
+          "value_encoding"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-native-ppt-designer"
+        ]
+      },
+      {
+        "pattern_id": "part_to_whole",
+        "content_shape": "parts of one whole or nested composition",
+        "use_when": "share, allocation, or hierarchy composition matters",
+        "skip_when": "parts do not share a valid denominator",
+        "accepted_object_families": [
+          "chart",
+          "shape",
+          "text_box"
+        ],
+        "required_observable_semantics": [
+          "whole_definition",
+          "part_encoding",
+          "total_consistency"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-ppt-reviewer"
+        ]
+      },
+      {
+        "pattern_id": "distribution_relationship",
+        "content_shape": "observations, ranges, correlation, or outliers",
+        "use_when": "spread, cluster, association, or distribution shape matters",
+        "skip_when": "only aggregate category values are available",
+        "accepted_object_families": [
+          "chart",
+          "path"
+        ],
+        "required_observable_semantics": [
+          "quantitative_axes",
+          "observation_encoding",
+          "outlier_or_range_legibility"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-native-ppt-designer"
+        ]
+      },
+      {
+        "pattern_id": "target_progress",
+        "content_shape": "actual, target, completion, or capability scores",
+        "use_when": "goal attainment or multi-axis capability is the message",
+        "skip_when": "there is no declared baseline or comparable scale",
+        "accepted_object_families": [
+          "chart",
+          "metric_grid"
+        ],
+        "required_observable_semantics": [
+          "baseline_or_target",
+          "actual_value",
+          "unit_or_scale"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-ppt-reviewer"
+        ]
+      },
+      {
+        "pattern_id": "variance_bridge",
+        "content_shape": "additive and subtractive contributors between two totals",
+        "use_when": "the audience must explain how a start becomes an end",
+        "skip_when": "contributors do not form a running total",
+        "accepted_object_families": [
+          "chart",
+          "shape",
+          "connector"
+        ],
+        "required_observable_semantics": [
+          "start_total",
+          "signed_steps",
+          "end_total"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-native-ppt-designer"
+        ]
+      },
+      {
+        "pattern_id": "magnitude_flow",
+        "content_shape": "flow with splits, merges, or volume loss",
+        "use_when": "magnitude through a system or conversion stages is material",
+        "skip_when": "steps have no quantity or branching semantics",
+        "accepted_object_families": [
+          "chart",
+          "path",
+          "connector"
+        ],
+        "required_observable_semantics": [
+          "source_nodes",
+          "directed_flow",
+          "magnitude_encoding"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-ppt-reviewer"
+        ]
+      },
+      {
+        "pattern_id": "sequential_process",
+        "content_shape": "ordered steps, phases, or pipeline outputs",
+        "use_when": "sequence and handoff logic matter more than time scale",
+        "skip_when": "the relation is cyclical or durations need an axis",
+        "accepted_object_families": [
+          "shape",
+          "connector",
+          "group"
+        ],
+        "required_observable_semantics": [
+          "ordered_steps",
+          "directional_edges",
+          "stage_outputs"
+        ],
+        "owner_skills": [
+          "rca-ppt-story-architect",
+          "rca-ppt-visual-director"
+        ]
+      },
+      {
+        "pattern_id": "time_schedule",
+        "content_shape": "milestones, durations, or roadmap states",
+        "use_when": "time position, duration, or delivery order is the message",
+        "skip_when": "steps are timeless or cyclical",
+        "accepted_object_families": [
+          "shape",
+          "connector",
+          "table"
+        ],
+        "required_observable_semantics": [
+          "time_axis",
+          "event_or_duration_binding",
+          "status_legibility"
+        ],
+        "owner_skills": [
+          "rca-ppt-story-architect",
+          "rca-ppt-visual-director"
+        ]
+      },
+      {
+        "pattern_id": "cycle_feedback",
+        "content_shape": "closed-loop stages or compounding feedback",
+        "use_when": "the final stage returns to or strengthens the first",
+        "skip_when": "the process is one-way",
+        "accepted_object_families": [
+          "shape",
+          "connector",
+          "path"
+        ],
+        "required_observable_semantics": [
+          "closed_loop",
+          "ordered_stages",
+          "feedback_direction"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-ppt-reviewer"
+        ]
+      },
+      {
+        "pattern_id": "hierarchy_architecture",
+        "content_shape": "layers, containment, maturity, or reporting hierarchy",
+        "use_when": "levels and parent-child structure are the message",
+        "skip_when": "items are peers without containment or rank",
+        "accepted_object_families": [
+          "shape",
+          "group",
+          "connector"
+        ],
+        "required_observable_semantics": [
+          "level_encoding",
+          "parent_child_relation",
+          "layer_labels"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-template-profiler"
+        ]
+      },
+      {
+        "pattern_id": "hub_network",
+        "content_shape": "one core with outward capabilities or inward forces",
+        "use_when": "core-periphery relation and edge direction matter",
+        "skip_when": "a strict hierarchy or sequence is required",
+        "accepted_object_families": [
+          "shape",
+          "connector",
+          "group"
+        ],
+        "required_observable_semantics": [
+          "core_node",
+          "spokes_or_forces",
+          "edge_direction"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-ppt-reviewer"
+        ]
+      },
+      {
+        "pattern_id": "matrix_quadrant",
+        "content_shape": "two axes, grid cells, or named quadrants",
+        "use_when": "position, priority, intensity, or cross-classification matters",
+        "skip_when": "there is only one comparison dimension",
+        "accepted_object_families": [
+          "chart",
+          "table",
+          "shape"
+        ],
+        "required_observable_semantics": [
+          "axis_or_row_column_grammar",
+          "cell_or_point_binding",
+          "quadrant_meaning"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-native-ppt-designer"
+        ]
+      },
+      {
+        "pattern_id": "comparison_decision",
+        "content_shape": "options, pros and cons, tiers, or decision gates",
+        "use_when": "the audience must compare alternatives and land a choice",
+        "skip_when": "items are unrelated facts without decision criteria",
+        "accepted_object_families": [
+          "table",
+          "shape",
+          "connector"
+        ],
+        "required_observable_semantics": [
+          "options",
+          "criteria_or_tradeoffs",
+          "decision_signal"
+        ],
+        "owner_skills": [
+          "rca-ppt-story-architect",
+          "rca-ppt-visual-director"
+        ]
+      },
+      {
+        "pattern_id": "tabular_evidence",
+        "content_shape": "rectangular facts, metrics, statements, or schedules",
+        "use_when": "precise row-column lookup is more honest than a chart",
+        "skip_when": "the message is a visible quantitative shape",
+        "accepted_object_families": [
+          "table",
+          "text_box"
+        ],
+        "required_observable_semantics": [
+          "headers",
+          "cell_alignment",
+          "units_and_sources"
+        ],
+        "owner_skills": [
+          "rca-template-profiler",
+          "rca-native-ppt-designer"
+        ]
+      },
+      {
+        "pattern_id": "portfolio_density",
+        "content_shape": "many weighted topics, modules, or nested areas",
+        "use_when": "coverage and relative emphasis matter more than sequence",
+        "skip_when": "each item needs a detailed sentence or exact position",
+        "accepted_object_families": [
+          "chart",
+          "shape",
+          "group"
+        ],
+        "required_observable_semantics": [
+          "item_set",
+          "weight_or_group_encoding",
+          "label_legibility"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-ppt-reviewer"
+        ]
+      },
+      {
+        "pattern_id": "root_cause",
+        "content_shape": "effect with grouped causal branches",
+        "use_when": "the audience must diagnose causes rather than follow a process",
+        "skip_when": "causal evidence is unavailable or the relation is merely sequential",
+        "accepted_object_families": [
+          "shape",
+          "connector",
+          "path"
+        ],
+        "required_observable_semantics": [
+          "effect",
+          "cause_groups",
+          "causal_edges"
+        ],
+        "owner_skills": [
+          "rca-ppt-story-architect",
+          "rca-ppt-visual-director"
+        ]
+      },
+      {
+        "pattern_id": "dependency_system_map",
+        "content_shape": "systems, components, routes, or actors connected by typed relationships",
+        "use_when": "the promise depends on topology, dependency, or information flow",
+        "skip_when": "items are merely grouped or sequential without meaningful edges",
+        "accepted_object_families": [
+          "shape",
+          "connector",
+          "group"
+        ],
+        "required_observable_semantics": [
+          "typed_nodes",
+          "meaningful_edges",
+          "direction_or_dependency_legend"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-ppt-reviewer"
+        ]
+      },
+      {
+        "pattern_id": "set_overlap",
+        "content_shape": "two or three sets whose overlap is the message",
+        "use_when": "shared membership or intersection carries the claim",
+        "skip_when": "sets do not overlap or need quantitative area accuracy",
+        "accepted_object_families": [
+          "shape",
+          "path",
+          "text_box"
+        ],
+        "required_observable_semantics": [
+          "named_sets",
+          "visible_intersection",
+          "intersection_meaning"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-ppt-reviewer"
+        ]
+      },
+      {
+        "pattern_id": "list_showcase",
+        "content_shape": "parallel items, agenda, roster, principles, or hero evidence",
+        "use_when": "the message is scannable parallel coverage or one dominant proof object",
+        "skip_when": "sequence, hierarchy, or comparison must be encoded",
+        "accepted_object_families": [
+          "shape",
+          "picture",
+          "text_box",
+          "group"
+        ],
+        "required_observable_semantics": [
+          "item_or_hero_identity",
+          "intentional_emphasis",
+          "reading_order"
+        ],
+        "owner_skills": [
+          "rca-ppt-visual-director",
+          "rca-template-profiler"
+        ]
+      }
     ]
   },
   "professional_style_registry": {
     "active_profile_id": "rca_executive_proof_board",
     "selection_field": "editable_shape_plan.design_spec_lock.professional_design_brief.design_register",
+    "image_first_selection_field": "visual_manifest.style_profile_id",
+    "style_profile_catalog_ref": "prompts/ppt_deck/style_profiles.json#/profiles",
+    "profile_selection_policy": {
+      "user_selectable": true,
+      "default_profile_unchanged": true,
+      "style_is_independent_of_communication_mode": true,
+      "style_cannot_rewrite_story_source_or_page_duty": true,
+      "style_cannot_admit_native_editability": true,
+      "calibrate_before_scaling": "one_anchor_plus_three_representative_page_roles_or_current_accepted_pages",
+      "review_order": [
+        "lecture_structure_and_source_fidelity",
+        "readability_and_relationships",
+        "style_continuity",
+        "style_similarity"
+      ],
+      "quality_debt_policy": "A visually pleasing illustration that loses the lecture argument is a style failure.",
+      "reference_images_optional": true
+    },
     "custom_escape": {
       "profile_id": "custom",
       "style_behavior_field": "editable_shape_plan.design_spec_lock.professional_design_brief.custom_style_behavior",
@@ -699,34 +1158,365 @@
       {
         "profile_id": "rca_swiss_system_brief",
         "use_when": "consulting, architecture, or type-led system explanation",
-        "palette": {"canvas":"#FAFAF8","ink":"#151515","muted":"#626262","accent":"#D62F2F","panel":"#EDEDEA"},
-        "typography": {"title_family":"Noto Sans CJK SC","body_family":"Noto Sans CJK SC","title_weight":700,"body_weight":400},
+        "palette": {
+          "canvas": "#FAFAF8",
+          "ink": "#151515",
+          "muted": "#626262",
+          "accent": "#D62F2F",
+          "panel": "#EDEDEA"
+        },
+        "typography": {
+          "title_family": "Noto Sans CJK SC",
+          "body_family": "Noto Sans CJK SC",
+          "title_weight": 700,
+          "body_weight": 400
+        },
         "layout_motif": "strict grid, sharp rules, large whitespace, asymmetric proof anchors",
-        "forbidden_patterns": ["soft floating card wall", "ornamental gradients", "uncontrolled alignment"]
+        "forbidden_patterns": [
+          "soft floating card wall",
+          "ornamental gradients",
+          "uncontrolled alignment"
+        ]
       },
       {
         "profile_id": "rca_data_editorial_report",
         "use_when": "market review, finance, research, or data-led long-form analysis",
-        "palette": {"canvas":"#FCFBF7","ink":"#202124","muted":"#70757A","accent":"#006B5B","panel":"#E8EEE9"},
-        "typography": {"title_family":"Noto Serif CJK SC","body_family":"Noto Sans CJK SC","title_weight":700,"body_weight":400},
+        "palette": {
+          "canvas": "#FCFBF7",
+          "ink": "#202124",
+          "muted": "#70757A",
+          "accent": "#006B5B",
+          "panel": "#E8EEE9"
+        },
+        "typography": {
+          "title_family": "Noto Serif CJK SC",
+          "body_family": "Noto Sans CJK SC",
+          "title_weight": 700,
+          "body_weight": 400
+        },
         "layout_motif": "editorial columns, source lines, annotated charts, strong typographic hierarchy",
-        "forbidden_patterns": ["dashboard chrome everywhere", "source-free charts", "equal emphasis on every number"]
+        "forbidden_patterns": [
+          "dashboard chrome everywhere",
+          "source-free charts",
+          "equal emphasis on every number"
+        ]
       },
       {
         "profile_id": "rca_technical_blueprint",
         "use_when": "engineering, architecture, or annotated technical walkthrough",
-        "palette": {"canvas":"#10202B","ink":"#F4F7F8","muted":"#A8BBC5","accent":"#46C2B3","panel":"#173441"},
-        "typography": {"title_family":"Noto Sans CJK SC","body_family":"Noto Sans Mono CJK SC","title_weight":700,"body_weight":400},
+        "palette": {
+          "canvas": "#10202B",
+          "ink": "#F4F7F8",
+          "muted": "#A8BBC5",
+          "accent": "#46C2B3",
+          "panel": "#173441"
+        },
+        "typography": {
+          "title_family": "Noto Sans CJK SC",
+          "body_family": "Noto Sans Mono CJK SC",
+          "title_weight": 700,
+          "body_weight": 400
+        },
         "layout_motif": "schematic line work, explicit nodes, measured annotations, restrained depth",
-        "forbidden_patterns": ["glow as structure", "unlabeled edges", "decorative pseudo-code"]
+        "forbidden_patterns": [
+          "glow as structure",
+          "unlabeled edges",
+          "decorative pseudo-code"
+        ]
       },
       {
         "profile_id": "rca_photo_editorial_story",
         "use_when": "architecture, culture, product, or brand story led by inspectable imagery",
-        "palette": {"canvas":"#F5F3EF","ink":"#161616","muted":"#66615A","accent":"#B43C32","panel":"#E7E1D8"},
-        "typography": {"title_family":"Noto Serif CJK SC","body_family":"Noto Sans CJK SC","title_weight":700,"body_weight":400},
+        "palette": {
+          "canvas": "#F5F3EF",
+          "ink": "#161616",
+          "muted": "#66615A",
+          "accent": "#B43C32",
+          "panel": "#E7E1D8"
+        },
+        "typography": {
+          "title_family": "Noto Serif CJK SC",
+          "body_family": "Noto Sans CJK SC",
+          "title_weight": 700,
+          "body_weight": 400
+        },
         "layout_motif": "large inspectable image fields, editorial captions, quiet text blocks, deliberate crop rhythm",
-        "forbidden_patterns": ["dark blurred stock image", "text covering the subject", "thumbnail mosaic without hierarchy"]
+        "forbidden_patterns": [
+          "dark blurred stock image",
+          "text covering the subject",
+          "thumbnail mosaic without hierarchy"
+        ]
+      },
+      {
+        "profile_id": "rca_handdrawn_lecture",
+        "display_name_i18n": {
+          "zh-CN": "讲课手绘",
+          "en-US": "Hand-drawn lecture"
+        },
+        "use_when": "教学讲解、医学科普、研究汇报需要亲和且可连续讲述的手绘视觉",
+        "route_compatibility": [
+          "image_first_full_slide",
+          "html",
+          "native"
+        ],
+        "palette": {
+          "canvas": "#F7F4EC",
+          "ink": "#18383A",
+          "muted": "#61716F",
+          "accent": "#3B9993",
+          "secondary": "#8AAEC4",
+          "warm": "#E6B95E",
+          "risk": "#B54D3E"
+        },
+        "typography": {
+          "title": "细钢笔手写标题，字面清楚，字距略松",
+          "body": "短标签使用同一钢笔笔触；英文、数字和期刊名保持可辨识",
+          "native_fallback": "选择已安装、笔画自然的手写/人文黑体；不要用僵硬正楷代替"
+        },
+        "material_and_mark_making": [
+          "近白纸面和轻微纸纹",
+          "细墨轮廓与自然起收笔",
+          "半透明水彩叠色",
+          "蓝绿、暖黄和少量红色强调",
+          "箭头与连接线保留手绘不规则感"
+        ],
+        "composition": "先建立首眼对象、因果关系和结论区；构图可变，不固定三栏卡片；医学对象和数据承担解释职责",
+        "text_treatment": "页面可共同绘制文字，但关键数字、真实二维码、真实界面和论文图保留可核验原始资产；文字不能压在高频纹理上",
+        "prompt_recipe": "fine pen hand lettering, thin ink outlines, translucent watercolor, warm paper, clear lecture diagram, readable scientific labels, varied composition",
+        "forbidden_patterns": [
+          "印刷楷体盖在水彩背景上",
+          "均匀三栏卡片墙",
+          "只画装饰图标不画语义关系",
+          "用纹理和贴纸代替结构",
+          "整页小字资料墙"
+        ],
+        "review_checks": [
+          "首眼是否是页面主张或证据",
+          "箭头/分组是否能在无讲稿时读出",
+          "中文、英文、数字、期刊名是否同属自然笔触",
+          "相邻页是否保持墨色、纸色、叠色和字形连续"
+        ]
+      },
+      {
+        "profile_id": "rca_chinese_ink_lecture",
+        "display_name_i18n": {
+          "zh-CN": "国风水墨讲课",
+          "en-US": "Chinese ink lecture"
+        },
+        "use_when": "需要中国书写气质、克制留白和东方材料感的医学或战略讲课",
+        "route_compatibility": [
+          "image_first_full_slide",
+          "html",
+          "native"
+        ],
+        "palette": {
+          "canvas": "#F5F0E5",
+          "ink": "#1C3031",
+          "muted": "#65706C",
+          "accent": "#587D7A",
+          "secondary": "#9DAFA8",
+          "warm": "#C99A57",
+          "vermilion": "#A94F43"
+        },
+        "typography": {
+          "title": "有锋面的毛笔/钢笔混合字形，保持大字号可读",
+          "body": "短句、数字和拉丁字母用较细干笔，避免粗重书法占满页面",
+          "native_fallback": "使用可读的人文宋/楷体作为排版基线，再用墨色和笔触做风格化"
+        },
+        "material_and_mark_making": [
+          "宣纸或温白纸面",
+          "浓淡墨塑形、干笔边缘和淡彩薄染",
+          "蓝灰、茶赭、少量朱砂作为语义强调",
+          "留白作为层级和阅读路径",
+          "局部飞白与不均匀墨量"
+        ],
+        "composition": "用留白和一到两个解释性主体建立呼吸；山、水、竹、印章只有在承担内容语义时出现；关系图、证据行和结论区仍要清楚",
+        "text_treatment": "字形、墨量和留白共同构成风格；不把纸纹当作水墨，不让装饰性国风元素抢走医学证据",
+        "prompt_recipe": "Chinese ink wash on warm xuan paper, controlled ink modeling, dry-brush edges, restrained blue-gray and ochre wash, vermilion emphasis, generous negative space, clear lecture diagram",
+        "forbidden_patterns": [
+          "硬加山水、竹子或印章作为边角装饰",
+          "普通扁平2D插画叠加水墨滤镜",
+          "高饱和渐变和玻璃卡片",
+          "书法字无法读出科学数字",
+          "整页只剩氛围没有讲课结构"
+        ],
+        "review_checks": [
+          "留白是否服务阅读而非制造空洞",
+          "墨色层次是否区分标题、关系、证据和结论",
+          "国风来自笔墨/纸面/空间而非随机装饰",
+          "医学解剖和数据仍然准确清楚"
+        ]
+      },
+      {
+        "profile_id": "rca_alariko_editorial_illustration",
+        "display_name_i18n": {
+          "zh-CN": "Alariko 灵感编辑插画",
+          "en-US": "Alariko-inspired editorial illustration"
+        },
+        "use_when": "需要有辨识度的叙事插画，同时保持投影场景下的讲课结构和证据可读性",
+        "route_compatibility": [
+          "image_first_full_slide"
+        ],
+        "approval_scope": "project_or_owner_selected; current project accepted as a three-page reference sample, not a global default",
+        "palette": {
+          "canvas": "#F5F0E5",
+          "ink": "#193D3E",
+          "muted": "#667B78",
+          "accent": "#3D8884",
+          "secondary": "#83A9AA",
+          "warm": "#D8A65D",
+          "rust": "#B96B49",
+          "shadow": "#789497"
+        },
+        "typography": {
+          "title": "细钢笔手写，略有自然粗细变化但不潦草",
+          "body": "标签和数字贴近对象，英文/数字清楚，避免印刷楷体",
+          "native_fallback": "image-first优先；若原生排版，使用细人文无衬线并以绘画式标注补足气质"
+        },
+        "material_and_mark_making": [
+          "分层纸张和轻微纸边",
+          "块状但不僵硬的蓝绿/暖赭色面",
+          "局部透明水彩与不规则轮廓",
+          "明确方向的柔和投影",
+          "局部透视和可触摸的书册、工具、人物器物",
+          "墨线与色块共同解释对象"
+        ],
+        "composition": "先画教学对象和关系：一页一个首眼主对象，标签贴对象、箭头贴关系；使用局部场景支持解释，不用满幅房间、窗景或风景占位",
+        "text_treatment": "文字和解释图共同设计；标题、证据、结论保持三级层次；避免把文字后加到“有空的插画”上",
+        "prompt_recipe": "editorial illustration with layered paper, irregular contours, local perspective, blue-green and warm ochre planes, translucent watercolor, directional soft shadows, fine pen lettering, one clear explanatory hero object, complete lecture slide",
+        "forbidden_patterns": [
+          "先画满幅办公室再找空处塞字",
+          "带文字的独立插画而不是讲课页",
+          "普通扁平2D卡片加少量山竹装饰",
+          "均匀小图标拼贴",
+          "文字漂浮、箭头断裂、结论压在复杂前景",
+          "随机山水/竹子/窗景填边角"
+        ],
+        "review_checks": [
+          "第一眼是否落在主张、证据或关系对象",
+          "页面是否像可讲授的PPT而非插画海报",
+          "每个标签是否指向唯一对象",
+          "色彩、字形、纸感和投影是否跨页连续",
+          "旧版相对审阅是否更清楚而非只是更漂亮"
+        ]
+      },
+      {
+        "profile_id": "rca_ukiyo_e_woodblock_lecture",
+        "display_name_i18n": {
+          "zh-CN": "浮世绘木版讲课",
+          "en-US": "Ukiyo-e woodblock lecture"
+        },
+        "use_when": "文化史、战略转折、人物/地域叙事或需要强轮廓与平面构成的讲课",
+        "route_compatibility": [
+          "image_first_full_slide",
+          "html",
+          "native"
+        ],
+        "palette": {
+          "canvas": "#F4EEDB",
+          "ink": "#1E2C36",
+          "muted": "#61706B",
+          "accent": "#24516A",
+          "secondary": "#6B8B79",
+          "warm": "#D2A452",
+          "vermilion": "#B44E3C"
+        },
+        "typography": {
+          "title": "清晰的木刻感标题，轮廓明确",
+          "body": "短标签和数据使用规整高对比字形，不模拟难读的古文字",
+          "native_fallback": "保留平面色块、边框线和非对称构图，文字使用稳定的衬线/无衬线组合"
+        },
+        "material_and_mark_making": [
+          "米白和纸纤维底",
+          "木版刻线和可见套色边缘",
+          "靛蓝、赭黄、朱红、黛绿的有限色盘",
+          "大块平面色与清楚轮廓",
+          "细微套色错位作为手工感",
+          "纹样只有在说明对象/类别/地域时使用"
+        ],
+        "composition": "非对称裁切、前后层次和明确框取；以一到两个主图形承载论点，证据和箭头使用木刻线条，不套统一卡片",
+        "text_treatment": "文字必须稳定、可读、少而精；日式假名、随机汉字和装饰性标题不可代替信息",
+        "prompt_recipe": "Japanese ukiyo-e woodblock print inspired lecture slide, warm rice paper, indigo and vermilion limited palette, bold carved contours, flat planes, subtle registration shift, asymmetric framing, clear evidence diagram, readable labels",
+        "forbidden_patterns": [
+          "动漫/照片/3D渲染混合",
+          "随机日文、假印章或无意义浪纹",
+          "用浮世绘纹样掩盖数据和关系",
+          "金属渐变、玻璃卡片、霓虹光效",
+          "古风装饰多于讲课信息"
+        ],
+        "review_checks": [
+          "有限色盘是否形成层级而非单调",
+          "木刻线和套色是否帮助区分对象",
+          "非对称构图是否仍有清楚阅读路径",
+          "文化元素是否承担语义，未变成贴图",
+          "医学和科学文本是否可投影阅读"
+        ]
+      },
+      {
+        "profile_id": "rca_warm_animation_lecture",
+        "display_name_i18n": {
+          "zh-CN": "清爽手绘动画讲课",
+          "en-US": "Warm hand-drawn animation lecture"
+        },
+        "use_when": "讲者选择明亮温暖、干净轮廓和清楚色面的手绘动画气质，同时需要完整教学结构与医学证据可读性",
+        "route_compatibility": [
+          "image_first_full_slide"
+        ],
+        "approval_scope": "project_or_owner_selected; art calibration does not imply whole-deck readiness; not a global default",
+        "palette": {
+          "canvas": "#FBFAF4",
+          "ink": "#203F35",
+          "muted": "#6B8076",
+          "accent": "#4C8D82",
+          "secondary": "#89B9C6",
+          "warm": "#E6CF9F",
+          "rust": "#AE684A",
+          "shadow": "#6B9391"
+        },
+        "typography": {
+          "title": "清楚轻盈的自然细笔手写；字形服务投影阅读",
+          "body": "标签、英文、数字和期刊行保持同一视觉家族与精确拼写",
+          "native_fallback": "本profile使用整页图；不能据画风选项推定原生可编辑"
+        },
+        "material_and_mark_making": [
+          "明亮柔暖日光与可信局部空间",
+          "干净自然的深色手绘轮廓与清晰色面",
+          "奶油色受光面、青绿色阴影和少量暖赭色",
+          "温和简洁的人物与有生活感的解释性器物",
+          "局部保留绘画笔触，干净与克制不作为缺点"
+        ],
+        "composition": "按页面主张安排首眼、对象关系、证据和结论；画法可借鉴手绘动画场景，教学页不必复制房屋街景，不把满幅插画当成通用课件背景",
+        "text_treatment": "文字与解释图共同设计；标题、图旁标签、数据与结论保持层级和可读性，科学符号与来源逐字检查",
+        "prompt_recipe": "warm hand-drawn animation illustration, clean natural contours, clear painted color planes, cream sunlight and teal-green shadows, gentle simplified characters, credible local perspective, light legible pen lettering, complete lecture diagram with explicit relationships",
+        "generation_guidance": {
+          "preferred_start": "text_only_when_supported_by_route_calibration_or_user_choice",
+          "image_reference_requirement": "optional",
+          "prompt_structure": "a concise coherent visual description, then page-specific teaching relationships and exact copy",
+          "calibration_boundary": "art-only probes test visual language; representative complete lecture pages test style transfer and evidence fidelity"
+        },
+        "forbidden_patterns": [
+          "先画满幅场景再找空处塞字",
+          "带文字的独立插画而不是讲课页",
+          "用无语义树叶、窗景、山竹填空",
+          "把干净线条自动判为缺少风格而强加粗粝纹理",
+          "为满足字面风格词而改变医学对象、数据或页职责"
+        ],
+        "review_checks": [
+          "无讲稿时是否能读出主张、关系和结论",
+          "明亮温暖的画法是否落在解释性主体上",
+          "文字、缩写、数值、解剖与来源是否准确",
+          "跨页字形、色彩和对象塑形是否连续",
+          "独立生成比较是否排除对应页成品输入，首次出图缺陷是否如实报告",
+          "人物、医学图、资料和工具是否使用同一画法；必须保留的真实资产是否清楚区分",
+          "混合医学页面是否被写实器官或照片质感压过教学主关系；反馈长句是否可顺读"
+        ],
+        "object_treatment": {
+          "characters": "同一套简洁手绘动画人物：清楚轮廓、概括五官和成块明暗；不在局部换成写实肖像、水彩照片或不同年龄/性别的替代角色",
+          "medical_diagrams": "保留正确解剖、模态和朝向，用同一套干净轮廓与简洁色面解释；真实影像若确有必要，独立标为经核验资产，不能生成假影像当证据",
+          "dossiers_and_tools": "资料、电脑和书册以同一局部透视与受光关系画成解释性器物；细节指向任务步骤、工具或质控，不用无意义屏幕图和杂物填充",
+          "relationships_and_copy": "箭头优先体现单向因果/反馈，标签就近放在安静水平文字区，长反馈句用自然换行，不因拥挤改成难读竖排",
+          "mixed_page": "多对象/多模态页面须逐类绑定同一视觉语言；全局一句风格词不能证明各子对象已遵守"
+        }
       }
     ]
   },

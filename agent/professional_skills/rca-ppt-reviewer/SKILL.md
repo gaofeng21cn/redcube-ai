@@ -82,6 +82,15 @@ Independently review the exact rendered pixels and route-specific package/readba
 
 ## Evidence, Density And Long-Deck Readback
 
+Consume the author's exact-copy/object/relationship/quantity/verified-asset
+brief when reading pixels. Check mandatory gates, branch meaning, count
+encodings and metric/input attribution separately from numeral recognition.
+The image exporter readback in `docs/delivery/image-deck-export.md` binds actual
+page order, original media, crop, layers and notes. A matching composition hash
+and prior review ref support AI's reuse decision; they cannot generate a visual
+pass. Any changed composition needs the affected pixel review. Keep the first
+output and actual selected generation request distinct in `ppt_review_evidence`.
+
 Use [source adaptation](../../knowledge/ppt_source_adaptation.md) to compare
 actual page duties, [style calibration](../../knowledge/ppt_style_calibration.md)
 to compare the old/new page and its neighbors, and
