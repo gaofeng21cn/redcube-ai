@@ -2,7 +2,9 @@
 import argparse
 import hashlib
 import json
-import zipfile
+import os
+import subprocess
+import sys
 import zlib
 from pathlib import Path
 
@@ -216,13 +218,26 @@ def write_delivery(output_root, fixture, image_manifest, style_manifest):
     review_summary_file = review_dir / "review-summary.json"
     final_delivery_manifest_file = export_dir / "final-delivery-manifest.json"
 
-    with zipfile.ZipFile(pptx_file, "w", compression=zipfile.ZIP_DEFLATED) as deck:
-        deck.writestr("[Content_Types].xml", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"/>")
-        deck.writestr("ppt/presentation.xml", "<presentation proof=\"image-first\"/>")
-        for image in image_manifest["images"]:
-            image_path = Path(image["png_file"])
-            deck.write(image_path, f"ppt/media/{image_path.name}")
-    pdf_file.write_bytes(b"%PDF-1.4\n% image-first proof placeholder\n%%EOF\n")
+    page_manifest_file = output_root / "page-manifest.json"
+    write_json(page_manifest_file, {
+        "schema_version": "rca.image-deck-export.v1",
+        "expected_slide_count": len(image_manifest["images"]),
+        "pages": [{
+            "slide_id": image["slide_id"],
+            "image_ref": Path(image["png_file"]).relative_to(output_root).as_posix(),
+            "sha256": file_sha256(Path(image["png_file"])),
+            "notes": f"Developer mechanical fixture {image['slide_id']}. No visual review.",
+        } for image in image_manifest["images"]],
+    })
+    invocation = [sys.executable, "-m", "redcube_ai.native_helpers.ppt_deck.export",
+                  "--page-manifest", str(page_manifest_file),
+                  "--output-pptx", str(pptx_file), "--output-pdf", str(pdf_file)]
+    environment = {**os.environ, "PYTHONPATH": str(Path(__file__).resolve().parents[2] / "python"),
+                   "PYTHONDONTWRITEBYTECODE": "1"}
+    conversion = subprocess.run(invocation, check=True, capture_output=True, text=True, env=environment)
+    receipt = json.loads(conversion.stdout)
+    receipt_file = export_dir / "export-readback.json"
+    write_json(receipt_file, receipt)
     write_json(export_bundle_file, {
         "schema_version": "image_ppt_export_bundle.v1",
         "source_visual_route": "author_image_pages",
@@ -233,6 +248,9 @@ def write_delivery(output_root, fixture, image_manifest, style_manifest):
         "prompt_manifest_file": (output_root / "prompt-manifest.json").resolve().as_posix(),
         "style_manifest_file": (output_root / "style-manifest.json").resolve().as_posix(),
         "review_summary_file": review_summary_file.resolve().as_posix(),
+        "page_manifest_file": page_manifest_file.resolve().as_posix(),
+        "real_conversion_invocation": invocation,
+        "export_readback_file": receipt_file.resolve().as_posix(),
     })
     write_json(gallery_file, {
         "schema_version": "image_ppt_gallery.v1",
@@ -244,7 +262,7 @@ def write_delivery(output_root, fixture, image_manifest, style_manifest):
     write_json(final_gallery_manifest_file, {
         "schema_version": "image_ppt_final_gallery_manifest.v1",
         "fixture_id": fixture.get("fixture_id"),
-        "status": "ready",
+        "status": "candidate",
         "items": [
             {
                 "slide_id": image["slide_id"],
@@ -259,7 +277,9 @@ def write_delivery(output_root, fixture, image_manifest, style_manifest):
     write_json(review_summary_file, {
         "schema_version": "image_ppt_review_summary.v1",
         "fixture_id": fixture.get("fixture_id"),
-        "status": "passed",
+        "status": "not_reviewed",
+        "mechanical_status": "passed",
+        "claim_boundary": "Mock images exercise real export and package readback; no visual review or owner acceptance.",
         "image_count": len(image_manifest["images"]),
         "style_reference_count": len(style_manifest["style_references"]),
         "checks": {
@@ -273,7 +293,7 @@ def write_delivery(output_root, fixture, image_manifest, style_manifest):
     })
     write_json(final_delivery_manifest_file, {
         "schema_version": "image_ppt_final_delivery_manifest.v1",
-        "delivery_status": "ready",
+        "delivery_status": "candidate",
         "refs": {
             "pptx": pptx_file.resolve().as_posix(),
             "pdf": pdf_file.resolve().as_posix(),
@@ -292,6 +312,9 @@ def write_delivery(output_root, fixture, image_manifest, style_manifest):
         "editable": False,
         "image_generation_mode": "mock",
         "uses_real_api": False,
+        "claim_boundary": "Mechanical proof only. Image generation is mocked; visual review, owner acceptance and native PowerPoint opening are unverified.",
+        "package_readback_status": receipt["package_readback"]["status"],
+        "pdf_readback_status": receipt["pdf_readback"]["status"],
         "png_count": len(image_manifest["images"]),
         "delivery_artifacts": {
             "pptx_file": pptx_file.resolve().as_posix(),
@@ -302,6 +325,8 @@ def write_delivery(output_root, fixture, image_manifest, style_manifest):
             "style_manifest_file": (output_root / "style-manifest.json").resolve().as_posix(),
             "review_summary_file": review_summary_file.resolve().as_posix(),
             "final_delivery_manifest_file": final_delivery_manifest_file.resolve().as_posix(),
+            "page_manifest_file": page_manifest_file.resolve().as_posix(),
+            "export_readback_file": receipt_file.resolve().as_posix(),
         },
     }
     write_json(output_root / "proof-summary.json", summary)

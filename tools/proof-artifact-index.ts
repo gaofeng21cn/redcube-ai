@@ -163,6 +163,8 @@ function imageIndex() {
     ['export_bundle_json', 'export_bundle_file', 'export_bundle'], ['gallery_json', 'gallery_file', 'gallery'],
     ['gallery_final_manifest_json', 'gallery_final_manifest_file', 'gallery'],
     ['final_delivery_manifest_json', 'final_delivery_manifest_file', 'final_delivery'],
+    ['page_manifest_json', 'page_manifest_file', 'export_input'],
+    ['export_readback_json', 'export_readback_file', 'package_readback'],
   ]) if (delivery[key]) artifacts.push(artifact(id, delivery[key], category));
   const missing = artifacts.filter((entry) => entry.required && !entry.exists).map((entry) => entry.artifact_id);
   return {

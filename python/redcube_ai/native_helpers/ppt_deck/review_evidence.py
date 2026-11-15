@@ -11,6 +11,41 @@ DIMENSIONS = ('content', 'facts', 'style', 'readability')
 REFERENCE_ROLES = {'content', 'style', 'anatomy', 'verified_asset', 'neighbor'}
 
 
+def request_evidence(request, root):
+    """Bind actual submitted text/inputs; do not reconstruct a request from a later file."""
+    result = {}
+    for field in ('prompt', 'shared_style'):
+        name = request.get(f'{field}_ref')
+        if name is None and field == 'shared_style':
+            continue
+        if not isinstance(name, str) or Path(name).is_absolute() or '://' in name:
+            raise ValueError('Request text ref must be asset-root-relative')
+        path = (root / name).resolve()
+        if not path.is_relative_to(root) or not path.is_file():
+            raise ValueError('Request text missing or outside asset_root')
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        if digest != request.get(f'{field}_sha256'):
+            raise ValueError('Submitted request text hash mismatch')
+        result.update({f'{field}_ref': name, f'{field}_sha256': digest})
+    result['input_images'] = []
+    for reference in request.get('input_images', []):
+        if reference.get('role') not in REFERENCE_ROLES:
+            raise ValueError('Unknown request image role')
+        scopes = {}
+        for key in ('allowed_borrowing', 'excluded_borrowing'):
+            values = reference.get(key)
+            if not isinstance(values, list) or not all(isinstance(v, str) and v.strip() for v in values):
+                raise ValueError('Request image must declare allowed/excluded borrowing lists')
+            scopes[key] = values
+        result['input_images'].append(dict(image_evidence(reference, root), role=reference['role'], **scopes))
+    for key in ('style_profile_id', 'style_revision'):
+        if key in request:
+            if not isinstance(request[key], str) or not request[key].strip():
+                raise ValueError('Style request identity must be nonempty')
+            result[key] = request[key]
+    return result
+
+
 def number(value, field):
     if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
         raise ValueError(f'{field} must be a finite nonnegative number')
@@ -74,6 +109,8 @@ def collect_evidence(manifest, root, expected_revision=None):
             if abs(info['width'] / info['height'] - 16 / 9) > .01:
                 raise ValueError('Generated page must have an uncropped near-16:9 composition')
             info.update(phase=generation['phase'], attempt_id=generation['attempt_id'], model=generation['model'])
+            if generation.get('request') is not None:
+                info['request'] = request_evidence(generation['request'], root)
             identities.append(info)
             elapsed.append(number(generation['elapsed_seconds'], 'elapsed_seconds'))
             if generation.get('cost_usd') is not None:
@@ -93,6 +130,13 @@ def collect_evidence(manifest, root, expected_revision=None):
         selected = page.get('selected_image_sha256')
         if selected is not None and selected not in [i['sha256'] for i in identities]:
             raise ValueError('Selected image is not among the recorded generations')
+        selected_attempt = page.get('selected_attempt_id')
+        selection = None
+        if selected_attempt is not None:
+            matches = [i for i in identities if i['attempt_id'] == selected_attempt and i['sha256'] == selected]
+            if len(matches) != 1:
+                raise ValueError('Selected attempt must uniquely bind the selected image')
+            selection = matches[0]
         group = groups.setdefault(variant, [])
         group.append({'review': review, 'calls': len(generations), 'elapsed': sum(elapsed),
                       'costs': costs, 'selected': selected is not None})
@@ -101,6 +145,8 @@ def collect_evidence(manifest, root, expected_revision=None):
             'images': identities, 'references': references,
             'first_review': dict(review) if review is not None else None,
             'selected_image_sha256': selected,
+            'selected_attempt_id': selected_attempt,
+            'selected_generation': selection,
         })
     metrics = {}
     for variant, items in groups.items():

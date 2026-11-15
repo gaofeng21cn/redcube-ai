@@ -48,6 +48,13 @@ A matching media set alone is insufficient. Re-render affected pages if
 compositing or editability breaks equivalence. Decode real QR assets or reuse
 hash-bound prior scan evidence. A package test is not native PowerPoint playback.
 
+Use the existing image export helper's explicit page manifest and actual
+readback described in `docs/delivery/image-deck-export.md`. Its composition
+hash binds ordered layers, crop, geometry and notes; an existing review ref
+must still be read and judged applicable. The selected generation's request
+snapshot, not a later edited prompt, supplies future reuse inputs. Keep first
+outputs for an active comparison even when later candidates are selected.
+
 Check every declared handoff copy separately and keep stable final names with
 revision/source metadata. Browser previews need all images, navigation,
 presentation/Escape and relevant narrow-screen checks. Archive necessary rollback

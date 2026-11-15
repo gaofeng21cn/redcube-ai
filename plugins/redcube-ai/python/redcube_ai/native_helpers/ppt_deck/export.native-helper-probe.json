@@ -14,7 +14,7 @@
         "slot_id": "build_pptx_artifact_write",
         "source_ref": "export.py",
         "symbol": "build_pptx",
-        "source_digest": "sha256:f4fee95c2c64c0c2220acc4a502197d5f31363358927819812ab34cb02256410",
+        "source_digest": "sha256:12d61999885572251dc0f33a3545f3643bbfac2a936cf692787c444802078aa3",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
@@ -23,7 +23,7 @@
         "slot_id": "build_pdf_artifact_write",
         "source_ref": "export.py",
         "symbol": "build_pdf",
-        "source_digest": "sha256:f4fee95c2c64c0c2220acc4a502197d5f31363358927819812ab34cb02256410",
+        "source_digest": "sha256:12d61999885572251dc0f33a3545f3643bbfac2a936cf692787c444802078aa3",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []

@@ -60,32 +60,48 @@
     "semantic_regression_cases": [
       {
         "case_id": "generic_ppt_request",
-        "request_semantics": ["make_a_ppt"],
+        "request_semantics": [
+          "make_a_ppt"
+        ],
         "expected_author_route": "author_image_pages"
       },
       {
         "case_id": "reference_pptx_template_request",
-        "request_semantics": ["attached_pptx", "use_as_reference", "follow_hospital_or_company_template"],
+        "request_semantics": [
+          "attached_pptx",
+          "use_as_reference",
+          "follow_hospital_or_company_template"
+        ],
         "expected_author_route": "author_image_pages"
       },
       {
         "case_id": "pptx_output_with_notes_and_pdf",
-        "request_semantics": ["pptx_output", "speaker_notes", "pdf_export"],
+        "request_semantics": [
+          "pptx_output",
+          "speaker_notes",
+          "pdf_export"
+        ],
         "expected_author_route": "author_image_pages"
       },
       {
         "case_id": "explicit_editable_objects_request",
-        "request_semantics": ["editable_text_shapes_charts_or_tables"],
+        "request_semantics": [
+          "editable_text_shapes_charts_or_tables"
+        ],
         "expected_author_route": "author_pptx_native"
       },
       {
         "case_id": "explicit_drawingml_request",
-        "request_semantics": ["native_powerpoint_objects_or_drawingml"],
+        "request_semantics": [
+          "native_powerpoint_objects_or_drawingml"
+        ],
         "expected_author_route": "author_pptx_native"
       },
       {
         "case_id": "explicit_native_authoring_request",
-        "request_semantics": ["explicit_native_pptx_authoring_route"],
+        "request_semantics": [
+          "explicit_native_pptx_authoring_route"
+        ],
         "expected_author_route": "author_pptx_native"
       }
     ]
@@ -207,6 +223,7 @@
   "verified_asset_overlay_policy": {
     "asset_overlay_surface": "verified_asset_overlay_manifest",
     "allowed_overlay_assets": [
+      "verified scientific or medical image",
       "real QR code",
       "download entry",
       "verified UI screenshot",
@@ -223,7 +240,21 @@
       "DOI",
       "logo",
       "publication screenshot"
-    ]
+    ],
+    "export_manifest_schema": "rca.image-deck-export.v1",
+    "export_helper_ref": "python/redcube_ai/native_helpers/ppt_deck/export.py",
+    "placement_fields": [
+      "asset_id",
+      "kind",
+      "image_ref",
+      "sha256",
+      "source_ref",
+      "box",
+      "crop_ltrb",
+      "expected_text (QR only)"
+    ],
+    "geometry_unit": "box: normalized slide fractions [x,y,width,height]; crop_ltrb: source fractions",
+    "qr_policy": "preserve full source and quiet zone, preserve aspect ratio, scan final use"
   },
   "long_deck_production_contract": {
     "contract_id": "ppt_image_first_long_deck_production_v1",
@@ -246,8 +277,8 @@
       "expected slide count matches image page count",
       "continuous slideNN ordering",
       "all generated pages are 16:9 PNG",
-      "exported PPTX has one full-slide image per slide",
-      "exported PPTX media count matches slide count",
+      "each actual PPTX slide has its declared full-frame base image plus only declared verified asset layers",
+      "actual ordered slide relationships, media bytes, geometry, crop and notes match the explicit page manifest; media deduplication is allowed",
       "full-deck contact sheet or manifest exists for operator review"
     ],
     "line_divergence_policy": {
@@ -358,20 +389,43 @@
     "export_pptx": {
       "source_visual_route": "author_image_pages|repair_image_pages",
       "editable_shapes_claim_allowed": false,
-      "full_slide_image_pages_allowed": true
+      "full_slide_image_pages_allowed": true,
+      "page_manifest_schema": "rca.image-deck-export.v1",
+      "mechanical_readback_required": [
+        "actual_pptx_parse",
+        "ordered_page_ids",
+        "base_and_overlay_media_hashes",
+        "layer_geometry_and_crop",
+        "notes",
+        "hidden_slide_state",
+        "pdf_parse_when_requested"
+      ],
+      "readback_is_visual_verdict": false,
+      "native_open_claim_requires_native_observation": true
     }
   },
   "alternate_routes": {
     "html": {
       "status": "production_selectable_optional",
       "explicit_selection_required": true,
-      "routes": ["render_html", "fix_html"]
+      "routes": [
+        "render_html",
+        "fix_html"
+      ]
     },
     "native_editable_pptx": {
       "status": "production_selectable_optional",
       "explicit_selection_required": true,
-      "routes": ["author_pptx_native", "repair_pptx_native"],
-      "use_when": ["editable", "native PPTX", "DrawingML", "可编辑"]
+      "routes": [
+        "author_pptx_native",
+        "repair_pptx_native"
+      ],
+      "use_when": [
+        "editable",
+        "native PPTX",
+        "DrawingML",
+        "可编辑"
+      ]
     }
   },
   "proof_runner": {

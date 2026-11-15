@@ -43,6 +43,13 @@ For a `ppt_deck`, decide the authoring lane from the complete current user reque
 5. Preserve user requests for plan review, approval, or staged continuation as a declared human-review intent. The hosted controller materializes the gate; RCA does not create a private pause/resume mechanism.
 6. Lock the selected image/native/HTML lane for the deliverable. Validator or repair failure cannot silently switch lanes.
 
+For image-first PPT production, the page author and reviewer consume the same
+exact-copy/object/relationship/quantity/verified-asset brief. Use explicit
+reference borrowing scopes and actual submitted-request snapshots. Package via
+the existing `ppt_deck_export` helper's explicit page manifest, notes and original
+asset layers; see `docs/delivery/image-deck-export.md`. Its mechanical readback
+supports review reuse and file verification without signing visual readiness.
+
 For HTML fidelity, use the page-author's actual-render method and the reviewer's
 actual-font/final-file evidence method. For image-heavy review, retain accepted
 page refs and remaining work in the existing StageRun artifacts, budget bytes

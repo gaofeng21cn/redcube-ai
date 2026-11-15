@@ -10,9 +10,23 @@ Before producing prompts, consume the page's source-duty mapping, exact visible 
 
 Calibrate the chosen visual language on a small set of pages that exposes the actual risks (for example, a mechanism and a dense result or transition), inspect them individually and alongside their neighbors, then continue the batch with the accepted direction. This is in-thread production refinement, not an extra approval gate or formal Review. Skip repeated calibration when current accepted pages already cover those risks.
 
+Use `image_first_prompt_template.md` as the page input, consuming the current
+blueprint's exact copy, objects, required relationships, quantity bindings and
+verified assets. Before each new page family, AI checks that the intended
+relationships and scope can be inferred from the proposed objects and arrows.
+Resolve contradictions upstream. After generation, read those same constraints
+against the pixels; exact numerals alone do not prove correct attribution.
+
+For each supplied reference, state allowed and excluded borrowing. A craft-only
+image contributes lettering, marks, color and light, without importing its
+garden, coast, props, people or composition unless the page explicitly needs
+them. Freeze the accepted shared craft prefix/revision in actual requests;
+representative calibration must cover this deck's object/relationship risks.
+Preserve the successful generation's submitted prompt and input identities.
+
 Use only facts available through the shared source truth whitelist, approved slide blueprint, or operator-supplied verified assets. If a precise visible claim cannot be traced, rephrase it as a general teaching statement or block for source repair instead of inventing specifics.
 
-Never ask the image model to generate QR codes, download URLs, DOI strings, logos, hospital names, patient demographics, publication status, page numbers, slide numbers, or chapter corner labels unless the verified asset policy explicitly supplies them. Real QR/download/UI/paper/logo assets belong in a deterministic verified asset overlay manifest, not in the generated bitmap prompt.
+Never ask the image model to generate QR codes, download URLs, DOI strings, logos, hospital names, patient demographics, publication status, page numbers, slide numbers, or chapter corner labels unless the verified asset policy explicitly supplies them. Real medical-image/QR/download/UI/paper/logo assets belong in a deterministic verified asset overlay manifest, not in the generated bitmap prompt. Reserve their regions before generation; preserve their original source bytes, explicit placement and crop. Teaching diagrams remain distinct from measured scientific evidence.
 
 Do not expose internal field names, prompt metadata, source ids, operator notes, or runtime labels in the visible slide image.
 

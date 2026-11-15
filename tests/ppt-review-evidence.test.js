@@ -101,6 +101,44 @@ test('unassessed dimensions never become a first-attempt pass', () => {
   assert.equal(report.metrics.candidate.first_attempt_usable_fraction, null);
 });
 
+test('selected attempt retains its actual prompt, shared style and scoped image inputs', () => {
+  const report = scenario(`
+(root/'submitted.txt').write_text('Actual selected request')
+(root/'shared.txt').write_text('Accepted shared craft')
+page['generations'][1]['request']={'prompt_ref':'submitted.txt','prompt_sha256':sha('submitted.txt'),
+ 'shared_style_ref':'shared.txt','shared_style_sha256':sha('shared.txt'),
+ 'style_profile_id':'test-profile','style_revision':'r1','input_images':[{
+ 'image_ref':'first.png','sha256':sha('first.png'),'role':'style',
+ 'allowed_borrowing':['lettering','light'],'excluded_borrowing':['scenery','layout']}]}
+page['selected_attempt_id']='repair'
+print(json.dumps(collect_evidence(m,root)))`);
+  const selected = report.bound_pages[0].selected_generation;
+  assert.equal(selected.attempt_id, 'repair');
+  assert.equal(selected.request.prompt_ref, 'submitted.txt');
+  assert.deepEqual(selected.request.input_images[0].excluded_borrowing, ['scenery', 'layout']);
+  assert.equal(report.bound_pages[0].first_review.style, 'fail');
+});
+
+test('a later prompt edit cannot replace the selected generation request', () => scenario(`
+(root/'submitted.txt').write_text('Original request')
+page['generations'][1]['request']={'prompt_ref':'submitted.txt','prompt_sha256':sha('submitted.txt')}
+(root/'submitted.txt').write_text('Later experiment')
+try:
+ collect_evidence(m,root)
+except ValueError as error:
+ assert 'request text hash mismatch' in str(error)
+else:
+ raise AssertionError('Edited prompt was promoted to the selected request')`));
+
+test('explicit selected attempt cannot be substituted by a different image attempt', () => scenario(`
+page['selected_attempt_id']='initial'
+try:
+ collect_evidence(m,root)
+except ValueError as error:
+ assert 'Selected attempt' in str(error)
+else:
+ raise AssertionError('Wrong selected attempt was accepted')`));
+
 for (const [name, mutation] of [
   ['tampered image', "(root/'first.png').write_bytes((root/'repair.png').read_bytes())"],
   ['final review substituted for first', "review['image_sha256']=sha('repair.png')"],

@@ -19,6 +19,7 @@ from .renderer_dependencies import (
 
 
 OPTIONAL_IMPORT_NAMES = {
+    "zxing-cpp": "zxingcpp",
     "Pillow": "PIL",
     "python-pptx": "pptx",
     "playwright": "playwright",

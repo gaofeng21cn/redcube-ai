@@ -53,6 +53,11 @@ page's source duty, exact content, object meanings and role-labeled references
 in the generation brief. A style-only reference must not donate facts or anatomy.
 Inspect calibration pages before scaling, and the whole changed page after a
 local edit. Preserve unchanged media and notes instead of rebuilding passed pages.
+Use the page input in `prompts/ppt_deck/image_first_prompt_template.md` for
+exact copy, objects, required relationships, quantity bindings and reserved
+verified assets. AI checks their meaning before generation and against the
+whole output afterwards. Reference borrowing includes explicit exclusions;
+bind shared craft, actual submitted prompt and input identities per attempt.
 
 1. Consume the available source, story, blueprint, and visual direction for the page. Missing inputs produce bounded assumptions, repair targets, or a no-output diagnostic under the quality policy below.
 2. Work from each page's current contract and check it against deck-level rhythm and style. Reuse already-read refs until an upstream change invalidates them.

@@ -66,6 +66,13 @@ Operate as the visual direction specialist between blueprint approval and page a
 
 ## Workbench Lessons To Preserve
 
+Bind one accepted shared craft prefix and profile revision across page families
+in actual submitted requests, including image-first routes beyond H3. For each
+reference, distinguish marks/material/lettering/light from permitted objects
+or composition. Calibrate this deck's difficult relationships and mixed objects;
+a simple scene cannot establish their stability. Keep geometry instructions
+outside exact visible copy and reserve verified evidence layers before drawing.
+
 - Visual direction for image-first decks must be page-by-page, not only deck-level. Each real slide id needs first-glance hook, composition, visible text budget, style reference, and image-prompt intent before image prompts are written.
 - A reference deck must be version-locked. Record the current source path/ref, representative pages, and what may be borrowed. Do not silently reuse stale archive pages just because they are visually familiar.
 - A `.pptx` reference or requested `.pptx` output does not imply editable authoring. Extract its approved visual/template signals for image-first unless explicit native admission evidence says otherwise.

@@ -35,7 +35,7 @@ HTML 与 native editable PPTX 继续保留为显式二线路线。用户明确�
 
 - 每页命名采用 `slideNN-short-name.png`；expected slide count 来自 `slide_blueprint.expected_slide_count` 或 `slide_blueprint.slides.length`。
 - 产物面至少包括 prompts、raw PNG、1920x1080 normalized PNG、style refs、fact verification ledger、visual QC ledger、contact sheet、PPTX。
-- 完整性 gate 检查 expected count、连续 `slideNN`、全部 16:9 PNG、PPTX 每页一张满版图、PPTX media count 与 slide count 一致、全 deck contact sheet 或 manifest 可供人工浏览。
+- 完整性 gate 检查 expected count、连续 `slideNN`、全部 16:9 PNG、PPTX 每页包含声明的满版底图及核验资产层、按实际 relationships 核对页序/原始媒体/几何/裁剪/备注（允许媒体去重）、全 deck contact sheet 或 manifest 可供人工浏览。
 - image-first 与 HTML/native 可以共享 source truth 和 storyline，但允许从 detailed outline / slide blueprint / visual direction 起分叉；image route 不是 HTML skin，HTML 默认不消费 image route PNG。
 - 被判错的 PIL/Canvas/HTML 页面修补路线只能作为 rejected provenance 保留；生产 repair 通过 `repair_image_pages` 重绘 blocked pages。后处理只允许确定性叠加真实资产，不承担构图、事实或文本修补。
 
@@ -62,3 +62,5 @@ Developer proof 使用 6 页以内 lightweight fixture，也不调用 Codex exec
 本文只解释当前路线。机器字段由 `contracts/runtime-program/ppt-image-first-production-route.json` 与 `tools/image-ppt-proof/ci-contract.json` 持有；过程记录使用 Git 追溯。真实 artifact-producing owner receipt、review/export acceptance 与 long-soak 的验收要求见 [未完成验收](../active/rca-ideal-state-gap-plan.md)。
 
 专业方法、风格优先级与真实图像评测见 [PPT工作台经验沉淀](ppt-workbench-learning.md)。现行用户要求与认可导演稿决定画法和语言；示例profile不得覆盖。
+
+整页图生产导出使用[显式页面清单与实际文件回读](image-deck-export.md)，developer proof 也调用真实 exporter；mock 只替代图片生成，视觉未审与候选交付分别记录。

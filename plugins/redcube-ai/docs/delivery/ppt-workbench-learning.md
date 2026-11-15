@@ -14,6 +14,14 @@ still selects the narrative, language, style, page constraints and authoring lan
 
 ## Real-image evidence helper
 
+Image-deck export now consumes an explicit page manifest with notes and original
+verified layers; see [the export and readback guide](image-deck-export.md).
+The actual package recipe can bind a previous RCA review without reloading
+unchanged images. Review reuse remains an AI decision over current source,
+direction and prior review; the helper only establishes byte/recipe equivalence.
+The author and reviewer share exact copy, object identity, required relationships,
+quantity/input attribution and reserved verified assets in the existing page brief.
+
 `ppt_review_evidence` is a read-only catalog helper behind the existing OPL
 native-helper envelope. It decodes physical images, checks declared hashes and
 source collections, binds RCA first-image observations, and computes generation

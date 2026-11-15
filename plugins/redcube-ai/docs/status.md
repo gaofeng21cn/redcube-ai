@@ -26,6 +26,13 @@ artifact locators，人的决定通过 Framework 当前任务动作提交并回�
 与后续 Attempt 已运行分别记录。
 这些源码和工具能力不代表已经完成真实新版/基线首稿盲评或正式版本激活。
 
+整页图导出 helper 现支持明确页序、备注、原始核验资产独立层及裁剪，解析实际
+PPTX/PDF 并回读媒体、几何、备注与配方绑定；二维码在最终合成画面和所请求的
+PDF 页面中复扫。developer image proof 只 mock 图片生成，调用同一真实 exporter；
+机械通过与未完成视觉审阅、候选交付分别标记。输入和回执见
+[整页图导出](delivery/image-deck-export.md)。生成与审阅提示词共享语义约束和
+参考借用范围，审阅证据可绑定选中尝试的实际提示词与输入身份。
+
 ## 领域证据
 
 `contracts/live_stage_run_progress_evidence.json` 记录
