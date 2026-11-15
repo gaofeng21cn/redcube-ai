@@ -75,6 +75,33 @@ bind shared craft, actual submitted prompt and input identities per attempt.
 14. For image-first materialization, follow `contracts/runtime-program/ppt-image-first-production-route.json#/api_contract`: prefer the active Codex built-in `image_gen` callable without checking `OPENAI_API_KEY`, then automatically call `agent/tools/generate-image.mjs` for Framework's `gpt-image-2` fallback if the tool is unavailable before image output.
 15. Do not ask the user to approve the same-model fallback or configure a second key. Framework owns model connection and credential resolution; RCA sends only the image request and consumes the materialization receipt. Use a new output path for repairs, preserve approved pages, and reconcile an unknown outcome before another request.
 
+### H3 full-slide text generation
+
+When the selected route is a user's requested from-scratch H3 full-slide path,
+keep H3 responsible for the complete page, including lettering and visual
+relationships. Freeze one byte-identical `shared_style_prefix` for the batch;
+write each page as a structured payload with `title`, `first_glance`,
+`reading_order`, `objects`, `exact_copy`, `evidence`, and `avoid`. Do not replace
+this route with illustration-only assets plus HTML/PPT text. Submit the same
+route, aspect ratio, area, and `n` for all pages, keep corresponding finished
+pages out of inputs, and treat verified scientific images as a separate asset
+role. Review the batch together before accepting a page. Drift routes back to
+the shared prefix or page-family rule and requires from-scratch regeneration;
+page-local style patches, filters, and text overlays are not repairs.
+
+If the user selects a provider direct API after observing host-side prompt
+rewriting, use that provider route and record the submitted prompt plus any
+provider-reported revised prompt. For MiniMax H3 Image, pure text-to-image
+with prompt enhancement disabled is the faithful route; an image reference
+may force the edit path and re-enable enhancement. Keep this distinction in the
+page proof packet and do not report a successful API call as visual readiness.
+
+Freeze reuse inputs from the selected page's actual submitted request, not the
+last edited prompt. Keep accepted shared art separate from experimental payloads;
+record whether the user accepted route stability, cross-page coherence or art
+quality. Follow the direct-API baseline guidance in
+`agent/knowledge/ppt_style_calibration.md` without page-local art overrides.
+
 ## Workbench Lessons To Preserve
 
 - Do not skip route gates: visual direction -> page prompts/payloads -> generated/rendered pages -> contact sheet -> visual QA -> PPTX assembly/export. A PPTX made before screenshot review is only a draft artifact.
@@ -142,3 +169,15 @@ Return `repair_target` when:
 - The page lacks a real structural visual.
 - A blocked page needs changed archetype, reduced slots, rewritten labels, or updated coordinates.
 - The failure should route back to source/story, visual direction, template profile, or native shape planning instead of being patched inside materialization.
+
+## Optional References And One-Pass Evaluation
+
+Follow the visual direction's selected input strategy. A reference image is
+optional; text-only generation is valid when selected by the brief or route
+calibration. Keep the style description coherent and the scientific copy exact.
+Do not send corresponding finished outputs when evaluating independent authoring.
+Keep first-pass evidence honest. From-scratch authoring does not end the
+delivery task after one failed invocation: improve the initial text/director
+brief and continue authorized independent generation until usable, preserving
+accepted pages. Do not substitute a later output into the first-pass record.
+Only an explicit experiment-only call limit imposes that scoped limit.

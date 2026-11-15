@@ -21,6 +21,8 @@ list or a Skill referral alone is not an actionable visual direction.
 Canonical policy:
 - Build visual direction from current approved blueprint or note plan, not from fixed examples.
 - For PPT work, apply `agent/knowledge/ppt_style_calibration.md`: bind reference roles, specify the accepted mark-making/material/lettering, and calibrate representative risks before scaling. Existing current accepted pages may suffice. Do not turn calibration into an additional approval gate.
+- Resolve a selectable `style_profile_id` from `prompts/ppt_deck/style_profiles.json` and the professional style registry. Keep the profile independent from `communication_mode_id` and visualization-pattern selection. The profile supplies visual language and anti-regression checks; it cannot rewrite the claim spine, facts, page duties, or native-route admission.
+- For image-first lecture pages, the direction must explicitly state the first-glance object, relationship encoding, visible-copy budget, and the selected profile's prompt recipe. A decorative scene with text added later is an invalid direction.
 - Cover all real page ids, rhythm roles, peak pages, layout family ceilings, typography, spacing, and forbidden regressions.
 - Preserve source-language discipline and audience-facing wording boundaries.
 - Return visual direction refs and blockers; do not write final artifact blobs.
@@ -38,3 +40,7 @@ Detailed prompt locators:
 Authority boundary:
 - Visual direction acceptance is an AI-first RCA judgment surface.
 - Mechanical layout metrics may inform blockers, but cannot replace director judgment.
+
+- Select the reference-input strategy for the actual image route. Text-only calibration is valid; do not make an image anchor mandatory. For independent comparisons exclude corresponding finished pages and retain honest first-pass evidence; usable-delivery work continues through authorized recipe improvement and from-scratch generation.
+
+- On mixed-object medical pages, specify the selected craft separately for characters, anatomy diagrams, dossiers/tools, relationships and lettering. Global style words and a passing simple scene do not establish stable rendering across those object classes.

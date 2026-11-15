@@ -94,6 +94,19 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 - `知识海报`：单页知识型视觉交付。
 - 学术论文与会议海报方向继续按具体项目评估和硬化。
 
+### PPT 美术风格 profile
+
+RCA 现在提供可选择的讲课视觉 profile，目录位于
+`prompts/ppt_deck/style_profiles.json`，并由视觉方向阶段绑定
+`style_profile_id`。当前预置：
+
+- `rca_handdrawn_lecture`：细钢笔、近白纸和半透明水彩，适合医学科普与研究讲解。
+- `rca_chinese_ink_lecture`：宣纸、浓淡墨、干笔、蓝灰/茶赭/朱砂和留白，国风来自笔墨与空间，不靠随机山水竹子。
+- `rca_alariko_editorial_illustration`：分层纸、蓝绿/暖赭块面、局部透视、透明水彩、方向投影和细钢笔字形；当前项目三页样例已作为项目级参考。
+- `rca_ukiyo_e_woodblock_lecture`：米白纸、靛蓝/朱红有限色盘、木刻线和非对称裁切，适合文化/历史/战略叙事。
+
+profile 只改变视觉语言，不改变故事主线、事实、页码职责、关系图语义或原生 PPTX 录入资格。新风格先用一个锚点校准三类页面；评审顺序是“像不像讲课 PPT、内容和关系是否准确、页间是否连续、最后才是风格相似度”。
+
 ## 工作方式
 
 - 专家提供源材料、受众预期和最终判断。
@@ -144,3 +157,5 @@ opl packages status --package-id rca --json
 - [文档生命周期](./docs/docs_portfolio_consolidation.md)：当前文档维护与退役规则。
 
 开发验证从 `scripts/verify.sh` 开始；lane 定义在 `scripts/test-registry.ts`。已退休实现和计划通过 Git 历史追溯，不作为运行入口。
+
+图像风格按通道适配，参考图可选。新增 `rca_warm_animation_lecture` 清爽手绘动画profile；独立比较排除对应页成品输入，首次生成质量单独记录，要求可用时继续改进方案并从头出图。规则见 `agent/knowledge/ppt_style_calibration.md`。
