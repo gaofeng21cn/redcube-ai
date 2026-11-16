@@ -16,6 +16,13 @@ def json_bytes(value):
 
 
 def projection():
+    owner_path = ROOT / 'contracts/opl_agent_package_manifest.json'
+    owner = json.loads(owner_path.read_text())
+    for pack in owner.get('skill_packs', []):
+        if (pack.get('source') == 'repo_local_codex_plugin_carrier'
+                and pack.get('install_mode') == 'bundled_required'):
+            pack['version'] = owner['version']
+    owner_bytes = json_bytes(owner)
     sources = subprocess.check_output(
         ['git', 'ls-files', '-z', '--', *RESOURCE_ROOTS], cwd=ROOT,
     ).decode().split('\0')
@@ -33,9 +40,8 @@ def projection():
         source = ROOT / relative
         if source.is_symlink() or not source.is_file():
             raise SystemExit(f'Carrier source must be a regular file: {relative}')
-        expected[CARRIER / relative] = source.read_bytes()
-    owner_path = ROOT / 'contracts/opl_agent_package_manifest.json'
-    owner = json.loads(owner_path.read_text())
+        expected[CARRIER / relative] = owner_bytes if source == owner_path else source.read_bytes()
+    expected[owner_path] = owner_bytes
     domain = json.loads((ROOT / owner['domain_descriptor_ref']).read_text())
     descriptor = {key: owner[key] for key in (
         'surface_kind', 'agent_id', 'package_id', 'display_name', 'presentation',
@@ -61,7 +67,7 @@ def projection():
         )
     }
     descriptor['codex_surface']['plugin_source_path'] = '.'
-    expected[ROOT / 'opl-package.json'] = owner_path.read_bytes()
+    expected[ROOT / 'opl-package.json'] = owner_bytes
     expected[CARRIER / 'opl-package.json'] = json_bytes(descriptor)
     expected[CARRIER / 'skills/redcube-ai/SKILL.md'] = (ROOT / 'agent/primary_skill/SKILL.md').read_bytes()
     for path in (ROOT / '.codex-plugin/plugin.json', CARRIER / '.codex-plugin/plugin.json', CARRIER / 'plugin.json'):

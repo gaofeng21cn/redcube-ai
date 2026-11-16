@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { mkUserScopedTestWorkspace } from './helpers/test-workspace.js';
+import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
 
 const repoRoot = path.resolve('.');
 const pluginRoot = path.join(repoRoot, 'plugins', 'redcube-ai');
@@ -266,4 +269,52 @@ test('nested Codex carrier remains a synchronized compatibility surface without 
   assert.equal(existsSync(path.join(pluginRoot, 'mcp.json')), false);
   assert.equal(nestedDescriptor.version, packageJson.version);
   assert.equal(existsSync(path.join(repoRoot, 'scripts', 'install-codex-plugin.ts')), false);
+});
+
+test('release preparation aligns bundled local skill versions while check remains read-only', () => {
+  const root = mkUserScopedTestWorkspace('redcube-carrier-version-');
+  for (const relative of [
+    'scripts/sync_carrier.py', 'contracts/opl_agent_package_manifest.json', 'contracts/domain_descriptor.json',
+    'agent/primary_skill/SKILL.md', 'pyproject.toml', 'uv.lock', 'README.md', 'README.zh-CN.md', 'LICENSE',
+    'assets/branding/redcube-ai-logo.png', 'assets/branding/redcube-ai-overview-v3.png',
+    'app-contribution-adapter.json', '.codex-plugin/plugin.json',
+    'plugins/redcube-ai/.codex-plugin/plugin.json', 'plugins/redcube-ai/plugin.json',
+  ]) {
+    const target = path.join(root, relative);
+    mkdirSync(path.dirname(target), { recursive: true });
+    copyFileSync(path.join(repoRoot, relative), target);
+  }
+  for (const args of [['init', '--quiet'], ['add', '.']]) {
+    assert.equal(spawnSync('git', args, { cwd: root }).status, 0);
+  }
+  const ownerPath = path.join(root, 'contracts/opl_agent_package_manifest.json');
+  const owner = readJson(ownerPath);
+  owner.version = '9.8.7';
+  owner.skill_packs.push(
+    { id: 'external', source: 'external', install_mode: 'bundled_required', version: '1.2.3' },
+    { id: 'optional', source: 'repo_local_codex_plugin_carrier', install_mode: 'optional', version: '2.3.4' },
+  );
+  writeFileSync(ownerPath, `${JSON.stringify(owner, null, 2)}\n`);
+  const before = readFileSync(ownerPath);
+  const python = resolveRedCubePythonCommand();
+  const prepare = (...args) => spawnSync(python.command, [...python.args, 'scripts/sync_carrier.py', ...args], {
+    cwd: root, encoding: 'utf8',
+  });
+  assert.notEqual(prepare('--check').status, 0);
+  assert.deepEqual(readFileSync(ownerPath), before);
+  assert.equal(existsSync(path.join(root, 'plugins/redcube-ai/contracts/opl_agent_package_manifest.json')), false);
+  const result = prepare();
+  assert.equal(result.status, 0, result.stderr);
+  const prepared = readJson(ownerPath);
+  assert.equal(prepared.skill_packs[0].version, '9.8.7');
+  assert.equal(prepared.skill_packs[1].version, '1.2.3');
+  assert.equal(prepared.skill_packs[2].version, '2.3.4');
+  assert.deepEqual(prepared.entrypoints, owner.entrypoints);
+  for (const relative of ['opl-package.json', 'plugins/redcube-ai/contracts/opl_agent_package_manifest.json']) {
+    assert.deepEqual(readJson(path.join(root, relative)), prepared);
+  }
+  const preparedBytes = readFileSync(ownerPath);
+  assert.equal(prepare('--check').status, 0);
+  assert.equal(prepare().status, 0);
+  assert.deepEqual(readFileSync(ownerPath), preparedBytes);
 });

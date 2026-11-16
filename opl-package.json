@@ -89,7 +89,7 @@
     {
       "id": "redcube-ai",
       "source": "repo_local_codex_plugin_carrier",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "install_mode": "bundled_required",
       "source_ref": "agent/primary_skill/SKILL.md",
       "carrier_mirror_ref": "plugins/redcube-ai/skills/redcube-ai/SKILL.md",
