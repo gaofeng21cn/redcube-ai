@@ -22,6 +22,61 @@ function resolveTestPythonCommand() {
   return cachedPythonCommand;
 }
 
+test('system Chrome fallback disables macOS app clones and closes after review failure', () => {
+  const python = resolveTestPythonCommand();
+  const program = `
+import argparse, asyncio, sys, tempfile
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
+from redcube_ai.native_helpers.ppt_deck import review
+
+events = []
+class ExpectedStop(Exception): pass
+class Page:
+    async def goto(self, *args, **kwargs): raise ExpectedStop()
+class Context:
+    async def new_page(self): return Page()
+    async def close(self): events.append('context_closed')
+class Browser:
+    async def new_context(self, **kwargs):
+        assert kwargs['viewport'] == {'width': 1920, 'height': 1080}
+        return Context()
+    async def close(self): events.append('browser_closed')
+class Chromium:
+    async def launch(self, **kwargs):
+        if not kwargs: raise RuntimeError('bundled browser unavailable')
+        events.append(kwargs)
+        return Browser()
+class Manager:
+    async def __aenter__(self): return SimpleNamespace(chromium=Chromium())
+    async def __aexit__(self, *args): pass
+
+async def run():
+    with tempfile.TemporaryDirectory(prefix='rca-chrome-fallback-') as directory:
+        html = Path(directory) / 'deck.html'
+        html.write_text('<!doctype html>')
+        options = argparse.Namespace(frame_width=1152, frame_height=648, html=str(html),
+                                     output_dir=directory, device_scale_factor=1)
+        with patch.object(review, 'async_playwright', Manager), \\
+             patch.object(review, 'CHROME_CANDIDATES', [sys.executable]), \\
+             patch.object(review.sys, 'platform', 'darwin'):
+            try: await review.collect_review(options)
+            except ExpectedStop: pass
+            else: raise AssertionError('review did not reach page loading')
+    assert events == [
+        {'executable_path': sys.executable, 'args': ['--disable-features=MacAppCodeSignClone']},
+        'context_closed', 'browser_closed',
+    ], events
+asyncio.run(run())
+`;
+  const result = spawnSync(python.command, [...(python.args || []), '-c', program], {
+    encoding: 'utf8',
+    env: { ...process.env, PYTHONPATH: path.resolve('python'), PYTHONDONTWRITEBYTECODE: '1' },
+  });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+});
+
 function runReviewForSingleSlideBody(bodyHtml) {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-surface-'));
   const htmlFile = path.join(workspaceRoot, 'deck.html');

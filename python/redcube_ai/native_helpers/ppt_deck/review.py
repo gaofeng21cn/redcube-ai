@@ -88,7 +88,10 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
             launch_errors.append(str(exc))
             for candidate in CHROME_CANDIDATES:
                 if Path(candidate).is_file():
-                    browser = await playwright.chromium.launch(executable_path=candidate)
+                    # macOS system Chrome otherwise creates a signed app clone
+                    # for each launch, which can survive an interrupted review.
+                    launch_args = ['--disable-features=MacAppCodeSignClone'] if sys.platform == 'darwin' else []
+                    browser = await playwright.chromium.launch(executable_path=candidate, args=launch_args)
                     break
         if browser is None:
             fail("无法启动浏览器进行截图: " + " | ".join(launch_errors))
