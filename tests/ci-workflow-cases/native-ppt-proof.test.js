@@ -51,7 +51,8 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   assert.match(runner, /tools\/resolve-proof-python\.ts/);
   assert.match(runner, /suite_id"\)\s*==\s*"data_charts"|suite_id/);
   assert.match(runner, /synthetic_preview/);
-  assert.match(dockerfile, /FROM ghcr\.io\/astral-sh\/uv:0\.13\.8 AS uv/);
+  // Require an explicit release pin without duplicating its version in a test.
+  assert.match(dockerfile, /^FROM ghcr\.io\/astral-sh\/uv:\d+\.\d+\.\d+(?:@sha256:[a-f0-9]{64})? AS uv$/m);
   assert.match(dockerfile, /FROM node:26-bookworm/);
   assert.match(dockerfile, /ARG TARGETARCH/);
   assert.match(dockerfile, /officecli-linux-arm64/);
