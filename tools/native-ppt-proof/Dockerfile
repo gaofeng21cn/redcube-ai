@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:0.13.8 AS uv
+FROM ghcr.io/astral-sh/uv:0.13.9 AS uv
 FROM node:26-bookworm
 
 ARG TARGETARCH
