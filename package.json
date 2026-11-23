@@ -17,9 +17,7 @@
     "typecheck:ci": "npm run --silent build:ci && tsc --noEmit --project tsconfig.typecheck.json --pretty false",
     "build": "tsc --noEmit --project tsconfig.json --pretty false",
     "build:ci": "tsc --noEmit --project tsconfig.json --pretty false",
-    "audit:fallow:production": "npx --yes fallow@3.3.0 dead-code --root . --no-cache --production --summary --fail-on-issues",
-    "line-budget": "node scripts/line-budget.ts",
-    "line-budget:strict": "node scripts/line-budget.ts --strict"
+    "audit:fallow:production": "npx --yes fallow@3.3.0 dead-code --root . --no-cache --production --summary --fail-on-issues"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

@@ -73,16 +73,12 @@ async function runPrivatePlatformReadback({ output }: PrivatePlatformReadbackSte
   writeFileSync(output, payload);
 }
 
-function runLineBudget(strict: boolean): void {
-  npmRun(strict ? 'line-budget:strict' : 'line-budget');
-}
-
 function runStructure(strict: boolean): void {
   if (strict) {
     run('scripts/run-structural-quality-gate.sh', ['--strict'], {
       env: {
         ...process.env,
-        OPL_LINE_BUDGET_STRICT: '1',
+        OPL_STRUCTURE_STRICT: '1',
       },
     });
     return;
@@ -114,10 +110,6 @@ async function runStep(step: VerifyStep, forwardedArgs: readonly string[]): Prom
     await runPrivatePlatformReadback(step);
     return;
   }
-  if (step.kind === 'line-budget') {
-    runLineBudget(step.strict);
-    return;
-  }
   if (step.kind === 'structure') {
     runStructure(step.strict);
     return;
@@ -131,18 +123,11 @@ function printUsage(): void {
 }
 
 const [rawLane = 'smoke', ...rawArgs] = process.argv.slice(2);
-const verifyWrapper = rawArgs.includes('--verify-wrapper');
 const forwardedArgs = rawArgs.filter((arg) => arg !== '--verify-wrapper');
 const lane = normalizeVerifyLane(rawLane);
 
 try {
-  if (verifyWrapper) {
-    runLineBudget(lane === 'line-budget-strict' || lane === 'structure-strict');
-  }
   run('scripts/repo-hygiene.sh');
-  if (verifyWrapper && (lane === 'line-budget' || lane === 'line-budget-strict')) {
-    process.exit(0);
-  }
 
   const plan = buildVerifyLanePlan(lane);
   for (const step of plan.steps) {

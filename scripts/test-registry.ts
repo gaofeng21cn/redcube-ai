@@ -14,7 +14,6 @@ export type VerifyStep = Readonly<
   | { kind: 'typecheck' }
   | { kind: 'test-group'; group: string }
   | { kind: 'private-platform-readback'; output: string }
-  | { kind: 'line-budget'; strict: boolean }
   | { kind: 'structure'; strict: boolean }
 >;
 export type VerifyLanePlan = Readonly<{
@@ -27,7 +26,6 @@ const TEST_REGISTRY: readonly TestRegistryEntry[] = Object.freeze([
   { file: 'tests/codex-plugin.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/image-ppt-proof-runner.test.js', lane: 'meta' },
   { file: 'tests/image-generation-runtime.test.js', lane: 'meta', smoke: true, fast: true },
-  { file: 'tests/line-budget.test.js', lane: 'meta' },
   { file: 'tests/native-ppt-proof-fixture-contract.test.js', lane: 'meta' },
   { file: 'tests/opl-agent-pack-contracts-semantic-pack.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/opl-agent-package-manifest.test.js', lane: 'meta', smoke: true, fast: true },
@@ -105,8 +103,6 @@ const VERIFY_LANE_ALIASES: Readonly<Record<string, string>> = Object.freeze({
 
 const SPECIAL_VERIFY_LANES = Object.freeze([
   'ci',
-  'line-budget',
-  'line-budget-strict',
   'private-platform:readback',
   'private-platform:strict',
   'structure',
@@ -146,8 +142,6 @@ export function buildVerifyLanePlan(lane: string = 'smoke'): VerifyLanePlan {
       { kind: 'test-group', group: 'fast' },
       { kind: 'test-group', group: 'meta:ci' },
     ],
-    'line-budget': [{ kind: 'line-budget', strict: false }],
-    'line-budget-strict': [{ kind: 'line-budget', strict: true }],
     'private-platform:readback': [{ kind: 'private-platform-readback', output: 'stdout' }],
     'private-platform:strict': [{ kind: 'private-platform-readback', output: '/tmp/redcube-ai-private-platform-retirement.json' }],
     structure: [{ kind: 'structure', strict: false }],

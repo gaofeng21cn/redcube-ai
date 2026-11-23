@@ -7,6 +7,7 @@
 - Plugin、CLI 或其他 carrier/executor 不取得 RCA identity、完整 installed truth 或领域 authority。
 - 当前源码与证据边界见 `docs/status.md`，剩余工作见 `docs/active/rca-ideal-state-gap-plan.md`，文档更新与退役见 `docs/docs_portfolio_consolidation.md`；不得从根规则推断 release 或 production ready。
 - 默认验证运行 `scripts/verify.sh`；视觉或交付物变更还须执行对应的 render、pixel/layout 和 artifact readback。
+- 模块拆分以职责内聚和调用清晰为准，在日常开发与 PR 阶段维护，不靠机械行数阈值或周期拆文件脚本：既避免把不相关职责堆成巨石文件，也禁止制造嵌套 `*_parts/*_parts`、过薄胶水切片或大段回调参数转运；重构优先消除重复与化简调用链，来源不明或储备能力默认保留（无静态调用者只作调查信号）。
 
 <!-- CODEGRAPH_START -->
 ## CodeGraph

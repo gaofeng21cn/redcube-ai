@@ -46,12 +46,13 @@ test('local structural diagnostics remain available after standalone advisory re
   assert.match(verify, /run-with-repo-temp-env\.sh/);
   assert.match(verify, /scripts\/verify-lane\.ts "\$lane" --verify-wrapper "\$@"/);
   assert.doesNotMatch(verify, /case "\$lane" in/);
-  assert.match(verifyLane, /runLineBudget\(lane === 'line-budget-strict' \|\| lane === 'structure-strict'\)/);
+  assert.equal(existsSync(path.join(repoRoot, 'scripts/line-budget.ts')), false);
+  assert.doesNotMatch(verifyLane, /line-budget/);
   assert.match(verifyLane, /runStructure/);
   assert.doesNotMatch(verify, /quality details|sentrux-advisory|opl-quality-details/);
 
   assert.match(structuralGate, /strict=0/);
-  assert.match(structuralGate, /OPL_LINE_BUDGET_STRICT/);
+  assert.match(structuralGate, /OPL_STRUCTURE_STRICT/);
   assert.match(structuralGate, /\bsentrux gate \./);
   assert.match(structuralGate, /\bsentrux check \./);
   assert.match(structuralGate, /scripts\/run-opl-quality-details\.sh/);
