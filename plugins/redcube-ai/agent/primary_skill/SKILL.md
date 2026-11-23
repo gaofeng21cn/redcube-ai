@@ -66,11 +66,14 @@ until the deliverable is usable, retaining honest attempt evidence. If the resul
 route back to composition and page authoring; do not repair the failure by
 adding decorative scenery.
 
-For HTML fidelity, use the page-author's actual-render method and the reviewer's
-actual-font/final-file evidence method. For image-heavy review, retain accepted
-page refs and remaining work in the existing StageRun artifacts, budget bytes
-separately from tokens, and serialize image-bearing tool results only on routes
-with observed ordering incompatibility. Tool-output errors do not prove that
+For HTML fidelity, lock one unified visual system and first-draft craft baseline
+from `agent/knowledge/ppt_style_calibration.md` (`## HTML Slide Visual System
+And First-Draft Craft`), use the page-author's actual-render, inner-clip and
+zero-animation checks, and require the reviewer's actual-font, pixel and
+final-file evidence methods. For image-heavy review, retain accepted page refs
+and remaining work in the existing StageRun artifacts, budget bytes separately
+from tokens, and serialize image-bearing tool results only on routes with
+observed ordering incompatibility. Tool-output errors do not prove that
 execution failed; return a redacted diagnostic to the hosted controller without
 fabricating outputs or replaying the full image history. Source/render/package
 currentness, final-copy fidelity and native-viewer evidence remain distinct.

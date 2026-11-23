@@ -272,3 +272,65 @@ If generated scientific images repeatedly confuse modality or anatomy, use
 verified original evidence or an accurate record/method illustration suitable
 for the page's duty, disclose that expression change and preserve the study
 facts. Do not use stylistic coherence to justify invented clinical scans.
+
+## HTML Slide Visual System And First-Draft Craft
+
+Applies when producing or reviewing HTML-authored slide decks so first drafts
+read as one designer's system rather than per-page experiments.
+
+1. **Single-designer deck-wide visual system**: Unify cover, dark chapter
+   dividers (including a multi-stage progress rail and target-language footer),
+   content slides, and closing slides under one CSS token set covering surface
+   backgrounds, card fills, 1px borders, elevation shadows, section accent
+   colors, neutral tint derivation (`color-mix(in oklab, ...)`), high-contrast
+   mode (`@media (forced-colors: active)`), header eyebrow/title/citation pill,
+   and tabular footer pagination (`{chapter} · NN / TOTAL`). Do not rely on
+   global `!important` resets or runtime DOM patching scripts to fix chrome;
+   when coexisting with utility frameworks that inject unlayered preflight
+   resets, keep component semantic rules outside `@layer` so base typography and
+   borders hold. Keep slide interiors completely static (no CSS animations or
+   `transition` rules).
+2. **Zero corner-hook rounded-card geometry**: On rounded cards (12–16px
+   radius) with `overflow: hidden`, never attach full-width top bars (`inset-inline: 0`)
+   or single-side CSS borders whose ends enter the corner arc, as corner clipping
+   produces curved hook artifacts. Inset vertical accent bars past top and
+   bottom radii (`>= radius + 1px`), inset horizontal accent bars past left and
+   right radii (`>= radius + 2px`), and use standalone 1px dividers rather than
+   `border-top` on a rounded shell.
+3. **Coordinate-locked SVG diagrams and connectors**: Never run diagonal
+   connectors across interior cards or text nodes. Route cross-column buses
+   through explicit vertical or horizontal gutters using orthogonal elbows and
+   consistent `marker-end` arrowheads, preserving a 6–10px clearance gap from
+   card edges. Match SVG `viewBox` aspect ratios to rendered container boxes (or
+   set `preserveAspectRatio="none"` on orthogonal grid-aligned connectors) so
+   default letterboxing does not shift arrows off target card centers. Size SVG
+   pill `<rect>` elements wider than their labels and layer them above connector
+   strokes. Never pair a card row and its adjacent SVG return loop with
+   `justify-content: space-between`, which opens an unintended gap and leaves
+   loop endpoints floating.
+4. **Honest data scales and unwrapped metric tracks**: Separate bar tracks
+   (`flex: 1; min-width: 0`) from value/unit labels (fixed column width,
+   `flex-shrink: 0`, `white-space: nowrap`, `tabular-nums`) so full-width bars
+   never wrap units (`s`, `GB`, `%`) onto orphan lines. Keep summary or average
+   rows on the exact same CSS Grid column template as detail rows. Never draw an
+   uncalibrated bar at 100% track width without a visible axis upper bound, and
+   never space non-uniform axis tick labels with `justify-between` over linear
+   bars; position ticks linearly by `(tick - min) / (max - min) * 100%` and mark
+   truncated scales explicitly.
+5. **Real figure aspect-ratio pairing, QR safety and icon parity**: Match
+   container column ratios to the natural aspect ratio of embedded figures
+   under `object-fit: contain`. Pair ultra-wide figures (`> 2.2` aspect ratio)
+   with adjacent structured takeaways instead of leaving >20% side white voids,
+   and narrow near-square columns (`~1.1–1.2`) to tighten framing. Preserve
+   native QR aspect ratio and white quiet zones, and decode QR targets directly
+   from rendered pixels. Keep icon metaphors 1-to-1 consistent between legends
+   and detail cards, avoiding unsuited decorative icons.
+6. **CJK first-draft typography, inner-clip safety and sibling alignment**:
+   Prevent 1–2 character CJK orphan trailing lines and mid-word breaks using
+   balanced measure, meaningful breaks, full-width CJK punctuation, and
+   `white-space: nowrap` on short compounds, badges, and unit values. Verify
+   horizontal clearance between headings and same-row pills. Align sibling
+   comparison sub-blocks across columns with matching body `min-height` or grid
+   rows. Check fixed-height `overflow: hidden` cards for internal bottom
+   clipping (`scrollHeight <= clientHeight + 4`), and eliminate large (>20%)
+   unintended interior dead zones.

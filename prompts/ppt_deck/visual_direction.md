@@ -10,6 +10,7 @@ Create a deck-wide visual thesis and page rhythm that makes the current blueprin
 - Define visual identity, hierarchy, typography, palette, spacing, continuity, semantic composition, rhythm, peak pages, and page-family reuse limits for this deck.
 - Give every page a first-glance relationship and proof object. Visual form must express the claim semantics, not decorate a repeated card grid.
 - Protect readable title/body/label/table/caption scale, safe zones, vertical balance, and separation between adjacent readable blocks.
+- For HTML-authored decks, lock one cohesive CSS token system across cover, dark chapter dividers (with multi-stage progress rail and target-language footer), content slides, and closing slides—defining section accent colors, header eyebrow/title/citation chrome, footer index format, inset accents inside rounded radii, and static zero-animation surfaces while keeping per-page semantic compositions diverse.
 - Preserve the accepted claim spine and public naming. Visual direction may propose the smallest blueprint route-back when canvas, template capacity, or hierarchy makes a page invalid.
 - For `optimize_existing`, name strengths to preserve and regressions to avoid.
 

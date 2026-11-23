@@ -121,7 +121,15 @@ Keep lettering inside original research images distinct from editable DOM text.
 Check natural title wrapping, not just bounding boxes. Intersecting line boxes
 are candidate findings until pixels show a collision; intentional decorative
 bleed is not automatically a defect. Conversely, a clean overflow report does
-not establish that SVG labels, images or covering layers are correct.
+not establish that SVG labels, images or covering layers are correct. Inspect
+rendered HTML pixels directly for rounded-border corner hooks, SVG lines
+piercing intermediate cards or shifted off grid centers by `viewBox`
+letterboxing, floating return loops above `space-between` gaps, text overflowing
+SVG pills, inner `overflow: hidden` box clipping, uncalibrated 100% bars or
+unevenly spaced scale labels, wrapped unit tags (`s`, `GB`, `%`), >20% side
+dead zones beside real figures or empty card mid-bands, swapped icons between
+legends and detail cards, 1–2 char CJK orphan lines, same-row badge/title
+overlap, mismatched divider language, and forbidden CSS animations.
 
 Use screenshots bound to the current source and dependencies after font/image
 loading and layout settlement. Validate navigation, first/last-page states, keyboard,

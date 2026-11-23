@@ -44,3 +44,5 @@ Authority boundary:
 - Select the reference-input strategy for the actual image route. Text-only calibration is valid; do not make an image anchor mandatory. For independent comparisons exclude corresponding finished pages and retain honest first-pass evidence; usable-delivery work continues through authorized recipe improvement and from-scratch generation.
 
 - On mixed-object medical pages, specify the selected craft separately for characters, anatomy diagrams, dossiers/tools, relationships and lettering. Global style words and a passing simple scene do not establish stable rendering across those object classes.
+
+- For the optional HTML slide route, lock one deck-wide visual system under `agent/knowledge/ppt_style_calibration.md` (`## HTML Slide Visual System And First-Draft Craft`) covering unified cover/chapter-rail/content/ending tokens, section accents, static zero-animation surfaces, inset corner-hook avoidance, honest chart scales, and aspect-matched media framing.

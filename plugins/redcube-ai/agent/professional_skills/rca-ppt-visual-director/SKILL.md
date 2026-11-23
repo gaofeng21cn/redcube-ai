@@ -125,6 +125,8 @@ the user's actual acceptance scope as the next improvement baseline.
 
 When the user requests whole-deck coherence, assess every current page, including previously passed/redrawn ones, then scope repairs from the new benchmark. Preserve pages that still meet the current intent. Record semantic information gaps and style defects separately in the existing direction payload; do not turn counts or a uniform card layout into the quality standard.
 
+For HTML-authored decks, lock one cohesive design-token contract across cover, dark chapter dividers (multi-stage progress rail, shared accent gradient, and same-language footer), content slides, and ending slides before page authoring begins. Specify static zero-animation surfaces, section accent tokens, header eyebrow/title/citation chrome, footer index formatting, rounded-card geometry free of corner-hook border clipping, aspect-matched framing for real scientific figures, and diverse page-role compositions within one designer's visual voice.
+
 ## Design Registry Consumption
 
 - Preserve the current blueprint mode and independently select a local style profile or explicit custom behavior. Bind semantic compositions to a pattern id and rationale using the relevant entries in `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/communication_mode_registry`, `#/visualization_pattern_registry`, and `#/professional_style_registry`.

@@ -13,6 +13,7 @@ Repair only the slides blocked by the current screenshot review, using the small
 ## Good Work
 
 - Resolve the named readability, overlap, overflow, containment, hierarchy, spacing, density, line-break, page-number, and audience-language failures at their cause.
+- Fix structural HTML/SVG causes directly rather than shrinking text or padding alone: inset card accents past `border-radius` to eliminate corner hooks; re-route card-piercing diagonals into orthogonal gutters with aspect-matched `viewBox` coordinates and flush loop attachment; split bar tracks from `nowrap` numeric/unit columns with linear tick placement; rebalance figure column ratios to remove dead voids; enforce CJK orphan protection, sibling sub-block alignment, zero animations, and `overflow: hidden` internal clearance.
 - Prefer shorter copy, clearer hierarchy, better container capacity, semantic reflow, or a different target-page composition over tiny text, hidden overflow, masking, or decorative filler.
 - Preserve matching slide identity, QA anchors, primary-point marking, audience-visible text coverage, inline-only styles, public naming, and the deck typography/visual continuity.
 - Do not expose review findings, revision context, prompt/route names, template registry, source ids, or private authoring notes in visible markup.

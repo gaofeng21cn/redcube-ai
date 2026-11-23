@@ -121,17 +121,40 @@ Keep blueprint, active prompt, image, speaker text, source records and PPTX note
 
 ## HTML Rendering Fidelity
 
-For the selected HTML lane, preserve the brief's typeface and role-based scale;
-do not force cover, chapter, evidence and numeric-display text into one size.
-Repair isolated trailing title characters through meaningful line breaks or a
-separate citation line before reducing text below readable scale. Existing
-paper figures retain their original lettering; they are not CSS font failures.
+For the selected HTML lane, lock one shared visual-system contract across cover,
+chapter dividers (stage rail and target-language footer), content slides, and
+ending slides (`agent/knowledge/ppt_style_calibration.md`, `## HTML Slide Visual
+System And First-Draft Craft`), and preserve the brief's typeface and
+role-based scale without forcing all roles into one size. Do not inject global
+`!important` resets or runtime DOM patching scripts; when pairing with utility
+frameworks that emit unlayered preflight rules, keep semantic chrome classes
+outside `@layer`, and keep slide interiors static with zero CSS animations or
+`transition` rules.
+
+Prevent recurring HTML first-draft geometry and typography defects at authoring
+time: inset rounded-card accents past `border-radius` corners so no corner hooks
+appear and use `1px` dividers instead of corner `border-top` lines; route
+cross-column SVG connectors cleanly through open gutters (`6–10px` edge gaps)
+with matched `viewBox` aspect ratios or `preserveAspectRatio="none"` on orthogonal
+grid buses so arrows stay centered on cards; widen SVG pill containers past label
+text above stroke lines; avoid `justify-content: space-between` above adjacent
+return loops; split bar tracks (`min-width: 0`) from `nowrap`, `tabular-nums`
+unit columns and align summary rows on the exact detail Grid; place non-uniform
+scale ticks linearly by `(tick - min) / (max - min) * 100%`; match column ratios
+to real figure aspect ratios (pairing `>2.2` wide visuals with structured text),
+preserve QR quiet zones, and keep 1-to-1 icon parity across legends and cards;
+protect CJK prose from 1–2 character trailing orphans (`nowrap` on short compounds
+and full-width punctuation), verify title/pill horizontal clearance, and align
+sibling sub-blocks across columns. Existing paper figures retain their original
+lettering; they are not CSS font failures.
 
 Emit render expectations for current source bytes and dependencies. Cache-busting
 must reach the actual navigation URL, not merely a variable updated after the
 render command was assembled. Wait for fonts, image decoding and settled layout
 before screenshots, and again after viewport changes. Record failed image loads
-rather than swallowing decode failures as success. CSS declarations and computed
+and check fixed-height `overflow: hidden` boxes for silent inner clipping
+(`scrollHeight > clientHeight + 4` or `scrollWidth > clientWidth + 4`) as well as
+active CSS animations/transitions before review. CSS declarations and computed
 font-family do not establish the actual font used for each script or SVG label;
 request platform-font evidence when typography fidelity is material.
 
