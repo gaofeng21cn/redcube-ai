@@ -7,7 +7,7 @@
 `contracts/pack_doctor.json`、
 `contracts/runtime-program/ppt-native-python-engine-contract.json` 和
 `contracts/runtime-program/python-native-helper-catalog.json` 声明诊断规格与 helper。
-当前 writer 为 OfficeCLI，true render 使用 LibreOffice headless -> PDF -> Poppler PNG，中文字体优先 Noto Sans CJK SC。
+当前 writer 与结构化 readback 统一使用 `python-pptx`（仅在 `<a:custGeom>` 与部分 OOXML 属性处辅以薄 `lxml.etree`），无需额外安装 `officecli` 二进制；true render 使用 LibreOffice headless -> PDF -> Poppler PNG，中文字体优先 Noto Sans CJK SC。
 
 开发安装器：
 
@@ -18,13 +18,7 @@ tools/native-ppt-proof/install-deps.sh
 macOS 使用 Homebrew 安装 LibreOffice、Poppler 和字体；Debian/Ubuntu 使用 apt。
 这是显式开发环境准备，不是 hosted action 的隐式安装动作。
 
-OfficeCLI 安装器与 Docker proof 镜像每次准备环境时解析官方最新版，从同一
-release 下载二进制与 `SHA256SUMS` 并校验，不固定历史版本，也不关闭官方
-自动更新。已安装的最新版可以复用；更新以原子替换保留正在运行的旧进程。
-依赖检查在临时目录实际创建并关闭 PPTX，仅 `--version` 成功不能证明
-materializer 可用；必须以完整 native proof 证明生成与渲染可用，不能由下载、版本号或自动更新单独推断成功。
-
-Python 依赖由 `pyproject.toml` 和 `uv.lock` 提供，Node 使用 `npm ci`。
+Python 依赖由 `pyproject.toml` 和 `uv.lock` 提供（包含 `python-pptx`、`Pillow`、`playwright` 等），Node 使用 `npm ci`。
 venv 必须在 checkout 外：
 
 ```bash
@@ -61,12 +55,9 @@ docker run --rm -v "$PWD:/workspace" --mount type=volume,target=/workspace/node_
 docker run --rm -v "$PWD:/workspace" redcube-native-ppt-proof chown -R "$(id -u):$(id -g)" /workspace/artifacts/image-native-ppt-proof
 ```
 
-容器以 root 生成产物，OfficeCLI 可能将 PPTX 保存为仅 owner 可读；最后一条命令
-只把本次输出目录交还给宿主用户，便于读取和打包。即使 proof 失败，也应在查看已有
-产物前执行该命令；Qualification 对该目录执行相同的 ownership 交接后再上传。
+容器以 root 生成产物；最后一条命令只把本次输出目录交还给宿主用户，便于读取和打包。即使 proof 失败，也应在查看已有产物前执行该命令；Qualification 对该目录执行相同的 ownership 交接后再上传。
 
-镜像构建会按 Docker `TARGETARCH` 选择 OfficeCLI 的 x64 或 arm64 官方资产，并把
-`contracts/` 复制到镜像，使默认 doctor 命令在不挂载源码时也能完成自身诊断。
+镜像构建把 `pyproject.toml`、`uv.lock`、`python/` 与 `contracts/` 复制到镜像并安装 `uv` 锁定依赖，使默认 doctor 命令在不挂载源码时也能完成自身诊断。
 Qualification 的 `image-native-ppt-proof` job 在原生 amd64 与 arm64 runner 上
 先真实 build 镜像，再运行默认 doctor 并检查 helper 与 renderer 可用，
 最后在源码挂载和独立 `node_modules` volume 中执行 native proof；其 artifact 只证明

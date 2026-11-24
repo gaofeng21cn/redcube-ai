@@ -80,7 +80,7 @@ def render_slide_svg_ir(slide_data, index: int, total: int, svg_dir: Path, repai
     slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')
     background = resolve_color(slide_data.get('background'), 'bg')
     lines = [
-        f'<svg xmlns="{SVG_NS}" width="{CANVAS_PX[0]}" height="{CANVAS_PX[1]}" viewBox="0 0 {CANVAS_PX[0]} {CANVAS_PX[1]}" data-redcube-ir="redcube_svg_ir_v1" data-slide-id="{xml_escape(slide_id)}" data-materializer="officecli_pptx_materializer">',
+        f'<svg xmlns="{SVG_NS}" width="{CANVAS_PX[0]}" height="{CANVAS_PX[1]}" viewBox="0 0 {CANVAS_PX[0]} {CANVAS_PX[1]}" data-redcube-ir="redcube_svg_ir_v1" data-slide-id="{xml_escape(slide_id)}" data-materializer="python_pptx_materializer">',
         '  <g id="slide-root" data-intent="group:ai_spatial_plan">',
         f'    <rect x="0" y="0" width="{CANVAS_PX[0]}" height="{CANVAS_PX[1]}" fill="{xml_escape(background)}" data-intent="rect:background" id="{xml_escape(slide_id)}-background" />',
     ]

@@ -79,7 +79,7 @@ with ZipFile(target, 'w', compression=ZIP_DEFLATED) as package:
   });
 }
 
-test('native PPT readback projects OfficeCLI objects without exposing package part paths', () => {
+test('native PPT readback projects python-pptx objects without exposing package part paths', () => {
   const workspace = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-package-readback-'));
   const pptxFile = path.join(workspace, 'complex.pptx');
   buildSyntheticPackage(pptxFile);
@@ -100,7 +100,7 @@ test('native PPT readback projects OfficeCLI objects without exposing package pa
   const readback = JSON.parse(stdout);
 
   assert.equal(readback.schema_version, 2);
-  assert.equal(readback.evidence_source, 'officecli_structured_readback');
+  assert.equal(readback.evidence_source, 'python_pptx_structured_readback');
   assert.match(readback.pptx_sha256, /^[a-f0-9]{64}$/);
   assert.equal(readback.slide_count, 2);
   assert.equal(readback.slides.every((slide) => slide.slide_part === undefined), true);
@@ -121,7 +121,7 @@ test('native PPT readback projects OfficeCLI objects without exposing package pa
     notes: 1,
     master: 0,
     layout: 0,
-    theme: 1,
+    theme: 0,
   });
   assert.deepEqual(readback.slides[0].object_names, [
     'D01-title',

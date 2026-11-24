@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import hashlib
+import json
 import platform
 import shutil
 import subprocess
@@ -72,7 +73,7 @@ def renderer_dependency_blocker(
         'synthetic_preview_allowed': False,
         'fail_closed_when_missing': True,
         'dependency_provisioning_owner': 'opl_connect_or_operator',
-        'required_commands': ['officecli', 'soffice', 'pdftoppm'],
+        'required_commands': ['soffice', 'pdftoppm'],
         'probe_surface': 'opl pack native-helper probe',
         'message': message,
         'probes': probes or [],

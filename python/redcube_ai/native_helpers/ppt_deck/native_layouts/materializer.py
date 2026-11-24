@@ -1,47 +1,27 @@
 import json
 from pathlib import Path
 
-from redcube_ai.native_helpers.ppt_deck.native_manifest_qa import fail_closed_on_manifest_qa, manifest_qa_failures
 from redcube_ai.native_helpers.ppt_deck.native_layouts.common import native_ai_design_shapes, safe_list, safe_text
-from redcube_ai.native_helpers.ppt_deck.native_layouts.slide_metadata import layout_family, primary_point_count, slide_title
-from redcube_ai.native_helpers.ppt_deck.native_layouts.officecli import native_shape_manifest_record
-from redcube_ai.native_helpers.ppt_deck.native_layouts.svg_ir import render_slide_svg_ir
-from redcube_ai.native_helpers.ppt_deck.native_layouts.validation import validate_ai_first_design_plan
-from redcube_ai.native_helpers.ppt_deck.native_layouts.materializer_commands import (
-    _animation_object_kind,
-    _animation_target_failures,
-    _apply_groups,
-    _apply_hyperlinks,
-    _apply_notes_and_motion,
-    _apply_paragraph_and_run_formatting,
-    _apply_table_formatting,
-    _assert_animation_targets,
-    _children_for_group,
-    _collect_object_commands,
-    _fill_existing_slide_indices,
-    _object_path,
-    _prop_args,
-    _run_officecli,
-    _speaker_notes,
+from redcube_ai.native_helpers.ppt_deck.native_layouts.materializer_readback import _bind_manifest_to_package
+from redcube_ai.native_helpers.ppt_deck.native_layouts.object_specs import native_shape_manifest_record
+from redcube_ai.native_helpers.ppt_deck.native_layouts.pptx_writer import (
     SUPPORTED_ANIMATION_TARGET_KINDS,
-    _template_mode,
-    _transition_props,
+    _assert_animation_targets,
     issue_count,
     materialize_native_pptx,
-    parse_json_output,
 )
-from redcube_ai.native_helpers.ppt_deck.native_layouts.materializer_readback import (
-    _assert_package_object_evidence,
-    _bind_manifest_to_package,
-    _expected_materialized_kinds,
-)
+from redcube_ai.native_helpers.ppt_deck.native_layouts.slide_metadata import layout_family, primary_point_count, slide_title
+from redcube_ai.native_helpers.ppt_deck.native_layouts.svg_ir import render_slide_svg_ir
+from redcube_ai.native_helpers.ppt_deck.native_layouts.validation import validate_ai_first_design_plan
+from redcube_ai.native_helpers.ppt_deck.native_manifest_qa import fail_closed_on_manifest_qa, manifest_qa_failures
 
 __all__ = [
-    'parse_json_output',
+    'SUPPORTED_ANIMATION_TARGET_KINDS',
     'issue_count',
     'materialize_native_pptx',
     'build_deck',
 ]
+
 
 def build_deck(
     slides,
@@ -78,12 +58,12 @@ def build_deck(
             '_deck_layout_rhythm': slide_data.get('_deck_layout_rhythm') if isinstance(slide_data.get('_deck_layout_rhythm'), dict) else {},
             'title': slide_title(slide_data, index),
             'layout_family': layout_family(slide_data),
-            'layout_writer': 'officecli_pptx_materializer',
+            'layout_writer': 'python_pptx_materializer',
             'ai_first_spatial_plan': {
                 'required': True,
                 'materialized': True,
                 'helper_template_layout_used': False,
-                'materializer': 'officecli_pptx_materializer',
+                'materializer': 'python_pptx_materializer',
                 'shape_count': len(ai_shapes),
             },
             'title_font_size': max(title_sizes, default=0),
@@ -113,20 +93,23 @@ def build_deck(
         fail_closed_on_manifest_qa(manifest_slides)
     for slide in manifest_slides:
         slide.pop('_deck_layout_rhythm', None)
-    officecli_gate = materialize_native_pptx(
-        slides, output_pptx, template_intake=template_intake,
+    materializer_gate = materialize_native_pptx(
+        slides,
+        output_pptx,
+        template_intake=template_intake,
         allow_quality_debt=allow_quality_debt,
     )
     _bind_manifest_to_package(
         manifest_slides,
-        officecli_gate['package_readback'],
-        officecli_gate['plan_slide_indices'],
+        materializer_gate['package_readback'],
+        materializer_gate['plan_slide_indices'],
     )
     return {
         'slides': manifest_slides,
-        'officecli_gate': officecli_gate,
-        'package_readback': officecli_gate['package_readback'],
-        'template_preservation': officecli_gate['template_preservation'],
+        'materializer_gate': materializer_gate,
+        'officecli_gate': materializer_gate,
+        'package_readback': materializer_gate['package_readback'],
+        'template_preservation': materializer_gate['template_preservation'],
         'quality_debt': {
             'status': 'recorded_non_blocking',
             'shape_plan_failures': [
@@ -138,11 +121,11 @@ def build_deck(
                 if slide.get('shape_plan_quality_debt')
             ],
             'manifest_qa_failures': qa_failures,
-            'officecli_quality_debt': officecli_gate.get('quality_debt'),
+            'materializer_quality_debt': materializer_gate.get('quality_debt'),
             'blocks_materialization': False,
             'blocks_visual_ready_claim': True,
             'blocks_export_ready_claim': True,
         } if allow_quality_debt and (
-            qa_failures or officecli_gate.get('quality_debt') or any(slide.get('shape_plan_quality_debt') for slide in manifest_slides)
+            qa_failures or materializer_gate.get('quality_debt') or any(slide.get('shape_plan_quality_debt') for slide in manifest_slides)
         ) else None,
     }

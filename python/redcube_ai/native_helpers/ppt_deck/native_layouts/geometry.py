@@ -1,11 +1,10 @@
 from pathlib import Path
-from zipfile import ZipFile
-from xml.etree import ElementTree
+
+from pptx import Presentation
 
 from redcube_ai.native_helpers.ppt_deck.native_layout_constants import (
     EMU_PER_INCH,
     MIN_CONNECTOR_THICKNESS_IN,
-    PPTX_NS,
     PX_PER_INCH,
     SLIDE_HEIGHT_IN,
     SLIDE_WIDTH_IN,
@@ -97,55 +96,34 @@ def pptx_geometry_audit(
     expected_height_in: float = SLIDE_HEIGHT_IN,
 ) -> dict:
     overflows = []
-    with ZipFile(pptx_file) as package:
-        presentation = ElementTree.fromstring(package.read('ppt/presentation.xml'))
-        slide_size = presentation.find('p:sldSz', PPTX_NS)
-        if slide_size is None:
-            raise ValueError('PPTX geometry audit failed: missing ppt/presentation.xml p:sldSz')
-        slide_width_emu = int(slide_size.attrib.get('cx') or 0)
-        slide_height_emu = int(slide_size.attrib.get('cy') or 0)
-        slide_width_in = slide_width_emu / EMU_PER_INCH
-        slide_height_in = slide_height_emu / EMU_PER_INCH
-        slide_files = sorted(
-            (name for name in package.namelist() if name.startswith('ppt/slides/slide') and name.endswith('.xml')),
-            key=lambda name: int(''.join(ch for ch in Path(name).stem if ch.isdigit()) or 0),
-        )
-        for slide_index, slide_file in enumerate(slide_files, 1):
-            slide = ElementTree.fromstring(package.read(slide_file))
-            for shape in [
-                *slide.findall('.//p:sp', PPTX_NS),
-                *slide.findall('.//p:cxnSp', PPTX_NS),
-            ]:
-                xfrm = shape.find('.//a:xfrm', PPTX_NS)
-                if xfrm is None:
-                    continue
-                offset = xfrm.find('a:off', PPTX_NS)
-                extent = xfrm.find('a:ext', PPTX_NS)
-                if offset is None or extent is None:
-                    continue
-                left = int(offset.attrib.get('x') or 0)
-                top = int(offset.attrib.get('y') or 0)
-                width = int(extent.attrib.get('cx') or 0)
-                height = int(extent.attrib.get('cy') or 0)
-                right = left + width
-                bottom = top + height
-                if left < 0 or top < 0 or right > slide_width_emu or bottom > slide_height_emu:
-                    shape_name = ''
-                    non_visual = shape.find('p:nvSpPr/p:cNvPr', PPTX_NS) or shape.find('p:nvCxnSpPr/p:cNvPr', PPTX_NS)
-                    if non_visual is not None:
-                        shape_name = safe_text(non_visual.attrib.get('name'))
-                    text = safe_text(''.join(item.text or '' for item in shape.findall('.//a:t', PPTX_NS)))
-                    overflows.append({
-                        'slide_index': slide_index,
-                        'shape_name': shape_name,
-                        'text': text[:80],
-                        'left_in': round(left / EMU_PER_INCH, 4),
-                        'top_in': round(top / EMU_PER_INCH, 4),
-                        'width_in': round(width / EMU_PER_INCH, 4),
-                        'height_in': round(height / EMU_PER_INCH, 4),
-                        'right_in': round(right / EMU_PER_INCH, 4),
-                        'bottom_in': round(bottom / EMU_PER_INCH, 4),
-                    })
+    prs = Presentation(str(pptx_file))
+    if prs.slide_width is None or prs.slide_height is None:
+        raise ValueError('PPTX geometry audit failed: missing presentation slide size')
+    slide_width_emu = int(prs.slide_width)
+    slide_height_emu = int(prs.slide_height)
+    slide_width_in = slide_width_emu / EMU_PER_INCH
+    slide_height_in = slide_height_emu / EMU_PER_INCH
+    for slide_index, slide in enumerate(prs.slides, 1):
+        for shape in slide.shapes:
+            left = int(shape.left or 0)
+            top = int(shape.top or 0)
+            width = int(shape.width or 0)
+            height = int(shape.height or 0)
+            right = left + width
+            bottom = top + height
+            if left < 0 or top < 0 or right > slide_width_emu or bottom > slide_height_emu:
+                text = safe_text(shape.text) if getattr(shape, 'has_text_frame', False) else ''
+                overflows.append({
+                    'slide_index': slide_index,
+                    'shape_name': safe_text(shape.name),
+                    'text': text[:80],
+                    'left_in': round(left / EMU_PER_INCH, 4),
+                    'top_in': round(top / EMU_PER_INCH, 4),
+                    'width_in': round(width / EMU_PER_INCH, 4),
+                    'height_in': round(height / EMU_PER_INCH, 4),
+                    'right_in': round(right / EMU_PER_INCH, 4),
+                    'bottom_in': round(bottom / EMU_PER_INCH, 4),
+                })
     size_ok = abs(slide_width_in - expected_width_in) < 0.001 and abs(slide_height_in - expected_height_in) < 0.001
     return {
         'slide_width_in': round(slide_width_in, 4),

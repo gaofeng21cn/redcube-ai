@@ -7,7 +7,7 @@ import {
   runNativeMaterializerFailure,
 } from './helpers/ppt-native-python-layout-fixtures.js';
 
-test('native PPTX officecli materializer accepts complete AI spatial plans', () => {
+test('native PPTX python-pptx materializer accepts complete AI spatial plans', () => {
   const slides = [
     createAiSlide({ slideId: 'S01', layoutFamily: 'cover_signal', title: 'Native cover proof' }),
     createAiSlide({ slideId: 'S02', layoutFamily: 'timeline_band', title: 'Native timeline proof', slotCount: 4 }),
@@ -16,7 +16,7 @@ test('native PPTX officecli materializer accepts complete AI spatial plans', () 
   assert.equal(result.slides.length, slides.length);
   assert.equal(result.pptx_slides.length, slides.length);
   assert.deepEqual(result.pptx_geometry.overflows, []);
-  assert.equal(result.officecli_gate.materializer, 'officecli_pptx_materializer');
+  assert.equal(result.officecli_gate.materializer, 'python_pptx_materializer');
   const timeline = result.slides.find((slide) => slide.slide_id === 'S02');
   const timelineConnectors = timeline.native_shapes.filter((shape) => shape.role === 'timeline_connector');
   assert.equal(timeline.metrics.semantic_visual_evidence.some((item) => item.family === 'timeline'), true);
@@ -29,7 +29,7 @@ test('native PPTX officecli materializer accepts complete AI spatial plans', () 
   )), true);
   assert.equal(
     result.slides.every((slide) => (
-      slide.layout_writer === 'officecli_pptx_materializer'
+      slide.layout_writer === 'python_pptx_materializer'
       && slide.ai_first_spatial_plan?.helper_template_layout_used === false
       && slide.redcube_svg_ir_preflight?.status === 'pass'
       && slide.issues.length === 0

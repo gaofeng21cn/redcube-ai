@@ -449,11 +449,15 @@ export function evaluateNativePptBenchmark({ fixture, suite, packageReadback, sh
     };
   });
 
+  const validReadbackSources = new Set([
+    'python_pptx_structured_readback',
+    'officecli_structured_readback',
+  ]);
   const gates = [
     gate(
       'package_readback_source',
       packageReadback?.schema_version === 2
-        && packageReadback?.evidence_source === 'officecli_structured_readback',
+        && validReadbackSources.has(String(packageReadback?.evidence_source || '')),
       {
         schema_version: packageReadback?.schema_version || null,
         evidence_source: packageReadback?.evidence_source || null,
@@ -532,7 +536,7 @@ export function evaluateNativePptBenchmark({ fixture, suite, packageReadback, sh
     gates,
     failures: failed.map((item) => ({ gate_id: item.gate_id, reason: item.reason })),
     evidence: {
-      source: 'officecli_structured_readback',
+      source: String(packageReadback?.evidence_source || 'python_pptx_structured_readback'),
       pptx_sha256: packageReadback?.pptx_sha256 || null,
       package_counts: packageCounts,
       relationship_integrity: relationshipIntegrity,

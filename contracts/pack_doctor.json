@@ -25,13 +25,6 @@
       "install_hint": "brew install node"
     },
     {
-      "name": "officecli",
-      "required": false,
-      "version_args": [],
-      "purpose": "Native PPTX XML inspection and editability verification",
-      "install_hint": "tools/native-ppt-proof/install-deps.sh"
-    },
-    {
       "name": "soffice",
       "required": false,
       "version_args": [],

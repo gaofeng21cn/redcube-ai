@@ -1,29 +1,18 @@
 #!/usr/bin/env python3
 import json
-import shutil
-import subprocess
 import sys
 from pathlib import Path
 
+from pptx import Presentation
+from pptx.dml.color import RGBColor
+from pptx.util import Inches
+
 from redcube_ai.native_helpers.ppt_deck.native import render_pptx
-from redcube_ai.native_helpers.ppt_deck.native_package import patch_chart_data, read_pptx_package
-
-
-def run_officecli(*args: str) -> None:
-    completed = subprocess.run(
-        ['officecli', *args],
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    if completed.returncode != 0:
-        raise RuntimeError(json.dumps({
-            'error_kind': 'native_ppt_edit_task_failed',
-            'command': ['officecli', *args],
-            'returncode': completed.returncode,
-            'stdout': completed.stdout,
-            'stderr': completed.stderr,
-        }, ensure_ascii=False, sort_keys=True))
+from redcube_ai.native_helpers.ppt_deck.native_package import (
+    patch_chart_data,
+    read_pptx_package,
+    save_presentation,
+)
 
 
 def main() -> None:
@@ -33,13 +22,6 @@ def main() -> None:
     output_dir = Path(sys.argv[2]).resolve()
     if not pptx_file.is_file():
         raise FileNotFoundError(f'native PPT edit task input not found: {pptx_file}')
-    officecli = shutil.which('officecli')
-    if not officecli:
-        raise RuntimeError(json.dumps({
-            'error_kind': 'missing_officecli_dependency',
-            'required_surface': 'native_ppt_editability_regression',
-            'fail_closed_when_missing': True,
-        }, sort_keys=True))
 
     patch_chart_data(pptx_file, [{
         'slide_index': 1,
@@ -49,23 +31,24 @@ def main() -> None:
             'series': [{'name': 'Reforecast', 'values': [5, 9, 12]}],
         },
     }])
-    run_officecli('open', str(pptx_file))
-    try:
-        run_officecli(
-            'set', str(pptx_file), '/slide[1]/shape[@name=S01-title]',
-            '--prop', 'text=Updated operating result',
-        )
-        run_officecli(
-            'set', str(pptx_file), '/slide[1]/shape[@name=S01-node-a]',
-            '--prop', 'fill=#0F766E', '--prop', 'x=1.5in', '--prop', 'y=2.2in',
-        )
-        run_officecli(
-            'set', str(pptx_file), '/slide[1]/notes',
-            '--prop', 'text=Updated speaker notes for the reforecast.',
-        )
-        run_officecli('save', str(pptx_file))
-    finally:
-        run_officecli('close', str(pptx_file))
+
+    prs = Presentation(str(pptx_file))
+    slide = prs.slides[0]
+    title_shape = next((sh for sh in slide.shapes if sh.name == 'S01-title'), None)
+    if title_shape is None or not title_shape.has_text_frame:
+        raise RuntimeError('native PPT edit target S01-title not found')
+    title_shape.text_frame.text = 'Updated operating result'
+
+    node_a = next((sh for sh in slide.shapes if sh.name == 'S01-node-a'), None)
+    if node_a is None:
+        raise RuntimeError('native PPT edit target S01-node-a not found')
+    node_a.fill.solid()
+    node_a.fill.fore_color.rgb = RGBColor.from_string('0F766E')
+    node_a.left = Inches(1.5)
+    node_a.top = Inches(2.2)
+
+    slide.notes_slide.notes_text_frame.text = 'Updated speaker notes for the reforecast.'
+    save_presentation(prs, pptx_file)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     package_readback = read_pptx_package(pptx_file)

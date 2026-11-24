@@ -671,9 +671,9 @@ export function assertMaterializedQuality({ fixture, suite, result, previewMetri
   assert.equal(compositionSignatures.length, slides.length);
   assert.equal(new Set(compositionSignatures).size >= Math.ceil(slides.length * 0.75), true);
   assert.deepEqual(repeatedCompositionSignatures(slides), []);
-  assertEvery(slides, (slide) => slide.layout_writer === 'officecli_pptx_materializer');
+  assertEvery(slides, (slide) => slide.layout_writer === 'python_pptx_materializer');
   assertEvery(slides, (slide) => slide.ai_first_spatial_plan.helper_template_layout_used === false);
-  assertEvery(slides, (slide) => slide.ai_first_spatial_plan.materializer === 'officecli_pptx_materializer');
+  assertEvery(slides, (slide) => slide.ai_first_spatial_plan.materializer === 'python_pptx_materializer');
   assertEvery(slides, (slide) => slide.shape_count >= 12);
   assertEvery(slides, (slide) => slide.text_box_count >= 6);
   assertEvery(slides, (slide) => slide.redcube_svg_ir_preflight.status === 'pass');
@@ -701,7 +701,7 @@ export function assertMaterializedQuality({ fixture, suite, result, previewMetri
   assertEvery(slides, (slide) => slide.metrics.occupied_ratio > fixture.suite_defaults.min_density);
   assertEvery(slides, (slide) => slide.metrics.occupied_ratio < fixture.suite_defaults.max_density);
   assertEvery(slides, (slide) => slide.metrics.structural_visual_count >= 1);
-  assert.equal(result.officecli_gate.materializer, 'officecli_pptx_materializer');
+  assert.equal(result.officecli_gate.materializer, 'python_pptx_materializer');
   assert.equal(result.officecli_gate.save_before_close, true);
   assert.equal(result.officecli_gate.command_count >= slides.length * 12, true);
   assert.equal(result.officecli_gate.geometry_audit.ok, true);

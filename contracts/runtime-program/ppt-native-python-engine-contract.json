@@ -12,7 +12,7 @@
   "engine_capabilities": {
     "authoring_ir": "redcube_svg_ir",
     "authoring_ir_version": 1,
-    "pptx_writer": "officecli_pptx_materializer",
+    "pptx_writer": "python_pptx_materializer",
     "editable_pptx": true,
     "strict_svg_preflight": true,
     "true_render_proof_required": true,
@@ -37,7 +37,7 @@
   },
   "native_object_model": {
     "unknown_kind_policy": "fail_fast",
-    "manifest_kind_source": "materialized_officecli_structured_readback",
+    "manifest_kind_source": "materialized_python_pptx_structured_readback",
     "stable_drawingml_intent": "grouped_editable_drawingml_children",
     "native_data_object_intent": [
       "chart",
@@ -46,7 +46,7 @@
     "path_geometry": "drawingml_custom_geometry",
     "package_readback_required": true,
     "package_readback_schema_version": 2,
-    "package_readback_evidence_source": "officecli_structured_readback",
+    "package_readback_evidence_source": "python_pptx_structured_readback",
     "pptx_sha256_required": true,
     "structured_object_counts_required": true
   },
@@ -104,18 +104,18 @@
     ]
   },
   "officecli_materializer_policy": {
-    "policy_id": "ppt_native_officecli_materializer_quality_gate_v1",
+    "policy_id": "ppt_native_python_pptx_materializer_quality_gate_v1",
     "adoption_status": "qa_materializer_discipline_only",
     "rca_main_workflow_owner": "redcube_stage_review_export",
     "skill_authoring_loop_adopted": false,
     "materializer_role": "default_editable_pptx_materializer_and_qa_gate",
-    "current_pptx_writer": "officecli_pptx_materializer",
-    "officecli_writer_adapter_default_enabled": true,
+    "current_pptx_writer": "python_pptx_materializer",
+    "officecli_writer_adapter_default_enabled": false,
     "required_gate_refs": [
-      "officecli_save_before_close",
-      "officecli_validate",
-      "officecli_view_issues",
-      "officecli_view_text"
+      "python_pptx_save_and_reopen",
+      "python_pptx_validate",
+      "python_pptx_view_issues",
+      "python_pptx_view_text"
     ],
     "save_before_close_required": true,
     "validate_required": true,

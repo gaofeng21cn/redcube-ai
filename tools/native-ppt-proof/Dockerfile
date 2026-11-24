@@ -1,8 +1,6 @@
 FROM ghcr.io/astral-sh/uv:0.13.9 AS uv
 FROM node:26-bookworm
 
-ARG TARGETARCH
-
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /workspace
 
@@ -16,23 +14,6 @@ RUN apt-get update \
       curl \
       python3 \
     && rm -rf /var/lib/apt/lists/*
-
-RUN case "$TARGETARCH" in \
-      amd64) officecli_asset="officecli-linux-x64" ;; \
-      arm64) officecli_asset="officecli-linux-arm64" ;; \
-      *) echo "Unsupported Docker TARGETARCH: $TARGETARCH" >&2; exit 1 ;; \
-    esac \
-    && release_url="$(curl -fsSL --connect-timeout 10 --max-time 60 -o /dev/null -w '%{url_effective}' https://github.com/iOfficeAI/OfficeCLI/releases/latest)" \
-    && version="${release_url##*/}" \
-    && printf '%s\n' "$version" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$' \
-    && curl -fsSL "https://github.com/iOfficeAI/OfficeCLI/releases/download/$version/SHA256SUMS" -o /tmp/officecli-SHA256SUMS \
-    && curl -fsSL "https://github.com/iOfficeAI/OfficeCLI/releases/download/$version/$officecli_asset" -o /usr/local/bin/officecli \
-    && grep "  $officecli_asset$" /tmp/officecli-SHA256SUMS | sed "s#$officecli_asset#/usr/local/bin/officecli#" | sha256sum -c - \
-    && chmod +x /usr/local/bin/officecli \
-    && officecli create /tmp/officecli-probe.pptx \
-    && officecli close /tmp/officecli-probe.pptx \
-    && test -s /tmp/officecli-probe.pptx \
-    && rm -f /tmp/officecli-SHA256SUMS /tmp/officecli-probe.pptx
 
 ENV UV_PROJECT_ENVIRONMENT=/opt/redcube-venv \
     UV_CACHE_DIR=/tmp/uv-cache \

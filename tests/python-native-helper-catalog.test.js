@@ -89,7 +89,7 @@ test('native helper catalog binds exact tracked Python entrypoints', () => {
   const nativeDescriptor = readJson(
     'python/redcube_ai/native_helpers/ppt_deck/native.native-helper-probe.json',
   );
-  assert.deepEqual(nativeDescriptor.required_commands, ['officecli', 'soffice', 'pdftoppm']);
+  assert.deepEqual(nativeDescriptor.required_commands, ['soffice', 'pdftoppm']);
 });
 
 test('native helper doctor reports registered entrypoints and optional dependencies without execution', () => {
