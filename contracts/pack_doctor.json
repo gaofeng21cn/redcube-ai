@@ -1,0 +1,79 @@
+{
+  "surface_kind": "opl_pack_doctor_spec",
+  "schema_version": 1,
+  "pack_id": "redcube-ai",
+  "owner": "rca",
+  "provisioning_owner": "opl_connect_or_operator",
+  "automatic_install_allowed": false,
+  "extra_paths": [
+    "/Applications/LibreOffice.app/Contents/MacOS",
+    "/opt/homebrew/Caskroom/libreoffice/latest/LibreOffice.app/Contents/MacOS"
+  ],
+  "cli_checks": [
+    {
+      "name": "python3",
+      "required": true,
+      "version_args": ["--version"],
+      "purpose": "Python native helper runtime",
+      "install_hint": "Install Python 3.11+"
+    },
+    {
+      "name": "node",
+      "required": true,
+      "version_args": ["--version"],
+      "purpose": "RedCube TypeScript tooling and proof scripts",
+      "install_hint": "brew install node"
+    },
+    {
+      "name": "officecli",
+      "required": false,
+      "version_args": [],
+      "purpose": "Native PPTX XML inspection and editability verification",
+      "install_hint": "tools/native-ppt-proof/install-deps.sh"
+    },
+    {
+      "name": "soffice",
+      "required": false,
+      "version_args": [],
+      "purpose": "LibreOffice headless PPTX-to-PDF rendering",
+      "install_hint": "brew install --cask libreoffice"
+    },
+    {
+      "name": "pdftoppm",
+      "required": false,
+      "version_args": ["-v"],
+      "purpose": "Poppler PDF-to-PNG slide preview rendering",
+      "install_hint": "brew install poppler"
+    },
+    {
+      "name": "pdfinfo",
+      "required": false,
+      "version_args": ["-v"],
+      "purpose": "Poppler PDF page count inspection",
+      "install_hint": "brew install poppler"
+    }
+  ],
+  "python_module_checks": [
+    {
+      "module": "PIL",
+      "package_name": "Pillow",
+      "required": false,
+      "purpose": "Slide preview image inspection",
+      "install_hint": "uv sync"
+    },
+    {
+      "module": "pptx",
+      "package_name": "python-pptx",
+      "required": false,
+      "purpose": "Native PPTX deck authoring and readback",
+      "install_hint": "uv sync"
+    },
+    {
+      "module": "playwright",
+      "package_name": "playwright",
+      "required": false,
+      "purpose": "HTML-to-slide preview rendering",
+      "install_hint": "uv sync"
+    }
+  ]
+}

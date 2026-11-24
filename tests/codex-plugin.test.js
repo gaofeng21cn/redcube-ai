@@ -271,10 +271,27 @@ test('nested Codex carrier remains a synchronized compatibility surface without 
   assert.equal(existsSync(path.join(repoRoot, 'scripts', 'install-codex-plugin.ts')), false);
 });
 
-test('release preparation aligns bundled local skill versions while check remains read-only', () => {
+test('release preparation aligns bundled local skill versions while check remains read-only', (t) => {
+  const siblingFramework = path.resolve(repoRoot, '..', 'one-person-lab');
+  const candidateOplBins = [
+    process.env.OPL_BIN,
+    process.env.OPL_FRAMEWORK_ROOT ? path.join(process.env.OPL_FRAMEWORK_ROOT, 'bin', 'opl') : null,
+    path.join(siblingFramework, 'bin', 'opl'),
+  ].filter(Boolean);
+  let resolvedOplBin = candidateOplBins.find((candidate) => existsSync(candidate)) ?? null;
+  if (!resolvedOplBin) {
+    const which = spawnSync('which', ['opl'], { encoding: 'utf8' });
+    if (which.status === 0 && which.stdout.trim()) {
+      resolvedOplBin = which.stdout.trim();
+    }
+  }
+  if (!resolvedOplBin) {
+    t.skip('OPL CLI is unavailable in standalone source CI');
+    return;
+  }
   const root = mkUserScopedTestWorkspace('redcube-carrier-version-');
   for (const relative of [
-    'scripts/sync_carrier.py', 'contracts/opl_agent_package_manifest.json', 'contracts/domain_descriptor.json',
+    'scripts/sync_carrier.py', 'contracts/carrier_projection.json', 'contracts/opl_agent_package_manifest.json', 'contracts/domain_descriptor.json',
     'agent/primary_skill/SKILL.md', 'pyproject.toml', 'uv.lock', 'README.md', 'README.zh-CN.md', 'LICENSE',
     'assets/branding/redcube-ai-logo.png', 'assets/branding/redcube-ai-overview-v3.png',
     'app-contribution-adapter.json', '.codex-plugin/plugin.json',
@@ -297,8 +314,17 @@ test('release preparation aligns bundled local skill versions while check remain
   writeFileSync(ownerPath, `${JSON.stringify(owner, null, 2)}\n`);
   const before = readFileSync(ownerPath);
   const python = resolveRedCubePythonCommand();
+  const prepareEnv = {
+    ...process.env,
+    OPL_BIN: resolvedOplBin,
+    ...(process.env.OPL_FRAMEWORK_ROOT
+      ? {}
+      : existsSync(siblingFramework)
+        ? { OPL_FRAMEWORK_ROOT: siblingFramework }
+        : {}),
+  };
   const prepare = (...args) => spawnSync(python.command, [...python.args, 'scripts/sync_carrier.py', ...args], {
-    cwd: root, encoding: 'utf8',
+    cwd: root, encoding: 'utf8', env: prepareEnv,
   });
   assert.notEqual(prepare('--check').status, 0);
   assert.deepEqual(readFileSync(ownerPath), before);

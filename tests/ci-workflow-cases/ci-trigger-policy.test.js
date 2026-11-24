@@ -60,6 +60,8 @@ test('local structural diagnostics remain available after standalone advisory re
   assert.match(structuralGate, /exit 0/);
 
   assert.match(qualityDetails, /compare_ref="\$\{OPL_QUALITY_DETAILS_COMPARE_REF:-origin\/main\}"/);
-  assert.match(qualityDetails, /OPL_QUALITY_DETAILS_BIN:-\/Users\/gaofeng\/workspace\/one-person-lab\/bin\/opl/);
+  assert.match(qualityDetails, /OPL_QUALITY_DETAILS_BIN/);
+  assert.match(qualityDetails, /\$repo_root\/\.\.\/one-person-lab\/bin\/opl/);
+  assert.doesNotMatch(qualityDetails, /\/Users\/[\w.-]+\/workspace/);
   assert.match(qualityDetails, /--compare-ref "\$compare_ref"/);
 });

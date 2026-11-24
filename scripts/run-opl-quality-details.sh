@@ -11,7 +11,17 @@ json_limit="${OPL_QUALITY_DETAILS_JSON_LIMIT:-50}"
 focus="${OPL_QUALITY_DETAILS_FOCUS:-auto}"
 opl_command="${OPL_COMMAND:-}"
 if [ -z "$opl_command" ]; then
-  opl_command="${OPL_QUALITY_DETAILS_BIN:-/Users/gaofeng/workspace/one-person-lab/bin/opl}"
+  if [ -n "${OPL_QUALITY_DETAILS_BIN:-}" ]; then
+    opl_command="$OPL_QUALITY_DETAILS_BIN"
+  elif [ -n "${OPL_BIN:-}" ]; then
+    opl_command="$OPL_BIN"
+  elif [ -n "${OPL_FRAMEWORK_ROOT:-}" ] && [ -x "${OPL_FRAMEWORK_ROOT}/bin/opl" ]; then
+    opl_command="${OPL_FRAMEWORK_ROOT}/bin/opl"
+  elif [ -x "$repo_root/../one-person-lab/bin/opl" ]; then
+    opl_command="$repo_root/../one-person-lab/bin/opl"
+  else
+    opl_command="opl"
+  fi
 fi
 
 case "$output_dir" in

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 
 type DirectoryArtifactEntry = {
@@ -9,7 +10,58 @@ type DirectoryArtifactEntry = {
   sha256: string;
 };
 
-function buildDeveloperProofDirectoryIndex(root: string, excludePaths: string[]) {
+const RCA_PROOF_AUTHORITY_BOUNDARY = {
+  index_can_write_visual_truth: false,
+  index_can_authorize_review_or_export: false,
+  index_can_sign_owner_receipt: false,
+  index_can_claim_domain_ready: false,
+};
+
+async function loadFrameworkProofDirectoryIndexer(): Promise<
+  | ((rootDir: string, options?: Record<string, unknown>) => {
+      surface_kind: string;
+      status: string;
+      entries: DirectoryArtifactEntry[];
+      authority_boundary: Record<string, unknown>;
+    })
+  | null
+> {
+  const candidates = [
+    process.env.OPL_FRAMEWORK_ROOT
+      ? path.join(process.env.OPL_FRAMEWORK_ROOT, 'src/authority/packages/proof-directory-index.ts')
+      : null,
+    path.resolve(import.meta.dirname, '../../one-person-lab/src/authority/packages/proof-directory-index.ts'),
+  ].filter((candidate): candidate is string => Boolean(candidate));
+  for (const candidate of candidates) {
+    if (!fs.existsSync(candidate)) continue;
+    try {
+      const mod = await import(pathToFileURL(candidate).href);
+      if (typeof mod.buildProofDirectoryIndex === 'function') {
+        return mod.buildProofDirectoryIndex;
+      }
+    } catch {
+      // Fall back to local deterministic indexer when Framework runtime is unavailable.
+    }
+  }
+  return null;
+}
+
+async function buildDeveloperProofDirectoryIndex(root: string, excludePaths: string[]) {
+  const fwIndexer = await loadFrameworkProofDirectoryIndexer();
+  if (fwIndexer) {
+    const built = fwIndexer(root, {
+      excludePaths,
+      surfaceKind: 'rca_developer_proof_directory_index',
+      status: 'developer_evidence_only',
+      authorityBoundary: { ...RCA_PROOF_AUTHORITY_BOUNDARY },
+    });
+    return {
+      surface_kind: built.surface_kind,
+      status: built.status,
+      entries: built.entries,
+      authority_boundary: built.authority_boundary,
+    };
+  }
   const excluded = new Set(excludePaths);
   const entries: DirectoryArtifactEntry[] = [];
   const visit = (directory: string) => {
@@ -36,12 +88,7 @@ function buildDeveloperProofDirectoryIndex(root: string, excludePaths: string[])
     surface_kind: 'rca_developer_proof_directory_index',
     status: 'developer_evidence_only',
     entries,
-    authority_boundary: {
-      index_can_write_visual_truth: false,
-      index_can_authorize_review_or_export: false,
-      index_can_sign_owner_receipt: false,
-      index_can_claim_domain_ready: false,
-    },
+    authority_boundary: { ...RCA_PROOF_AUTHORITY_BOUNDARY },
   };
 }
 
@@ -66,7 +113,7 @@ const mediaType = (file: string) => ({
   '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation', '.md': 'text/markdown',
 }[path.extname(file).toLowerCase()] || 'application/octet-stream');
 
-const generic = buildDeveloperProofDirectoryIndex(outputRoot, [relative(indexFile)]);
+const generic = await buildDeveloperProofDirectoryIndex(outputRoot, [relative(indexFile)]);
 const indexed = new Map(generic.entries.map((entry) => [entry.relative_path, entry]));
 function artifact(artifactId: string, file: string, category: string, required = true, sourceRefPresent = true) {
   const relativePath = relative(file);
