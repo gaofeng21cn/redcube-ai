@@ -109,13 +109,6 @@
       }
     ]
   },
-  "kind": "agent",
-  "domain_id": "redcube_ai",
-  "task_provider_ref": "contracts/domain_descriptor.json#/standard_agent_interface/stage_catalog",
-  "action_catalog_ref": "contracts/action_catalog.json",
-  "view_refs": [],
-  "requires": [],
-  "capability_dependencies": [],
   "codex_surface": {
     "plugin_id": "redcube-ai",
     "configured_codex_plugin_carrier": {
@@ -145,5 +138,12 @@
       "manifest": "app-contribution-adapter.json"
     },
     "plugin_source_path": "."
-  }
+  },
+  "kind": "agent",
+  "action_catalog_ref": "contracts/action_catalog.json",
+  "view_refs": [],
+  "requires": [],
+  "capability_dependencies": [],
+  "domain_id": "redcube_ai",
+  "task_provider_ref": "contracts/domain_descriptor.json#/standard_agent_interface/stage_catalog"
 }

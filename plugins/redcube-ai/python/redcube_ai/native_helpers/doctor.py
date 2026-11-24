@@ -11,6 +11,7 @@ from typing import Any
 from .catalog import CATALOG_FILE, load_helper_catalog, repo_root
 from .renderer_dependencies import (
     NATIVE_PPT_DOCKER_COMMAND,
+    _load_opl_dependency_probe,
     install_commands,
     libreoffice_probe,
     platform_install_hint,
@@ -35,6 +36,13 @@ def _pyproject_metadata(pyproject_file: Path) -> dict[str, Any]:
     }
 
 
+def _module_available(import_name: str) -> bool:
+    fw_probe = _load_opl_dependency_probe()
+    if fw_probe is not None:
+        return bool(fw_probe.probe_python_module(import_name, find_spec=importlib.util.find_spec)["ok"])
+    return importlib.util.find_spec(import_name) is not None
+
+
 def _dependency_summary(requirements: list[str]) -> list[dict[str, Any]]:
     summary: list[dict[str, Any]] = []
     for requirement in requirements:
@@ -47,7 +55,7 @@ def _dependency_summary(requirements: list[str]) -> list[dict[str, Any]]:
                 "available": None,
             })
             continue
-        available = importlib.util.find_spec(import_name) is not None
+        available = _module_available(import_name)
         summary.append({
             "name": requirement,
             "import_name": import_name,
@@ -58,7 +66,7 @@ def _dependency_summary(requirements: list[str]) -> list[dict[str, Any]]:
 
 
 def _python_dependency_probe(name: str, import_name: str) -> dict[str, Any]:
-    available = importlib.util.find_spec(import_name) is not None
+    available = _module_available(import_name)
     return {
         "name": name,
         "available": available,
@@ -142,40 +150,51 @@ def _renderer_availability() -> dict[str, Any]:
 
 def _helper_diagnostics(helper: dict[str, Any], root: Path) -> dict[str, Any]:
     module = str(helper.get("package_module") or "")
-    module_spec_found = importlib.util.find_spec(module) is not None if module else False
+    module_spec_found = _module_available(module) if module else False
     descriptor_ref = str(helper.get("probe_descriptor_ref") or "")
     source_ref = str(helper.get("source_ref") or "")
     descriptor_file = (root / descriptor_ref).resolve() if descriptor_ref else None
     source_file = (root / source_ref).resolve() if source_ref else None
-    descriptor: dict[str, Any] = {}
-    if descriptor_file and descriptor_file.is_file():
-        try:
-            candidate = json.loads(descriptor_file.read_text(encoding="utf-8"))
-            if isinstance(candidate, dict):
-                descriptor = candidate
-        except (OSError, json.JSONDecodeError):
-            descriptor = {}
-    entrypoint_ref = str(descriptor.get("entrypoint_ref") or "")
-    descriptor_entrypoint = (
-        (descriptor_file.parent / entrypoint_ref).resolve()
-        if descriptor_file and entrypoint_ref
-        else None
-    )
-    authority = descriptor.get("authority_boundary")
-    authority_is_false = (
-        isinstance(authority, dict)
-        and bool(authority)
-        and all(value is False for value in authority.values())
-    )
-    descriptor_matches_source = bool(
-        descriptor_file
-        and source_file
-        and descriptor.get("surface_kind") == "opl_pack_native_helper_probe_descriptor"
-        and descriptor.get("schema_version") == 1
-        and descriptor.get("helper_id") == helper.get("helper_id")
-        and descriptor_entrypoint == source_file
-        and authority_is_false
-    )
+    fw_probe = _load_opl_dependency_probe()
+    if fw_probe is not None:
+        checked = fw_probe.probe_native_helper_descriptor(
+            descriptor_file,
+            source_file,
+            helper.get("helper_id"),
+        )
+        descriptor_exists = bool(checked["exists"])
+        descriptor_matches_source = bool(checked["matches_source"])
+    else:
+        descriptor: dict[str, Any] = {}
+        descriptor_exists = bool(descriptor_file and descriptor_file.is_file())
+        if descriptor_exists and descriptor_file is not None:
+            try:
+                candidate = json.loads(descriptor_file.read_text(encoding="utf-8"))
+                if isinstance(candidate, dict):
+                    descriptor = candidate
+            except (OSError, json.JSONDecodeError):
+                descriptor = {}
+        entrypoint_ref = str(descriptor.get("entrypoint_ref") or "")
+        descriptor_entrypoint = (
+            (descriptor_file.parent / entrypoint_ref).resolve()
+            if descriptor_file and entrypoint_ref
+            else None
+        )
+        authority = descriptor.get("authority_boundary")
+        authority_is_false = (
+            isinstance(authority, dict)
+            and bool(authority)
+            and all(value is False for value in authority.values())
+        )
+        descriptor_matches_source = bool(
+            descriptor_exists
+            and source_file
+            and descriptor.get("surface_kind") == "opl_pack_native_helper_probe_descriptor"
+            and descriptor.get("schema_version") == 1
+            and descriptor.get("helper_id") == helper.get("helper_id")
+            and descriptor_entrypoint == source_file
+            and authority_is_false
+        )
 
     return {
         "helper_id": helper.get("helper_id"),
@@ -186,7 +205,7 @@ def _helper_diagnostics(helper: dict[str, Any], root: Path) -> dict[str, Any]:
         "entrypoint": {
             "source_ref": source_ref,
             "probe_descriptor_ref": descriptor_ref,
-            "probe_descriptor_exists": bool(descriptor_file and descriptor_file.is_file()),
+            "probe_descriptor_exists": descriptor_exists,
             "probe_descriptor_matches_source": descriptor_matches_source,
             "public_launcher": False,
         },

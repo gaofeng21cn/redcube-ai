@@ -146,7 +146,7 @@
     {
       "file": "tools/proof-artifact-index.ts",
       "symbol": "<module>",
-      "source_digest": "sha256:9fd0f650ccec12da06da911307b6402fc44886a43a89a76558627f9897742377",
+      "source_digest": "sha256:fb8af13104ee761650ca1136710ef45e90658486fb4783c20f470fab69ebd4c4",
       "allowed_effects": [
         "filesystem_write"
       ],

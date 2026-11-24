@@ -1,3 +1,5 @@
+import { spawnSync } from 'node:child_process';
+
 const INPUT_FIELDS = new Set([
   'prompt', 'output_path', 'model', 'size', 'quality', 'background',
   'reference_image_paths', 'timeout_ms',
@@ -35,7 +37,58 @@ function validRequest(input) {
   );
 }
 
-export async function generateImage(input, loadRuntime = () => import('opl-framework/domain-task-runtime')) {
+function findOplBin() {
+  const configured = process.env.OPL_BIN?.trim();
+  if (configured) return configured;
+  const resolved = spawnSync('which', ['opl'], { encoding: 'utf8' });
+  return resolved.status === 0 ? resolved.stdout.trim() || null : null;
+}
+
+async function defaultLoadRuntime() {
+  try {
+    return await import('opl-framework/domain-task-runtime');
+  } catch (error) {
+    const code = error?.code;
+    if (code !== 'ERR_MODULE_NOT_FOUND' && code !== 'ERR_PACKAGE_PATH_NOT_EXPORTED') {
+      throw error;
+    }
+    const oplBin = findOplBin();
+    if (!oplBin) throw error;
+    return {
+      runDomainImageGeneration: async (req) => {
+        const args = [
+          'image', 'generate', '--prompt', req.prompt,
+          '--output', req.output_path, '--model', req.model,
+        ];
+        if (req.size) args.push('--size', req.size);
+        if (req.quality) args.push('--quality', req.quality);
+        if (req.background) args.push('--background', req.background);
+        for (const ref of req.reference_image_paths ?? []) args.push('--reference', ref);
+        if (req.timeout_ms !== undefined) args.push('--timeout-ms', String(req.timeout_ms));
+        args.push('--json');
+        const run = spawnSync(oplBin, args, { encoding: 'utf8' });
+        let parsed = null;
+        try {
+          parsed = run.stdout ? JSON.parse(run.stdout) : null;
+        } catch {
+          parsed = null;
+        }
+        if (run.status === 0 && parsed?.domain_image_generation) {
+          return parsed.domain_image_generation;
+        }
+        const details = parsed?.error?.details ?? {};
+        throw Object.assign(new Error('opl image generate failed'), {
+          details: {
+            failure_code: details.failure_code ?? 'image_generation_unknown',
+            outcome: details.outcome ?? 'unknown',
+          },
+        });
+      },
+    };
+  }
+}
+
+export async function generateImage(input, loadRuntime = defaultLoadRuntime) {
   if (!validRequest(input)) return failure('invalid_image_request');
   let runtime;
   try {

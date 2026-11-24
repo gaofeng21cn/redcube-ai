@@ -115,3 +115,32 @@ test('projected carrier helper resolves the public module and accepts stdin requ
   assert.equal(JSON.parse(invalid.stdout).failure_code, 'invalid_image_request');
   assert.equal(invalid.stderr, '');
 });
+
+test('default runtime falls back to opl image generate CLI when OPL_BIN is set', (t) => {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'rca-opl-bin-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const fakeOpl = path.join(root, 'opl');
+  const outputPath = path.join(root, 'cli-slide.png');
+  writeFileSync(fakeOpl, [
+    '#!/usr/bin/env node',
+    "import { writeFileSync } from 'node:fs';",
+    'const args = process.argv.slice(2);',
+    'const outIdx = args.indexOf("--output");',
+    'writeFileSync(args[outIdx + 1], "png-bytes");',
+    'process.stdout.write(JSON.stringify({ version: "g2", domain_image_generation: {',
+    '  surface_kind: "opl_domain_image_generation", status: "completed",',
+    '  output_path: args[outIdx + 1], image_sha256: "b".repeat(64), model: "gpt-image-2",',
+    '  operation: "generate", request_id: "cli-req-1"',
+    '} }));',
+  ].join('\n'), { mode: 0o755 });
+  const run = spawnSync(process.execPath, ['plugins/redcube-ai/agent/tools/generate-image.mjs'], {
+    input: JSON.stringify({ prompt: 'CLI slide', output_path: outputPath }),
+    encoding: 'utf8',
+    env: { ...process.env, OPL_BIN: fakeOpl },
+  });
+  assert.equal(run.status, 0, run.stderr);
+  const receipt = JSON.parse(run.stdout);
+  assert.equal(receipt.status, 'completed');
+  assert.equal(receipt.request_id, 'cli-req-1');
+  assert.equal(readFileSync(outputPath, 'utf8'), 'png-bytes');
+});
