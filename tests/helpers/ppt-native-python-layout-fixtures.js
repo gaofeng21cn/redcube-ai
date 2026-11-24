@@ -14,7 +14,7 @@ import {
   templateLayoutGrammar,
   withLayoutZone,
   withTemplateLayoutDefaults,
-} from './ppt-native-python-layout-fixture-parts.js';
+} from './ppt-native-python-layout-templates.js';
 
 const PYTHON_CACHE_ROOT = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-layouts-python-cache-'));
 
