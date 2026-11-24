@@ -1,14 +1,16 @@
+from pptx.dml.color import RGBColor
+
 from redcube_ai.native_helpers.ppt_deck.native_layout_constants import PALETTE
 from redcube_ai.native_helpers.ppt_deck.native_layouts.common import safe_text
 
 __all__ = [
     'resolve_color',
+    'parse_rgb_color',
     'ai_shape_fill',
     'ai_shape_line',
     'ai_shape_line_width_pt',
     'ai_shape_line_end',
-    'officecli_line_prop',
-    'officecli_valign',
+    'normalize_valign',
     'ai_shape_color',
 ]
 
@@ -18,6 +20,18 @@ def resolve_color(value, default_key: str) -> str:
         value = value.get('color') or value.get('value')
     color = safe_text(value, default_key)
     return PALETTE.get(color, color)
+
+
+def parse_rgb_color(value: str) -> RGBColor | None:
+    text = safe_text(value)
+    if not text or text.lower() in {'none', 'transparent'}:
+        return None
+    hex_str = text.lstrip('#')
+    if len(hex_str) == 3 and all(ch in '0123456789abcdefABCDEF' for ch in hex_str):
+        hex_str = ''.join(ch * 2 for ch in hex_str)
+    if len(hex_str) == 6 and all(ch in '0123456789abcdefABCDEF' for ch in hex_str):
+        return RGBColor.from_string(hex_str.upper())
+    return None
 
 
 def ai_shape_fill(shape_spec: dict, *, text: str) -> str:
@@ -34,7 +48,7 @@ def ai_shape_line_width_pt(shape_spec: dict) -> float:
     if isinstance(line_spec, dict):
         width = line_spec.get('width_pt') or line_spec.get('width') or line_spec.get('line_width')
     if width is None:
-        width = shape_spec.get('line_width') or shape_spec.get('stroke_width') or 1.0
+        width = shape_spec.get('line_width_pt') or shape_spec.get('line_width') or shape_spec.get('stroke_width') or 1.0
     try:
         numeric = float(width)
     except (TypeError, ValueError):
@@ -55,14 +69,7 @@ def ai_shape_line_end(shape_spec: dict, *, end: str) -> str:
     return 'none'
 
 
-def officecli_line_prop(shape_spec: dict, line_color: str) -> str:
-    if safe_text(line_color).lower() == 'none':
-        return 'none'
-    width = ai_shape_line_width_pt(shape_spec)
-    return f'{line_color}:{width:g}' if width > 0 else line_color
-
-
-def officecli_valign(shape_spec: dict) -> str:
+def normalize_valign(shape_spec: dict) -> str:
     raw = safe_text(shape_spec.get('valign') or shape_spec.get('vertical_align'), 'top').lower()
     if raw in {'mid', 'middle', 'center', 'centre', 'ctr', 'c', 'm'}:
         return 'center'

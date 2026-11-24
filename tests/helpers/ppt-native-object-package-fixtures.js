@@ -94,28 +94,41 @@ export function runPackageReadback(pptxFile) {
 
 export function createTemplatePptx(workspaceRoot, slideCount = 1) {
   const templateFile = path.join(workspaceRoot, 'template.pptx');
-  const officecli = process.env.OFFICECLI || 'officecli';
-  const run = (args) => execFileSync(officecli, args, { encoding: 'utf-8' });
-  run(['create', templateFile]);
-  run(['open', templateFile]);
-  try {
-    for (let slideIndex = 1; slideIndex <= slideCount; slideIndex += 1) {
-      run(['add', templateFile, '/', '--type', 'slide', '--prop', 'layout=blank', '--prop', 'background=F4F7FB']);
-      run([
-        'add', templateFile, `/slide[${slideIndex}]`, '--type', 'placeholder',
-        '--prop', 'phType=title', '--prop', `name=TemplateTitle${slideIndex === 1 ? '' : slideIndex}`,
-        '--prop', `text=Template title placeholder ${slideIndex}`,
-      ]);
-      run([
-        'add', templateFile, `/slide[${slideIndex}]`, '--type', 'shape',
-        '--prop', `name=TemplateAnchor${slideIndex === 1 ? '' : slideIndex}`, '--prop', 'preset=roundRect', '--prop', 'fill=E2E8F0',
-        '--prop', 'x=0.7in', '--prop', 'y=6.7in', '--prop', 'width=2.2in', '--prop', 'height=0.35in',
-      ]);
-    }
-    run(['save', templateFile]);
-  } finally {
-    run(['close', templateFile]);
-  }
+  const script = `
+import sys
+from pptx import Presentation
+from pptx.dml.color import RGBColor
+from pptx.enum.shapes import MSO_SHAPE
+from pptx.util import Inches
+
+template_file = sys.argv[1]
+slide_count = int(sys.argv[2])
+prs = Presentation()
+prs.slide_width = Inches(16)
+prs.slide_height = Inches(9)
+title_layout = prs.slide_layouts[5]
+for slide_index in range(1, slide_count + 1):
+    slide = prs.slides.add_slide(title_layout)
+    bg = slide.background.fill
+    bg.solid()
+    bg.fore_color.rgb = RGBColor.from_string('F4F7FB')
+    if slide.shapes.title is not None:
+        slide.shapes.title.name = f'TemplateTitle{"" if slide_index == 1 else slide_index}'
+        slide.shapes.title.text = f'Template title placeholder {slide_index}'
+    anchor = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(0.7),
+        Inches(6.7),
+        Inches(2.2),
+        Inches(0.35),
+    )
+    anchor.name = f'TemplateAnchor{"" if slide_index == 1 else slide_index}'
+    anchor.fill.solid()
+    anchor.fill.fore_color.rgb = RGBColor.from_string('E2E8F0')
+    anchor.line.fill.background()
+prs.save(template_file)
+`;
+  runPython(script, [templateFile, String(slideCount)]);
   return templateFile;
 }
 

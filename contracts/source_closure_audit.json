@@ -15,6 +15,28 @@
       ]
     },
     {
+      "file": "scripts/sync_carrier.py",
+      "symbol": "_list_git_tracked_entries",
+      "source_digest": "sha256:65278bde88b6d1ad1c9e6700cd88821e0dd5fb0a214f4d0a1cb4f2c1cb2b5696",
+      "allowed_effects": [
+        "process_spawn"
+      ],
+      "role": "developer_tool",
+      "allowed_targets": [
+        "git"
+      ]
+    },
+    {
+      "file": "scripts/sync_carrier.py",
+      "symbol": "project_carrier_standalone",
+      "source_digest": "sha256:65278bde88b6d1ad1c9e6700cd88821e0dd5fb0a214f4d0a1cb4f2c1cb2b5696",
+      "allowed_effects": [
+        "filesystem_write"
+      ],
+      "role": "developer_tool",
+      "allowed_targets": []
+    },
+    {
       "file": "scripts/verification-runtime.ts",
       "symbol": "ensureRepoTempEnvironment",
       "source_digest": "sha256:e1f14cee6042758034c9d2aa6c3207618d1abe08b43b641d3975fb5a96e003e4",
@@ -29,7 +51,7 @@
     {
       "file": "scripts/verify-lane.ts",
       "symbol": "run",
-      "source_digest": "sha256:6a43117e1d851050f676f6b27646405432bd6f7a6a8ddf11f35ea9f08da15a6a",
+      "source_digest": "sha256:d9393e568940aafbf6a5bca70001fcaf80ef74c4c279dd55def8ba246a677cbf",
       "allowed_effects": [
         "process_spawn"
       ],
@@ -37,6 +59,7 @@
       "allowed_targets": [
         "node",
         "npm",
+        "python3",
         "scripts/repo-hygiene.sh",
         "scripts/run-structural-quality-gate.sh"
       ]
@@ -44,7 +67,7 @@
     {
       "file": "scripts/verify-lane.ts",
       "symbol": "runPrivatePlatformReadback",
-      "source_digest": "sha256:6a43117e1d851050f676f6b27646405432bd6f7a6a8ddf11f35ea9f08da15a6a",
+      "source_digest": "sha256:d9393e568940aafbf6a5bca70001fcaf80ef74c4c279dd55def8ba246a677cbf",
       "allowed_effects": [
         "filesystem_write"
       ],
@@ -114,7 +137,7 @@
     {
       "file": "tools/native-ppt-proof/evaluate-quality.ts",
       "symbol": "runCli",
-      "source_digest": "sha256:b36b61e1abd67586be1f8054a08d0f742355f56fdc7ac9977176305c718b0b29",
+      "source_digest": "sha256:512b656149d11db7668fd599e0df3e67b2417c5ff4df4abcd94960b8a4d1ba5c",
       "allowed_effects": [
         "filesystem_write"
       ],
@@ -124,24 +147,12 @@
     {
       "file": "tools/native-ppt-proof/run-editability-regression.py",
       "symbol": "main",
-      "source_digest": "sha256:4c5f3f630d462913037441c376e2111db11bbb83e20569b32f5359d408f0c1f1",
+      "source_digest": "sha256:65da3f9f872c24499d61fd41a7a26234c18beb11d0c094b7b455c1013df1097b",
       "allowed_effects": [
         "filesystem_write"
       ],
       "role": "developer_tool",
       "allowed_targets": []
-    },
-    {
-      "file": "tools/native-ppt-proof/run-editability-regression.py",
-      "symbol": "run_officecli",
-      "source_digest": "sha256:4c5f3f630d462913037441c376e2111db11bbb83e20569b32f5359d408f0c1f1",
-      "allowed_effects": [
-        "process_spawn"
-      ],
-      "role": "developer_tool",
-      "allowed_targets": [
-        "officecli"
-      ]
     },
     {
       "file": "tools/proof-artifact-index.ts",

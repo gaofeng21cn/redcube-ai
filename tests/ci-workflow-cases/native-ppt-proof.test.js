@@ -13,11 +13,8 @@ test('native PPT Linux proof environment is documented without adding a desktop-
     assert.match(source, /libreoffice/);
     assert.match(source, /poppler-utils|Poppler/);
     assert.match(source, /fonts-noto-cjk/);
+    assert.doesNotMatch(source, /iOfficeAI\/OfficeCLI|officecli/);
   }
-  assert.match(installScript, /iOfficeAI\/OfficeCLI\/releases\/download\/\$version\/\$asset/);
-  assert.match(installScript, /iOfficeAI\/OfficeCLI\/releases\/latest/);
-  assert.match(installScript, /sha256sum|shasum -a 256/);
-  assert.match(installScript, /officecli --version/);
 
   assert.match(runner, /LibreOffice\/Poppler/);
   assert.match(runner, /tools\/native-ppt-proof\/install-deps\.sh/);
@@ -54,9 +51,6 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   // Require an explicit release pin without duplicating its version in a test.
   assert.match(dockerfile, /^FROM ghcr\.io\/astral-sh\/uv:\d+\.\d+\.\d+(?:@sha256:[a-f0-9]{64})? AS uv$/m);
   assert.match(dockerfile, /FROM node:26-bookworm/);
-  assert.match(dockerfile, /ARG TARGETARCH/);
-  assert.match(dockerfile, /officecli-linux-arm64/);
-  assert.match(dockerfile, /officecli-linux-x64/);
   assert.match(dockerfile, /COPY --from=uv \/uv \/uvx \/bin\//);
   assert.match(dockerfile, /COPY pyproject\.toml uv\.lock/);
   assert.match(dockerfile, /COPY contracts \.\/contracts/);
@@ -66,8 +60,6 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   assert.match(dockerfile, /uv sync --locked --no-dev --extra native --no-install-project --python \/usr\/bin\/python3/);
   assert.doesNotMatch(dockerfile, /pip install|requirements\/ci-python\.txt/);
   assert.doesNotMatch(runner, /PIP_CACHE_DIR/);
-  assert.match(dockerfile, /iOfficeAI\/OfficeCLI\/releases\/latest/);
-  assert.match(dockerfile, /sha256sum -c -/);
   for (const source of [dockerfile, runner]) {
     assert.doesNotMatch(source, new RegExp(['powerpoint', '_applescript'].join(''), 'i'));
     assert.doesNotMatch(source, new RegExp(['osa', 'script'].join(''), 'i'));

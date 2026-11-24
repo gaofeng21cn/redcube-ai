@@ -77,12 +77,12 @@ _EXPORTS: dict[str, tuple[str, ...]] = {
     ),
     'redcube_ai.native_helpers.ppt_deck.native_layouts.style': (
         'resolve_color',
+        'parse_rgb_color',
         'ai_shape_fill',
         'ai_shape_line',
         'ai_shape_line_width_pt',
         'ai_shape_line_end',
-        'officecli_line_prop',
-        'officecli_valign',
+        'normalize_valign',
         'ai_shape_color',
     ),
     'redcube_ai.native_helpers.ppt_deck.native_layouts.rules': (
@@ -116,14 +116,11 @@ _EXPORTS: dict[str, tuple[str, ...]] = {
         'strict_svg_preflight',
         'render_slide_svg_ir',
     ),
-    'redcube_ai.native_helpers.ppt_deck.native_layouts.officecli': (
+    'redcube_ai.native_helpers.ppt_deck.native_layouts.object_specs': (
         'canonical_object_kind',
-        'officecli_shape_props',
-        'officecli_command_for_ai_shape',
         'native_shape_manifest_record',
     ),
     'redcube_ai.native_helpers.ppt_deck.native_layouts.materializer': (
-        'parse_json_output',
         'issue_count',
         'materialize_native_pptx',
         'build_deck',

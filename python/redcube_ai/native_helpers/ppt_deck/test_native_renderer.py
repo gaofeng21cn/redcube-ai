@@ -6,7 +6,7 @@ from unittest import mock
 from PIL import Image
 
 from redcube_ai.native_helpers import renderer_dependencies
-from redcube_ai.native_helpers.ppt_deck import native
+from redcube_ai.native_helpers.ppt_deck import native, native_render_proof
 from redcube_ai.native_helpers.ppt_deck import native_layout_grammar, native_manifest_qa
 from redcube_ai.native_helpers.ppt_deck.native_layouts import common
 
@@ -31,15 +31,15 @@ class NativePptLibreOfficeRendererTest(unittest.TestCase):
 
         def fake_run(command, text, capture_output, check):
             if command[:2] == ['/usr/local/bin/soffice', '--version']:
-                return native.subprocess.CompletedProcess(command, 0, stdout='LibreOffice 26.2.3\n', stderr='')
+                return native_render_proof.subprocess.CompletedProcess(command, 0, stdout='LibreOffice 26.2.3\n', stderr='')
             if command[:2] == ['/usr/local/bin/pdftoppm', '-v']:
-                return native.subprocess.CompletedProcess(command, 0, stdout='', stderr='pdftoppm version 26.04.0\n')
+                return native_render_proof.subprocess.CompletedProcess(command, 0, stdout='', stderr='pdftoppm version 26.04.0\n')
             raise AssertionError(f'unexpected command: {command}')
 
         with (
             mock.patch.object(renderer_dependencies.shutil, 'which', side_effect=fake_which),
             mock.patch.object(renderer_dependencies.Path, 'exists', return_value=False),
-            mock.patch.object(native.subprocess, 'run', side_effect=fake_run) as run,
+            mock.patch.object(native_render_proof.subprocess, 'run', side_effect=fake_run) as run,
         ):
             renderer = native.resolve_renderer('auto')
 
@@ -55,7 +55,7 @@ class NativePptLibreOfficeRendererTest(unittest.TestCase):
         with (
             mock.patch.object(renderer_dependencies.shutil, 'which', return_value=None),
             mock.patch.object(renderer_dependencies.Path, 'exists', return_value=False),
-            mock.patch.object(native.subprocess, 'run') as run,
+            mock.patch.object(native_render_proof.subprocess, 'run') as run,
             mock.patch('sys.stderr') as stderr,
             self.assertRaises(SystemExit),
         ):
@@ -95,15 +95,15 @@ class NativePptLibreOfficeRendererTest(unittest.TestCase):
 
             def fake_run(command, text, capture_output, check):
                 if command[:2] == [str(cask_soffice), '--version']:
-                    return native.subprocess.CompletedProcess(command, 0, stdout='LibreOffice 26.2.3\n', stderr='')
+                    return native_render_proof.subprocess.CompletedProcess(command, 0, stdout='LibreOffice 26.2.3\n', stderr='')
                 if command[:2] == ['/usr/local/bin/pdftoppm', '-v']:
-                    return native.subprocess.CompletedProcess(command, 0, stdout='', stderr='pdftoppm version 26.04.0\n')
+                    return native_render_proof.subprocess.CompletedProcess(command, 0, stdout='', stderr='pdftoppm version 26.04.0\n')
                 raise AssertionError(f'unexpected command: {command}')
 
             with (
                 mock.patch.object(renderer_dependencies, 'MACOS_LIBREOFFICE_PATHS', (cask_soffice,)),
                 mock.patch.object(renderer_dependencies.shutil, 'which', side_effect=fake_which),
-                mock.patch.object(native.subprocess, 'run', side_effect=fake_run),
+                mock.patch.object(native_render_proof.subprocess, 'run', side_effect=fake_run),
             ):
                 renderer = native.resolve_renderer('auto')
 
@@ -129,21 +129,21 @@ class NativePptLibreOfficeRendererTest(unittest.TestCase):
 
             def fake_run(command, text, capture_output, check):
                 if command[:2] == ['/usr/local/bin/soffice', '--version']:
-                    return native.subprocess.CompletedProcess(command, 0, stdout='LibreOffice 24.2.0\n', stderr='')
+                    return native_render_proof.subprocess.CompletedProcess(command, 0, stdout='LibreOffice 24.2.0\n', stderr='')
                 if command[:2] == ['/usr/local/bin/pdftoppm', '-v']:
-                    return native.subprocess.CompletedProcess(command, 0, stdout='', stderr='pdftoppm version 24.02.0\n')
+                    return native_render_proof.subprocess.CompletedProcess(command, 0, stdout='', stderr='pdftoppm version 24.02.0\n')
                 if command[0] == '/usr/local/bin/soffice':
                     (output_pdf.parent / 'deck.pdf').write_bytes(b'pdf')
-                    return native.subprocess.CompletedProcess(command, 0, stdout='', stderr='')
+                    return native_render_proof.subprocess.CompletedProcess(command, 0, stdout='', stderr='')
                 if command[0] == '/usr/local/bin/pdftoppm':
                     preview_dir.mkdir(parents=True, exist_ok=True)
                     Image.new('RGB', (32, 18), (255, 255, 255)).save(preview_dir / 'slide-1.png')
-                    return native.subprocess.CompletedProcess(command, 0, stdout='', stderr='')
+                    return native_render_proof.subprocess.CompletedProcess(command, 0, stdout='', stderr='')
                 raise AssertionError(f'unexpected command: {command}')
 
             with (
                 mock.patch.object(renderer_dependencies.shutil, 'which', side_effect=fake_which),
-                mock.patch.object(native.subprocess, 'run', side_effect=fake_run),
+                mock.patch.object(native_render_proof.subprocess, 'run', side_effect=fake_run),
             ):
                 proof = native.render_pptx(
                     pptx,

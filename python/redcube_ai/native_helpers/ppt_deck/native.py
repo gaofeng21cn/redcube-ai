@@ -166,13 +166,13 @@ def main() -> None:
         'engine_contract': engine_contract,
         'engine_contract_file': str(engine_contract_file),
         'builder': {
-            'kind': 'officecli_pptx_materializer',
-            'implementation': 'officecli_batch_from_ai_spatial_plan',
+            'kind': 'python_pptx_materializer',
+            'implementation': 'python_pptx_from_ai_spatial_plan',
             'surface': 'editable_native_pptx',
             'screenshot_packaging': False,
         },
         'capability': {
-            'kind': 'officecli materializer adapter',
+            'kind': 'python-pptx materializer adapter',
             'editable_artifact': True,
             'native_shapes': True,
             'redcube_svg_ir': True,

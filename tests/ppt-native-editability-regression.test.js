@@ -70,7 +70,7 @@ test('native quality-debt mode preserves a readable candidate while strict valid
   ] }] };
   const strict = runNativeObjectMaterializerFailure({ workspaceRoot, payload });
   assert.notEqual(strict.status, 0);
-  assert.match(strict.stderr, /officecli quality gate failed/);
+  assert.match(strict.stderr, /materializer quality gate failed/);
   const candidate = runNativeObjectMaterializer({ workspaceRoot, payload: { ...payload, allow_quality_debt: true } });
   assert.equal(candidate.package_readback.slide_count, 1);
   assert.equal(candidate.quality_debt.reason, 'native_materialized_visual_quality');
@@ -148,8 +148,9 @@ test('native PPT edit task survives package readback and true rerender', () => {
   const edited = proof.package_readback;
   const byName = Object.fromEntries(edited.slides[0].objects.map((item) => [item.name, item]));
   assert.notEqual(edited.pptx_sha256, baseline.pptx_sha256);
+  assert.deepEqual(byName['S01-chart'].categories, ['North', 'South', 'West']);
   assert.equal(byName['S01-chart'].categories_raw, 'North,South,West');
-  assert.equal(byName['S01-chart'].categories_readback, 'delimiter_ambiguous');
+  assert.equal(byName['S01-chart'].categories_readback, 'exact');
   assert.deepEqual(byName['S01-chart'].series, [{ name: 'Reforecast', values: [5, 9, 12] }]);
   assert.equal(byName['S01-title'].text, 'Updated operating result');
   assert.equal(byName['S01-node-a'].fill, '#0F766E');
