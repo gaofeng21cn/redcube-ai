@@ -29,7 +29,7 @@
     {
       "file": "scripts/verify-lane.ts",
       "symbol": "run",
-      "source_digest": "sha256:6a43117e1d851050f676f6b27646405432bd6f7a6a8ddf11f35ea9f08da15a6a",
+      "source_digest": "sha256:d9393e568940aafbf6a5bca70001fcaf80ef74c4c279dd55def8ba246a677cbf",
       "allowed_effects": [
         "process_spawn"
       ],
@@ -37,6 +37,7 @@
       "allowed_targets": [
         "node",
         "npm",
+        "python3",
         "scripts/repo-hygiene.sh",
         "scripts/run-structural-quality-gate.sh"
       ]
@@ -44,7 +45,7 @@
     {
       "file": "scripts/verify-lane.ts",
       "symbol": "runPrivatePlatformReadback",
-      "source_digest": "sha256:6a43117e1d851050f676f6b27646405432bd6f7a6a8ddf11f35ea9f08da15a6a",
+      "source_digest": "sha256:d9393e568940aafbf6a5bca70001fcaf80ef74c4c279dd55def8ba246a677cbf",
       "allowed_effects": [
         "filesystem_write"
       ],

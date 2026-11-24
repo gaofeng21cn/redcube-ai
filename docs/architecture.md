@@ -41,7 +41,7 @@
 
 RCA owner 持有 Package identity、能力和领域语义。实际 carrier 平台管理其承载的 bytes，并提供安装、更新、移除后的真实读回；Framework 聚合 presence/callability 和公开 action。
 
-当前 Codex Plugin (`plugins/redcube-ai/`) 是由 `scripts/sync_carrier.py` 委托 `opl pack project-carrier`、按 `contracts/carrier_projection.json` 从 tracked `agent/`、`contracts/`、`python/`、`runtime/`、`docs/` 与 `prompts/ppt_deck/` 投影出的自包含安装载体。`plugins/redcube-ai/skills/redcube-ai/SKILL.md` 按 `contracts/capability_map.json` 的 `carrier_projection_contract` 与 canonical `agent/primary_skill/SKILL.md` 保持逐字一致；它是 Codex 插件安装所需物理载体副本，不构成第二套能力或 visual truth owner。未来替换 carrier 只替换资源投影，不改变 RCA capability、task、typed view 或领域 authority。
+当前 Codex Plugin (`plugins/redcube-ai/`) 仅在 Git 中跟踪 4 份载体独有清单/元数据（`.codex-plugin/plugin.json`、`plugin.json`、`opl-package.json`、`skills/redcube-ai/agents/openai.yaml`）；其余自包含安装载体资源由 `scripts/sync_carrier.py`（优先委托 `opl pack project-carrier`，独立环境回退为纯 Python 确定性物化器）按 `contracts/carrier_projection.json` 在构建、验证与发布阶段从 tracked `agent/`、`contracts/`、`python/`、`runtime/`、`docs/` 与 `prompts/ppt_deck/` 投影生成并被 `.gitignore` 忽略。物化后的 `plugins/redcube-ai/skills/redcube-ai/SKILL.md` 按 `contracts/capability_map.json` 的 `carrier_projection_contract` 与 canonical `agent/primary_skill/SKILL.md` 保持逐字一致，不构成第二套能力或 visual truth owner。未来替换 carrier 只替换资源投影，不改变 RCA capability、task、typed view 或领域 authority。
 
 完整 RCA bytes 的发布遵循 owner Package channel；共享 Release Set 仅用于离线或 QA 快照。普通 required/optional dependency 检查 identity presence 与 entrypoint callability。发布 digest 保护一次 bytes 交付，领域 artifact hash 保护 lineage，二者不构成中央依赖版本求解器。
 

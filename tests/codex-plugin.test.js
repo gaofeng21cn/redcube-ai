@@ -271,24 +271,30 @@ test('nested Codex carrier remains a synchronized compatibility surface without 
   assert.equal(existsSync(path.join(repoRoot, 'scripts', 'install-codex-plugin.ts')), false);
 });
 
-test('release preparation aligns bundled local skill versions while check remains read-only', (t) => {
-  const siblingFramework = path.resolve(repoRoot, '..', 'one-person-lab');
-  const candidateOplBins = [
-    process.env.OPL_BIN,
-    process.env.OPL_FRAMEWORK_ROOT ? path.join(process.env.OPL_FRAMEWORK_ROOT, 'bin', 'opl') : null,
-    path.join(siblingFramework, 'bin', 'opl'),
-  ].filter(Boolean);
-  let resolvedOplBin = candidateOplBins.find((candidate) => existsSync(candidate)) ?? null;
-  if (!resolvedOplBin) {
-    const which = spawnSync('which', ['opl'], { encoding: 'utf8' });
-    if (which.status === 0 && which.stdout.trim()) {
-      resolvedOplBin = which.stdout.trim();
-    }
-  }
-  if (!resolvedOplBin) {
-    t.skip('OPL CLI is unavailable in standalone source CI');
-    return;
-  }
+test('plugins/redcube-ai keeps only unique carrier manifests in git and materializes projected files cleanly', () => {
+  const tracked = spawnSync('git', ['ls-files', 'plugins/redcube-ai'], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+  });
+  assert.equal(tracked.status, 0, tracked.stderr);
+  assert.deepEqual(
+    tracked.stdout.trim().split('\n').filter(Boolean).sort(),
+    [
+      'plugins/redcube-ai/.codex-plugin/plugin.json',
+      'plugins/redcube-ai/opl-package.json',
+      'plugins/redcube-ai/plugin.json',
+      'plugins/redcube-ai/skills/redcube-ai/agents/openai.yaml',
+    ],
+  );
+  const python = resolveRedCubePythonCommand();
+  const check = spawnSync(python.command, [...python.args, 'scripts/sync_carrier.py', '--standalone', '--check'], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+  });
+  assert.equal(check.status, 0, `${check.stdout}\n${check.stderr}`);
+});
+
+function runCarrierVersionSyncContract(extraArgs, extraEnv) {
   const root = mkUserScopedTestWorkspace('redcube-carrier-version-');
   for (const relative of [
     'scripts/sync_carrier.py', 'contracts/carrier_projection.json', 'contracts/opl_agent_package_manifest.json', 'contracts/domain_descriptor.json',
@@ -314,23 +320,16 @@ test('release preparation aligns bundled local skill versions while check remain
   writeFileSync(ownerPath, `${JSON.stringify(owner, null, 2)}\n`);
   const before = readFileSync(ownerPath);
   const python = resolveRedCubePythonCommand();
-  const prepareEnv = {
-    ...process.env,
-    OPL_BIN: resolvedOplBin,
-    ...(process.env.OPL_FRAMEWORK_ROOT
-      ? {}
-      : existsSync(siblingFramework)
-        ? { OPL_FRAMEWORK_ROOT: siblingFramework }
-        : {}),
-  };
-  const prepare = (...args) => spawnSync(python.command, [...python.args, 'scripts/sync_carrier.py', ...args], {
-    cwd: root, encoding: 'utf8', env: prepareEnv,
-  });
+  const prepare = (...args) => spawnSync(
+    python.command,
+    [...python.args, 'scripts/sync_carrier.py', ...extraArgs, ...args],
+    { cwd: root, encoding: 'utf8', env: { ...process.env, ...extraEnv } },
+  );
   assert.notEqual(prepare('--check').status, 0);
   assert.deepEqual(readFileSync(ownerPath), before);
   assert.equal(existsSync(path.join(root, 'plugins/redcube-ai/contracts/opl_agent_package_manifest.json')), false);
   const result = prepare();
-  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
   const prepared = readJson(ownerPath);
   assert.equal(prepared.skill_packs[0].version, '9.8.7');
   assert.equal(prepared.skill_packs[1].version, '1.2.3');
@@ -343,4 +342,31 @@ test('release preparation aligns bundled local skill versions while check remain
   assert.equal(prepare('--check').status, 0);
   assert.equal(prepare().status, 0);
   assert.deepEqual(readFileSync(ownerPath), preparedBytes);
+}
+
+test('release preparation aligns bundled local skill versions while check remains read-only', () => {
+  runCarrierVersionSyncContract(['--standalone'], { OPL_BIN: '' });
+  const siblingFramework = path.resolve(repoRoot, '..', 'one-person-lab');
+  const candidateOplBins = [
+    process.env.OPL_BIN,
+    process.env.OPL_FRAMEWORK_ROOT ? path.join(process.env.OPL_FRAMEWORK_ROOT, 'bin', 'opl') : null,
+    path.join(siblingFramework, 'bin', 'opl'),
+  ].filter(Boolean);
+  let resolvedOplBin = candidateOplBins.find((candidate) => existsSync(candidate)) ?? null;
+  if (!resolvedOplBin) {
+    const which = spawnSync('which', ['opl'], { encoding: 'utf8' });
+    if (which.status === 0 && which.stdout.trim()) {
+      resolvedOplBin = which.stdout.trim();
+    }
+  }
+  if (resolvedOplBin) {
+    runCarrierVersionSyncContract([], {
+      OPL_BIN: resolvedOplBin,
+      ...(process.env.OPL_FRAMEWORK_ROOT
+        ? {}
+        : existsSync(siblingFramework)
+          ? { OPL_FRAMEWORK_ROOT: siblingFramework }
+          : {}),
+    });
+  }
 });

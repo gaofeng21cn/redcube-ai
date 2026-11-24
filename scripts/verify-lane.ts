@@ -22,6 +22,7 @@ function errorMessage(error: unknown): string {
 type VerifyCommand =
   | 'node'
   | 'npm'
+  | 'python3'
   | 'scripts/repo-hygiene.sh'
   | 'scripts/run-structural-quality-gate.sh';
 
@@ -36,9 +37,11 @@ function run(command: VerifyCommand, args: readonly string[] = [], options: Spaw
     ? spawnSync('node', args, spawnOptions)
     : command === 'npm'
       ? spawnSync('npm', args, spawnOptions)
-      : command === 'scripts/repo-hygiene.sh'
-        ? spawnSync('scripts/repo-hygiene.sh', args, spawnOptions)
-        : spawnSync('scripts/run-structural-quality-gate.sh', args, spawnOptions);
+      : command === 'python3'
+        ? spawnSync('python3', args, spawnOptions)
+        : command === 'scripts/repo-hygiene.sh'
+          ? spawnSync('scripts/repo-hygiene.sh', args, spawnOptions)
+          : spawnSync('scripts/run-structural-quality-gate.sh', args, spawnOptions);
   if (result.error) throw result.error;
   if ((result.status ?? 1) !== 0) {
     process.exit(result.status ?? 1);
@@ -130,6 +133,11 @@ try {
   run('scripts/repo-hygiene.sh');
 
   const plan = buildVerifyLanePlan(lane);
+  if (plan.steps.some((step) => step.kind === 'test-group')) {
+    run('python3', ['scripts/sync_carrier.py'], {
+      stdio: ['ignore', 'ignore', 'inherit'],
+    });
+  }
   for (const step of plan.steps) {
     await runStep(step, forwardedArgs);
   }
