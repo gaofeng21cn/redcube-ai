@@ -33,13 +33,15 @@
 
 终局 decisive Attempt 返回 `stage_route_decision`；非终局 Attempt 最多返回 `stage_route_recommendation`。独立 Meta Review 不修改上游 artifact，也不递归启动 Stage 内正式 Review。具体 outcome、repair budget 和 route-back 规则由 `contracts/stage_quality_cycle_policy.json` 持有。
 
-图片生成优先使用 executor 实际提供的 built-in tool。该能力在产物生成前不可用时，`agent/tools/generate-image.mjs` 通过 stdin 接受 JSON 请求，并调用 `opl-framework/domain-task-runtime` 的 `runDomainImageGeneration`。请求只包含 prompt、全新输出路径、可选参考图和图片参数；Framework 管理当前模型连接、凭证解析与一次生成或编辑调用。RCA 消费脱敏产物回执，继续负责视觉审阅、lineage 和导出判定。未知结果先核对，不自动重试。
+图片生成优先使用 executor 实际提供的 built-in tool。该能力在产物生成前不可用时，`agent/tools/generate-image.mjs` 通过 stdin 接受 JSON 请求，优先导入 `opl-framework/domain-task-runtime` 的 `runDomainImageGeneration`；若 ESM 导入不可用，则回退调用 `opl image generate --json`。请求只包含 prompt、全新输出路径、可选参考图和图片参数；Framework 管理当前模型连接、凭证解析与一次生成或编辑调用。RCA 消费脱敏产物回执，继续负责视觉审阅、lineage 和导出判定。未知结果先核对，不自动重试。
 
 该 helper 随现有 carrier 投影，公共模块经 Framework 已有的 managed link 解析。缺少入口时由 Framework 安装或链接流程修复；RCA 不维护另一份配置解析器、模型 SDK、凭证库或 Framework 安装定位器。
 
 ## Package、Carrier 与 Executor
 
-RCA owner 持有 Package identity、能力和领域语义。实际 carrier 平台管理其承载的 bytes，并提供安装、更新、移除后的真实读回；Framework 聚合 presence/callability 和公开 action。当前 Codex Plugin 自包含入口 Skill、声明式 pack、contracts、native helpers 和引用文档，由 `scripts/sync_carrier.py` 从 canonical source 投影；具体资源与权威边界见 [carrier 说明](./references/primary-skill-plugin-carrier-boundary.md)。
+RCA owner 持有 Package identity、能力和领域语义。实际 carrier 平台管理其承载的 bytes，并提供安装、更新、移除后的真实读回；Framework 聚合 presence/callability 和公开 action。
+
+当前 Codex Plugin (`plugins/redcube-ai/`) 是由 `scripts/sync_carrier.py` 委托 `opl pack project-carrier`、按 `contracts/carrier_projection.json` 从 tracked `agent/`、`contracts/`、`python/`、`runtime/`、`docs/` 与 `prompts/ppt_deck/` 投影出的自包含安装载体。`plugins/redcube-ai/skills/redcube-ai/SKILL.md` 按 `contracts/capability_map.json` 的 `carrier_projection_contract` 与 canonical `agent/primary_skill/SKILL.md` 保持逐字一致；它是 Codex 插件安装所需物理载体副本，不构成第二套能力或 visual truth owner。未来替换 carrier 只替换资源投影，不改变 RCA capability、task、typed view 或领域 authority。
 
 完整 RCA bytes 的发布遵循 owner Package channel；共享 Release Set 仅用于离线或 QA 快照。普通 required/optional dependency 检查 identity presence 与 entrypoint callability。发布 digest 保护一次 bytes 交付，领域 artifact hash 保护 lineage，二者不构成中央依赖版本求解器。
 
@@ -47,7 +49,7 @@ RCA owner 持有 Package identity、能力和领域语义。实际 carrier 平�
 
 ## 数据归属
 
-RCA 持有 visual truth、review/export verdict、artifact mutation authorization、visual memory accept/reject、typed blocker 和 owner receipt。平台可以传递 refs、验证身份、保存 execution receipt 和展示结果，但不能代签领域批准。
+OPL Framework 持有 workspace binding、source locator、materialization、hash/currentness 与 input artifact transport；RCA 持有 visual truth、source-readiness 领域判断、review/export verdict、artifact mutation authorization、visual memory accept/reject、typed blocker 和 owner receipt。平台可传递 body-free refs、验证身份、保存 execution receipt 与展示结果，但不能代签领域批准，真实 source body 也不进入 repo contracts。
 
 产品知识正文由 `agent/knowledge/` 与 v2 catalog 维护；用户、主题和项目知识按稳定身份绑定到各自的唯一正文来源。已有 Obsidian 的用户继续在原库维护个人知识，无库时由普通工作目录承载，两种来源可以在一个任务中组合。归属范围与内容性质、有效期、物理位置分开，具体领域规则见 [视觉记忆政策](./policies/visual_pattern_memory_policy.md)。
 

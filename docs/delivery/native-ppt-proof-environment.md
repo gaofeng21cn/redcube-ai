@@ -4,8 +4,9 @@
 
 ## 依赖
 
+`contracts/pack_doctor.json`、
 `contracts/runtime-program/ppt-native-python-engine-contract.json` 和
-`contracts/runtime-program/python-native-helper-catalog.json` 声明 helper。
+`contracts/runtime-program/python-native-helper-catalog.json` 声明诊断规格与 helper。
 当前 writer 为 OfficeCLI，true render 使用 LibreOffice headless -> PDF -> Poppler PNG，中文字体优先 Noto Sans CJK SC。
 
 开发安装器：
@@ -21,9 +22,7 @@ OfficeCLI 安装器与 Docker proof 镜像每次准备环境时解析官方最�
 release 下载二进制与 `SHA256SUMS` 并校验，不固定历史版本，也不关闭官方
 自动更新。已安装的最新版可以复用；更新以原子替换保留正在运行的旧进程。
 依赖检查在临时目录实际创建并关闭 PPTX，仅 `--version` 成功不能证明
-materializer 可用。Linux CI 曾在建档时出现 `System.Private.Xml` 装配加载
-失败，故最终仍须通过完整 native proof，不能由下载、版本号或自动更新
-单独推断生成与渲染成功。
+materializer 可用；必须以完整 native proof 证明生成与渲染可用，不能由下载、版本号或自动更新单独推断成功。
 
 Python 依赖由 `pyproject.toml` 和 `uv.lock` 提供，Node 使用 `npm ci`。
 venv 必须在 checkout 外：
@@ -53,8 +52,7 @@ runner 通过 exact helper/probe contract 物化 `data_charts` fixture，输出
 doctor、helper output、package readback、quality verdict、proof summary、
 artifact index、PPTX/PDF、shape manifest 与 PNG screenshots。
 
-也可以使用隔离容器。当前源码 CI 基线是 `.nvmrc` 的 Node 26.13.0 LTS，
-fallback 镜像跟随 Node 26 的受支持更新；容器与 hosted CI 分别验证：
+也可以使用隔离容器。当前源码 CI 的 Node 基线跟随 `.nvmrc` 声明版本；容器与 hosted CI 分别验证：
 
 ```bash
 docker build -f tools/native-ppt-proof/Dockerfile -t redcube-native-ppt-proof .

@@ -28,4 +28,4 @@ Review and revision stay in the same project. Feedback is tied to specific pages
 
 Install **RedCube AI** from the OPL Software Center. Open a project and share the material you have, the audience, and your delivery format. Start with a reviewable outline or sample pages. [Usage guide](docs/product/human_quickstart.md) · [Current status](docs/status.md)
 
-[Slide production and review](docs/delivery/ppt-workbench-learning.md) · [Documentation](docs/README.md) · [Architecture](docs/architecture.md)
+[Image-first PPT route](docs/delivery/image-first-ppt-production-route.md) · [Export and review evidence](docs/delivery/image-deck-export.md) · [Documentation](docs/README.md) · [Architecture](docs/architecture.md)

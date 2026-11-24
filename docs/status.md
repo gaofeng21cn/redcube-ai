@@ -6,32 +6,18 @@
 
 - `contracts/opl_agent_package_manifest.json` 声明 Package `rca`、当前 Codex carrier 和稳定 entrypoints；source version 从该文件及同步的 Node/Python/Plugin declarations 读取。
 - `agent/` 为声明式 visual pack；`contracts/action_catalog.json` 提供完整交付、image proof 和 native proof 的 hosted action binding。
-- `scripts/sync_carrier.py` 将当前 tracked 领域资源确定性投影到 `plugins/redcube-ai/`；安装目录含 Mini App adapter、descriptor、阶段合同和 Python native helpers，不依赖仓库外层路径。`--check` 核对投影字节，实际安装与发布仍由各 owner 回读。
+- `scripts/sync_carrier.py` 委托 `opl pack project-carrier` 按 `contracts/carrier_projection.json` 将当前 tracked 领域资源确定性投影到 `plugins/redcube-ai/`（含 Mini App adapter、descriptor、阶段合同与 Python native helpers），`--check` 核对投影字节；`contracts/pack_doctor.json` 声明运行环境诊断规格。实际安装与发布仍由各 owner 回读。
 - `contracts/generated_surface_handoff.json` 的 repo-local handler targets 为空，`structural_cutover_complete=true`，`production_evidence_complete=false`。
 - `contracts/functional_privatization_audit.json` 仅保留 visual authority decisions 与 Python native helpers；物理源码归属由 `contracts/physical_source_morphology_policy.json` 声明。旧私有 CLI、domain-entry、runtime、governance 和 overlay roots 已不存在。
 - 当前 manifest 仍包含 source-contract、carrier、health/proof 与 clean-runner metadata。它们不能单独证明完整 installed truth、发布 currentness 或 executor readiness；跨仓 consumer 的现状必须由其 owner fresh 读取。
 
 图片 API 回退通过 `agent/tools/generate-image.mjs` 调用 Framework 公共模型入口；它不再解析宿主配置或寻找独立图片客户端。隔离测试覆盖请求字段边界、生成与编辑调用、脱敏错误和未知结果不重试；真实 provider、安装载体和视觉质量仍分别由对应 owner 验收。
 
-## PPT工作台经验
+## PPT 工作台经验与导出边界
 
-已有专业技能现接入源页语义改编、画法校准、增量生产与交付核验三组
-stage-scoped知识。逐页提示词消费当前语言、认可画法与参考角色；笔记马克笔
-profile是可选示例。`ppt_review_evidence`通过现有OPL helper目录读取真实图片，
-绑定首轮与回修观察并计算次数、耗时和已知成本；它不作语义、美术或ready判定。
-方法、行为案例与使用方式见[PPT工作台经验](delivery/ppt-workbench-learning.md)。
-审阅证据输出保留原图引用、真实哈希、首轮观察及精确选中项，并提供可复核的
-manifest revision；后续读取可拒绝旧意见或旧选择。共享产物页仍使用原任务的
-artifact locators，人的决定通过 Framework 当前任务动作提交并回读，投递信号
-与后续 Attempt 已运行分别记录。
-这些源码和工具能力不代表已经完成真实新版/基线首稿盲评或正式版本激活。
+已有专业技能接入源页语义改编、画法校准、增量生产与交付核验三组 stage-scoped 知识。`ppt_review_evidence` 与 `ppt_deck_export` 作为 OPL native helper 绑定真实页面清单、原始资产哈希、几何/裁剪/备注与 `composition_sha256`、`manifest revision`，并在需要时扫描最终画面与 PDF 页面二维码；人类决定通过 Framework 任务动作提交并回读。具体清单契约、评测边界与首轮工作流约束见 [整页图导出与审阅证据](delivery/image-deck-export.md) 与 [Image-first PPT 路线](delivery/image-first-ppt-production-route.md)。
 
-整页图导出 helper 现支持明确页序、备注、原始核验资产独立层及裁剪，解析实际
-PPTX/PDF 并回读媒体、几何、备注与配方绑定；二维码在最终合成画面和所请求的
-PDF 页面中复扫。developer image proof 只 mock 图片生成，调用同一真实 exporter；
-机械通过与未完成视觉审阅、候选交付分别标记。输入和回执见
-[整页图导出](delivery/image-deck-export.md)。生成与审阅提示词共享语义约束和
-参考借用范围，审阅证据可绑定选中尝试的实际提示词与输入身份。
+这些源码和工具能力以及只 mock 图片生成的 developer image proof（`status: passed`、`visual_review: not_reviewed`、`delivery: candidate`）不代表已经完成真实新版/基线首稿盲评或正式版本激活。
 
 ## 领域证据
 

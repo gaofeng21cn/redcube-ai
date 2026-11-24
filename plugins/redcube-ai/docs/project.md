@@ -20,4 +20,15 @@ RCA 提供专业视觉方法、声明式阶段、合同和 native helpers。通�
 
 Package identity、实际 carrier 和 executor 分开，使专业能力与任务语义可以独立演进。Codex Plugin 是当前 carrier projection，不能单独证明完整 Package 或 hosted runtime 可用。
 
-长期能力方向见 [目标态参考](./references/rca-visual-deliverable-agent-ideal-state.md)。目标不构成发布、安装或生产就绪声明。
+## 长期能力方向
+
+RCA 作为可替换、可安装、可托管的 `OPL Package(kind=agent)`，持续提升以下领域能力（进入 `agent/`、质量合同与 native helpers，不新建独立 runtime、scheduler 或 session store）：
+
+- source-to-story communication strategy；
+- visual direction、layout grammar、brand/style consistency；
+- image-first、HTML 与 editable native PPT 的显式路线选择；
+- screenshot/layout/content-fit review；
+- exact artifact lineage、export integrity 与 visual memory reuse；
+- 独立 reviewer/re_reviewer 的质量判断与 bounded repair。
+
+领域能力提升必须由真实 source/artifact、独立 Review、export、memory 与 owner evidence 证明；未关闭验收项见 [未完成验收](./active/rca-ideal-state-gap-plan.md)。目标方向不构成发布、安装或生产就绪声明。

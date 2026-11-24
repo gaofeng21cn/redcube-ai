@@ -102,7 +102,7 @@ deck continuity as separate findings; a strong result on one cannot erase a
 failure on another. Record the first generation before refinement when comparing
 initial quality. Real-image metrics support review, not a readiness verdict. Use catalog helper
 `ppt_review_evidence` for exact image binding and arithmetic; its manifest and
-invocation are documented in `docs/delivery/ppt-workbench-learning.md`. The
+invocation are documented in `docs/delivery/image-deck-export.md`. The
 [behavior cases](resources/workbench-evaluation.json) are optional inputs to the
 existing standard suite, not keyword tests or a new workflow gate.
 

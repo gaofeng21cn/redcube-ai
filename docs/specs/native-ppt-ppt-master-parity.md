@@ -144,16 +144,6 @@ Chart/table 支持两种显式 materialization intent：
 
 RCA 只有在专业性和美观度 A/B 非劣效下界不低于参考项目 5 个百分点、critical defect rate 不高于参考项目、结构和编辑任务全部通过时，才可由 RCA authority 形成 parity owner receipt。测试、合同或单次 proof 不得替代该 receipt。
 
-## 完成条件
+## 完成状态与未闭合验收
 
-以下条目必须全部 `done`，否则不得声称彻底落地：
-
-1. Stage route 持续自动推进且 progress baton/targeted repair 不回归。
-2. Professional skills 和 route injection 覆盖 story、visual、template、native design、review、memory。
-3. Typed materializer 真实支持全部声明对象，未知 kind fail-fast。
-4. Template intake/fill、notes、transition、timing、optional animation 可用。
-5. evaluator 不再接受一根线/圆点绕过机械卡片检测。
-6. benchmark 保留真实 chart/table fixture，并有 package assertions。
-7. 至少产出一套真实复杂 native PPT proof，包含 chart/table/picture/connector/notes/transition，并通过真实 render 和 screenshot review。
-8. 文档、contracts、tests、generated/hosted projection 与实际能力一致。
-9. Learning Landing Audit 逐项给出 fresh evidence；无法完成的项必须是明确 typed blocker，不得静默 deferred。
+本规格不另建第二份进度清单；当前已实现能力与源码面见 [当前状态](../status.md)，尚未闭合的跨 viewer、同源双跑盲评与 `ppt-master` 对照 parity receipt 要求见 [未完成验收](../active/rca-ideal-state-gap-plan.md) 与 `contracts/runtime-program/ppt-master-learning-landing.json`。

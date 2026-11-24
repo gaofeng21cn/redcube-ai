@@ -28,4 +28,4 @@ RedCube AI 帮专家、教师和创作团队把讲稿、笔记和参考材料做
 
 在 OPL 软件中心安装 **RedCube AI**。打开一个项目，给出已有材料、目标受众和交付格式。可以先从可审阅的大纲或样页开始。[使用入口](docs/product/human_quickstart.md) · [当前状态](docs/status.md)
 
-[幻灯片制作与审阅](docs/delivery/ppt-workbench-learning.md) · [文档索引](docs/README.md) · [架构](docs/architecture.md)
+[整页图 PPT 路线](docs/delivery/image-first-ppt-production-route.md) · [导出与审阅证据](docs/delivery/image-deck-export.md) · [文档索引](docs/README.md) · [架构](docs/architecture.md)

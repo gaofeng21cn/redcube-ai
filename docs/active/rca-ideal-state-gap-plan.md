@@ -1,6 +1,6 @@
 # RCA 未完成验收
 
-本页只持有尚未关闭工作的 owner、下一动作和验收条件。源码事实见 [状态](../status.md)，目标见 [目标态参考](../references/rca-visual-deliverable-agent-ideal-state.md)。完成项更新所属文档和机器证据后从本页移除，过程由 Git 或外部 evidence owner 保管。
+本页只持有尚未关闭工作的 owner、下一动作和验收条件。源码事实见 [状态](../status.md)，目标方向见 [项目定位](../project.md)。完成项更新所属文档和机器证据后从本页移除，过程由 Git 或外部 evidence owner 保管。
 
 | 工作 | Owner 与下一动作 | 关闭证据 |
 | --- | --- | --- |

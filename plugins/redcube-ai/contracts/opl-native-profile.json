@@ -59,7 +59,10 @@
   },
   "owned_by_repo": [
     "contracts/**",
-    "src/**",
+    "agent/**",
+    "python/**",
+    "runtime/**",
+    "tools/**",
     "tests/**",
     "docs/status.md",
     "docs/active/rca-ideal-state-gap-plan.md"
@@ -73,7 +76,6 @@
     "docs/product",
     "docs/runtime",
     "docs/delivery",
-    "docs/source",
     "docs/policies",
     "docs/specs",
     "docs/references"

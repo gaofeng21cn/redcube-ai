@@ -20,7 +20,7 @@ Tool affordances are advisory capabilities, not workflow control. They may expos
 - `native_ppt_render_screenshot_and_export_helpers`: Render, screenshot, and package deliverables when the stage and owner boundary permit artifact operations.
 - `visual_review_repair_and_artifact_lineage_support`: Support review, targeted repair, export checks, and no-regression evidence without converting tool output into RCA verdicts.
 
-- `ppt_review_evidence_measurements`: Use catalog helper `ppt_review_evidence` to decode real page images, bind exact hashes and reference roles, and summarize supplied first-attempt observations, attempts/time/known cost. See `docs/delivery/ppt-workbench-learning.md`. It returns measurements, not semantic or visual verdicts; it cannot turn placeholder assets into quality evidence.
+- `ppt_review_evidence_measurements`: Use catalog helper `ppt_review_evidence` to decode real page images, bind exact hashes and reference roles, and summarize supplied first-attempt observations, attempts/time/known cost. See `docs/delivery/image-deck-export.md`. It returns measurements, not semantic or visual verdicts; it cannot turn placeholder assets into quality evidence.
 
 ## Forbidden Authority
 
