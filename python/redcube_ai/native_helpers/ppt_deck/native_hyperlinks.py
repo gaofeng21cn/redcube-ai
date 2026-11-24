@@ -1,7 +1,7 @@
 import re
 from urllib.parse import urlsplit
 
-from .native_layouts_parts.common import native_ai_design_shapes, shape_kind
+from .native_layouts.common import native_ai_design_shapes, shape_kind
 
 
 LINK_OBJECT_KINDS = {'text_box', 'text', 'textbox', 'shape', 'preset_shape', 'rect', 'rectangle', 'rounded_rect', 'panel', 'oval', 'circle', 'path'}

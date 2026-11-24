@@ -3,13 +3,13 @@ import argparse
 import json
 from pathlib import Path
 
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.common import safe_list, safe_text
+from redcube_ai.native_helpers.ppt_deck.native_layouts.common import safe_list, safe_text
 from redcube_ai.native_helpers.ppt_deck.native_layout_grammar import (
     allowed_template_archetypes,
     archetype_contracts,
     validate_template_layout_grammar,
 )
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import build_deck
+from redcube_ai.native_helpers.ppt_deck.native_layouts.materializer import build_deck
 from redcube_ai.native_helpers.ppt_deck.native_quality import evaluate_native_slide_quality
 from redcube_ai.native_helpers.ppt_deck.native_sample_layout import sample_layout_profile_failures
 from redcube_ai.native_helpers.renderer_dependencies import libreoffice_probe, poppler_probe

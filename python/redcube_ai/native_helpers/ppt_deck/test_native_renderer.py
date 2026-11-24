@@ -8,7 +8,7 @@ from PIL import Image
 from redcube_ai.native_helpers import renderer_dependencies
 from redcube_ai.native_helpers.ppt_deck import native
 from redcube_ai.native_helpers.ppt_deck import native_layout_grammar, native_manifest_qa
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts import common
+from redcube_ai.native_helpers.ppt_deck.native_layouts import common
 
 
 class NativePptLibreOfficeRendererTest(unittest.TestCase):

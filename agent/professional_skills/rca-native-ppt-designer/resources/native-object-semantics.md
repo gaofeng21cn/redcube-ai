@@ -104,8 +104,8 @@ Boolean engine, or icon corpus is required.
   `d3d81fe3cf4cc642de225159586308bbe98eeb4d`, Skill v6.3.0.
 - Inspected references: `native-data-interface.md`, `native-formula.md`,
   `native-hyperlinks.md`, `native-shape-authoring.md`.
-- Local implementation: `native_layouts_parts/officecli.py`,
-  `native_layouts_parts/materializer.py`, `native_hyperlinks.py`,
+- Local implementation: `native_layouts/officecli.py`,
+  `native_layouts/materializer.py`, `native_hyperlinks.py`,
   `native_package.py`, and `officecli_readback.py` under the RCA native helper.
 - Acceptance: `tests/ppt-native-editability-regression.test.js`,
   `tests/ppt-native-quality-package-readback.test.js`,

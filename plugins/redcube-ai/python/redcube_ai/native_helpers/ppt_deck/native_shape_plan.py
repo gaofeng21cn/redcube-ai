@@ -8,9 +8,9 @@ from redcube_ai.native_helpers.ppt_deck.native_layout_grammar import (
     archetype_contracts,
     validate_template_layout_grammar,
 )
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.common import safe_list, safe_text
+from redcube_ai.native_helpers.ppt_deck.native_layouts.common import safe_list, safe_text
 from redcube_ai.native_helpers.ppt_deck.native_sample_layout import sample_layout_profile_failures
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.validation import validate_ai_first_design_plan
+from redcube_ai.native_helpers.ppt_deck.native_layouts.validation import validate_ai_first_design_plan
 
 ENGINE_CAPABILITIES = {
     'authoring_ir': 'redcube_svg_ir',

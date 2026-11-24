@@ -9,7 +9,7 @@ from pathlib import Path
 from PIL import Image
 
 from redcube_ai.native_helpers.renderer_dependencies import libreoffice_probe, poppler_probe
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.common import safe_list, safe_text
+from redcube_ai.native_helpers.ppt_deck.native_layouts.common import safe_list, safe_text
 from redcube_ai.native_helpers.ppt_deck.native_shape_plan import RENDERER_KIND, RENDERER_PIPELINE
 
 

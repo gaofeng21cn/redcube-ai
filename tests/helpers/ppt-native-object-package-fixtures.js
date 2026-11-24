@@ -38,7 +38,7 @@ export function runNativeObjectMaterializer({ workspaceRoot, payload, templateIn
 import json
 import sys
 from pathlib import Path
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import materialize_native_pptx
+from redcube_ai.native_helpers.ppt_deck.native_layouts.materializer import materialize_native_pptx
 
 payload = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
 result = materialize_native_pptx(
@@ -61,7 +61,7 @@ export function runNativeObjectMaterializerFailure({ workspaceRoot, payload, out
 import json
 import sys
 from pathlib import Path
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import materialize_native_pptx
+from redcube_ai.native_helpers.ppt_deck.native_layouts.materializer import materialize_native_pptx
 
 payload = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
 materialize_native_pptx(

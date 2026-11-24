@@ -1,4 +1,4 @@
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.common import safe_list, safe_text
+from redcube_ai.native_helpers.ppt_deck.native_layouts.common import safe_list, safe_text
 
 
 SAMPLE_TEMPLATE_ARCHETYPES = {
