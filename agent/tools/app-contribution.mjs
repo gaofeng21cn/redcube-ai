@@ -5,33 +5,113 @@ import { fileURLToPath } from 'node:url';
 
 const RESPONSE_SCHEMA = 'opl-package-app-contribution-response.v1';
 
-function readJsonSafe(filePath) {
+function isWithin(rootDir, targetPath) {
+  const rel = path.relative(rootDir, targetPath);
+  return rel === '' || (rel !== '..' && !rel.startsWith(`..${path.sep}`) && !path.isAbsolute(rel));
+}
+
+function resolveContainedPath(workspaceRoot, targetPath) {
+  if (!fs.existsSync(targetPath)) return null;
+  let realTarget;
   try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    realTarget = fs.realpathSync(targetPath);
+  } catch {
+    return null;
+  }
+  return isWithin(workspaceRoot, realTarget) ? realTarget : null;
+}
+
+function readJsonSafe(filePath, workspaceRoot) {
+  const safePath = resolveContainedPath(workspaceRoot, filePath);
+  if (!safePath) return null;
+  try {
+    if (!fs.statSync(safePath).isFile()) return null;
+    return JSON.parse(fs.readFileSync(safePath, 'utf8'));
   } catch {
     return null;
   }
 }
 
-function isWithin(rootDir, targetPath) {
-  const rel = path.relative(rootDir, targetPath);
-  return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
+function hasTraversalSegment(rawPath) {
+  return rawPath.split(/[\\/]+/).includes('..');
+}
+
+function resolveRealDirectory(dirPath) {
+  if (typeof dirPath !== 'string') return null;
+  const trimmed = dirPath.trim();
+  if (!trimmed || trimmed.includes('\0')) return null;
+  const resolved = path.resolve(trimmed);
+  if (!fs.existsSync(resolved)) return null;
+  try {
+    const real = fs.realpathSync(resolved);
+    return fs.statSync(real).isDirectory() ? real : null;
+  } catch {
+    return null;
+  }
 }
 
 function resolveWorkspaceRoot(input) {
-  const candidate = [
-    input?.workspace_root,
-    input?.workspaceRoot,
-    process.env.OPL_PROFILE_WORKSPACE,
-  ].find((value) => typeof value === 'string' && value.trim().length > 0);
-  if (!candidate) return null;
-  const resolved = path.resolve(candidate.trim());
-  if (!fs.existsSync(resolved)) return null;
-  try {
-    return fs.statSync(resolved).isDirectory() ? fs.realpathSync(resolved) : null;
-  } catch {
-    return null;
+  const rawExplicit = input?.workspace_root !== undefined ? input.workspace_root : input?.workspaceRoot;
+  const hasExplicitValue = rawExplicit !== undefined && rawExplicit !== null && !(typeof rawExplicit === 'string' && rawExplicit.trim().length === 0);
+  const envWorkspace = typeof process.env.OPL_PROFILE_WORKSPACE === 'string' ? process.env.OPL_PROFILE_WORKSPACE.trim() : '';
+
+  if (hasExplicitValue) {
+    if (typeof rawExplicit !== 'string') {
+      return {
+        ok: false,
+        reason: 'invalid_workspace_root',
+        code: 'INVALID_WORKSPACE_ROOT',
+        message: 'workspace_root must be an absolute path string.',
+      };
+    }
+    const candidate = rawExplicit.trim();
+    if (candidate.includes('\0') || !path.isAbsolute(candidate) || hasTraversalSegment(candidate)) {
+      return {
+        ok: false,
+        reason: 'invalid_workspace_root',
+        code: 'INVALID_WORKSPACE_ROOT',
+        message: 'workspace_root must be an absolute path without traversal segments.',
+      };
+    }
+    const realCandidate = resolveRealDirectory(candidate);
+    if (envWorkspace.length > 0) {
+      const realEnvBase = hasTraversalSegment(envWorkspace) ? null : resolveRealDirectory(envWorkspace);
+      if (!realEnvBase || !realCandidate || !isWithin(realEnvBase, realCandidate)) {
+        return {
+          ok: false,
+          reason: 'workspace_root_outside_allowed_boundary',
+          code: 'WORKSPACE_ROOT_OUTSIDE_ALLOWED_BOUNDARY',
+          message: 'workspace_root resolves outside the allowed OPL_PROFILE_WORKSPACE boundary.',
+        };
+      }
+    }
+    if (!realCandidate) {
+      return {
+        ok: false,
+        reason: 'workspace_not_found',
+        code: 'WORKSPACE_NOT_FOUND',
+        message: 'Configured workspace_root does not exist or is not a directory.',
+      };
+    }
+    return { ok: true, workspaceRoot: realCandidate };
   }
+
+  if (envWorkspace.length > 0) {
+    if (hasTraversalSegment(envWorkspace) || !path.isAbsolute(envWorkspace)) {
+      return {
+        ok: false,
+        reason: 'invalid_workspace_root',
+        code: 'INVALID_WORKSPACE_ROOT',
+        message: 'OPL_PROFILE_WORKSPACE must be an absolute path without traversal segments.',
+      };
+    }
+    const realEnvBase = resolveRealDirectory(envWorkspace);
+    if (realEnvBase) {
+      return { ok: true, workspaceRoot: realEnvBase };
+    }
+  }
+
+  return { ok: true, workspaceRoot: null };
 }
 
 function selectProjectId(input, indexData) {
@@ -50,8 +130,8 @@ function selectProjectId(input, indexData) {
 function collectStatus(workspaceRoot, input) {
   const indexPath = path.join(workspaceRoot, 'workspace_index.json');
   const workspacePath = path.join(workspaceRoot, 'workspace.json');
-  const indexData = fs.existsSync(indexPath) ? readJsonSafe(indexPath) : null;
-  const workspaceData = fs.existsSync(workspacePath) ? readJsonSafe(workspacePath) : null;
+  const indexData = readJsonSafe(indexPath, workspaceRoot);
+  const workspaceData = readJsonSafe(workspacePath, workspaceRoot);
   const projectId = selectProjectId(input, indexData);
 
   const stages = [];
@@ -62,14 +142,23 @@ function collectStatus(workspaceRoot, input) {
   }
 
   const runtimeStateDir = path.join(workspaceRoot, 'runtime-state');
-  if (fs.existsSync(runtimeStateDir) && isWithin(workspaceRoot, fs.realpathSync(runtimeStateDir))) {
-    for (const entry of fs.readdirSync(runtimeStateDir, { withFileTypes: true })) {
-      if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
-      const full = path.join(runtimeStateDir, entry.name);
-      const doc = readJsonSafe(full);
-      if (doc && typeof doc === 'object' && Array.isArray(doc.stages)) {
-        for (const stage of doc.stages) {
-          if (stage && typeof stage === 'object') stages.push(stage);
+  const safeRuntimeStateDir = resolveContainedPath(workspaceRoot, runtimeStateDir);
+  if (safeRuntimeStateDir) {
+    let isDir = false;
+    try {
+      isDir = fs.statSync(safeRuntimeStateDir).isDirectory();
+    } catch {
+      isDir = false;
+    }
+    if (isDir) {
+      for (const entry of fs.readdirSync(safeRuntimeStateDir, { withFileTypes: true })) {
+        if (!entry.name.endsWith('.json')) continue;
+        const full = path.join(safeRuntimeStateDir, entry.name);
+        const doc = readJsonSafe(full, workspaceRoot);
+        if (doc && typeof doc === 'object' && Array.isArray(doc.stages)) {
+          for (const stage of doc.stages) {
+            if (stage && typeof stage === 'object') stages.push(stage);
+          }
         }
       }
     }
@@ -100,27 +189,37 @@ function collectStatus(workspaceRoot, input) {
 
 function collectArtifacts(workspaceRoot, input) {
   const indexPath = path.join(workspaceRoot, 'workspace_index.json');
-  const indexData = fs.existsSync(indexPath) ? readJsonSafe(indexPath) : null;
+  const indexData = readJsonSafe(indexPath, workspaceRoot);
   const projectId = selectProjectId(input, indexData);
   const artifacts = [];
 
   for (const folderName of ['artifacts', 'deliverables']) {
     const dirPath = path.join(workspaceRoot, folderName);
-    if (!fs.existsSync(dirPath)) continue;
-    let realDir;
+    const safeDir = resolveContainedPath(workspaceRoot, dirPath);
+    if (!safeDir) continue;
+    let isDir = false;
     try {
-      realDir = fs.realpathSync(dirPath);
+      isDir = fs.statSync(safeDir).isDirectory();
     } catch {
-      continue;
+      isDir = false;
     }
-    if (!isWithin(workspaceRoot, realDir) || !fs.statSync(realDir).isDirectory()) continue;
-    for (const entry of fs.readdirSync(realDir, { withFileTypes: true })) {
+    if (!isDir) continue;
+    for (const entry of fs.readdirSync(safeDir, { withFileTypes: true })) {
       if (entry.name.startsWith('.')) continue;
+      const entryPath = path.join(safeDir, entry.name);
+      const realEntryPath = resolveContainedPath(workspaceRoot, entryPath);
+      if (!realEntryPath) continue;
+      let stat;
+      try {
+        stat = fs.statSync(realEntryPath);
+      } catch {
+        continue;
+      }
       const relPath = path.posix.join(folderName, entry.name);
       artifacts.push({
         name: entry.name,
         path: relPath,
-        kind: entry.isDirectory() ? 'directory' : 'file',
+        kind: stat.isDirectory() ? 'directory' : 'file',
       });
     }
   }
@@ -188,7 +287,24 @@ export function handleContributionRequest(envelope) {
   const input = envelope.input && typeof envelope.input === 'object' && !Array.isArray(envelope.input)
     ? envelope.input
     : {};
-  const workspaceRoot = resolveWorkspaceRoot(input);
+  const resolution = resolveWorkspaceRoot(input);
+  if (!resolution.ok) {
+    return {
+      schema_version: RESPONSE_SCHEMA,
+      ok: false,
+      state: 'unavailable',
+      package_id: 'rca',
+      ref,
+      reason: resolution.reason,
+      error: { code: resolution.code, message: resolution.message },
+      data: {
+        view: ref.endsWith('#artifacts') ? 'artifacts' : 'progress',
+        stages: [],
+        artifacts: [],
+      },
+    };
+  }
+  const workspaceRoot = resolution.workspaceRoot;
   if (!workspaceRoot) {
     return {
       schema_version: RESPONSE_SCHEMA,

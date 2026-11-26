@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { handleContributionRequest } from '../agent/tools/app-contribution.mjs';
@@ -125,4 +125,170 @@ test('RCA contribution_handler reports unavailable when unconfigured and reads r
   });
   assert.equal(execRes.ok, false);
   assert.equal(execRes.state, 'unsupported_action');
+});
+
+test('RCA contribution_handler blocks path traversal, outside OPL_PROFILE_WORKSPACE, and symlink escapes', () => {
+  const runCli = (envelope, envOverrides = {}) => {
+    const res = spawnSync(process.execPath, ['agent/tools/app-contribution.mjs'], {
+      cwd: repoRoot,
+      input: JSON.stringify(envelope),
+      encoding: 'utf8',
+      env: { ...process.env, ...envOverrides },
+    });
+    assert.equal(res.status, 0, res.stderr);
+    return JSON.parse(res.stdout);
+  };
+
+  for (const traversalPath of ['../../../../../etc', './relative/ws', '/tmp/../etc', 123]) {
+    const body = runCli({
+      schema_version: 'opl-package-app-contribution-request.v1',
+      operation: 'read',
+      package_id: 'rca',
+      ref: 'rca.workspace.v1#status',
+      input: { workspace_root: traversalPath },
+    }, { OPL_PROFILE_WORKSPACE: '' });
+    assert.equal(body.ok, false);
+    assert.equal(body.state, 'unavailable');
+    assert.equal(body.reason, 'invalid_workspace_root');
+    assert.equal(body.error?.code, 'INVALID_WORKSPACE_ROOT');
+    assert.equal(body.workspace_root, undefined);
+    assert.equal(JSON.stringify(body).includes('/private/etc'), false);
+  }
+
+  const allowedWs = mkUserScopedTestWorkspace('redcube-allowed-');
+  const outsideDir = mkUserScopedTestWorkspace('redcube-outside-');
+  const nestedAllowed = path.join(allowedWs, 'nested-project');
+  mkdirSync(nestedAllowed, { recursive: true });
+  writeFileSync(path.join(nestedAllowed, 'workspace.json'), JSON.stringify({
+    status: 'active',
+    stages: [{ stage_id: 'inside_stage', status: 'completed' }],
+  }));
+  writeFileSync(path.join(outsideDir, 'secret.json'), JSON.stringify({
+    status: 'hijacked',
+    stages: [{ stage_id: 'evil_stage', status: 'pwned' }],
+  }));
+  writeFileSync(path.join(outsideDir, 'index-secret.json'), JSON.stringify({
+    projects: { leaked_project: { name: 'leaked' } },
+  }));
+  writeFileSync(path.join(outsideDir, 'outside.txt'), 'secret-artifact');
+  mkdirSync(path.join(outsideDir, 'outside-dir'), { recursive: true });
+
+  const symlinkEscapeWs = path.join(allowedWs, 'symlink-escape-ws');
+  symlinkSync(outsideDir, symlinkEscapeWs, 'dir');
+
+  for (const outsideCandidate of [outsideDir, symlinkEscapeWs]) {
+    const body = runCli({
+      schema_version: 'opl-package-app-contribution-request.v1',
+      operation: 'read',
+      package_id: 'rca',
+      ref: 'rca.workspace.v1#status',
+      input: { workspace_root: outsideCandidate },
+    }, { OPL_PROFILE_WORKSPACE: allowedWs });
+    assert.equal(body.ok, false);
+    assert.equal(body.state, 'unavailable');
+    assert.equal(body.reason, 'workspace_root_outside_allowed_boundary');
+    assert.equal(body.error?.code, 'WORKSPACE_ROOT_OUTSIDE_ALLOWED_BOUNDARY');
+    assert.equal(body.workspace_root, undefined);
+    assert.equal(JSON.stringify(body).includes(outsideDir), false);
+  }
+
+  const allowedBody = runCli({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'read',
+    package_id: 'rca',
+    ref: 'rca.workspace.v1#status',
+    input: { workspace_root: nestedAllowed },
+  }, { OPL_PROFILE_WORKSPACE: allowedWs });
+  assert.equal(allowedBody.ok, true);
+  assert.equal(allowedBody.state, 'ready');
+  assert.deepEqual(allowedBody.data.stages, [{ stage_id: 'inside_stage', status: 'completed' }]);
+
+  const wsWithSymlinks = mkUserScopedTestWorkspace('redcube-symlink-contained-');
+  mkdirSync(path.join(wsWithSymlinks, 'runtime-state'), { recursive: true });
+  mkdirSync(path.join(wsWithSymlinks, 'artifacts'), { recursive: true });
+  mkdirSync(path.join(wsWithSymlinks, 'deliverables'), { recursive: true });
+
+  symlinkSync(path.join(outsideDir, 'secret.json'), path.join(wsWithSymlinks, 'workspace.json'));
+  symlinkSync(path.join(outsideDir, 'index-secret.json'), path.join(wsWithSymlinks, 'workspace_index.json'));
+  symlinkSync(path.join(outsideDir, 'secret.json'), path.join(wsWithSymlinks, 'runtime-state', 'evil.json'));
+  symlinkSync(path.join(outsideDir, 'outside.txt'), path.join(wsWithSymlinks, 'artifacts', 'escape.txt'));
+  symlinkSync(path.join(outsideDir, 'outside-dir'), path.join(wsWithSymlinks, 'deliverables', 'escape-dir'));
+  symlinkSync(path.join(outsideDir, 'nonexistent.txt'), path.join(wsWithSymlinks, 'artifacts', 'dangling.txt'));
+
+  writeFileSync(path.join(wsWithSymlinks, 'runtime-state', 'legit.json'), JSON.stringify({
+    stages: [{ stage_id: 'legit_stage', status: 'completed' }],
+  }));
+  writeFileSync(path.join(wsWithSymlinks, 'artifacts', 'legit.png'), 'png-bytes');
+  writeFileSync(path.join(wsWithSymlinks, 'deliverables', 'legit-deliverable.pdf'), 'pdf-bytes');
+  symlinkSync(path.join(outsideDir, 'outside.txt'), path.join(wsWithSymlinks, 'deliverables', 'escape.pdf'));
+
+  const statusBody = runCli({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'read',
+    package_id: 'rca',
+    ref: 'rca.workspace.v1#status',
+    input: { workspace_root: wsWithSymlinks },
+  }, { OPL_PROFILE_WORKSPACE: '' });
+  assert.equal(statusBody.ok, true);
+  assert.equal(statusBody.state, 'ready');
+  assert.deepEqual(statusBody.data.projects, []);
+  assert.deepEqual(statusBody.data.stages, [{ stage_id: 'legit_stage', status: 'completed' }]);
+  assert.equal(statusBody.data.workspace_status, 'active');
+
+  const artifactsBody = runCli({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'read',
+    package_id: 'rca',
+    ref: 'rca.workspace.v1#artifacts',
+    input: { workspace_root: wsWithSymlinks },
+  }, { OPL_PROFILE_WORKSPACE: '' });
+  assert.equal(artifactsBody.ok, true);
+  assert.equal(artifactsBody.state, 'ready');
+  assert.deepEqual(artifactsBody.data.artifacts, [
+    { name: 'legit.png', path: 'artifacts/legit.png', kind: 'file' },
+    { name: 'legit-deliverable.pdf', path: 'deliverables/legit-deliverable.pdf', kind: 'file' },
+  ]);
+
+  const wsDirSymlinks = mkUserScopedTestWorkspace('redcube-dir-symlink-escape-');
+  const outsideRuntimeState = path.join(outsideDir, 'outside-runtime-state');
+  mkdirSync(outsideRuntimeState, { recursive: true });
+  writeFileSync(path.join(outsideRuntimeState, 'secret.json'), JSON.stringify({
+    stages: [{ stage_id: 'dir_escape_stage', status: 'pwned' }],
+  }));
+  symlinkSync(outsideRuntimeState, path.join(wsDirSymlinks, 'runtime-state'), 'dir');
+  symlinkSync(outsideDir, path.join(wsDirSymlinks, 'artifacts'), 'dir');
+  symlinkSync(outsideDir, path.join(wsDirSymlinks, 'deliverables'), 'dir');
+
+  const dirEscapeStatus = runCli({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'read',
+    package_id: 'rca',
+    ref: 'rca.workspace.v1#status',
+    input: { workspace_root: wsDirSymlinks },
+  }, { OPL_PROFILE_WORKSPACE: allowedWs });
+  assert.equal(dirEscapeStatus.ok, false);
+  assert.equal(dirEscapeStatus.state, 'unavailable');
+  assert.equal(dirEscapeStatus.reason, 'workspace_root_outside_allowed_boundary');
+
+  const dirEscapeStatusDirect = runCli({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'read',
+    package_id: 'rca',
+    ref: 'rca.workspace.v1#status',
+    input: { workspace_root: wsDirSymlinks },
+  }, { OPL_PROFILE_WORKSPACE: '' });
+  assert.equal(dirEscapeStatusDirect.ok, true);
+  assert.equal(dirEscapeStatusDirect.state, 'empty');
+  assert.deepEqual(dirEscapeStatusDirect.data.stages, []);
+
+  const dirEscapeArtifactsDirect = runCli({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'read',
+    package_id: 'rca',
+    ref: 'rca.workspace.v1#artifacts',
+    input: { workspace_root: wsDirSymlinks },
+  }, { OPL_PROFILE_WORKSPACE: '' });
+  assert.equal(dirEscapeArtifactsDirect.ok, true);
+  assert.equal(dirEscapeArtifactsDirect.state, 'empty');
+  assert.deepEqual(dirEscapeArtifactsDirect.data.artifacts, []);
 });

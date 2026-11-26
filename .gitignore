@@ -24,6 +24,7 @@ tmp/
 artifacts/
 
 # Python
+.venv/
 __pycache__/
 *.egg-info/
 *.pyc
