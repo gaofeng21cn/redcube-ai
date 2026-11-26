@@ -100,7 +100,7 @@ npm run --silent build
 PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
   "$proof_python" -m redcube_ai.native_helpers.doctor > "$doctor_report"
 
-cp contracts/opl_agent_package_manifest.json "$package_manifest_report"
+cp opl-package.json "$package_manifest_report"
 cp contracts/runtime-program/python-native-helper-catalog.json "$helper_catalog_report"
 
 node tools/native-ppt-proof/build-fixture-input.ts \
@@ -161,7 +161,8 @@ if doctor.get("status") != "ok":
     failures.append(f"doctor status is {doctor.get('status')!r}")
 if not doctor.get("renderer_availability", {}).get("linux_native_proof", {}).get("available"):
     failures.append("doctor linux_native_proof is not available")
-if package_manifest.get("package_id") != "rca" or package_manifest.get("agent_id") != "rca":
+package_identity = package_manifest.get("identity", {})
+if package_identity.get("id") != "rca" or package_identity.get("intent") != "agent":
     failures.append("RCA package manifest identity mismatch")
 if helper_catalog.get("framework_execution_envelope", {}).get("owner") != "opl":
     failures.append("native helper execution envelope must be OPL-owned")
@@ -198,9 +199,9 @@ summary = {
     "doctor_status": doctor.get("status"),
     "renderer_available": doctor.get("renderer_availability", {}).get("linux_native_proof", {}).get("available"),
     "agent_package_contract": {
-        "package_id": package_manifest.get("package_id"),
-        "agent_id": package_manifest.get("agent_id"),
-        "version": package_manifest.get("version"),
+        "package_id": package_identity.get("id"),
+        "agent_id": package_identity.get("id"),
+        "version": package_identity.get("version"),
     },
     "native_helper_contract": {
         "execution_envelope_owner": helper_catalog.get("framework_execution_envelope", {}).get("owner"),

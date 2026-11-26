@@ -15,28 +15,6 @@
       ]
     },
     {
-      "file": "scripts/sync_carrier.py",
-      "symbol": "_list_git_tracked_entries",
-      "source_digest": "sha256:65278bde88b6d1ad1c9e6700cd88821e0dd5fb0a214f4d0a1cb4f2c1cb2b5696",
-      "allowed_effects": [
-        "process_spawn"
-      ],
-      "role": "developer_tool",
-      "allowed_targets": [
-        "git"
-      ]
-    },
-    {
-      "file": "scripts/sync_carrier.py",
-      "symbol": "project_carrier_standalone",
-      "source_digest": "sha256:65278bde88b6d1ad1c9e6700cd88821e0dd5fb0a214f4d0a1cb4f2c1cb2b5696",
-      "allowed_effects": [
-        "filesystem_write"
-      ],
-      "role": "developer_tool",
-      "allowed_targets": []
-    },
-    {
       "file": "scripts/verification-runtime.ts",
       "symbol": "ensureRepoTempEnvironment",
       "source_digest": "sha256:e1f14cee6042758034c9d2aa6c3207618d1abe08b43b641d3975fb5a96e003e4",

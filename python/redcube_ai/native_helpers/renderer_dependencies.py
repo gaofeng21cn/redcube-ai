@@ -1,39 +1,9 @@
 from __future__ import annotations
 
-import os
 import platform
 import shutil
-import sys
 from pathlib import Path
 from typing import Any
-
-
-def _load_opl_dependency_probe() -> Any | None:
-    try:
-        from opl_framework import dependency_probe
-        return dependency_probe
-    except ImportError:
-        pass
-    candidates: list[Path] = []
-    for env_key, suffix in (
-        ("OPL_FRAMEWORK_PYTHON_ROOT", ""),
-        ("OPL_FRAMEWORK_ROOT", "python"),
-    ):
-        raw = os.environ.get(env_key, "").strip()
-        if raw:
-            candidates.append(Path(raw) / suffix if suffix else Path(raw))
-    here = Path(__file__).resolve()
-    for parent in here.parents:
-        candidates.append(parent / "one-person-lab" / "python")
-    for candidate in candidates:
-        if (candidate / "opl_framework").is_dir() and str(candidate) not in sys.path:
-            sys.path.insert(0, str(candidate))
-            try:
-                from opl_framework import dependency_probe
-                return dependency_probe
-            except ImportError:
-                return None
-    return None
 
 
 LIBREOFFICE_CANDIDATES = (
@@ -59,13 +29,8 @@ NATIVE_PPT_DOCKER_COMMAND = (
 
 
 def command_probe(name: str, *candidates: str, extra_paths: tuple[Path, ...] = ()) -> dict[str, Any]:
-    fw_probe = _load_opl_dependency_probe()
     for candidate in candidates:
-        path = (
-            fw_probe.find_executable(candidate, extra_paths=(), which=shutil.which)
-            if fw_probe is not None
-            else shutil.which(candidate)
-        )
+        path = shutil.which(candidate)
         if path:
             return {
                 "name": name,

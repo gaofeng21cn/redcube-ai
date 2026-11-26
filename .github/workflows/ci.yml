@@ -34,9 +34,5 @@ jobs:
         run: |
           npm ci
           python -m pip install ".[ppt]"
-      - name: Materialize Codex carrier
-        run: |
-          python scripts/sync_carrier.py
-          python scripts/sync_carrier.py --check
       - name: Run source gate
         run: scripts/verify.sh ci

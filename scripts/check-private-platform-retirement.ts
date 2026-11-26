@@ -15,7 +15,7 @@ const RETIRED_SOURCE_ROOTS = Object.freeze([
 const ACTIVE_MACHINE_SURFACES = Object.freeze([
   'package.json',
   'tsconfig.json',
-  'contracts/opl_agent_package_manifest.json',
+  'opl-package.json',
   'contracts/opl_domain_manifest_registration.json',
   'contracts/standard_agent_interface.json',
 ]);
@@ -98,7 +98,6 @@ export function buildPrivatePlatformSourceGuardReadback() {
         'agent/',
         'contracts/',
         'python/redcube_ai/native_helpers/',
-        'plugins/redcube-ai/',
       ],
     },
     authority_boundary: {

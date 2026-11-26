@@ -1,6 +1,6 @@
 # RedCube AI
 
-本仓是视觉交付 domain agent；`contracts/opl_agent_package_manifest.json` 定义 `agent_id/package_id=rca`，`contracts/domain_descriptor.json` 定义 `domain_id=redcube_ai`。
+本仓是视觉交付 domain agent；根目录唯一 `opl-package.json`（`opl.package.v2`）定义 `identity.id=rca`，`contracts/domain_descriptor.json` 定义 `domain_id=redcube_ai`。
 
 - RCA 持有 visual truth、layout/review/export verdict、artifact、visual memory 和 owner receipt authority；Framework 只提供通用 runtime、transport、gallery/handoff shell 与 generated interfaces。
 - `agent/primary_skill/SKILL.md` 是主路由，稳定能力和 carrier 映射以 `agent/` 与 `contracts/` 为准。

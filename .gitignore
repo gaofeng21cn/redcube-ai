@@ -24,6 +24,7 @@ tmp/
 artifacts/
 
 # Python
+.venv/
 __pycache__/
 *.egg-info/
 *.pyc
@@ -56,19 +57,4 @@ runtime-state/
 /workspace_health.json
 .agent-contract-baseline.json
 .tsbuildinfo/
-
-# Build-time materialized Codex carrier files (projected from canonical sources via scripts/sync_carrier.py)
-/plugins/redcube-ai/agent/
-/plugins/redcube-ai/contracts/
-/plugins/redcube-ai/python/
-/plugins/redcube-ai/runtime/
-/plugins/redcube-ai/docs/
-/plugins/redcube-ai/prompts/
-/plugins/redcube-ai/assets/
-/plugins/redcube-ai/skills/redcube-ai/SKILL.md
-/plugins/redcube-ai/pyproject.toml
-/plugins/redcube-ai/uv.lock
-/plugins/redcube-ai/README.md
-/plugins/redcube-ai/README.zh-CN.md
-/plugins/redcube-ai/LICENSE
-/plugins/redcube-ai/app-contribution-adapter.json
+opl-release.lock.json

@@ -1,137 +1,48 @@
-import test from 'node:test';
 import assert from 'node:assert/strict';
-import path from 'node:path';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import test from 'node:test';
+import { handleContributionRequest } from '../agent/tools/app-contribution.mjs';
 import { mkUserScopedTestWorkspace } from './helpers/test-workspace.js';
-import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
 
 const repoRoot = path.resolve('.');
-const pluginRoot = path.join(repoRoot, 'plugins', 'redcube-ai');
-const rootPluginManifestPath = path.join(repoRoot, '.codex-plugin', 'plugin.json');
-const rootPackageDescriptorPath = path.join(repoRoot, 'opl-package.json');
-const pluginManifestPath = path.join(pluginRoot, '.codex-plugin', 'plugin.json');
-const portablePluginManifestPath = path.join(pluginRoot, 'plugin.json');
-const packageDescriptorPath = path.join(pluginRoot, 'opl-package.json');
-const marketplacePath = path.join(repoRoot, '.agents', 'plugins', 'marketplace.json');
-const pluginIconPath = path.join(pluginRoot, 'assets', 'icon.png');
-const pluginSkillPath = path.join(pluginRoot, 'skills', 'redcube-ai', 'SKILL.md');
+const manifestPath = path.join(repoRoot, 'opl-package.json');
 const canonicalSkillPath = path.join(repoRoot, 'agent', 'primary_skill', 'SKILL.md');
-const pluginSkillUiMetadataPath = path.join(pluginRoot, 'skills', 'redcube-ai', 'agents', 'openai.yaml');
-function readJson(filePath) { return JSON.parse(readFileSync(filePath, 'utf-8')); }
-const forbiddenLifecycleBasisFields = new Set([
-  'content_lock',
-  'dependency_resolution',
-  'distribution_payload',
-  'durable_transaction',
-  'installed_lock',
-  'last_known_good',
-  'lifecycle',
-  'lifecycle_receipt',
-  'lifecycle_receipt_owner',
-  'lkg',
-  'lock_owner',
-  'materialization',
-  'materialization_readiness',
-  'materializer',
-  'opl_managed_surface',
-  'package_core',
-  'package_lock_ref',
-  'payload',
-  'payload_digest_ref',
-  'receipt_ref',
-  'resolver',
-  'rollback',
-  'rollback_ref',
-  'transaction',
-  'update_channel',
-]);
-function assertNoLegacyLifecycleBasis(value, valuePath = 'descriptor') {
-  if (Array.isArray(value)) {
-    value.forEach((item, index) => assertNoLegacyLifecycleBasis(item, `${valuePath}[${index}]`));
-    return;
-  }
-  if (value === null || typeof value !== 'object') return;
-  for (const [key, nestedValue] of Object.entries(value)) {
-    assert.equal(forbiddenLifecycleBasisFields.has(key), false, `${valuePath}.${key}`);
-    assertNoLegacyLifecycleBasis(nestedValue, `${valuePath}.${key}`);
-  }
-}
-test('codex plugin scaffold tracks repo metadata and skill layout', () => {
-  const packageJson = readJson(path.join(repoRoot, 'package.json'));
-  const packageManifest = readJson(path.join(repoRoot, 'contracts', 'opl_agent_package_manifest.json'));
-  const manifest = readJson(pluginManifestPath);
-  const skillText = readFileSync(pluginSkillPath, 'utf-8');
-  const canonicalSkillText = readFileSync(canonicalSkillPath, 'utf-8');
-  const metadataText = readFileSync(pluginSkillUiMetadataPath, 'utf-8');
+const skillUiMetadataPath = path.join(repoRoot, 'agent', 'primary_skill', 'agents', 'openai.yaml');
 
-  assert.equal(manifest.name, 'redcube-ai');
-  assert.equal(manifest.version, packageJson.version);
-  assert.equal(manifest.skills, './skills/');
-  assert.equal(manifest.interface.displayName, 'RedCube AI');
-  assert.equal(manifest.interface.category, 'Creative');
-  assert.equal(manifest.interface.composerIcon, './assets/icon.png');
-  assert.equal(manifest.interface.logo, './assets/icon.png');
-  assert.equal(manifest.description, packageManifest.presentation.description_i18n['en-US']);
-  assert.equal(existsSync(pluginIconPath), true);
+function readJson(filePath) {
+  return JSON.parse(readFileSync(filePath, 'utf-8'));
+}
+
+test('v2 primary skill, branding icon, and Codex metadata stay canonical without plugins/ mirrors', () => {
+  const manifest = readJson(manifestPath);
+  const skillText = readFileSync(canonicalSkillPath, 'utf-8');
+  const metadataText = readFileSync(skillUiMetadataPath, 'utf-8');
+
+  assert.equal(existsSync(path.join(repoRoot, 'plugins')), false);
+  assert.equal(existsSync(path.join(repoRoot, '.codex-plugin')), false);
+  assert.equal(existsSync(path.join(repoRoot, '.agents')), false);
+  assert.equal(existsSync(path.join(repoRoot, 'scripts', 'sync_carrier.py')), false);
+  assert.equal(existsSync(path.join(repoRoot, 'scripts', 'install-codex-plugin.ts')), false);
+
+  assert.equal(manifest.schema_version, 'opl.package.v2');
+  assert.equal(manifest.host_hints.codex.sync_enabled, true);
+  assert.equal(manifest.host_hints.codex.plugin_name, 'redcube-ai');
+  assert.equal(existsSync(path.join(repoRoot, manifest.identity.icon)), true);
   assert.match(metadataText, /display_name: "RedCube AI"/);
   assert.match(metadataText, /default_prompt: "Use \$redcube-ai/);
   assert.match(skillText, /^name: redcube-ai$/m);
-  assert.equal(skillText, canonicalSkillText);
-  assert.equal(existsSync(path.join(repoRoot, 'plugins', 'rca')), false);
-  assert.equal(existsSync(path.join(pluginRoot, 'skills', 'rca')), false);
 });
 
-test('repo marketplace exposes the Codex carrier without taking RCA package authority', () => {
-  const marketplace = readJson(marketplacePath);
-  const pluginManifest = readJson(pluginManifestPath);
-  const packageManifest = readJson(path.join(repoRoot, 'contracts', 'opl_agent_package_manifest.json'));
+test('hosted RCA stage manifest and action catalog resolve cleanly from canonical sources', () => {
+  const manifest = readJson(manifestPath);
+  const actionCatalog = readJson(path.join(repoRoot, 'contracts', 'action_catalog.json'));
+  const domainDescriptor = readJson(path.join(repoRoot, manifest.provides.agent.stages_ref === 'agent/stages/manifest.json'
+    ? 'contracts/domain_descriptor.json'
+    : manifest.provides.agent.stages_ref));
 
-  assert.equal(marketplace.name, 'redcube-ai');
-  assert.equal(marketplace.interface.displayName, 'RedCube AI');
-  assert.equal(marketplace.plugins.length, 1);
-  assert.deepEqual(marketplace.plugins[0], {
-    name: 'redcube-ai',
-    source: {
-      source: 'local',
-      path: './plugins/redcube-ai',
-    },
-    policy: {
-      installation: 'AVAILABLE',
-      authentication: 'ON_INSTALL',
-    },
-    category: 'Creative',
-  });
-  assert.equal(marketplace.plugins[0].name, pluginManifest.name);
-  assert.equal(packageManifest.package_id, 'rca');
-  assert.notEqual(marketplace.plugins[0].name, packageManifest.package_id);
-});
-
-test('nested native carrier keeps the hosted RCA runtime owned by the repo', () => {
-  const marketplace = readJson(marketplacePath);
-  const marketplacePluginRoot = path.resolve(repoRoot, marketplace.plugins[0].source.path);
-  const pluginManifest = readJson(pluginManifestPath);
-  const canonicalDescriptorPath = path.join(repoRoot, 'contracts', 'opl_agent_package_manifest.json');
-  const ownerDescriptor = readJson(canonicalDescriptorPath);
-  const carrierDescriptor = readJson(packageDescriptorPath);
-  const actionCatalog = readJson(path.join(repoRoot, ownerDescriptor.entrypoints
-    .find(({ entrypoint_id }) => entrypoint_id === 'hosted_stage_actions').source_ref));
-
-  assert.equal(marketplacePluginRoot, pluginRoot);
-  assert.equal(pluginManifest.skills, './skills/');
-  assert.equal(pluginManifest.version, ownerDescriptor.version);
-  assert.equal(carrierDescriptor.version, ownerDescriptor.version);
-  assert.equal(
-    readFileSync(rootPackageDescriptorPath, 'utf-8'),
-    readFileSync(canonicalDescriptorPath, 'utf-8'),
-  );
-  assert.equal(ownerDescriptor.codex_surface.carrier_source_path, '.');
-  assert.equal(ownerDescriptor.domain_descriptor_ref, 'contracts/domain_descriptor.json');
-  assertNoLegacyLifecycleBasis(ownerDescriptor);
-  assertNoLegacyLifecycleBasis(carrierDescriptor);
-  assert.equal(existsSync(path.join(repoRoot, ownerDescriptor.source_contract.domain_descriptor_ref)), true);
-  assert.equal(existsSync(path.join(repoRoot, 'contracts', 'action_catalog.json')), true);
-
+  assert.equal(domainDescriptor.package_id, 'rca');
   const stageManifestRefs = new Set(actionCatalog.actions.map(
     ({ execution_binding }) => execution_binding.stage_manifest_ref,
   ));
@@ -146,227 +57,293 @@ test('nested native carrier keeps the hosted RCA runtime owned by the repo', () 
   }
 });
 
-test('native package descriptor exposes RCA without recreating package lifecycle authority', () => {
-  const packageJson = readJson(path.join(repoRoot, 'package.json'));
-  const pluginManifest = readJson(pluginManifestPath);
-  const descriptor = readJson(packageDescriptorPath);
-
-  assert.equal(descriptor.surface_kind, 'opl_agent_package_manifest.v1');
-  assert.equal(descriptor.kind, 'agent');
-  assert.equal(descriptor.agent_id, 'rca');
-  assert.equal(descriptor.package_id, 'rca');
-  assert.equal(descriptor.domain_id, 'redcube_ai');
-  assert.equal(descriptor.version, packageJson.version);
-  assert.equal(descriptor.version, pluginManifest.version);
-  assert.equal(descriptor.carrier_source_role, 'codex_plugin_default_carrier_not_package_truth');
-  assert.deepEqual(descriptor.codex_surface, {
-    plugin_id: 'redcube-ai',
-    plugin_source_path: '.',
-    configured_codex_plugin_carrier: {
-      kind: 'codex_plugin_manager',
-      plugin_selector: 'redcube-ai@redcube-ai',
-      executor_route: 'codex_cli',
-      marketplace_source: 'gaofeng21cn/redcube-ai',
-      publication_ref: 'ghcr.io/gaofeng21cn/one-person-lab-packages/rca:latest-stable',
-    },
-    required_skill_ids: ['redcube-ai'],
-    app_contribution_abi: {
-      schema_version: 'opl-package-app-contribution-cli.v1',
-      transport: 'stdin_json_stdout_json',
-      argv: ['opl', 'app', 'contribution', 'adapter', '--stdin'],
-      request_schema: 'opl-package-app-contribution-request.v1',
-      response_schema: 'opl-package-app-contribution-response.v1',
-    },
-    app_contribution_adapter: {
-      manifest: 'app-contribution-adapter.json',
-    },
+test('RCA contribution_handler reports unavailable when unconfigured and reads real workspace state', (t) => {
+  const unconfigured = handleContributionRequest({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'read',
+    package_id: 'rca',
+    ref: 'rca.workspace.v1#status',
+    input: {},
   });
-  assert.deepEqual(descriptor.requires, []);
-  assert.deepEqual(descriptor.capability_dependencies, []);
-  const adapter = readJson(path.join(repoRoot, 'app-contribution-adapter.json'));
-  const carrierAdapter = readJson(path.join(pluginRoot, 'app-contribution-adapter.json'));
-  assert.deepEqual(adapter, carrierAdapter);
-  assert.deepEqual(descriptor.app_contributions, readJson(packageDescriptorPath).app_contributions);
-  assert.deepEqual(Object.keys(adapter.reads), [
-    'rca.workspace.v1#status',
-    'rca.workspace.v1#artifacts',
-  ]);
-  assert.deepEqual(adapter.actions, {});
-  assert.equal(descriptor.domain_descriptor_ref, 'contracts/domain_descriptor.json');
-  assert.equal(
-    descriptor.task_provider_ref,
-    'contracts/domain_descriptor.json#/standard_agent_interface/stage_catalog',
-  );
-  assert.equal(descriptor.action_catalog_ref, 'contracts/action_catalog.json');
-  assert.deepEqual(descriptor.view_refs, []);
-  assert.deepEqual(descriptor.entrypoints.map(({ entrypoint_id }) => entrypoint_id), [
-    'codex_primary_skill',
-    'hosted_stage_actions',
-  ]);
-  assert.deepEqual(descriptor.presentation.home_shortcuts, [{
-    shortcut_id: 'invoke_product_entry',
-    label_i18n: {
-      'zh-CN': '制作视觉交付物',
-      'en-US': 'Create or continue a visual deliverable',
-    },
-    default_visible: true,
-    user_configurable: true,
-    route: {
-      route_kind: 'agent_package_shortcut',
-      executor: 'codex_cli',
-      codex_visible_entry: 'redcube-ai',
-    },
-  }]);
+  assert.equal(unconfigured.ok, true);
+  assert.equal(unconfigured.state, 'unavailable');
+  assert.equal(unconfigured.reason, 'workspace_not_configured');
 
-  for (const forbiddenField of [
-    'authority_boundary',
-    'configured_codex_plugin_carrier',
-    'content_lock',
-    'distribution_payload',
-    'health_check',
-    'lifecycle',
-    'machine_boundary',
-    'managed_shell',
-    'opl_managed_surface',
-    'package_core',
-    'permissions',
-    'receipt_ref',
-    'resolver',
-    'rollback_ref',
-    'source_contract',
-    'transaction',
-    'update_channel',
-  ]) {
-    assert.equal(
-      Object.hasOwn(descriptor, forbiddenField),
-      false,
-      `${forbiddenField} must remain outside the installed owner descriptor`,
-    );
-  }
-  assertNoLegacyLifecycleBasis(descriptor);
-});
+  const ws = mkUserScopedTestWorkspace('redcube-contrib-');
+  mkdirSync(path.join(ws, 'artifacts'), { recursive: true });
+  writeFileSync(path.join(ws, 'workspace.json'), JSON.stringify({
+    status: 'in_progress',
+    stages: [{ stage_id: 'visual_direction', status: 'completed' }],
+  }));
+  writeFileSync(path.join(ws, 'artifacts', 'deck.pptx'), 'pptx-placeholder');
 
-test('nested Codex carrier remains a synchronized compatibility surface without a repo-local installer', () => {
-  const packageJson = readJson(path.join(repoRoot, 'package.json'));
-  const rootPluginManifest = readJson(rootPluginManifestPath);
-  const nestedPluginManifest = readJson(pluginManifestPath);
-  const portablePluginManifest = readJson(portablePluginManifestPath);
-  const nestedDescriptor = readJson(packageDescriptorPath);
-
-  assert.equal(rootPluginManifest.version, packageJson.version);
-  assert.equal(nestedPluginManifest.version, packageJson.version);
-  assert.equal(portablePluginManifest.version, packageJson.version);
-  assert.equal(
-    portablePluginManifest.$schema,
-    'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json',
-  );
-  assert.equal(portablePluginManifest.name, nestedPluginManifest.name);
-  assert.deepEqual(
-    portablePluginManifest.extensions['com.openai'].interface,
-    nestedPluginManifest.interface,
-  );
-  assert.equal(Object.hasOwn(portablePluginManifest, 'skills'), false);
-  assert.equal(existsSync(path.join(pluginRoot, 'mcp.json')), false);
-  assert.equal(nestedDescriptor.version, packageJson.version);
-  assert.equal(existsSync(path.join(repoRoot, 'scripts', 'install-codex-plugin.ts')), false);
-});
-
-test('plugins/redcube-ai keeps only unique carrier manifests in git and materializes projected files cleanly', () => {
-  const tracked = spawnSync('git', ['ls-files', 'plugins/redcube-ai'], {
+  const statusRes = spawnSync(process.execPath, ['agent/tools/app-contribution.mjs'], {
     cwd: repoRoot,
+    input: JSON.stringify({
+      schema_version: 'opl-package-app-contribution-request.v1',
+      operation: 'read',
+      package_id: 'rca',
+      ref: 'rca.workspace.v1#status',
+      input: { workspace_root: ws },
+    }),
     encoding: 'utf8',
+    env: { ...process.env, OPL_PROFILE_WORKSPACE: '' },
   });
-  assert.equal(tracked.status, 0, tracked.stderr);
-  assert.deepEqual(
-    tracked.stdout.trim().split('\n').filter(Boolean).sort(),
-    [
-      'plugins/redcube-ai/.codex-plugin/plugin.json',
-      'plugins/redcube-ai/opl-package.json',
-      'plugins/redcube-ai/plugin.json',
-      'plugins/redcube-ai/skills/redcube-ai/agents/openai.yaml',
-    ],
-  );
-  const python = resolveRedCubePythonCommand();
-  const check = spawnSync(python.command, [...python.args, 'scripts/sync_carrier.py', '--standalone', '--check'], {
+  assert.equal(statusRes.status, 0, statusRes.stderr);
+  const statusBody = JSON.parse(statusRes.stdout);
+  assert.equal(statusBody.ok, true);
+  assert.equal(statusBody.state, 'ready');
+  assert.equal(statusBody.data.stages.length, 1);
+  assert.equal(statusBody.data.stages[0].stage_id, 'visual_direction');
+
+  const artifactsRes = spawnSync(process.execPath, ['agent/tools/app-contribution.mjs'], {
     cwd: repoRoot,
+    input: JSON.stringify({
+      schema_version: 'opl-package-app-contribution-request.v1',
+      operation: 'read',
+      package_id: 'rca',
+      ref: 'rca.workspace.v1#artifacts',
+      input: {},
+    }),
     encoding: 'utf8',
+    env: { ...process.env, OPL_PROFILE_WORKSPACE: ws },
   });
-  assert.equal(check.status, 0, `${check.stdout}\n${check.stderr}`);
+  assert.equal(artifactsRes.status, 0, artifactsRes.stderr);
+  const artifactsBody = JSON.parse(artifactsRes.stdout);
+  assert.equal(artifactsBody.ok, true);
+  assert.equal(artifactsBody.state, 'ready');
+  assert.deepEqual(artifactsBody.data.artifacts, [
+    { name: 'deck.pptx', path: 'artifacts/deck.pptx', kind: 'file' },
+  ]);
+
+  const execRes = handleContributionRequest({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'execute',
+    package_id: 'rca',
+    action_id: 'rca.noop',
+    payload: {},
+  });
+  assert.equal(execRes.ok, false);
+  assert.equal(execRes.state, 'unsupported_action');
 });
 
-function runCarrierVersionSyncContract(extraArgs, extraEnv) {
-  const root = mkUserScopedTestWorkspace('redcube-carrier-version-');
-  for (const relative of [
-    'scripts/sync_carrier.py', 'contracts/carrier_projection.json', 'contracts/opl_agent_package_manifest.json', 'contracts/domain_descriptor.json',
-    'agent/primary_skill/SKILL.md', 'pyproject.toml', 'uv.lock', 'README.md', 'README.zh-CN.md', 'LICENSE',
-    'assets/branding/redcube-ai-logo.png', 'assets/branding/redcube-ai-overview-v3.png',
-    'app-contribution-adapter.json', '.codex-plugin/plugin.json',
-    'plugins/redcube-ai/.codex-plugin/plugin.json', 'plugins/redcube-ai/plugin.json',
-  ]) {
-    const target = path.join(root, relative);
-    mkdirSync(path.dirname(target), { recursive: true });
-    copyFileSync(path.join(repoRoot, relative), target);
-  }
-  for (const args of [['init', '--quiet'], ['add', '.']]) {
-    assert.equal(spawnSync('git', args, { cwd: root }).status, 0);
-  }
-  const ownerPath = path.join(root, 'contracts/opl_agent_package_manifest.json');
-  const owner = readJson(ownerPath);
-  owner.version = '9.8.7';
-  owner.skill_packs.push(
-    { id: 'external', source: 'external', install_mode: 'bundled_required', version: '1.2.3' },
-    { id: 'optional', source: 'repo_local_codex_plugin_carrier', install_mode: 'optional', version: '2.3.4' },
-  );
-  writeFileSync(ownerPath, `${JSON.stringify(owner, null, 2)}\n`);
-  const before = readFileSync(ownerPath);
-  const python = resolveRedCubePythonCommand();
-  const prepare = (...args) => spawnSync(
-    python.command,
-    [...python.args, 'scripts/sync_carrier.py', ...extraArgs, ...args],
-    { cwd: root, encoding: 'utf8', env: { ...process.env, ...extraEnv } },
-  );
-  assert.notEqual(prepare('--check').status, 0);
-  assert.deepEqual(readFileSync(ownerPath), before);
-  assert.equal(existsSync(path.join(root, 'plugins/redcube-ai/contracts/opl_agent_package_manifest.json')), false);
-  const result = prepare();
-  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
-  const prepared = readJson(ownerPath);
-  assert.equal(prepared.skill_packs[0].version, '9.8.7');
-  assert.equal(prepared.skill_packs[1].version, '1.2.3');
-  assert.equal(prepared.skill_packs[2].version, '2.3.4');
-  assert.deepEqual(prepared.entrypoints, owner.entrypoints);
-  for (const relative of ['opl-package.json', 'plugins/redcube-ai/contracts/opl_agent_package_manifest.json']) {
-    assert.deepEqual(readJson(path.join(root, relative)), prepared);
-  }
-  const preparedBytes = readFileSync(ownerPath);
-  assert.equal(prepare('--check').status, 0);
-  assert.equal(prepare().status, 0);
-  assert.deepEqual(readFileSync(ownerPath), preparedBytes);
-}
-
-test('release preparation aligns bundled local skill versions while check remains read-only', () => {
-  runCarrierVersionSyncContract(['--standalone'], { OPL_BIN: '' });
-  const siblingFramework = path.resolve(repoRoot, '..', 'one-person-lab');
-  const candidateOplBins = [
-    process.env.OPL_BIN,
-    process.env.OPL_FRAMEWORK_ROOT ? path.join(process.env.OPL_FRAMEWORK_ROOT, 'bin', 'opl') : null,
-    path.join(siblingFramework, 'bin', 'opl'),
-  ].filter(Boolean);
-  let resolvedOplBin = candidateOplBins.find((candidate) => existsSync(candidate)) ?? null;
-  if (!resolvedOplBin) {
-    const which = spawnSync('which', ['opl'], { encoding: 'utf8' });
-    if (which.status === 0 && which.stdout.trim()) {
-      resolvedOplBin = which.stdout.trim();
-    }
-  }
-  if (resolvedOplBin) {
-    runCarrierVersionSyncContract([], {
-      OPL_BIN: resolvedOplBin,
-      ...(process.env.OPL_FRAMEWORK_ROOT
-        ? {}
-        : existsSync(siblingFramework)
-          ? { OPL_FRAMEWORK_ROOT: siblingFramework }
-          : {}),
+test('RCA contribution_handler blocks path traversal, outside OPL_PROFILE_WORKSPACE, and symlink escapes', () => {
+  const runCli = (envelope, envOverrides = {}) => {
+    const res = spawnSync(process.execPath, ['agent/tools/app-contribution.mjs'], {
+      cwd: repoRoot,
+      input: JSON.stringify(envelope),
+      encoding: 'utf8',
+      env: { ...process.env, ...envOverrides },
     });
+    assert.equal(res.status, 0, res.stderr);
+    return JSON.parse(res.stdout);
+  };
+
+  for (const traversalPath of ['../../../../../etc', './relative/ws', '/tmp/../etc', 123]) {
+    const body = runCli({
+      schema_version: 'opl-package-app-contribution-request.v1',
+      operation: 'read',
+      package_id: 'rca',
+      ref: 'rca.workspace.v1#status',
+      input: { workspace_root: traversalPath },
+    }, { OPL_PROFILE_WORKSPACE: '' });
+    assert.equal(body.ok, false);
+    assert.equal(body.state, 'unavailable');
+    assert.equal(body.reason, 'invalid_workspace_root');
+    assert.equal(body.error?.code, 'INVALID_WORKSPACE_ROOT');
+    assert.equal(body.workspace_root, undefined);
+    assert.equal(JSON.stringify(body).includes('/private/etc'), false);
+  }
+
+  const allowedWs = mkUserScopedTestWorkspace('redcube-allowed-');
+  const outsideDir = mkUserScopedTestWorkspace('redcube-outside-');
+  const nestedAllowed = path.join(allowedWs, 'nested-project');
+  mkdirSync(nestedAllowed, { recursive: true });
+  writeFileSync(path.join(nestedAllowed, 'workspace.json'), JSON.stringify({
+    status: 'active',
+    stages: [{ stage_id: 'inside_stage', status: 'completed' }],
+  }));
+  writeFileSync(path.join(outsideDir, 'secret.json'), JSON.stringify({
+    status: 'hijacked',
+    stages: [{ stage_id: 'evil_stage', status: 'pwned' }],
+  }));
+  writeFileSync(path.join(outsideDir, 'index-secret.json'), JSON.stringify({
+    projects: { leaked_project: { name: 'leaked' } },
+  }));
+  writeFileSync(path.join(outsideDir, 'outside.txt'), 'secret-artifact');
+  mkdirSync(path.join(outsideDir, 'outside-dir'), { recursive: true });
+
+  const symlinkEscapeWs = path.join(allowedWs, 'symlink-escape-ws');
+  symlinkSync(outsideDir, symlinkEscapeWs, 'dir');
+
+  for (const outsideCandidate of [outsideDir, symlinkEscapeWs]) {
+    const body = runCli({
+      schema_version: 'opl-package-app-contribution-request.v1',
+      operation: 'read',
+      package_id: 'rca',
+      ref: 'rca.workspace.v1#status',
+      input: { workspace_root: outsideCandidate },
+    }, { OPL_PROFILE_WORKSPACE: allowedWs });
+    assert.equal(body.ok, false);
+    assert.equal(body.state, 'unavailable');
+    assert.equal(body.reason, 'workspace_root_outside_allowed_boundary');
+    assert.equal(body.error?.code, 'WORKSPACE_ROOT_OUTSIDE_ALLOWED_BOUNDARY');
+    assert.equal(body.workspace_root, undefined);
+    assert.equal(JSON.stringify(body).includes(outsideDir), false);
+  }
+
+  const allowedBody = runCli({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'read',
+    package_id: 'rca',
+    ref: 'rca.workspace.v1#status',
+    input: { workspace_root: nestedAllowed },
+  }, { OPL_PROFILE_WORKSPACE: allowedWs });
+  assert.equal(allowedBody.ok, true);
+  assert.equal(allowedBody.state, 'ready');
+  assert.deepEqual(allowedBody.data.stages, [{ stage_id: 'inside_stage', status: 'completed' }]);
+
+  const wsWithSymlinks = mkUserScopedTestWorkspace('redcube-symlink-contained-');
+  mkdirSync(path.join(wsWithSymlinks, 'runtime-state'), { recursive: true });
+  mkdirSync(path.join(wsWithSymlinks, 'artifacts'), { recursive: true });
+  mkdirSync(path.join(wsWithSymlinks, 'deliverables'), { recursive: true });
+
+  symlinkSync(path.join(outsideDir, 'secret.json'), path.join(wsWithSymlinks, 'workspace.json'));
+  symlinkSync(path.join(outsideDir, 'index-secret.json'), path.join(wsWithSymlinks, 'workspace_index.json'));
+  symlinkSync(path.join(outsideDir, 'secret.json'), path.join(wsWithSymlinks, 'runtime-state', 'evil.json'));
+  symlinkSync(path.join(outsideDir, 'outside.txt'), path.join(wsWithSymlinks, 'artifacts', 'escape.txt'));
+  symlinkSync(path.join(outsideDir, 'outside-dir'), path.join(wsWithSymlinks, 'deliverables', 'escape-dir'));
+  symlinkSync(path.join(outsideDir, 'nonexistent.txt'), path.join(wsWithSymlinks, 'artifacts', 'dangling.txt'));
+
+  writeFileSync(path.join(wsWithSymlinks, 'runtime-state', 'legit.json'), JSON.stringify({
+    stages: [{ stage_id: 'legit_stage', status: 'completed' }],
+  }));
+  writeFileSync(path.join(wsWithSymlinks, 'artifacts', 'legit.png'), 'png-bytes');
+  writeFileSync(path.join(wsWithSymlinks, 'deliverables', 'legit-deliverable.pdf'), 'pdf-bytes');
+  symlinkSync(path.join(outsideDir, 'outside.txt'), path.join(wsWithSymlinks, 'deliverables', 'escape.pdf'));
+
+  const statusBody = runCli({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'read',
+    package_id: 'rca',
+    ref: 'rca.workspace.v1#status',
+    input: { workspace_root: wsWithSymlinks },
+  }, { OPL_PROFILE_WORKSPACE: '' });
+  assert.equal(statusBody.ok, true);
+  assert.equal(statusBody.state, 'ready');
+  assert.deepEqual(statusBody.data.projects, []);
+  assert.deepEqual(statusBody.data.stages, [{ stage_id: 'legit_stage', status: 'completed' }]);
+  assert.equal(statusBody.data.workspace_status, 'active');
+
+  const artifactsBody = runCli({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'read',
+    package_id: 'rca',
+    ref: 'rca.workspace.v1#artifacts',
+    input: { workspace_root: wsWithSymlinks },
+  }, { OPL_PROFILE_WORKSPACE: '' });
+  assert.equal(artifactsBody.ok, true);
+  assert.equal(artifactsBody.state, 'ready');
+  assert.deepEqual(artifactsBody.data.artifacts, [
+    { name: 'legit.png', path: 'artifacts/legit.png', kind: 'file' },
+    { name: 'legit-deliverable.pdf', path: 'deliverables/legit-deliverable.pdf', kind: 'file' },
+  ]);
+
+  const wsDirSymlinks = mkUserScopedTestWorkspace('redcube-dir-symlink-escape-');
+  const outsideRuntimeState = path.join(outsideDir, 'outside-runtime-state');
+  mkdirSync(outsideRuntimeState, { recursive: true });
+  writeFileSync(path.join(outsideRuntimeState, 'secret.json'), JSON.stringify({
+    stages: [{ stage_id: 'dir_escape_stage', status: 'pwned' }],
+  }));
+  symlinkSync(outsideRuntimeState, path.join(wsDirSymlinks, 'runtime-state'), 'dir');
+  symlinkSync(outsideDir, path.join(wsDirSymlinks, 'artifacts'), 'dir');
+  symlinkSync(outsideDir, path.join(wsDirSymlinks, 'deliverables'), 'dir');
+
+  const dirEscapeStatus = runCli({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'read',
+    package_id: 'rca',
+    ref: 'rca.workspace.v1#status',
+    input: { workspace_root: wsDirSymlinks },
+  }, { OPL_PROFILE_WORKSPACE: allowedWs });
+  assert.equal(dirEscapeStatus.ok, false);
+  assert.equal(dirEscapeStatus.state, 'unavailable');
+  assert.equal(dirEscapeStatus.reason, 'workspace_root_outside_allowed_boundary');
+
+  const dirEscapeStatusDirect = runCli({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'read',
+    package_id: 'rca',
+    ref: 'rca.workspace.v1#status',
+    input: { workspace_root: wsDirSymlinks },
+  }, { OPL_PROFILE_WORKSPACE: '' });
+  assert.equal(dirEscapeStatusDirect.ok, true);
+  assert.equal(dirEscapeStatusDirect.state, 'empty');
+  assert.deepEqual(dirEscapeStatusDirect.data.stages, []);
+
+  const dirEscapeArtifactsDirect = runCli({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'read',
+    package_id: 'rca',
+    ref: 'rca.workspace.v1#artifacts',
+    input: { workspace_root: wsDirSymlinks },
+  }, { OPL_PROFILE_WORKSPACE: '' });
+  assert.equal(dirEscapeArtifactsDirect.ok, true);
+  assert.equal(dirEscapeArtifactsDirect.state, 'empty');
+  assert.deepEqual(dirEscapeArtifactsDirect.data.artifacts, []);
+});
+
+test('RCA contribution_handler CLI fails closed with exit code 2 on non-read and malformed requests', () => {
+  const runRawCli = (rawInput) => spawnSync(process.execPath, ['agent/tools/app-contribution.mjs'], {
+    cwd: repoRoot,
+    input: rawInput,
+    encoding: 'utf8',
+    env: { ...process.env, OPL_PROFILE_WORKSPACE: '' },
+  });
+
+  const executeRes = runRawCli(JSON.stringify({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'execute',
+    package_id: 'rca',
+    action_id: 'rca.noop',
+    payload: {},
+    dry_run: false,
+  }));
+  assert.equal(executeRes.status, 2, executeRes.stderr);
+  const executeBody = JSON.parse(executeRes.stdout);
+  assert.equal(executeBody.ok, false);
+  assert.equal(executeBody.state, 'unsupported_action');
+  assert.equal(executeBody.action_id, 'rca.noop');
+  assert.equal(executeBody.error?.code, 'UNSUPPORTED_ACTION');
+
+  const invalidJsonRes = runRawCli('{not-valid-json');
+  assert.equal(invalidJsonRes.status, 2, invalidJsonRes.stderr);
+  const invalidJsonBody = JSON.parse(invalidJsonRes.stdout);
+  assert.equal(invalidJsonBody.ok, false);
+  assert.equal(invalidJsonBody.state, 'invalid_request');
+  assert.equal(invalidJsonBody.error?.code, 'INVALID_JSON');
+
+  const unsupportedOpRes = runRawCli(JSON.stringify({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'unknown',
+    package_id: 'rca',
+  }));
+  assert.equal(unsupportedOpRes.status, 2, unsupportedOpRes.stderr);
+  const unsupportedOpBody = JSON.parse(unsupportedOpRes.stdout);
+  assert.equal(unsupportedOpBody.ok, false);
+  assert.equal(unsupportedOpBody.state, 'unsupported_operation');
+  assert.equal(unsupportedOpBody.error?.code, 'UNSUPPORTED_OPERATION');
+
+  for (const missingOpPayload of [
+    JSON.stringify({ schema_version: 'opl-package-app-contribution-request.v1', package_id: 'rca' }),
+    JSON.stringify({ operation: '' }),
+    JSON.stringify(['not', 'an', 'object']),
+  ]) {
+    const invalidReqRes = runRawCli(missingOpPayload);
+    assert.equal(invalidReqRes.status, 2, invalidReqRes.stderr);
+    const invalidReqBody = JSON.parse(invalidReqRes.stdout);
+    assert.equal(invalidReqBody.ok, false);
+    assert.equal(invalidReqBody.state, 'invalid_request');
+    assert.equal(invalidReqBody.error?.code, 'INVALID_REQUEST');
   }
 });
