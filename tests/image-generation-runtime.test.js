@@ -87,7 +87,7 @@ test('projected carrier helper resolves the public module and accepts stdin requ
   const framework = path.join(root, 'node_modules/opl-framework');
   mkdirSync(path.dirname(helper), { recursive: true });
   mkdirSync(framework, { recursive: true });
-  copyFileSync('plugins/redcube-ai/agent/tools/generate-image.mjs', helper);
+  copyFileSync('agent/tools/generate-image.mjs', helper);
   writeFileSync(path.join(framework, 'package.json'), JSON.stringify({
     name: 'opl-framework', type: 'module', exports: { './domain-task-runtime': './runtime.mjs' },
   }));
@@ -133,7 +133,7 @@ test('default runtime falls back to opl image generate CLI when OPL_BIN is set',
     '  operation: "generate", request_id: "cli-req-1"',
     '} }));',
   ].join('\n'), { mode: 0o755 });
-  const run = spawnSync(process.execPath, ['plugins/redcube-ai/agent/tools/generate-image.mjs'], {
+  const run = spawnSync(process.execPath, ['agent/tools/generate-image.mjs'], {
     input: JSON.stringify({ prompt: 'CLI slide', output_path: outputPath }),
     encoding: 'utf8',
     env: { ...process.env, OPL_BIN: fakeOpl },

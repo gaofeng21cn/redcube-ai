@@ -26,6 +26,6 @@
 ## RCA 生命周期应用说明
 
 - `agent/` 与 `prompts/` 属于可执行/被消费的行为资源（Stage、专业 Skill、质量门与提示词模板），不按普通 prose 去重；改动需同步追踪 manifest、action 与实际调用者。
-- `plugins/redcube-ai/` 仅在 Git 中跟踪 4 份载体独有清单/元数据（`.codex-plugin/plugin.json`、`plugin.json`、`opl-package.json`、`skills/redcube-ai/agents/openai.yaml`），其余文件由 `scripts/sync_carrier.py` 按 `contracts/carrier_projection.json` 在构建/验证期从 tracked canonical source 确定性物化并被 `.gitignore` 忽略。
+- 根目录 `opl-package.json`（`opl.package.v2`）是 RCA 唯一包清单；构建期通过 `opl pack build` 生成 `opl-release.lock.json`，运行期由 `opl pack link` / `carriers/codex-sync` 零拷贝符号链接自动投影到 Codex，仓内不再维护 `plugins/redcube-ai/` 源码镜像。
 - 法律与授权文件保留原职责；已完成计划、执行流水与退役界面说明从当前树删除，历史通过 Git 追溯。
 - 验证文档与资源链接、结构一致性及投影后，只报告本次实际检查范围与结果。

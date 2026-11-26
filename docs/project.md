@@ -4,7 +4,7 @@
 
 RedCube AI 面向专家、教师、研究者和专业团队，把源材料转成幻灯片、小红书图文和知识海报，完成叙事、视觉创作、审阅、修订、导出与文件交付。
 
-RCA 是 OPL 的视觉交付领域 Agent，canonical Package identity 为 `rca`，domain identity 为 `redcube_ai`。`redcube-ai` 是仓库、Codex Plugin 和 Skill carrier 名称。身份声明由 `contracts/opl_agent_package_manifest.json` 与 `contracts/domain_descriptor.json` 持有。
+RCA 是 OPL 的视觉交付领域 Agent，canonical Package identity 为 `rca`，domain identity 为 `redcube_ai`。`redcube-ai` 是仓库、Codex Plugin 和 Skill carrier 名称。身份声明由根目录 `opl-package.json`（`opl.package.v2`）与 `contracts/domain_descriptor.json` 持有。
 
 ## 交付范围
 

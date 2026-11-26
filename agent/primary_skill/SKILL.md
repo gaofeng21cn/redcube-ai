@@ -103,10 +103,7 @@ currentness, final-copy fidelity and native-viewer evidence remain distinct.
 
 ## References
 
-Resolve these refs from the installed RCA carrier root, two directories above
-this installed Skill. It contains the owner-projected declarative pack, contracts,
-native helpers, and reference docs. Edit the canonical owner sources when
-maintaining RCA, then regenerate the carrier with `scripts/sync_carrier.py`.
+Resolve these refs from the installed RCA package root (linked or installed via `opl pack`). It contains the canonical declarative pack, contracts, native helpers, and reference docs. Edit the canonical owner sources directly when maintaining RCA; Codex carrier projection is managed by OPL `carriers/codex-sync`.
 Load the contract or professional resource for the selected action and stage,
 and reuse accepted refs while their source, user constraints, and scope remain current.
 

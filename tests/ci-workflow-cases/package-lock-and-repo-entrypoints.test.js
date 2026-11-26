@@ -32,13 +32,13 @@ test('qualification validates against the latest OPL Framework without mutating 
 
   assert.match(workflow, /npm ci --prefix \..\/one-person-lab --ignore-scripts/);
   assert.match(workflow, /npm run --prefix \..\/one-person-lab build/);
-  assert.match(workflow, /agents interfaces --repo-dir "\$GITHUB_WORKSPACE" --json/);
-  assert.match(workflow, /agents conformance --agent "rca=\$GITHUB_WORKSPACE" --json/);
+  assert.match(workflow, /pack inspect "\$GITHUB_WORKSPACE" --json/);
+  assert.doesNotMatch(workflow, /sync_carrier\.py|agents interfaces|agents conformance/);
   assert.doesNotMatch(workflow, /packages link-framework|packages install|packages update/);
   assert.doesNotMatch(workflow, /npm run typecheck:ci|node scripts\/run-test-group\.ts/);
   assert.doesNotMatch(workflow, /scripts\/run-test-group\.ts family/);
 
   const sourceWorkflow = readRepoFile('.github/workflows/ci.yml');
-  assert.doesNotMatch(sourceWorkflow, /one-person-lab|agents interfaces|agents conformance/);
+  assert.doesNotMatch(sourceWorkflow, /one-person-lab|sync_carrier\.py|agents interfaces|agents conformance/);
   assert.match(sourceWorkflow, /scripts\/verify\.sh ci/);
 });

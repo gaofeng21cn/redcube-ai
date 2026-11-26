@@ -95,22 +95,19 @@
         "runtime_projection_refs": [
           {
             "ref_kind": "repo_path",
-            "ref": "plugins/redcube-ai/skills/redcube-ai/SKILL.md",
-            "role": "codex_plugin_carrier_compat_mirror"
+            "ref": "agent/primary_skill/SKILL.md",
+            "role": "canonical_primary_skill"
           },
           {
-            "ref_kind": "contract_ref",
-            "ref": "plugins/redcube-ai/plugin.json",
-            "role": "canonical_plugin_scaffold_source_locator"
+            "ref_kind": "repo_path",
+            "ref": "opl-package.json",
+            "role": "opl_package_v2_manifest"
           }
         ],
-        "sync_policy": "repo_local_standard_primary_skill_with_plugin_carrier_compat",
+        "sync_policy": "opl_pack_codex_sync_zero_copy_projection",
         "carrier_projection_contract": {
           "canonical_source": "agent/primary_skill/SKILL.md",
-          "carrier_skill_ref": "plugins/redcube-ai/skills/redcube-ai/SKILL.md",
-          "carrier_materialization": "materialized_full_skill_copy",
-          "codex_install_requires_real_skill_md": true,
-          "plugin_skill_must_remain_real_file": true,
+          "carrier_projection_mode": "opl_pack_codex_sync_symlink",
           "carrier_role": "transport_install_detail_not_agent_membership_or_status",
           "authority": false,
           "carrier_can_override_canonical_source": false,

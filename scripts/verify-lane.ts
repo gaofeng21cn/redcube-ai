@@ -133,11 +133,6 @@ try {
   run('scripts/repo-hygiene.sh');
 
   const plan = buildVerifyLanePlan(lane);
-  if (plan.steps.some((step) => step.kind === 'test-group')) {
-    run('python3', ['scripts/sync_carrier.py'], {
-      stdio: ['ignore', 'ignore', 'inherit'],
-    });
-  }
   for (const step of plan.steps) {
     await runStep(step, forwardedArgs);
   }

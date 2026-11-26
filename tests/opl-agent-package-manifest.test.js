@@ -9,12 +9,10 @@ function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
 }
 
-test('repo-local OPL agent package manifest keeps RCA package and authority boundaries explicit', () => {
-  const manifest = readJson('contracts/opl_agent_package_manifest.json');
+test('single root opl.package.v2 manifest aligns RCA identity, versions, and UI boundaries', () => {
+  const manifest = readJson('opl-package.json');
   const domainDescriptor = readJson('contracts/domain_descriptor.json');
   const registration = readJson('contracts/opl_domain_manifest_registration.json');
-  const pluginManifest = readJson('.codex-plugin/plugin.json');
-  const compatibilityPluginManifest = readJson('plugins/redcube-ai/.codex-plugin/plugin.json');
   const packageJson = readJson('package.json');
   const packageLock = readJson('package-lock.json');
   const pyproject = fs.readFileSync(path.join(repoRoot, 'pyproject.toml'), 'utf8');
@@ -22,93 +20,64 @@ test('repo-local OPL agent package manifest keeps RCA package and authority boun
   const pyprojectVersion = pyproject.match(/^version = "([^"]+)"$/m);
   const uvProjectVersion = uvLock.match(/\[\[package\]\]\nname = "redcube-ai"\nversion = "([^"]+)"/m);
 
-  assert.equal(manifest.surface_kind, 'opl_agent_package_manifest.v1');
-  assert.equal(manifest.agent_id, 'rca');
-  assert.equal(manifest.package_id, 'rca');
-  assert.deepEqual(manifest.presentation, {
-    display_name_i18n: { 'zh-CN': 'RedCube AI', 'en-US': 'RedCube AI' },
-    description_i18n: {
-      'zh-CN': '以图像为核心的视觉内容设计、生成、评审与交付。',
-      'en-US': 'Image-first visual content design, generation, review, and delivery.',
-    },
-    session_routing_summary_i18n: {
-      'en-US': 'Run the RCA visual-deliverable stages through the OPL-hosted StageRun controller while preserving RCA visual truth and review/export authority.',
-    },
-    home_shortcuts: [{
-      shortcut_id: 'invoke_product_entry',
-      label_i18n: {
-        'zh-CN': '制作视觉交付物',
-        'en-US': 'Create or continue a visual deliverable',
-      },
-      default_visible: true,
-      user_configurable: true,
-      route: {
-        route_kind: 'agent_package_shortcut',
-        executor: 'codex_cli',
-        codex_visible_entry: 'redcube-ai',
-      },
-    }],
+  assert.equal(manifest.schema_version, 'opl.package.v2');
+  assert.equal(manifest.identity.id, 'rca');
+  assert.equal(manifest.identity.intent, 'agent');
+  assert.equal(manifest.identity.publisher, 'one-person-lab');
+  assert.equal(manifest.identity.license, 'Apache-2.0');
+  assert.deepEqual(manifest.identity.name, { 'zh-CN': 'RedCube AI', 'en-US': 'RedCube AI' });
+  assert.deepEqual(manifest.identity.summary, {
+    'zh-CN': '以图像为核心的视觉内容设计、生成、评审与交付。',
+    'en-US': 'Image-first visual content design, generation, review, and delivery.',
   });
-  assert.match(manifest.version, /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
-  assert.equal(packageJson.version, manifest.version);
-  assert.equal(packageLock.version, manifest.version);
-  assert.equal(packageLock.packages[''].version, manifest.version);
-  assert.equal(manifest.skill_packs[0].version, manifest.version);
-  assert.equal(pyprojectVersion?.[1], manifest.version);
-  assert.equal(uvProjectVersion?.[1], manifest.version);
-  assert.equal(manifest.package_id, manifest.agent_id);
-  assert.equal(manifest.source, 'first_party_repo_local');
-  assert.equal(manifest.source_contract.central_manifest_ref, 'contracts/opl-framework/packages/rca.json');
-  assert.equal(manifest.source_contract.central_package_id, 'rca');
-  assert.equal(manifest.source_contract.repo_slug, 'redcube-ai');
-  assert.equal(Object.hasOwn(manifest.source_contract, 'central_agent_id_alias'), false);
-  assert.equal(manifest.source_contract.repo_canonical_agent_id, registration.agent_id);
-  assert.equal(domainDescriptor.package_id, manifest.package_id);
+  assert.match(manifest.identity.version, /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
+  assert.equal(packageJson.version, manifest.identity.version);
+  assert.equal(packageLock.version, manifest.identity.version);
+  assert.equal(packageLock.packages[''].version, manifest.identity.version);
+  assert.equal(pyprojectVersion?.[1], manifest.identity.version);
+  assert.equal(uvProjectVersion?.[1], manifest.identity.version);
+  assert.equal(domainDescriptor.package_id, manifest.identity.id);
+  assert.equal(registration.agent_id, manifest.identity.id);
 
-  assert.equal(manifest.carrier_source_role, 'codex_plugin_default_carrier_not_package_truth');
-  assert.equal(manifest.codex_surface.plugin_id, 'redcube-ai');
-  assert.equal(manifest.codex_surface.carrier_source_path, '.');
-  assert.deepEqual(manifest.codex_surface.configured_codex_plugin_carrier, {
-    kind: 'codex_plugin_manager',
-    plugin_selector: 'redcube-ai@redcube-ai',
-    executor_route: 'codex_cli',
-    marketplace_source: 'gaofeng21cn/redcube-ai',
-    publication_ref: 'ghcr.io/gaofeng21cn/one-person-lab-packages/rca:latest-stable',
+  assert.equal(fs.existsSync(path.join(repoRoot, manifest.identity.icon)), true);
+  assert.equal(manifest.provides.agent.stages_ref, 'agent/stages/manifest.json');
+  assert.equal(fs.existsSync(path.join(repoRoot, manifest.provides.agent.stages_ref)), true);
+  assert.deepEqual(manifest.provides.skills, [
+    { id: 'redcube-ai', path: './agent/primary_skill', exposure: 'default' },
+  ]);
+  assert.deepEqual(manifest.provides.contribution_handler, {
+    kind: 'cli',
+    argv: ['node', './agent/tools/app-contribution.mjs'],
+    transport: 'stdin_json_stdout_json',
   });
-  assert.equal(pluginManifest.name, 'redcube-ai');
-  assert.equal(pluginManifest.version, manifest.version);
-  assert.equal(compatibilityPluginManifest.version, manifest.version);
-  assert.notEqual(pluginManifest.name, manifest.package_id);
-  assert.equal(
-    fs.readFileSync(path.join(repoRoot, 'opl-package.json'), 'utf8'),
-    fs.readFileSync(path.join(repoRoot, 'contracts/opl_agent_package_manifest.json'), 'utf8'),
+  assert.equal(fs.existsSync(path.join(repoRoot, 'agent/tools/app-contribution.mjs')), true);
+
+  assert.deepEqual(
+    manifest.ui.declarative.views.map((view) => view.id),
+    ['rca.workspace.status', 'rca.workspace.artifacts'],
   );
-  assert.deepEqual(manifest.codex_surface.required_skill_ids, ['redcube-ai']);
-  assert.deepEqual(manifest.required_skill_ids, ['redcube-ai']);
-  for (const forbiddenField of [
-    'distribution_payload',
-    'lifecycle',
-    'opl_managed_surface',
-    'package_core',
-    'rollback_ref',
-    'update_channel',
-  ]) {
-    assert.equal(Object.hasOwn(manifest, forbiddenField), false, forbiddenField);
-  }
-  assert.deepEqual(manifest.capability_dependencies, []);
+  assert.deepEqual(manifest.host_hints.codex, {
+    sync_enabled: true,
+    plugin_name: 'redcube-ai',
+    category: 'Creative',
+    brand_color: '#C65D2E',
+    capabilities: ['Interactive', 'Write'],
+  });
+  assert.notEqual(manifest.host_hints.codex.plugin_name, manifest.identity.id);
+  assert.deepEqual(manifest.distribution, {
+    oci: 'ghcr.io/gaofeng21cn/one-person-lab-packages/rca',
+    visibility: 'public',
+  });
 
-  assert.equal(Object.hasOwn(manifest.authority_boundary, 'package_core_owner'), false);
-  assert.equal(Object.hasOwn(manifest.authority_boundary, 'package_exposure_owner'), false);
-  assert.equal(manifest.authority_boundary.domain_truth_owner, 'redcube_ai');
-  assert.equal(manifest.authority_boundary.rca_owns_visual_truth, true);
-  assert.equal(manifest.authority_boundary.rca_owns_review_export_verdict, true);
-  assert.equal(manifest.authority_boundary.rca_owns_artifact_authority, true);
-  assert.equal(manifest.authority_boundary.repo_can_own_generic_runtime, false);
-  assert.equal(manifest.authority_boundary.repo_can_own_generic_package_manager, false);
-  assert.equal(manifest.authority_boundary.manifest_can_write_domain_truth, false);
-  assert.equal(manifest.authority_boundary.manifest_can_sign_owner_receipt, false);
-  assert.equal(manifest.authority_boundary.manifest_can_create_typed_blocker, false);
-  assert.equal(manifest.authority_boundary.manifest_can_write_runtime_queue, false);
-  assert.equal(manifest.authority_boundary.manifest_can_claim_runtime_readiness, false);
-  assert.equal(manifest.authority_boundary.manifest_can_claim_release_readiness, false);
+  for (const legacyPath of [
+    '.codex-plugin',
+    '.agents',
+    'plugins',
+    'app-contribution-adapter.json',
+    'contracts/carrier_projection.json',
+    'contracts/opl_agent_package_manifest.json',
+    'scripts/sync_carrier.py',
+  ]) {
+    assert.equal(fs.existsSync(path.join(repoRoot, legacyPath)), false, `${legacyPath} must be removed in v2`);
+  }
 });

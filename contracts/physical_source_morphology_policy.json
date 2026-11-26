@@ -10,7 +10,6 @@
     "declarative_visual_pack",
     "visual_authority_contract",
     "visual_native_helper_implementation",
-    "codex_plugin_carrier",
     "developer_proof",
     "repo_verification"
   ],
@@ -41,14 +40,6 @@
         "python/redcube_ai/native_helpers/"
       ],
       "active_caller": "OPL native-helper execution envelope"
-    },
-    {
-      "surface_id": "codex_plugin_carrier",
-      "classification": "codex_plugin_carrier",
-      "source_refs": [
-        "plugins/redcube-ai/"
-      ],
-      "active_caller": "OPL Packages carrier projection"
     },
     {
       "surface_id": "developer_proofs",

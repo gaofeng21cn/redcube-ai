@@ -7,12 +7,10 @@ Machine boundary: JSON body 和 schema 是机器面；本文只解释 owner 和�
 
 ## Standard Agent canonical inputs
 
-- `opl_agent_package_manifest.json`：`rca` Package sidecar。RCA owner 独立发布完整
-  bytes 并推进自己的 GHCR `latest-stable`；配置的 carrier/runtime adapter 持有实际
-  install/update/remove 与 fresh physical readback，Framework 只聚合
-  presence/callability、executor routes 和 projected actions。RCA manifest 已移除旧的
-  lifecycle/lock/payload/rollback authority；Framework 或 `opl packages` 的兼容读面仍
-  属于迁移证据，不构成 RCA 或 OPL-owned Package Manager 的目标 authority。
+- `../opl-package.json`：`rca` 唯一包清单（`opl.package.v2`）。由 `opl pack build` 生成不可变
+  `opl-release.lock.json`，由 `opl pack link` / `carriers/codex-sync` 自动投影到 Codex。
+  RCA 持有 visual truth、review/export verdict、artifact authority、visual memory 与
+  owner receipt authority，不持有通用 runtime 或包管理器。
 - `domain_descriptor.json`：RCA domain identity 与标准 pack refs。
 - `pack_compiler_input.json`：declarative visual pack source refs。
 - `standard_agent_interface.json`：OPL compiler 可消费的标准接口声明，不含 repo-local command template。
