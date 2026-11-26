@@ -292,3 +292,58 @@ test('RCA contribution_handler blocks path traversal, outside OPL_PROFILE_WORKSP
   assert.equal(dirEscapeArtifactsDirect.state, 'empty');
   assert.deepEqual(dirEscapeArtifactsDirect.data.artifacts, []);
 });
+
+test('RCA contribution_handler CLI fails closed with exit code 2 on non-read and malformed requests', () => {
+  const runRawCli = (rawInput) => spawnSync(process.execPath, ['agent/tools/app-contribution.mjs'], {
+    cwd: repoRoot,
+    input: rawInput,
+    encoding: 'utf8',
+    env: { ...process.env, OPL_PROFILE_WORKSPACE: '' },
+  });
+
+  const executeRes = runRawCli(JSON.stringify({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'execute',
+    package_id: 'rca',
+    action_id: 'rca.noop',
+    payload: {},
+    dry_run: false,
+  }));
+  assert.equal(executeRes.status, 2, executeRes.stderr);
+  const executeBody = JSON.parse(executeRes.stdout);
+  assert.equal(executeBody.ok, false);
+  assert.equal(executeBody.state, 'unsupported_action');
+  assert.equal(executeBody.action_id, 'rca.noop');
+  assert.equal(executeBody.error?.code, 'UNSUPPORTED_ACTION');
+
+  const invalidJsonRes = runRawCli('{not-valid-json');
+  assert.equal(invalidJsonRes.status, 2, invalidJsonRes.stderr);
+  const invalidJsonBody = JSON.parse(invalidJsonRes.stdout);
+  assert.equal(invalidJsonBody.ok, false);
+  assert.equal(invalidJsonBody.state, 'invalid_request');
+  assert.equal(invalidJsonBody.error?.code, 'INVALID_JSON');
+
+  const unsupportedOpRes = runRawCli(JSON.stringify({
+    schema_version: 'opl-package-app-contribution-request.v1',
+    operation: 'unknown',
+    package_id: 'rca',
+  }));
+  assert.equal(unsupportedOpRes.status, 2, unsupportedOpRes.stderr);
+  const unsupportedOpBody = JSON.parse(unsupportedOpRes.stdout);
+  assert.equal(unsupportedOpBody.ok, false);
+  assert.equal(unsupportedOpBody.state, 'unsupported_operation');
+  assert.equal(unsupportedOpBody.error?.code, 'UNSUPPORTED_OPERATION');
+
+  for (const missingOpPayload of [
+    JSON.stringify({ schema_version: 'opl-package-app-contribution-request.v1', package_id: 'rca' }),
+    JSON.stringify({ operation: '' }),
+    JSON.stringify(['not', 'an', 'object']),
+  ]) {
+    const invalidReqRes = runRawCli(missingOpPayload);
+    assert.equal(invalidReqRes.status, 2, invalidReqRes.stderr);
+    const invalidReqBody = JSON.parse(invalidReqRes.stdout);
+    assert.equal(invalidReqBody.ok, false);
+    assert.equal(invalidReqBody.state, 'invalid_request');
+    assert.equal(invalidReqBody.error?.code, 'INVALID_REQUEST');
+  }
+});

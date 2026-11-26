@@ -250,7 +250,17 @@ export function handleContributionRequest(envelope) {
     };
   }
 
-  const operation = typeof envelope.operation === 'string' ? envelope.operation : 'read';
+  if (typeof envelope.operation !== 'string' || envelope.operation.trim().length === 0) {
+    return {
+      schema_version: RESPONSE_SCHEMA,
+      ok: false,
+      state: 'invalid_request',
+      package_id: 'rca',
+      error: { code: 'INVALID_REQUEST', message: 'Contribution request requires a non-empty string operation.' },
+    };
+  }
+
+  const operation = envelope.operation.trim();
   if (operation === 'execute') {
     return {
       schema_version: RESPONSE_SCHEMA,
@@ -335,6 +345,7 @@ async function main() {
   try {
     parsed = raw.trim() ? JSON.parse(raw) : {};
   } catch {
+    process.exitCode = 2;
     process.stdout.write(`${JSON.stringify({
       schema_version: RESPONSE_SCHEMA,
       ok: false,
@@ -345,6 +356,15 @@ async function main() {
     return;
   }
   const response = handleContributionRequest(parsed);
+  const isReadOperation =
+    Boolean(parsed)
+    && typeof parsed === 'object'
+    && !Array.isArray(parsed)
+    && typeof parsed.operation === 'string'
+    && parsed.operation.trim() === 'read';
+  if (response.ok === false && !isReadOperation) {
+    process.exitCode = 2;
+  }
   process.stdout.write(`${JSON.stringify(response)}\n`);
 }
 
