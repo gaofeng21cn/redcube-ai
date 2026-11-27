@@ -4,6 +4,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 const RESPONSE_SCHEMA = 'opl-package-app-contribution-response.v1';
+const REQUEST_SCHEMA = 'opl-package-app-contribution-request.v1';
 const PROJECT_ID = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
 function isWithin(rootDir, targetPath) {
@@ -292,6 +293,19 @@ function collectLocalArtifacts(workspaceRoot) {
   return artifacts;
 }
 
+function readResponse(ref, result) {
+  return {
+    // Preserve the existing direct-read fields alongside the contribution result.
+    ...result,
+    schema_version: RESPONSE_SCHEMA,
+    ok: true,
+    package_id: 'rca',
+    operation: 'read',
+    ref,
+    result,
+  };
+}
+
 export function handleContributionRequest(envelope) {
   if (!envelope || typeof envelope !== 'object' || Array.isArray(envelope)) {
     return {
@@ -300,6 +314,16 @@ export function handleContributionRequest(envelope) {
       state: 'invalid_request',
       package_id: 'rca',
       error: { code: 'INVALID_REQUEST', message: 'Contribution request must be a JSON object.' },
+    };
+  }
+
+  if (envelope.schema_version !== REQUEST_SCHEMA || envelope.package_id !== 'rca') {
+    return {
+      schema_version: RESPONSE_SCHEMA,
+      ok: false,
+      state: 'invalid_request',
+      package_id: 'rca',
+      error: { code: 'INVALID_REQUEST', message: 'Contribution request schema or package identity is invalid.' },
     };
   }
 
@@ -315,12 +339,15 @@ export function handleContributionRequest(envelope) {
 
   const operation = envelope.operation.trim();
   if (operation === 'execute') {
+    const actionId = typeof envelope.action_id === 'string' ? envelope.action_id : null;
     return {
       schema_version: RESPONSE_SCHEMA,
       ok: false,
       state: 'unsupported_action',
       package_id: 'rca',
-      action_id: typeof envelope.action_id === 'string' ? envelope.action_id : null,
+      operation,
+      ref: typeof envelope.ref === 'string' ? envelope.ref.trim() : actionId,
+      action_id: actionId,
       error: { code: 'UNSUPPORTED_ACTION', message: 'RCA declarative views are read-only.' },
     };
   }
@@ -331,6 +358,7 @@ export function handleContributionRequest(envelope) {
       ok: false,
       state: 'unsupported_operation',
       package_id: 'rca',
+      operation,
       error: { code: 'UNSUPPORTED_OPERATION', message: `Unsupported operation '${operation}'.` },
     };
   }
@@ -342,6 +370,7 @@ export function handleContributionRequest(envelope) {
       ok: false,
       state: 'unsupported_ref',
       package_id: 'rca',
+      operation,
       ref,
       error: { code: 'UNSUPPORTED_REF', message: `Unsupported RCA contribution ref '${ref}'.` },
     };
@@ -352,41 +381,32 @@ export function handleContributionRequest(envelope) {
     : {};
   const resolution = resolveWorkspaceRoot(input);
   if (!resolution.ok) {
-    return {
-      schema_version: RESPONSE_SCHEMA,
-      ok: false,
+    const result = {
       state: 'unavailable',
-      package_id: 'rca',
-      ref,
       reason: resolution.reason,
-      error: { code: resolution.code, message: resolution.message },
       data: {
         view: ref.endsWith('#artifacts') ? 'artifacts' : 'progress',
         stages: [],
         artifacts: [],
       },
     };
+    return { ...readResponse(ref, result), ok: false, error: { code: resolution.code, message: resolution.message } };
   }
   const workspaceRoot = resolution.workspaceRoot;
   if (!workspaceRoot) {
-    return {
-      schema_version: RESPONSE_SCHEMA,
-      ok: true,
+    return readResponse(ref, {
       state: 'unavailable',
-      package_id: 'rca',
-      ref,
       reason: 'workspace_not_configured',
       data: {
         view: ref.endsWith('#artifacts') ? 'artifacts' : 'progress',
         stages: [],
         artifacts: [],
       },
-    };
+    });
   }
 
   const selected = selectProject(workspaceRoot, input);
-  const response = { schema_version: RESPONSE_SCHEMA, ok: true, package_id: 'rca', ref };
-  if (selected.state) return { ...response, ...selected };
+  if (selected.state) return readResponse(ref, selected);
 
   const readArtifacts = ref.endsWith('#artifacts');
   let data;
@@ -395,7 +415,10 @@ export function handleContributionRequest(envelope) {
       ? readRegisteredArtifacts(workspaceRoot, selected.root, selected.project)
       : collectLocalArtifacts(workspaceRoot);
     if (artifacts === null) {
-      return { ...response, state: 'unavailable', reason: 'The artifact inventory belongs to a different project.' };
+      return readResponse(ref, {
+        state: 'unavailable',
+        reason: 'The artifact inventory belongs to a different project.',
+      });
     }
     data = {
       view: 'artifacts',
@@ -415,7 +438,11 @@ export function handleContributionRequest(envelope) {
     }
   }
   const available = readArtifacts ? data.artifacts.length > 0 : data.workspace_status !== 'empty';
-  return { ...response, state: available ? 'ready' : 'empty', workspace_root: workspaceRoot, data };
+  return readResponse(ref, {
+    state: available ? 'ready' : 'empty',
+    workspace_root: workspaceRoot,
+    data,
+  });
 }
 
 async function main() {

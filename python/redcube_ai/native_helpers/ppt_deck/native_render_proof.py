@@ -60,7 +60,7 @@ def renderer_dependency_blocker(
     payload = {
         'error_kind': 'missing_renderer_dependency',
         'typed_blocker_kind': 'missing_renderer_dependency',
-        'renderer_selection': 'opl_probe_then_helper_capability_bind',
+        'renderer_selection': 'helper_local_capability_probe_then_renderer_bind',
         'required_surface': 'native_pptx_true_render_proof',
         'supported_renderers': [
             {
@@ -74,7 +74,7 @@ def renderer_dependency_blocker(
         'fail_closed_when_missing': True,
         'dependency_provisioning_owner': 'opl_connect_or_operator',
         'required_commands': ['soffice', 'pdftoppm'],
-        'probe_surface': 'opl pack native-helper probe',
+        'probe_surface': 'local_native_ppt_renderer_capability_probe',
         'message': message,
         'probes': probes or [],
     }
@@ -109,7 +109,7 @@ def resolve_probed_renderer(probe: dict) -> dict | None:
         'kind': RENDERER_KIND,
         'pipeline': RENDERER_PIPELINE,
         'runtime': RENDERER_KIND,
-        'selection_policy': 'opl_probe_then_helper_capability_bind',
+        'selection_policy': 'helper_local_capability_probe_then_renderer_bind',
         'dependency_provisioning_owner': 'opl_connect_or_operator',
         'soffice': soffice,
         'pdftoppm': pdftoppm,
@@ -130,12 +130,12 @@ def resolve_renderer(renderer_name: str) -> dict:
     reasons = missing_renderer_reasons(*probes)
     fail(renderer_dependency_blocker(
         'native PPT true render proof requires a supported renderer capability; '
-        f'current supported pipeline is {RENDERER_PIPELINE}; resolve the OPL native-helper '
-        f'probe/provisioning blocker before execution: {"; ".join(reasons)}',
+        f'current supported pipeline is {RENDERER_PIPELINE}; resolve the local native PPT '
+        f'renderer probe/provisioning blocker before execution: {"; ".join(reasons)}',
         probes=probes,
     ) if requested == 'auto' else renderer_dependency_blocker(
         'native PPT true render proof requires LibreOffice headless and Poppler for '
-        f'{RENDERER_PIPELINE}: {"; ".join(reasons)}; resolve the OPL native-helper '
+        f'{RENDERER_PIPELINE}: {"; ".join(reasons)}; resolve the local native PPT renderer '
         'probe/provisioning blocker before execution',
         probes=probes,
     ))

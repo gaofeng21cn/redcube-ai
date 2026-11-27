@@ -39,7 +39,7 @@
       "source_refs": [
         "python/redcube_ai/native_helpers/"
       ],
-      "active_caller": "OPL native-helper execution envelope"
+      "active_caller": "tools/native-ppt-proof/run.sh"
     },
     {
       "surface_id": "developer_proofs",

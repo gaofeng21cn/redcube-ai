@@ -22,36 +22,29 @@
     }
   },
   "scope": "Repo-tracked Python helper catalog for native PPT/Office/document automation surfaces.",
-  "typescript_boundary": "RCA declares visual route semantics and implements native helpers; OPL owns generated/hosted StageRun surfaces, catalog resolution, Python environment selection, process lifecycle, timeout, and the JSON execution receipt envelope.",
-  "framework_execution_envelope": {
-    "owner": "opl",
-    "surface": "opl pack native-helper run",
-    "command_shape": "opl pack native-helper run --catalog <catalog.json> --helper <helper_id> --request <request.json> --json",
-    "receipt_surface_kind": "opl_pack_native_helper_execution_receipt",
-    "rca_role": "catalog_declaration_helper_implementation_and_receipt_consumer",
-    "rca_owns_catalog_resolution": false,
-    "rca_owns_python_environment_selection": false,
-    "rca_owns_helper_process_lifecycle": false,
-    "rca_owns_json_execution_envelope": false,
+  "typescript_boundary": "Framework v2 dispatches package contribution requests and orchestrates StageRuns. RCA declares visual routes, native helper modules, and probe descriptors. The native PPT proof runner selects Python, invokes the RCA module, and collects its JSON result.",
+  "execution_model": {
+    "framework_boundary": {
+      "package_contribution_handler": "opl.package.v2 provides.contribution_handler",
+      "native_helper_catalog_loader": false,
+      "native_helper_cli": false
+    },
+    "stage_run_orchestration": {
+      "owner": "opl",
+      "surface": "opl_runway",
+      "stage_manifest_ref": "agent/stages/manifest.json"
+    },
+    "native_helper_catalog_owner": "redcube_ai",
+    "native_helper_catalog_consumers": [
+      "python/redcube_ai/native_helpers/doctor.py",
+      "tools/native-ppt-proof/run.sh"
+    ],
     "opl_owns_visual_truth": false,
     "opl_owns_review_export_verdict": false,
     "opl_owns_artifact_authority": false
   },
   "invocation_policy": {
-    "preferred_internal_invocation": "opl_pack_native_helper_envelope",
-    "preferred_argv_shape": [
-      "opl",
-      "pack",
-      "native-helper",
-      "run",
-      "--catalog",
-      "<catalog.json>",
-      "--helper",
-      "<helper_id>",
-      "--request",
-      "<request.json>",
-      "--json"
-    ],
+    "hosted_workflow_invocation": "opl_runway_task_stage",
     "domain_implementation_shape": "python_package_module",
     "legacy_wrapper_scripts_allowed": false,
     "legacy_wrapper_scripts_are_preferred": false
@@ -202,7 +195,7 @@
       "true_render_proof": {
         "required": true,
         "source_surface_kind": "native_pptx",
-        "renderer_selection_policy": "opl_probe_then_helper_capability_bind",
+        "renderer_selection_policy": "helper_local_capability_probe_then_renderer_bind",
         "user_preinstalled_libreoffice_required": false,
         "renderer_kind": "libreoffice_headless",
         "renderer_pipeline": "libreoffice_headless_pdf_png_v1",
@@ -228,7 +221,7 @@
           }
         ],
         "bootstrap_policy": {
-          "capability_probe": "opl pack native-helper probe",
+          "capability_probe": "local_native_ppt_renderer_capability_probe",
           "automatic_bootstrap_allowed": false,
           "user_preinstall_required": false,
           "dependency_provisioning_owner": "opl_connect_or_operator",

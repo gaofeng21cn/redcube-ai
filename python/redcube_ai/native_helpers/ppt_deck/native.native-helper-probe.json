@@ -17,7 +17,7 @@
         "slot_id": "renderer_version_process",
         "source_ref": "native_render_proof.py",
         "symbol": "command_version",
-        "source_digest": "sha256:ae13e4af2435928785ca404b78eadc92f86a2a8e51afa04652aac7578ef1973a",
+        "source_digest": "sha256:f0121306ff8c8c00b1b0b75f45ccad7c58766feb9c1dbedd3617232d567d68ef",
         "effect_kind": "process_spawn",
         "target_policy": "declared_command_set",
         "allowed_targets": [
@@ -29,7 +29,7 @@
         "slot_id": "render_cleanup_artifact_write",
         "source_ref": "native_render_proof.py",
         "symbol": "clean_render_outputs",
-        "source_digest": "sha256:ae13e4af2435928785ca404b78eadc92f86a2a8e51afa04652aac7578ef1973a",
+        "source_digest": "sha256:f0121306ff8c8c00b1b0b75f45ccad7c58766feb9c1dbedd3617232d567d68ef",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
@@ -38,7 +38,7 @@
         "slot_id": "render_pdf_artifact_write",
         "source_ref": "native_render_proof.py",
         "symbol": "render_pptx_to_pdf",
-        "source_digest": "sha256:ae13e4af2435928785ca404b78eadc92f86a2a8e51afa04652aac7578ef1973a",
+        "source_digest": "sha256:f0121306ff8c8c00b1b0b75f45ccad7c58766feb9c1dbedd3617232d567d68ef",
         "effect_kind": "filesystem_write",
         "target_policy": "declared_artifact_write_slot",
         "allowed_targets": []
@@ -47,7 +47,7 @@
         "slot_id": "render_pdf_process",
         "source_ref": "native_render_proof.py",
         "symbol": "render_pptx_to_pdf",
-        "source_digest": "sha256:ae13e4af2435928785ca404b78eadc92f86a2a8e51afa04652aac7578ef1973a",
+        "source_digest": "sha256:f0121306ff8c8c00b1b0b75f45ccad7c58766feb9c1dbedd3617232d567d68ef",
         "effect_kind": "process_spawn",
         "target_policy": "declared_command_set",
         "allowed_targets": [
@@ -58,7 +58,7 @@
         "slot_id": "render_png_process",
         "source_ref": "native_render_proof.py",
         "symbol": "render_png_from_pdf",
-        "source_digest": "sha256:ae13e4af2435928785ca404b78eadc92f86a2a8e51afa04652aac7578ef1973a",
+        "source_digest": "sha256:f0121306ff8c8c00b1b0b75f45ccad7c58766feb9c1dbedd3617232d567d68ef",
         "effect_kind": "process_spawn",
         "target_policy": "declared_command_set",
         "allowed_targets": [

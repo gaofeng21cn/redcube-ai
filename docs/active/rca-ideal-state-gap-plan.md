@@ -17,8 +17,8 @@
 先读取当前安装的 OPL interface 和完整 Package / executor 状态，再在 owner 授权的 workspace 执行：
 
 ```bash
-opl agents conformance --family-defaults --json
-opl agents run --domain redcube_ai --action invoke_product_entry --workspace <workspace> --payload '{"project_id":"<registered-project-id>"}'
+opl pack inspect . --json
+opl runway start --workspace <workspace-id> --title <title> --goal invoke_product_entry
 ```
 
 conformance 只证明结构投影。实际 StageRun 保留 input identity、artifact refs、

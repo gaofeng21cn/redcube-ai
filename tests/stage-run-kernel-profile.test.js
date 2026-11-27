@@ -259,6 +259,12 @@ test('post-standardization live progress remains a typed blocker until fresh hos
   assert.equal(evidence.evidence_scope, 'post_standardization_owner_chain_refs_only');
   assert.equal(evidence.controlled_fixture_is_live_progress, false);
   assert.equal(liveProgress.status, 'owner_typed_blocker_recorded_not_ready_claim');
+  assert.deepEqual(liveProgress.refs.next_verification_command_refs, [
+    'command:opl pack inspect <rca-package-source> --json',
+    'command:opl runway start --workspace <registered-workspace-id> --agent rca --title <task-title> --goal "Continue visual project <registered-project-id>" --json',
+    'command:opl runway status <task-id> --json',
+    'command:opl ledger receipts <task-id> --json',
+  ]);
   assert.deepEqual(liveProgress.refs.owner_receipt_refs, []);
   assert.deepEqual(liveProgress.refs.quality_or_export_receipt_refs, []);
   assert.deepEqual(liveProgress.refs.no_regression_refs, []);

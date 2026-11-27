@@ -21,8 +21,10 @@
       "docs/architecture.md"
     ],
     "next_verification_command_refs": [
-      "command:opl agents conformance --family-defaults --json",
-      "command:opl agents run --domain redcube_ai --action invoke_product_entry --workspace <workspace> --payload '{\"project_id\":\"<registered-project-id>\"}'"
+      "command:opl pack inspect <rca-package-source> --json",
+      "command:opl runway start --workspace <registered-workspace-id> --agent rca --title <task-title> --goal \"Continue visual project <registered-project-id>\" --json",
+      "command:opl runway status <task-id> --json",
+      "command:opl ledger receipts <task-id> --json"
     ]
   },
   "evidence_items": [
