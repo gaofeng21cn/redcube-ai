@@ -4,6 +4,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 const RESPONSE_SCHEMA = 'opl-package-app-contribution-response.v1';
+const PROJECT_ID = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
 function isWithin(rootDir, targetPath) {
   const rel = path.relative(rootDir, targetPath);
@@ -51,7 +52,7 @@ function resolveRealDirectory(dirPath) {
 }
 
 function resolveWorkspaceRoot(input) {
-  const rawExplicit = input?.workspace_root !== undefined ? input.workspace_root : input?.workspaceRoot;
+  const rawExplicit = input.workspace_root ?? input.workspaceRoot ?? input.workspace_path;
   const hasExplicitValue = rawExplicit !== undefined && rawExplicit !== null && !(typeof rawExplicit === 'string' && rawExplicit.trim().length === 0);
   const envWorkspace = typeof process.env.OPL_PROFILE_WORKSPACE === 'string' ? process.env.OPL_PROFILE_WORKSPACE.trim() : '';
 
@@ -114,25 +115,62 @@ function resolveWorkspaceRoot(input) {
   return { ok: true, workspaceRoot: null };
 }
 
-function selectProjectId(input, indexData) {
-  const explicit = [input?.project_id, input?.projectId].find(
-    (value) => typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(value.trim()),
-  );
-  if (explicit) return explicit.trim();
-  const projects = indexData?.projects;
-  if (projects && typeof projects === 'object' && !Array.isArray(projects)) {
-    const keys = Object.keys(projects);
-    if (keys.length === 1) return keys[0];
+function selectProject(workspaceRoot, input) {
+  const index = readJsonSafe(path.join(workspaceRoot, 'workspace_index.json'), workspaceRoot);
+  const indexed = index?.projects;
+  const identity = input.work_item_identity;
+  const requestedIds = [input.project_id, input.projectId, identity?.domain_work_item_id]
+    .filter((id) => id !== undefined && id !== null);
+  const projectId = requestedIds[0];
+  const identityWorkspace = identity?.workspace_path;
+  if (requestedIds.some((id) => typeof id !== 'string' || !PROJECT_ID.test(id) || id !== projectId)
+      || (identity && (identity.identity_state !== 'resolved' || identity.agent_id !== 'rca'
+        || (identityWorkspace && resolveRealDirectory(identityWorkspace) !== workspaceRoot)))) {
+    return { state: 'unavailable', reason: 'The requested visual task conflicts with the selected workspace.' };
   }
-  return null;
+
+  // Keep direct reads usable in single-project workspaces without a central index.
+  if (indexed === undefined && !projectId) return { project: null, root: workspaceRoot, projects: [] };
+  const rows = Array.isArray(indexed)
+    ? indexed
+    : Object.entries(indexed || {}).map(([project_id, row]) => ({ ...row, project_id }));
+  const projects = rows.filter((row) => typeof row?.project_id === 'string' && PROJECT_ID.test(row.project_id));
+  const matching = projectId
+    ? projects.filter((row) => row.project_id === projectId)
+    : projects;
+  if (!projectId && matching.length > 1) {
+    return {
+      state: 'input_required',
+      reason: 'Select a visual project in this workspace.',
+      input_schema: {
+        type: 'object',
+        required: ['project_id'],
+        properties: {
+          project_id: { type: 'string', title: 'Visual project', enum: matching.map((row) => row.project_id) },
+        },
+      },
+    };
+  }
+
+  const project = matching.length === 1 ? matching[0] : null;
+  if (!project) {
+    return { state: 'unavailable', reason: 'The visual project is not registered in this workspace.' };
+  }
+  const projectRef = project.project_root;
+  const declaredRoot = typeof projectRef === 'string' && !path.isAbsolute(projectRef) && !hasTraversalSegment(projectRef)
+    ? path.resolve(workspaceRoot, projectRef)
+    : null;
+  const root = declaredRoot ? resolveContainedPath(workspaceRoot, declaredRoot) : null;
+  const requestedRoot = input.work_item_root ?? identity?.work_item_root;
+  if (!root || root === workspaceRoot || root !== declaredRoot || !resolveRealDirectory(root)
+      || (requestedRoot && resolveRealDirectory(requestedRoot) !== root)) {
+    return { state: 'unavailable', reason: 'The visual project directory does not match the workspace index.' };
+  }
+  return { project, root, projects: projects.map((row) => row.project_id) };
 }
 
-function collectStatus(workspaceRoot, input) {
-  const indexPath = path.join(workspaceRoot, 'workspace_index.json');
-  const workspacePath = path.join(workspaceRoot, 'workspace.json');
-  const indexData = readJsonSafe(indexPath, workspaceRoot);
-  const workspaceData = readJsonSafe(workspacePath, workspaceRoot);
-  const projectId = selectProjectId(input, indexData);
+function collectStatus(workspaceRoot, { project, root, projects }) {
+  const workspaceData = readJsonSafe(path.join(root, 'workspace.json'), root);
 
   const stages = [];
   if (Array.isArray(workspaceData?.stages)) {
@@ -141,8 +179,8 @@ function collectStatus(workspaceRoot, input) {
     }
   }
 
-  const runtimeStateDir = path.join(workspaceRoot, 'runtime-state');
-  const safeRuntimeStateDir = resolveContainedPath(workspaceRoot, runtimeStateDir);
+  const runtimeStateDir = path.join(root, 'runtime-state');
+  const safeRuntimeStateDir = resolveContainedPath(root, runtimeStateDir);
   if (safeRuntimeStateDir) {
     let isDir = false;
     try {
@@ -154,7 +192,7 @@ function collectStatus(workspaceRoot, input) {
       for (const entry of fs.readdirSync(safeRuntimeStateDir, { withFileTypes: true })) {
         if (!entry.name.endsWith('.json')) continue;
         const full = path.join(safeRuntimeStateDir, entry.name);
-        const doc = readJsonSafe(full, workspaceRoot);
+        const doc = readJsonSafe(full, root);
         if (doc && typeof doc === 'object' && Array.isArray(doc.stages)) {
           for (const stage of doc.stages) {
             if (stage && typeof stage === 'object') stages.push(stage);
@@ -164,35 +202,62 @@ function collectStatus(workspaceRoot, input) {
     }
   }
 
-  const projects =
-    indexData?.projects && typeof indexData.projects === 'object' && !Array.isArray(indexData.projects)
-      ? Object.keys(indexData.projects)
-      : [];
+  const pointerRef = project?.current_stage_pointer_ref;
+  const pointer = typeof pointerRef === 'string' && !path.isAbsolute(pointerRef) && !hasTraversalSegment(pointerRef)
+    ? readJsonSafe(path.resolve(workspaceRoot, pointerRef), root)
+    : null;
+  const currentStage = pointer?.surface_kind === 'opl_current_stage_pointer' && pointer.project_id === project.project_id
+    ? pointer.current_stage
+    : null;
+  const stageId = currentStage?.stage_id ?? project?.current_stage_id;
+  if (typeof stageId === 'string' && !stages.some((stage) => stage.stage_id === stageId)) {
+    stages.push({ stage_id: stageId, status: currentStage?.status ?? project?.current_stage_status });
+  }
 
-  const hasData = stages.length > 0 || projects.length > 0 || workspaceData !== null;
+  const status = project?.business_status ?? project?.lifecycle?.status ?? workspaceData?.status;
   return {
-    schema_version: RESPONSE_SCHEMA,
-    ok: true,
-    state: hasData ? 'ready' : 'empty',
-    package_id: 'rca',
-    ref: 'rca.workspace.v1#status',
-    workspace_root: workspaceRoot,
-    data: {
-      view: 'progress',
-      project_id: projectId,
-      projects,
-      stages,
-      workspace_status: workspaceData?.status ?? (hasData ? 'active' : 'empty'),
-    },
+    view: 'progress',
+    project_id: project?.project_id ?? null,
+    projects,
+    stages,
+    workspace_status: status ?? (stages.length || workspaceData || project ? 'active' : 'empty'),
   };
 }
 
-function collectArtifacts(workspaceRoot, input) {
-  const indexPath = path.join(workspaceRoot, 'workspace_index.json');
-  const indexData = readJsonSafe(indexPath, workspaceRoot);
-  const projectId = selectProjectId(input, indexData);
-  const artifacts = [];
+function readRegisteredArtifacts(workspaceRoot, projectRoot, project) {
+  const projection = readJsonSafe(path.join(projectRoot, 'control/opl/artifact_lifecycle/output_lifecycle.json'), projectRoot);
+  if (!projection) return [];
+  if (projection.surface_kind !== 'opl_workspace_output_lifecycle'
+      || projection.project_id !== project.project_id
+      || typeof projection.project_root !== 'string'
+      || resolveContainedPath(workspaceRoot, path.resolve(workspaceRoot, projection.project_root)) !== projectRoot) {
+    return null;
+  }
+  const artifacts = new Map();
+  for (const source of [projection.artifacts, projection.current_refs]) {
+    if (!Array.isArray(source)) continue;
+    for (const entry of source) {
+      const ref = entry?.ref;
+      if (typeof ref !== 'string' || path.isAbsolute(ref) || hasTraversalSegment(ref)) continue;
+      const filePath = path.resolve(workspaceRoot, ref);
+      if (filePath === projectRoot || !isWithin(projectRoot, filePath)) continue;
+      const realPath = resolveContainedPath(projectRoot, filePath);
+      if (!realPath) continue;
+      artifacts.set(ref, {
+        id: ref,
+        name: path.basename(ref),
+        path: realPath,
+        source_ref: ref,
+        kind: entry.kind ?? 'file',
+        status: entry.exists === false ? 'unavailable' : 'recorded',
+      });
+    }
+  }
+  return [...artifacts.values()];
+}
 
+function collectLocalArtifacts(workspaceRoot) {
+  const artifacts = [];
   for (const folderName of ['artifacts', 'deliverables']) {
     const dirPath = path.join(workspaceRoot, folderName);
     const safeDir = resolveContainedPath(workspaceRoot, dirPath);
@@ -224,19 +289,7 @@ function collectArtifacts(workspaceRoot, input) {
     }
   }
 
-  return {
-    schema_version: RESPONSE_SCHEMA,
-    ok: true,
-    state: artifacts.length > 0 ? 'ready' : 'empty',
-    package_id: 'rca',
-    ref: 'rca.workspace.v1#artifacts',
-    workspace_root: workspaceRoot,
-    data: {
-      view: 'artifacts',
-      project_id: projectId,
-      artifacts,
-    },
-  };
+  return artifacts;
 }
 
 export function handleContributionRequest(envelope) {
@@ -331,9 +384,38 @@ export function handleContributionRequest(envelope) {
     };
   }
 
-  return ref.endsWith('#artifacts')
-    ? collectArtifacts(workspaceRoot, input)
-    : collectStatus(workspaceRoot, input);
+  const selected = selectProject(workspaceRoot, input);
+  const response = { schema_version: RESPONSE_SCHEMA, ok: true, package_id: 'rca', ref };
+  if (selected.state) return { ...response, ...selected };
+
+  const readArtifacts = ref.endsWith('#artifacts');
+  let data;
+  if (readArtifacts) {
+    const artifacts = selected.project
+      ? readRegisteredArtifacts(workspaceRoot, selected.root, selected.project)
+      : collectLocalArtifacts(workspaceRoot);
+    if (artifacts === null) {
+      return { ...response, state: 'unavailable', reason: 'The artifact inventory belongs to a different project.' };
+    }
+    data = {
+      view: 'artifacts',
+      project_id: selected.project?.project_id ?? null,
+      artifacts,
+      items: artifacts,
+    };
+  } else {
+    data = collectStatus(workspaceRoot, selected);
+    if (selected.project) {
+      data.items = [{
+        id: selected.project.project_id,
+        title: selected.project.title ?? selected.project.project_id,
+        status: data.workspace_status,
+        stages: data.stages,
+      }];
+    }
+  }
+  const available = readArtifacts ? data.artifacts.length > 0 : data.workspace_status !== 'empty';
+  return { ...response, state: available ? 'ready' : 'empty', workspace_root: workspaceRoot, data };
 }
 
 async function main() {

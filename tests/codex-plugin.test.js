@@ -127,6 +127,85 @@ test('RCA contribution_handler reports unavailable when unconfigured and reads r
   assert.equal(execRes.state, 'unsupported_action');
 });
 
+test('RCA contribution reads the selected existing project and its registered outputs', () => {
+  const workspace = mkUserScopedTestWorkspace('redcube-registered-projects-');
+  const projects = ['deck-a', 'deck-b'].map((project_id) => ({
+    project_id,
+    project_root: 'projects/' + project_id,
+    current_stage_pointer_ref: 'projects/' + project_id + '/artifacts/stage_outputs/current_stage.json',
+  }));
+  writeFileSync(path.join(workspace, 'workspace_index.json'), JSON.stringify({ projects }));
+  for (const project of projects) {
+    const root = path.join(workspace, project.project_root);
+    mkdirSync(path.join(root, 'artifacts/stage_outputs'), { recursive: true });
+    mkdirSync(path.join(root, 'control/opl/artifact_lifecycle'), { recursive: true });
+    writeFileSync(path.join(workspace, project.current_stage_pointer_ref), JSON.stringify({
+      surface_kind: 'opl_current_stage_pointer',
+      project_id: project.project_id,
+      current_stage: {
+        stage_id: project.project_id === 'deck-a' ? 'visual_direction' : 'export',
+        status: 'completed',
+      },
+    }));
+    writeFileSync(path.join(root, 'artifacts', 'deck.pptx'), 'registered deck');
+    writeFileSync(path.join(root, 'artifacts', 'scratch.pptx'), 'unregistered draft');
+    writeFileSync(path.join(root, 'control/opl/artifact_lifecycle/output_lifecycle.json'), JSON.stringify({
+      surface_kind: 'opl_workspace_output_lifecycle',
+      project_id: project.project_id,
+      project_root: project.project_root,
+      artifacts: [
+        { ref: project.project_root + '/artifacts/deck.pptx', exists: true },
+        { ref: 'projects/deck-b/artifacts/deck.pptx', exists: true },
+      ],
+    }));
+  }
+
+  function read(view, input = {}) {
+    const result = spawnSync(process.execPath, ['agent/tools/app-contribution.mjs'], {
+      cwd: repoRoot,
+      input: JSON.stringify({
+        schema_version: 'opl-package-app-contribution-request.v1',
+        operation: 'read',
+        package_id: 'rca',
+        ref: 'rca.workspace.v1#' + view,
+        input,
+      }),
+      encoding: 'utf8',
+      env: { ...process.env, OPL_PROFILE_WORKSPACE: workspace },
+    });
+    assert.equal(result.status, 0, result.stderr);
+    return JSON.parse(result.stdout);
+  }
+
+  const choices = read('status');
+  assert.equal(choices.state, 'input_required');
+  assert.deepEqual(choices.input_schema.properties.project_id.enum, ['deck-a', 'deck-b']);
+
+  const selection = {
+    workspace_path: workspace,
+    work_item_identity: {
+      identity_state: 'resolved',
+      agent_id: 'rca',
+      domain_work_item_id: 'deck-a',
+      workspace_path: workspace,
+      work_item_root: path.join(workspace, 'projects/deck-a'),
+    },
+  };
+  const status = read('status', selection);
+  assert.equal(status.state, 'ready');
+  assert.equal(status.data.project_id, 'deck-a');
+  assert.deepEqual(status.data.stages, [{ stage_id: 'visual_direction', status: 'completed' }]);
+
+  const artifacts = read('artifacts', selection);
+  assert.equal(artifacts.state, 'ready');
+  assert.deepEqual(artifacts.data.items.map((item) => item.source_ref), ['projects/deck-a/artifacts/deck.pptx']);
+  assert.equal(read('artifacts', { project_id: 'missing' }).state, 'unavailable');
+  assert.equal(read('artifacts', { ...selection, project_id: 'deck-b' }).state, 'unavailable');
+
+  const second = read('artifacts', { project_id: 'deck-b' });
+  assert.deepEqual(second.data.items.map((item) => item.source_ref), ['projects/deck-b/artifacts/deck.pptx']);
+});
+
 test('RCA contribution_handler blocks path traversal, outside OPL_PROFILE_WORKSPACE, and symlink escapes', () => {
   const runCli = (envelope, envOverrides = {}) => {
     const res = spawnSync(process.execPath, ['agent/tools/app-contribution.mjs'], {
