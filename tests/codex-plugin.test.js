@@ -66,6 +66,9 @@ test('RCA contribution_handler reports unavailable when unconfigured and reads r
     input: {},
   });
   assert.equal(unconfigured.ok, true);
+  assert.equal(unconfigured.operation, 'read');
+  assert.equal(unconfigured.ref, 'rca.workspace.v1#status');
+  assert.equal(unconfigured.result.state, 'unavailable');
   assert.equal(unconfigured.state, 'unavailable');
   assert.equal(unconfigured.reason, 'workspace_not_configured');
 
@@ -92,6 +95,9 @@ test('RCA contribution_handler reports unavailable when unconfigured and reads r
   assert.equal(statusRes.status, 0, statusRes.stderr);
   const statusBody = JSON.parse(statusRes.stdout);
   assert.equal(statusBody.ok, true);
+  assert.equal(statusBody.operation, 'read');
+  assert.equal(statusBody.ref, 'rca.workspace.v1#status');
+  assert.equal(statusBody.result.state, 'ready');
   assert.equal(statusBody.state, 'ready');
   assert.equal(statusBody.data.stages.length, 1);
   assert.equal(statusBody.data.stages[0].stage_id, 'visual_direction');
@@ -111,6 +117,9 @@ test('RCA contribution_handler reports unavailable when unconfigured and reads r
   assert.equal(artifactsRes.status, 0, artifactsRes.stderr);
   const artifactsBody = JSON.parse(artifactsRes.stdout);
   assert.equal(artifactsBody.ok, true);
+  assert.equal(artifactsBody.operation, 'read');
+  assert.equal(artifactsBody.ref, 'rca.workspace.v1#artifacts');
+  assert.equal(artifactsBody.result.state, 'ready');
   assert.equal(artifactsBody.state, 'ready');
   assert.deepEqual(artifactsBody.data.artifacts, [
     { name: 'deck.pptx', path: 'artifacts/deck.pptx', kind: 'file' },
@@ -125,6 +134,19 @@ test('RCA contribution_handler reports unavailable when unconfigured and reads r
   });
   assert.equal(execRes.ok, false);
   assert.equal(execRes.state, 'unsupported_action');
+  assert.equal(execRes.operation, 'execute');
+  assert.equal(execRes.ref, 'rca.noop');
+});
+
+test('RCA contribution handler rejects non-v2 request identities', () => {
+  for (const request of [
+    { schema_version: 'opl-package-app-contribution-request.v0', package_id: 'rca', operation: 'read', ref: 'rca.workspace.v1#status' },
+    { schema_version: 'opl-package-app-contribution-request.v1', package_id: 'other', operation: 'read', ref: 'rca.workspace.v1#status' },
+  ]) {
+    const response = handleContributionRequest(request);
+    assert.equal(response.ok, false);
+    assert.equal(response.error.code, 'INVALID_REQUEST');
+  }
 });
 
 test('RCA contribution reads the selected existing project and its registered outputs', () => {
@@ -179,6 +201,9 @@ test('RCA contribution reads the selected existing project and its registered ou
 
   const choices = read('status');
   assert.equal(choices.state, 'input_required');
+  assert.equal(choices.operation, 'read');
+  assert.equal(choices.ref, 'rca.workspace.v1#status');
+  assert.equal(choices.result.state, 'input_required');
   assert.deepEqual(choices.input_schema.properties.project_id.enum, ['deck-a', 'deck-b']);
 
   const selection = {
@@ -193,11 +218,15 @@ test('RCA contribution reads the selected existing project and its registered ou
   };
   const status = read('status', selection);
   assert.equal(status.state, 'ready');
+  assert.equal(status.result.state, 'ready');
   assert.equal(status.data.project_id, 'deck-a');
   assert.deepEqual(status.data.stages, [{ stage_id: 'visual_direction', status: 'completed' }]);
 
   const artifacts = read('artifacts', selection);
   assert.equal(artifacts.state, 'ready');
+  assert.equal(artifacts.operation, 'read');
+  assert.equal(artifacts.ref, 'rca.workspace.v1#artifacts');
+  assert.equal(artifacts.result.state, 'ready');
   assert.deepEqual(artifacts.data.items.map((item) => item.source_ref), ['projects/deck-a/artifacts/deck.pptx']);
   assert.equal(read('artifacts', { project_id: 'missing' }).state, 'unavailable');
   assert.equal(read('artifacts', { ...selection, project_id: 'deck-b' }).state, 'unavailable');

@@ -164,8 +164,11 @@ if not doctor.get("renderer_availability", {}).get("linux_native_proof", {}).get
 package_identity = package_manifest.get("identity", {})
 if package_identity.get("id") != "rca" or package_identity.get("intent") != "agent":
     failures.append("RCA package manifest identity mismatch")
-if helper_catalog.get("framework_execution_envelope", {}).get("owner") != "opl":
-    failures.append("native helper execution envelope must be OPL-owned")
+execution_model = helper_catalog.get("execution_model", {})
+if execution_model.get("stage_run_orchestration", {}).get("owner") != "opl":
+    failures.append("native helper hosted StageRun must be OPL-owned")
+if execution_model.get("framework_boundary", {}).get("native_helper_cli") is not False:
+    failures.append("native helper catalog must not claim a Framework CLI")
 if helper_catalog.get("bypass_policy", {}).get("required_entry_surface") != "OPL-hosted RCA StageRun action with RCA authority receipt boundary":
     failures.append("native helper required entry surface mismatch")
 if proof_lane.get("default_enabled") is not False:
@@ -204,7 +207,7 @@ summary = {
         "version": package_identity.get("version"),
     },
     "native_helper_contract": {
-        "execution_envelope_owner": helper_catalog.get("framework_execution_envelope", {}).get("owner"),
+        "hosted_stage_run_owner": execution_model.get("stage_run_orchestration", {}).get("owner"),
         "required_entry_surface": helper_catalog.get("bypass_policy", {}).get("required_entry_surface"),
     },
     "native_proof_lane": {

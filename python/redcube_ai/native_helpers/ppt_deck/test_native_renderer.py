@@ -45,7 +45,7 @@ class NativePptLibreOfficeRendererTest(unittest.TestCase):
 
         self.assertEqual(renderer['kind'], 'libreoffice_headless')
         self.assertEqual(renderer['pipeline'], 'libreoffice_headless_pdf_png_v1')
-        self.assertEqual(renderer['selection_policy'], 'opl_probe_then_helper_capability_bind')
+        self.assertEqual(renderer['selection_policy'], 'helper_local_capability_probe_then_renderer_bind')
         self.assertEqual(renderer['dependency_provisioning_owner'], 'opl_connect_or_operator')
         self.assertEqual(len(run.call_args_list), 2)
         self.assertNotIn('bootstrap_policy', renderer)
@@ -62,7 +62,7 @@ class NativePptLibreOfficeRendererTest(unittest.TestCase):
             native.resolve_renderer('auto')
         message = ''.join(call.args[0] for call in stderr.write.call_args_list if call.args)
         self.assertIn('missing_renderer_dependency', message)
-        self.assertIn('opl pack native-helper probe', message)
+        self.assertIn('local_native_ppt_renderer_capability_probe', message)
         self.assertIn('opl_connect_or_operator', message)
         self.assertIn('libreoffice_headless_pdf_png_v1', message)
         run.assert_not_called()
@@ -81,7 +81,7 @@ class NativePptLibreOfficeRendererTest(unittest.TestCase):
         message = ''.join(call.args[0] for call in stderr.write.call_args_list if call.args)
         self.assertIn('pdftoppm', message)
         self.assertIn('Poppler', message)
-        self.assertIn('OPL native-helper probe/provisioning', message)
+        self.assertIn('local native PPT renderer probe/provisioning', message)
 
     def test_renderer_resolves_macos_homebrew_cask_libreoffice_app_path(self):
         with tempfile.TemporaryDirectory() as temp_dir:

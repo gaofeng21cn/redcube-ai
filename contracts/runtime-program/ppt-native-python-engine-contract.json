@@ -131,7 +131,7 @@
   "true_render_proof": {
     "required": true,
     "source_surface_kind": "native_pptx",
-    "renderer_selection_policy": "opl_probe_then_helper_capability_bind",
+    "renderer_selection_policy": "helper_local_capability_probe_then_renderer_bind",
     "user_preinstalled_libreoffice_required": false,
     "renderer_kind": "libreoffice_headless",
     "renderer_pipeline": "libreoffice_headless_pdf_png_v1",
@@ -157,7 +157,7 @@
       }
     ],
     "bootstrap_policy": {
-      "capability_probe": "opl pack native-helper probe",
+      "capability_probe": "local_native_ppt_renderer_capability_probe",
       "automatic_bootstrap_allowed": false,
       "user_preinstall_required": false,
       "dependency_provisioning_owner": "opl_connect_or_operator",

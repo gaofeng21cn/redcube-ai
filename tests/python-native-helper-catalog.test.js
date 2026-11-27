@@ -25,7 +25,7 @@ function pythonEnv() {
   };
 }
 
-test('Python native helper catalog exposes only RCA artifact helpers behind OPL execution', () => {
+test('Python native helper catalog declares RCA modules and the Runway boundary', () => {
   const catalog = readJson('contracts/runtime-program/python-native-helper-catalog.json');
   const pyproject = fs.readFileSync(path.join(repoRoot, 'pyproject.toml'), 'utf8');
 
@@ -33,6 +33,11 @@ test('Python native helper catalog exposes only RCA artifact helpers behind OPL 
   assert.equal(catalog.language, 'python');
   assert.equal(catalog.bypass_policy.generic_bypass_allowed, false);
   assert.match(catalog.bypass_policy.required_entry_surface, /OPL-hosted/i);
+  assert.equal(catalog.execution_model.framework_boundary.native_helper_cli, false);
+  assert.equal(catalog.execution_model.framework_boundary.native_helper_catalog_loader, false);
+  assert.equal(catalog.execution_model.stage_run_orchestration.owner, 'opl');
+  assert.equal(catalog.execution_model.native_helper_catalog_owner, 'redcube_ai');
+  assert.equal(catalog.invocation_policy.domain_implementation_shape, 'python_package_module');
   assert.deepEqual(catalog.helpers.map((entry) => entry.helper_id), [
     'ppt_deck_review',
     'ppt_deck_export',

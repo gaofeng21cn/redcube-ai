@@ -80,7 +80,7 @@ stdout 回执包含 `package_readback` 和可选 `pdf_readback`，绑定实际�
 
 `ppt_review_evidence` 是只读 OPL native helper，用于解码真实图像、核验声明哈希与来源集合、绑定首图观察并统计生成次数、耗时与已知成本，但不作内容、审美或 ready 判定；未审与未选保持 `null`，重复字节保留全部记录而不反推选中项。
 
-清单使用 `schema_version: rca.ppt-review-evidence.v1`、`evidence_kind: rendered_images` 与非空 `pages` 数组（每页含 `slide_id`、`variant`、`source_page_ids`、`generations`、`references`、`first_review` 与可选 `selected_image_sha256`）。`references` 仅允许 `content`、`style`、`anatomy`、`verified_asset` 或 `neighbor`；首图必须在 `refinement` / `repair` 之前且 `first_review` 绑定该首图。通过 `opl pack native-helper run`（依据 `contracts/runtime-program/python-native-helper-catalog.json` 中的 `ppt_review_evidence`）传参 `--manifest <manifest.json> --asset-root <authorized evaluation asset root>`（及回读时的 `--expected-revision <revision>`）调用；共享 `rca.workspace.artifacts` 视图仍消费原任务产物定位，人类决策经 Framework 任务动作提交并回读。
+清单使用 `schema_version: rca.ppt-review-evidence.v1`、`evidence_kind: rendered_images` 与非空 `pages` 数组（每页含 `slide_id`、`variant`、`source_page_ids`、`generations`、`references`、`first_review` 与可选 `selected_image_sha256`）。`references` 仅允许 `content`、`style`、`anatomy`、`verified_asset` 或 `neighbor`；首图必须在 `refinement` / `repair` 之前且 `first_review` 绑定该首图。通过 `python -m redcube_ai.native_helpers.ppt_deck.review_evidence`（依据 `contracts/runtime-program/python-native-helper-catalog.json` 中的 `ppt_review_evidence`）传参 `--manifest <manifest.json> --asset-root <authorized evaluation asset root>`（及回读时的 `--expected-revision <revision>`）调用；共享 `rca.workspace.artifacts` 视图仍消费原任务产物定位，人类决策经 Framework 任务动作提交并回读。
 
 ## 验证与收口
 

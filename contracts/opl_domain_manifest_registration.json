@@ -45,7 +45,7 @@
   "consumed_by": [
     "OPL workspace bind",
     "OPL domain manifest resolver",
-    "OPL agents pack-compiler",
+    "OPL Pack compiler",
     "OPL generated interface bundle"
   ],
   "provided_outputs": [
